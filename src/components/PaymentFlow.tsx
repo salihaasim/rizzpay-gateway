@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 
 const PaymentFlow = () => {
   const [step, setStep] = useState(1);
@@ -25,7 +23,6 @@ const PaymentFlow = () => {
     paymentStatus: ''
   });
 
-  // Generate a random transaction ID when component mounts
   useEffect(() => {
     const randomId = 'RIZZPAY' + Math.floor(Math.random() * 10000000);
     setPaymentData(prev => ({
@@ -45,7 +42,6 @@ const PaymentFlow = () => {
 
   const handleNext = () => {
     if (step === 1) {
-      // Validate first step
       if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
         toast.error('Please enter a valid amount');
         return;
@@ -68,20 +64,16 @@ const PaymentFlow = () => {
         return;
       }
       
-      // Start payment flow
       initiatePayment();
     }
   };
 
-  // Initiate payment based on selected method
   const initiatePayment = () => {
     setLoading(true);
     
-    // Simulate payment processing
     setTimeout(() => {
       setLoading(false);
       
-      // Set payment status (success for demo)
       setPaymentData(prev => ({
         ...prev,
         paymentStatus: 'success'
@@ -92,7 +84,6 @@ const PaymentFlow = () => {
     }, 2000);
   };
 
-  // Get currency symbol based on selected currency
   const getCurrencySymbol = (currency: string) => {
     switch (currency) {
       case 'INR': return '₹';
@@ -102,19 +93,17 @@ const PaymentFlow = () => {
     }
   };
 
-  // Create UPI payment link
   const getUpiPaymentLink = () => {
     if (!paymentData.upiId) return '';
     
     const amount = paymentData.amount;
-    const upiId = paymentData.upiId;
-    const txnId = paymentData.transactionId;
-    const purpose = paymentData.purpose || 'Payment via Rizzpay';
+    const upiId = encodeURIComponent(paymentData.upiId);
+    const txnId = encodeURIComponent(paymentData.transactionId);
+    const purpose = encodeURIComponent(paymentData.purpose || 'Payment via Rizzpay');
     
-    return `upi://pay?pa=${upiId}&pn=Rizzpay&am=${amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(purpose)}&tr=${txnId}`;
+    return `upi://pay?pa=${upiId}&pn=Rizzpay&am=${amount}&cu=${paymentData.currency}&tn=${purpose}&tr=${txnId}`;
   };
 
-  // Handle UPI payment
   const handleUpiPayment = () => {
     if (!validateUpiId(paymentData.upiId)) {
       toast.error('Please enter a valid UPI ID');
@@ -123,26 +112,27 @@ const PaymentFlow = () => {
 
     const upiUrl = getUpiPaymentLink();
     
-    // Check if mobile device to open UPI app
     if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      window.location.href = upiUrl;
-      
-      // Set timer to check payment status (for demo, we'll assume success)
-      setLoading(true);
-      setTimeout(() => {
+      try {
+        window.location.href = upiUrl;
+        
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          setStep(3);
+          setPaymentData(prev => ({
+            ...prev,
+            paymentStatus: 'success'
+          }));
+          toast.success(`Payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount} successful!`);
+        }, 3000);
+      } catch (error) {
         setLoading(false);
-        setStep(3);
-        setPaymentData(prev => ({
-          ...prev,
-          paymentStatus: 'success'
-        }));
-        toast.success(`Payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount} successful!`);
-      }, 3000);
+        toast.error("Error opening Google Pay. Please try another payment method.");
+      }
     } else {
-      // For desktop, show the UPI ID and info for manual payment
       toast.info("Scan the QR code with your UPI app or use your mobile device");
       
-      // For demo purposes
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
@@ -156,18 +146,24 @@ const PaymentFlow = () => {
     }
   };
 
-  // Copy UPI ID to clipboard
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    toast.success('Copied to clipboard!');
-    
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+  const getUpiQrCodeUrl = () => {
+    const upiUrl = encodeURIComponent(getUpiPaymentLink());
+    return `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${upiUrl}&choe=UTF-8`;
   };
 
-  // Validate UPI ID format
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      toast.success('Copied to clipboard!');
+      
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    }).catch(() => {
+      toast.error('Failed to copy. Please try again.');
+    });
+  };
+
   const validateUpiId = (value: string) => {
     if (!value) return false;
     const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
@@ -308,7 +304,18 @@ const PaymentFlow = () => {
                       </div>
                       <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okaxis, name@ybl)</p>
                     </div>
+                    
+                    {paymentData.upiId && validateUpiId(paymentData.upiId) && (
+                      <div className="mt-4">
+                        <p className="text-sm font-medium mb-2">Scan QR Code</p>
+                        <div className="bg-white p-2 rounded-lg inline-block">
+                          <img src={getUpiQrCodeUrl()} alt="UPI QR Code" width={200} height={200} />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">Scan this QR code with any UPI app</p>
+                      </div>
+                    )}
                   </div>
+                  
                   <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={handleUpiPayment}>
                     <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
                       <Smartphone className="h-6 w-6 text-primary" />
@@ -386,7 +393,15 @@ const PaymentFlow = () => {
             <div className="bg-secondary rounded-lg p-4 max-w-xs mx-auto">
               <div className="flex justify-between mb-2">
                 <span className="text-muted-foreground">Transaction ID:</span>
-                <span className="font-medium">{paymentData.transactionId}</span>
+                <div className="flex items-center">
+                  <span className="font-medium mr-2 text-sm truncate max-w-[120px]">{paymentData.transactionId}</span>
+                  <button 
+                    onClick={() => copyToClipboard(paymentData.transactionId)}
+                    className="text-primary hover:text-primary/80"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
               <div className="flex justify-between mb-2">
                 <span className="text-muted-foreground">Amount:</span>
@@ -439,7 +454,6 @@ const PaymentFlow = () => {
               upiId: '',
               purpose: '',
               paymentStatus: '',
-              // Generate a new transaction ID
               transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000)
             }));
           }} className="rounded-full px-6">
