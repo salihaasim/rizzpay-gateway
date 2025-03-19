@@ -5,7 +5,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowRight, Loader2, CreditCard } from 'lucide-react';
+import { ArrowRight, Loader2, CreditCard, Smartphone } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const PaymentFlow = () => {
   const [step, setStep] = useState(1);
@@ -13,7 +15,21 @@ const PaymentFlow = () => {
   const [formData, setFormData] = useState({
     amount: '',
     currency: 'INR',
-    paymentMethod: 'upi'
+    paymentMethod: 'upi',
+    upiId: '',
+    name: '',
+    email: '',
+  });
+
+  const form = useForm({
+    defaultValues: {
+      amount: '',
+      currency: 'INR',
+      paymentMethod: 'upi',
+      upiId: '',
+      name: '',
+      email: '',
+    }
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,13 +49,56 @@ const PaymentFlow = () => {
       }
       setStep(2);
     } else if (step === 2) {
+      if (formData.paymentMethod === 'upi' && !formData.upiId) {
+        toast.error('Please enter UPI ID');
+        return;
+      }
+      
       // Simulate payment processing
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
         setStep(3);
+        // After successful payment
+        toast.success(`Payment of ₹${formData.amount} successful!`);
       }, 1500);
     }
+  };
+
+  // Open UPI app for payment
+  const handleUpiPayment = () => {
+    if (!formData.upiId) {
+      toast.error('Please enter UPI ID');
+      return;
+    }
+
+    const amount = formData.amount;
+    const upiId = formData.upiId;
+
+    // Create UPI payment link
+    const upiUrl = `upi://pay?pa=${upiId}&pn=Rizzpay&am=${amount}&cu=INR&tn=Payment%20for%20order`;
+    
+    // Check if mobile device to open UPI app
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.location.href = upiUrl;
+    } else {
+      // For desktop, show QR code or ask to enter UPI ID manually
+      console.log("UPI URL for QR code:", upiUrl);
+      toast.info("Scan the QR code with your UPI app or use your mobile device");
+      
+      // Simulate payment for demo purpose
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        setStep(3);
+        toast.success(`Payment of ₹${formData.amount} successful!`);
+      }, 1500);
+    }
+  };
+
+  const validateUpiId = (value: string) => {
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    return upiRegex.test(value) || "Please enter a valid UPI ID (e.g., name@upi)";
   };
 
   return (
@@ -61,6 +120,7 @@ const PaymentFlow = () => {
                   onChange={handleInputChange}
                   placeholder="Enter amount"
                   className="pl-8"
+                  type="number"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
               </div>
@@ -99,6 +159,27 @@ const PaymentFlow = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Your Name</label>
+              <Input
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter your name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter your email"
+                type="email"
+              />
+            </div>
           </div>
         )}
         
@@ -110,16 +191,87 @@ const PaymentFlow = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="text-sm font-medium mb-2">Google Pay (UPI)</div>
-              <div className="rounded-lg border p-4 flex items-center">
-                <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                  <CreditCard className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <div className="font-medium">Pay with Google Pay</div>
-                  <div className="text-sm text-muted-foreground">Quick, secure UPI payment</div>
-                </div>
-              </div>
+              {formData.paymentMethod === 'upi' && (
+                <>
+                  <div className="text-sm font-medium mb-2">Google Pay (UPI)</div>
+                  <div className="rounded-lg border p-4">
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium">UPI ID</label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          name="upiId"
+                          value={formData.upiId}
+                          onChange={handleInputChange}
+                          placeholder="yourname@upi"
+                          className="flex-1"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okhdfcbank, name@ybl)</p>
+                    </div>
+                  </div>
+                  <div className="rounded-lg border p-4 flex items-center">
+                    <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                      <Smartphone className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-medium">Pay with Google Pay</div>
+                      <div className="text-sm text-muted-foreground">Quick, secure UPI payment</div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.paymentMethod === 'card' && (
+                <>
+                  <div className="text-sm font-medium mb-2">Credit/Debit Card</div>
+                  <div className="rounded-lg border p-4">
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Card Number</label>
+                        <Input placeholder="1234 5678 9012 3456" className="flex-1" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Expiry Date</label>
+                          <Input placeholder="MM/YY" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">CVV</label>
+                          <Input placeholder="123" type="password" maxLength={3} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Card Holder Name</label>
+                        <Input placeholder="Name on card" value={formData.name} />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.paymentMethod === 'netbanking' && (
+                <>
+                  <div className="text-sm font-medium mb-2">Net Banking</div>
+                  <div className="rounded-lg border p-4">
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium">Select Bank</label>
+                      <Select defaultValue="hdfc">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Bank" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hdfc">HDFC Bank</SelectItem>
+                          <SelectItem value="sbi">State Bank of India</SelectItem>
+                          <SelectItem value="icici">ICICI Bank</SelectItem>
+                          <SelectItem value="axis">Axis Bank</SelectItem>
+                          <SelectItem value="kotak">Kotak Mahindra Bank</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">You will be redirected to the bank's website to complete the payment</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -134,7 +286,7 @@ const PaymentFlow = () => {
             <div className="bg-secondary rounded-lg p-4 max-w-xs mx-auto">
               <div className="flex justify-between mb-2">
                 <span className="text-muted-foreground">Transaction ID:</span>
-                <span className="font-medium">UPI87654321</span>
+                <span className="font-medium">UPI{Math.floor(Math.random() * 10000000)}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span className="text-muted-foreground">Amount:</span>
@@ -157,7 +309,11 @@ const PaymentFlow = () => {
         )}
         
         {step === 2 && (
-          <Button onClick={handleNext} disabled={loading} className="rounded-full px-6">
+          <Button 
+            onClick={formData.paymentMethod === 'upi' ? handleUpiPayment : handleNext} 
+            disabled={loading} 
+            className="rounded-full px-6 w-full"
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
@@ -173,7 +329,14 @@ const PaymentFlow = () => {
         {step === 3 && (
           <Button variant="outline" onClick={() => {
             setStep(1);
-            setFormData({ amount: '', currency: 'INR', paymentMethod: 'upi' });
+            setFormData({ 
+              amount: '', 
+              currency: 'INR', 
+              paymentMethod: 'upi',
+              upiId: '',
+              name: '',
+              email: '' 
+            });
           }} className="rounded-full px-6">
             Make Another Payment
           </Button>
