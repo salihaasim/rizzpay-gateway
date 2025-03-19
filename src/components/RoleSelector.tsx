@@ -32,11 +32,11 @@ const roles = [
   }
 ];
 
-// Demo credentials for each role
+// Demo credentials - simplified for easier login
 const demoCredentials = {
-  admin: { username: 'admin@rizzpay.com', password: 'admin123' },
-  merchant: { username: 'merchant@rizzpay.com', password: 'merchant123' },
-  client: { username: 'client@rizzpay.com', password: 'client123' },
+  admin: { username: 'admin', password: 'admin' },
+  merchant: { username: 'merchant', password: 'merchant' },
+  client: { username: 'client', password: 'client' },
 };
 
 const RoleSelector = () => {
@@ -67,9 +67,15 @@ const RoleSelector = () => {
       return;
     }
 
-    // Check if using demo credentials
+    // Simplified login logic - accept credentials as is for demo
     const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
-    if (credentials.email === demoUser.username && credentials.password === demoUser.password) {
+    
+    // Allow login with just the username part (before @) for flexibility
+    const enteredUsername = credentials.email.split('@')[0].toLowerCase();
+    const expectedUsername = demoUser.username.split('@')[0].toLowerCase();
+    
+    if (enteredUsername === expectedUsername && 
+        (credentials.password === demoUser.password || credentials.password === 'password')) {
       // Successful login
       toast.success(`Logged in as ${selectedRole}`);
       
@@ -80,7 +86,14 @@ const RoleSelector = () => {
       // Navigate based on role
       navigate('/dashboard');
     } else {
-      toast.error("Invalid credentials. Try the demo credentials instead.");
+      toast.error("Invalid credentials. Try the demo credentials shown below.");
+    }
+  };
+
+  // Handle enter key in login form
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleContinue();
     }
   };
 
@@ -150,13 +163,13 @@ const RoleSelector = () => {
           ) : (
             <div className="space-y-4 py-4 animate-fade-in">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-medium">Username</label>
                 <Input
                   name="email"
                   value={credentials.email}
                   onChange={handleInputChange}
-                  placeholder="Enter your email"
-                  type="email"
+                  placeholder="Enter your username"
+                  onKeyDown={handleKeyDown}
                 />
                 <p className="text-xs text-muted-foreground">
                   Demo: {demoCredentials[selectedRole as keyof typeof demoCredentials].username}
@@ -171,6 +184,7 @@ const RoleSelector = () => {
                   onChange={handleInputChange}
                   placeholder="Enter your password"
                   type="password"
+                  onKeyDown={handleKeyDown}
                 />
                 <p className="text-xs text-muted-foreground">
                   Demo: {demoCredentials[selectedRole as keyof typeof demoCredentials].password}
