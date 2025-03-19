@@ -33,7 +33,7 @@ const Navbar = () => {
             <span className="bg-primary text-primary-foreground p-2 rounded-md">
               <CreditCard size={20} />
             </span>
-            <span className="font-bold text-xl">FlowPay</span>
+            <span className="font-bold text-xl">Rizzpay</span>
           </Link>
           
           <div className="flex items-center space-x-1">
@@ -68,7 +68,7 @@ const Navbar = () => {
             <span className="bg-primary text-primary-foreground p-1.5 rounded-md">
               <CreditCard size={18} />
             </span>
-            <span className="font-bold text-lg">FlowPay</span>
+            <span className="font-bold text-lg">Rizzpay</span>
           </Link>
 
           <Button

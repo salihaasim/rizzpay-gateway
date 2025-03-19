@@ -25,7 +25,7 @@ const Index = () => {
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-8 animate-fade-in">
-              FlowPay provides a secure, fast and reliable payment gateway for businesses and consumers. 
+              Rizzpay provides a secure, fast and reliable payment gateway for businesses and consumers. 
               Integrate UPI, cards, and more with a single platform.
             </p>
             
@@ -47,7 +47,7 @@ const Index = () => {
       <section className="py-16 md:py-24 bg-secondary/50">
         <div className="container px-4 mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why Choose FlowPay?</h2>
+            <h2 className="text-3xl font-bold mb-4">Why Choose Rizzpay?</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Our powerful platform is designed to meet the needs of merchants, 
               customers, and administrators with an intuitive interface.
@@ -95,7 +95,7 @@ const Index = () => {
             <h2 className="text-3xl font-bold mb-4">Choose Your Role</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Whether you're managing a business, processing transactions, or making payments,
-              FlowPay has the right interface for you.
+              Rizzpay has the right interface for you.
             </p>
           </div>
           
@@ -111,11 +111,11 @@ const Index = () => {
               <span className="bg-primary text-primary-foreground p-2 rounded-md mr-2">
                 <CreditCard size={20} />
               </span>
-              <span className="font-bold text-xl">FlowPay</span>
+              <span className="font-bold text-xl">Rizzpay</span>
             </div>
             
             <div className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} FlowPay. All rights reserved.
+              © {new Date().getFullYear()} Rizzpay. All rights reserved.
             </div>
           </div>
         </div>
