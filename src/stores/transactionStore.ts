@@ -2,8 +2,40 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type TransactionStatus = 'successful' | 'failed' | 'pending';
+export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
 export type UserRole = 'admin' | 'merchant' | 'client' | null;
+export type PaymentMethod = 'upi' | 'card' | 'netbanking';
+export type PaymentProcessingState = 
+  | 'initiated' 
+  | 'gateway_processing'
+  | 'processor_routing'
+  | 'card_network_processing'
+  | 'bank_authorization'
+  | 'authorization_decision'
+  | 'declined'
+  | 'settlement_recording'
+  | 'settlement_initiated'
+  | 'settlement_processing'
+  | 'funds_transferred'
+  | 'merchant_credited'
+  | 'completed';
+
+export interface PaymentDetails {
+  cardNumber?: string;
+  cardHolderName?: string;
+  expiryDate?: string;
+  cvv?: string;
+  bankName?: string;
+  upiId?: string;
+  processor?: string;
+  cardNetwork?: string;
+  issuingBank?: string;
+  acquiringBank?: string;
+  authorizationCode?: string;
+  declineReason?: string;
+  settlementId?: string;
+  processingFee?: string;
+}
 
 export interface Transaction {
   id: string;
@@ -12,7 +44,16 @@ export interface Transaction {
   paymentMethod: string;
   status: TransactionStatus;
   customer: string;
-  createdBy?: string; // To track which role created the transaction
+  createdBy?: string;
+  processingState?: PaymentProcessingState;
+  detailedStatus?: string;
+  rawAmount?: number;
+  paymentDetails?: PaymentDetails;
+  processingTimeline?: {
+    stage: string;
+    timestamp: string;
+    message: string;
+  }[];
 }
 
 interface TransactionState {
@@ -20,6 +61,7 @@ interface TransactionState {
   userRole: UserRole;
   userEmail: string | null;
   addTransaction: (transaction: Transaction) => void;
+  updateTransaction: (id: string, updates: Partial<Transaction>) => void;
   clearTransactions: () => void;
   setUserRole: (role: UserRole, email: string | null) => void;
   clearUserData: () => void;
@@ -34,6 +76,14 @@ export const useTransactionStore = create<TransactionState>()(
       addTransaction: (transaction) => 
         set((state) => ({ 
           transactions: [transaction, ...state.transactions] 
+        })),
+      updateTransaction: (id, updates) =>
+        set((state) => ({
+          transactions: state.transactions.map(transaction => 
+            transaction.id === id 
+              ? { ...transaction, ...updates } 
+              : transaction
+          )
         })),
       clearTransactions: () => set({ transactions: [] }),
       setUserRole: (role, email) => set({ userRole: role, userEmail: email }),

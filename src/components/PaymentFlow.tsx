@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,16 +6,21 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check, AlertTriangle } from 'lucide-react';
+import { addTransaction, simulatePaymentProcessing } from './TransactionUtils';
+import { PaymentMethod } from '@/stores/transactionStore';
+import { useNavigate } from 'react-router-dom';
 
 const PaymentFlow = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [qrCodeError, setQrCodeError] = useState(false);
+  const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [paymentData, setPaymentData] = useState({
     amount: '',
     currency: 'INR',
-    paymentMethod: 'upi',
+    paymentMethod: 'upi' as PaymentMethod,
     upiId: '',
     name: '',
     email: '',
@@ -73,20 +79,43 @@ const PaymentFlow = () => {
     }
   };
 
-  const initiatePayment = () => {
+  const initiatePayment = async () => {
     setLoading(true);
     
-    setTimeout(() => {
+    try {
+      // Create the transaction in the store
+      const transaction = addTransaction(
+        paymentData.amount,
+        paymentData.paymentMethod,
+        'pending',
+        paymentData.name,
+        {
+          upiId: paymentData.paymentMethod === 'upi' ? paymentData.upiId : undefined,
+          cardNumber: paymentData.paymentMethod === 'card' ? '•••• •••• •••• 4242' : undefined,
+          cardHolderName: paymentData.paymentMethod === 'card' ? paymentData.name : undefined,
+          bankName: paymentData.paymentMethod === 'netbanking' ? 'HDFC Bank' : undefined,
+        }
+      );
+      
+      setCurrentTransactionId(transaction.id);
+      
+      // Start the payment processing simulation
+      toast.info(`Processing payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`);
+      
+      // Simulate payment processing with 80% success rate
+      await simulatePaymentProcessing(
+        transaction.id, 
+        paymentData.paymentMethod,
+        Math.random() > 0.2 // 80% success rate
+      );
+      
       setLoading(false);
-      
-      setPaymentData(prev => ({
-        ...prev,
-        paymentStatus: 'success'
-      }));
-      
       setStep(3);
-      toast.success(`Payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount} successful!`);
-    }, 2000);
+    } catch (error) {
+      console.error("Payment processing error:", error);
+      toast.error("An error occurred during payment processing");
+      setLoading(false);
+    }
   };
 
   const getCurrencySymbol = (currency: string) => {
@@ -131,34 +160,14 @@ const PaymentFlow = () => {
     if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
       try {
         window.location.href = upiUrl;
-        
-        setLoading(true);
-        setTimeout(() => {
-          setLoading(false);
-          setStep(3);
-          setPaymentData(prev => ({
-            ...prev,
-            paymentStatus: 'success'
-          }));
-          toast.success(`Payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount} successful!`);
-        }, 3000);
+        initiatePayment();
       } catch (error) {
         setLoading(false);
-        toast.error("Error opening Google Pay. Please try another payment method.");
+        toast.error("Error opening UPI app. Please try another payment method.");
       }
     } else {
       toast.info("Scan the QR code with your UPI app or use your mobile device");
-      
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        setStep(3);
-        setPaymentData(prev => ({
-          ...prev,
-          paymentStatus: 'success'
-        }));
-        toast.success(`Payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount} successful!`);
-      }, 3000);
+      initiatePayment();
     }
   };
 
@@ -211,6 +220,12 @@ const PaymentFlow = () => {
     console.error("QR code failed to load");
     setQrCodeError(true);
     toast.error("Error loading QR code. Please check your UPI ID.");
+  };
+
+  const handleViewTransaction = () => {
+    if (currentTransactionId) {
+      navigate(`/transactions?id=${currentTransactionId}`);
+    }
   };
 
   return (
@@ -454,8 +469,8 @@ const PaymentFlow = () => {
             <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="h-8 w-8 text-emerald-500" strokeWidth={3} />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Payment Successful!</h3>
-            <p className="text-muted-foreground mb-6">Your transaction has been completed.</p>
+            <h3 className="text-xl font-semibold mb-2">Payment Submitted</h3>
+            <p className="text-muted-foreground mb-6">Your payment is being processed.</p>
             <div className="bg-secondary rounded-lg p-4 max-w-xs mx-auto">
               <div className="flex justify-between mb-2">
                 <span className="text-muted-foreground">Transaction ID:</span>
@@ -477,16 +492,12 @@ const PaymentFlow = () => {
                 <span className="text-muted-foreground">Date:</span>
                 <span className="font-medium">{new Date().toLocaleDateString()}</span>
               </div>
-              <div className="flex justify-between mt-2">
-                <span className="text-muted-foreground">Status:</span>
-                <span className="font-medium text-emerald-500">Successful</span>
-              </div>
             </div>
           </div>
         )}
       </CardContent>
       
-      <CardFooter className={`flex ${step === 3 ? 'justify-center' : 'justify-end'} pt-2 pb-6`}>
+      <CardFooter className={`flex ${step === 3 ? 'justify-center flex-col space-y-2' : 'justify-end'} pt-2 pb-6`}>
         {step === 1 && (
           <Button onClick={handleNext} className="rounded-full px-6">
             Continue <ArrowRight className="ml-2 h-4 w-4" />
@@ -512,19 +523,29 @@ const PaymentFlow = () => {
         )}
         
         {step === 3 && (
-          <Button variant="outline" onClick={() => {
-            setStep(1);
-            setPaymentData(prev => ({ 
-              ...prev,
-              amount: '',
-              upiId: '',
-              purpose: '',
-              paymentStatus: '',
-              transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000)
-            }));
-          }} className="rounded-full px-6">
-            Make Another Payment
-          </Button>
+          <>
+            <Button onClick={handleViewTransaction} variant="default" className="rounded-full px-6 w-full">
+              View Transaction Details
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setStep(1);
+                setPaymentData(prev => ({ 
+                  ...prev,
+                  amount: '',
+                  upiId: '',
+                  purpose: '',
+                  paymentStatus: '',
+                  transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000)
+                }));
+                setCurrentTransactionId(null);
+              }} 
+              className="rounded-full px-6 w-full"
+            >
+              Make Another Payment
+            </Button>
+          </>
         )}
       </CardFooter>
     </Card>

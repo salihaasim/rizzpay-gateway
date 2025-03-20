@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,15 +7,30 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import TransactionCard from '@/components/TransactionCard';
+import TransactionDetails from '@/components/TransactionDetails';
 import Navbar from '@/components/Navbar';
 import { Search, Download, Filter, ArrowUpDown } from 'lucide-react';
 import { useTransactionStore } from '@/stores/transactionStore';
+import { useLocation } from 'react-router-dom';
 
 const Transactions = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const transactionIdParam = searchParams.get('id');
+  
   const { transactions } = useTransactionStore();
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(transactionIdParam);
+  
+  useEffect(() => {
+    if (transactionIdParam) {
+      setSelectedTransactionId(transactionIdParam);
+    }
+  }, [transactionIdParam]);
+  
+  const selectedTransaction = transactions.find(t => t.id === selectedTransactionId);
   
   // Filter transactions based on selected filter
   const filteredTransactions = transactions.filter(transaction => {
@@ -47,6 +62,7 @@ const Transactions = () => {
   const successfulTotal = getTotalAmount('successful');
   const pendingTotal = getTotalAmount('pending');
   const failedTotal = getTotalAmount('failed');
+  const processingTotal = getTotalAmount('processing');
 
   // Generate payment method data for pie chart
   const getPaymentMethodData = () => {
@@ -58,10 +74,13 @@ const Transactions = () => {
     });
     
     const colors: Record<string, string> = {
+      'upi': '#34A853',
       'Google Pay': '#4285F4',
       'UPI': '#34A853',
+      'card': '#EA4335',
       'Credit Card': '#EA4335',
       'Debit Card': '#FBBC05',
+      'netbanking': '#003087',
       'PayPal': '#003087',
       'Cash': '#6B7280',
     };
@@ -74,6 +93,20 @@ const Transactions = () => {
   };
 
   const paymentMethodData = getPaymentMethodData();
+
+  if (selectedTransaction) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container px-4 pt-20 pb-16 mx-auto">
+          <TransactionDetails 
+            transaction={selectedTransaction} 
+            onClose={() => setSelectedTransactionId(null)} 
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,6 +139,12 @@ const Transactions = () => {
                   <div className="text-sm font-medium mb-1">Successful</div>
                   <div className="text-2xl font-bold">₹{successfulTotal.toLocaleString('en-IN')}</div>
                   <div className="text-xs text-emerald-600 mt-1">{transactions.filter(t => t.status === 'successful').length} transactions</div>
+                </div>
+                
+                <div className="bg-blue-50 text-blue-500 rounded-lg p-4 flex-1 min-w-[120px]">
+                  <div className="text-sm font-medium mb-1">Processing</div>
+                  <div className="text-2xl font-bold">₹{processingTotal.toLocaleString('en-IN')}</div>
+                  <div className="text-xs text-blue-600 mt-1">{transactions.filter(t => t.status === 'processing').length} transactions</div>
                 </div>
                 
                 <div className="bg-amber-50 text-amber-500 rounded-lg p-4 flex-1 min-w-[120px]">
@@ -187,6 +226,7 @@ const Transactions = () => {
                 <SelectContent>
                   <SelectItem value="all">All Transactions</SelectItem>
                   <SelectItem value="successful">Successful</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
                 </SelectContent>
@@ -211,9 +251,10 @@ const Transactions = () => {
           </div>
           
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="w-full max-w-md grid grid-cols-4">
+            <TabsList className="w-full max-w-md grid grid-cols-5">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="successful">Successful</TabsTrigger>
+              <TabsTrigger value="processing">Processing</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="failed">Failed</TabsTrigger>
             </TabsList>
@@ -222,7 +263,9 @@ const Transactions = () => {
               <div className="space-y-4">
                 {filteredTransactions.length > 0 ? (
                   filteredTransactions.map((transaction) => (
-                    <TransactionCard key={transaction.id} {...transaction} />
+                    <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                      <TransactionCard {...transaction} />
+                    </div>
                   ))
                 ) : (
                   <div className="text-center py-12 border rounded-lg">
@@ -235,7 +278,19 @@ const Transactions = () => {
             <TabsContent value="successful" className="mt-6">
               <div className="space-y-4">
                 {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (
-                  <TransactionCard key={transaction.id} {...transaction} />
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="processing" className="mt-6">
+              <div className="space-y-4">
+                {filteredTransactions.filter(t => t.status === 'processing').map((transaction) => (
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
                 ))}
               </div>
             </TabsContent>
@@ -243,7 +298,9 @@ const Transactions = () => {
             <TabsContent value="pending" className="mt-6">
               <div className="space-y-4">
                 {filteredTransactions.filter(t => t.status === 'pending').map((transaction) => (
-                  <TransactionCard key={transaction.id} {...transaction} />
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
                 ))}
               </div>
             </TabsContent>
@@ -251,7 +308,9 @@ const Transactions = () => {
             <TabsContent value="failed" className="mt-6">
               <div className="space-y-4">
                 {filteredTransactions.filter(t => t.status === 'failed').map((transaction) => (
-                  <TransactionCard key={transaction.id} {...transaction} />
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
                 ))}
               </div>
             </TabsContent>
