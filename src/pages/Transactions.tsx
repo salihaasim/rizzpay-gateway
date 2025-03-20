@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,33 +9,16 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import TransactionCard from '@/components/TransactionCard';
 import Navbar from '@/components/Navbar';
 import { Search, Download, Filter, ArrowUpDown } from 'lucide-react';
-
-// Mock data
-const transactionsData = [
-  { id: '8721', date: 'Today, 2:30 PM', amount: '₹12,500', paymentMethod: 'Google Pay', status: 'successful', customer: 'Ajay Sharma' },
-  { id: '8720', date: 'Today, 11:15 AM', amount: '₹3,200', paymentMethod: 'UPI', status: 'pending', customer: 'Priya Patel' },
-  { id: '8719', date: 'Yesterday, 5:45 PM', amount: '₹8,750', paymentMethod: 'Credit Card', status: 'successful', customer: 'Rahul Verma' },
-  { id: '8718', date: 'Yesterday, 1:20 PM', amount: '₹950', paymentMethod: 'Google Pay', status: 'failed', customer: 'Neha Singh' },
-  { id: '8717', date: '2 days ago, 9:30 AM', amount: '₹5,200', paymentMethod: 'UPI', status: 'successful', customer: 'Vikram Malhotra' },
-  { id: '8716', date: '2 days ago, 8:15 AM', amount: '₹2,800', paymentMethod: 'Credit Card', status: 'successful', customer: 'Ananya Desai' },
-  { id: '8715', date: '3 days ago, 7:45 PM', amount: '₹15,250', paymentMethod: 'Google Pay', status: 'successful', customer: 'Rohan Sharma' },
-  { id: '8714', date: '3 days ago, 3:20 PM', amount: '₹4,750', paymentMethod: 'UPI', status: 'failed', customer: 'Meera Patel' },
-] as const;
-
-const paymentMethodData = [
-  { name: 'Google Pay', value: 45, color: '#4285F4' },
-  { name: 'UPI', value: 30, color: '#34A853' },
-  { name: 'Credit Card', value: 15, color: '#EA4335' },
-  { name: 'Debit Card', value: 10, color: '#FBBC05' },
-];
+import { useTransactionStore } from '@/stores/transactionStore';
 
 const Transactions = () => {
+  const { transactions } = useTransactionStore();
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Filter transactions based on selected filter
-  const filteredTransactions = transactionsData.filter(transaction => {
+  const filteredTransactions = transactions.filter(transaction => {
     if (filter === 'all') return true;
     return transaction.status === filter;
   }).filter(transaction => {
@@ -48,6 +32,48 @@ const Transactions = () => {
       transaction.paymentMethod.toLowerCase().includes(query)
     );
   });
+
+  // Calculate totals
+  const getTotalAmount = (status: string) => {
+    return transactions
+      .filter(t => status === 'all' || t.status === status)
+      .reduce((sum, t) => {
+        // Remove non-numeric characters and convert to number
+        const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+  };
+
+  const successfulTotal = getTotalAmount('successful');
+  const pendingTotal = getTotalAmount('pending');
+  const failedTotal = getTotalAmount('failed');
+
+  // Generate payment method data for pie chart
+  const getPaymentMethodData = () => {
+    const methodCounts: Record<string, number> = {};
+    
+    transactions.forEach(transaction => {
+      const method = transaction.paymentMethod;
+      methodCounts[method] = (methodCounts[method] || 0) + 1;
+    });
+    
+    const colors: Record<string, string> = {
+      'Google Pay': '#4285F4',
+      'UPI': '#34A853',
+      'Credit Card': '#EA4335',
+      'Debit Card': '#FBBC05',
+      'PayPal': '#003087',
+      'Cash': '#6B7280',
+    };
+    
+    return Object.entries(methodCounts).map(([name, value]) => ({
+      name,
+      value,
+      color: colors[name] || '#6B7280',
+    }));
+  };
+
+  const paymentMethodData = getPaymentMethodData();
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,20 +104,20 @@ const Transactions = () => {
               <div className="flex gap-4 flex-wrap">
                 <div className="bg-emerald-50 text-emerald-500 rounded-lg p-4 flex-1 min-w-[120px]">
                   <div className="text-sm font-medium mb-1">Successful</div>
-                  <div className="text-2xl font-bold">₹42,500</div>
-                  <div className="text-xs text-emerald-600 mt-1">+12.5% from last week</div>
+                  <div className="text-2xl font-bold">₹{successfulTotal.toLocaleString('en-IN')}</div>
+                  <div className="text-xs text-emerald-600 mt-1">{transactions.filter(t => t.status === 'successful').length} transactions</div>
                 </div>
                 
                 <div className="bg-amber-50 text-amber-500 rounded-lg p-4 flex-1 min-w-[120px]">
                   <div className="text-sm font-medium mb-1">Pending</div>
-                  <div className="text-2xl font-bold">₹12,200</div>
-                  <div className="text-xs text-amber-600 mt-1">-3.2% from last week</div>
+                  <div className="text-2xl font-bold">₹{pendingTotal.toLocaleString('en-IN')}</div>
+                  <div className="text-xs text-amber-600 mt-1">{transactions.filter(t => t.status === 'pending').length} transactions</div>
                 </div>
                 
                 <div className="bg-rose-50 text-rose-500 rounded-lg p-4 flex-1 min-w-[120px]">
                   <div className="text-sm font-medium mb-1">Failed</div>
-                  <div className="text-2xl font-bold">₹5,700</div>
-                  <div className="text-xs text-rose-600 mt-1">+2.1% from last week</div>
+                  <div className="text-2xl font-bold">₹{failedTotal.toLocaleString('en-IN')}</div>
+                  <div className="text-xs text-rose-600 mt-1">{transactions.filter(t => t.status === 'failed').length} transactions</div>
                 </div>
               </div>
             </CardContent>
@@ -104,27 +130,33 @@ const Transactions = () => {
             </CardHeader>
             <CardContent className="pt-4">
               <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={paymentMethodData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      labelLine={false}
-                    >
-                      {paymentMethodData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Legend verticalAlign="bottom" height={36} />
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                {paymentMethodData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={paymentMethodData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        {paymentMethodData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Legend verticalAlign="bottom" height={36} />
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    No transaction data available
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -200,7 +232,6 @@ const Transactions = () => {
               </div>
             </TabsContent>
             
-            {/* Other tabs have same content but different filters */}
             <TabsContent value="successful" className="mt-6">
               <div className="space-y-4">
                 {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (

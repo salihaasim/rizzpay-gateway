@@ -3,16 +3,9 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Check, X, Clock } from 'lucide-react';
+import { Transaction } from '@/stores/transactionStore';
 
-type TransactionStatus = 'successful' | 'failed' | 'pending';
-
-interface TransactionCardProps {
-  id: string;
-  date: string;
-  amount: string;
-  paymentMethod: string;
-  status: TransactionStatus;
-  customer: string;
+interface TransactionCardProps extends Transaction {
   className?: string;
 }
 

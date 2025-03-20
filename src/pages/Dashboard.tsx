@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
@@ -8,8 +7,8 @@ import Navbar from '@/components/Navbar';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTransactionStore } from '@/stores/transactionStore';
 
-// Mock data
 const chartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -20,14 +19,24 @@ const chartData = [
   { name: 'Jul', value: 3490 },
 ];
 
-const transactions = [
-  { id: '8721', date: 'Today, 2:30 PM', amount: '₹12,500', paymentMethod: 'Google Pay', status: 'successful', customer: 'Ajay Sharma' },
-  { id: '8720', date: 'Today, 11:15 AM', amount: '₹3,200', paymentMethod: 'UPI', status: 'pending', customer: 'Priya Patel' },
-  { id: '8719', date: 'Yesterday, 5:45 PM', amount: '₹8,750', paymentMethod: 'Credit Card', status: 'successful', customer: 'Rahul Verma' },
-  { id: '8718', date: 'Yesterday, 1:20 PM', amount: '₹950', paymentMethod: 'Google Pay', status: 'failed', customer: 'Neha Singh' },
-] as const;
-
 const Dashboard = () => {
+  const { transactions } = useTransactionStore();
+  
+  const totalRevenue = transactions
+    .filter(t => t.status === 'successful')
+    .reduce((sum, t) => {
+      const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
+  
+  const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
+  
+  const avgTransaction = transactions.length > 0 
+    ? totalRevenue / transactions.filter(t => t.status === 'successful').length 
+    : 0;
+  
+  const recentTransactions = [...transactions].slice(0, 4);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -51,30 +60,30 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Revenue"
-            value="₹86,429"
+            value={`₹${totalRevenue.toLocaleString('en-IN')}`}
             icon={<DollarSign className="h-4 w-4" />}
-            trend={{ value: 12.8, isPositive: true }}
+            trend={{ value: transactions.length > 0 ? 12.8 : 0, isPositive: true }}
           />
           
           <StatCard
             title="Transactions"
-            value="924"
+            value={transactions.length.toString()}
             icon={<CreditCard className="h-4 w-4" />}
-            trend={{ value: 8.3, isPositive: true }}
+            trend={{ value: transactions.length > 0 ? 8.3 : 0, isPositive: true }}
           />
           
           <StatCard
             title="Customers"
-            value="512"
+            value={uniqueCustomers.toString()}
             icon={<Users className="h-4 w-4" />}
-            trend={{ value: 2.1, isPositive: true }}
+            trend={{ value: uniqueCustomers > 0 ? 2.1 : 0, isPositive: true }}
           />
           
           <StatCard
             title="Avg. Transaction"
-            value="₹935"
+            value={`₹${avgTransaction.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
             icon={<BarChart3 className="h-4 w-4" />}
-            trend={{ value: 1.2, isPositive: false }}
+            trend={{ value: avgTransaction > 0 ? 1.2 : 0, isPositive: false }}
           />
         </div>
         
@@ -130,7 +139,7 @@ const Dashboard = () => {
                     <p className="font-medium">Incoming</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-emerald-500 font-semibold ml-auto">+₹24,500</p>
+                  <p className="text-emerald-500 font-semibold ml-auto">+₹{totalRevenue.toLocaleString('en-IN')}</p>
                 </div>
                 
                 <div className="flex items-center">
@@ -141,13 +150,13 @@ const Dashboard = () => {
                     <p className="font-medium">Outgoing</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-rose-500 font-semibold ml-auto">-₹8,250</p>
+                  <p className="text-rose-500 font-semibold ml-auto">-₹0</p>
                 </div>
                 
                 <div className="pt-4 border-t">
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-muted-foreground">Available Balance</div>
-                    <div className="text-xl font-semibold">₹62,390</div>
+                    <div className="text-xl font-semibold">₹{totalRevenue.toLocaleString('en-IN')}</div>
                   </div>
                 </div>
               </div>
@@ -160,9 +169,15 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold">Recent Transactions</h2>
             
             <div className="space-y-4">
-              {transactions.map((transaction) => (
-                <TransactionCard key={transaction.id} {...transaction} />
-              ))}
+              {recentTransactions.length > 0 ? (
+                recentTransactions.map((transaction) => (
+                  <TransactionCard key={transaction.id} {...transaction} />
+                ))
+              ) : (
+                <div className="text-center py-12 border rounded-lg">
+                  <p className="text-muted-foreground">No transactions yet</p>
+                </div>
+              )}
             </div>
           </div>
           
