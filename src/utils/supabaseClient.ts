@@ -1,17 +1,51 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase client with public anon key (safe to use in client-side code)
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || '',
-  import.meta.env.VITE_SUPABASE_ANON_KEY || ''
-);
+// Create a singleton Supabase client with lazy initialization
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
+
+export const supabase = () => {
+  if (supabaseInstance) return supabaseInstance;
+  
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  // Return a mock client if credentials are missing (prevents app from crashing)
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('Supabase credentials missing, using mock client');
+    return createMockSupabaseClient();
+  }
+  
+  supabaseInstance = createClient(supabaseUrl, supabaseKey);
+  return supabaseInstance;
+};
+
+// Create a mock client that won't crash the app when credentials are missing
+const createMockSupabaseClient = () => {
+  const mockResponse = { data: null, error: new Error('Mock client - no credentials') };
+  
+  return {
+    from: () => ({
+      select: () => Promise.resolve(mockResponse),
+      insert: () => Promise.resolve(mockResponse),
+      upsert: () => Promise.resolve(mockResponse),
+      update: () => Promise.resolve(mockResponse),
+      delete: () => Promise.resolve(mockResponse),
+    }),
+    auth: {
+      getUser: () => Promise.resolve(mockResponse),
+      signUp: () => Promise.resolve(mockResponse),
+      signIn: () => Promise.resolve(mockResponse),
+      signOut: () => Promise.resolve(mockResponse),
+    },
+  } as unknown as ReturnType<typeof createClient>;
+};
 
 // Helper function to check if Supabase connection is working
 export const checkSupabaseConnection = async (): Promise<boolean> => {
   try {
     // Attempt to get user to check connection
-    const { data, error } = await supabase.auth.getUser();
+    const { data, error } = await supabase().auth.getUser();
     if (error) {
       console.error('Supabase connection error:', error);
       return false;
@@ -26,7 +60,7 @@ export const checkSupabaseConnection = async (): Promise<boolean> => {
 // Function to sync transaction to Supabase
 export const syncTransactionToSupabase = async (transaction: any) => {
   try {
-    const { error } = await supabase
+    const { error } = await supabase()
       .from('transactions')
       .upsert({
         id: transaction.id,
@@ -59,7 +93,7 @@ export const syncTransactionToSupabase = async (transaction: any) => {
 // Function to fetch transactions from Supabase
 export const fetchTransactionsFromSupabase = async (userEmail?: string) => {
   try {
-    let query = supabase
+    let query = supabase()
       .from('transactions')
       .select('*');
     
@@ -75,7 +109,7 @@ export const fetchTransactionsFromSupabase = async (userEmail?: string) => {
       return [];
     }
     
-    return data.map(transaction => ({
+    return (data || []).map(transaction => ({
       id: transaction.id,
       date: transaction.date,
       amount: transaction.amount,

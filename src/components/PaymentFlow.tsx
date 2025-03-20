@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -8,6 +9,18 @@ import { PaymentMethod } from '@/stores/transactionStore';
 import { useNavigate } from 'react-router-dom';
 import { createCardPayment, createNeftPayment } from './webhook/instamojoUtils';
 import { showTransactionNotification } from '@/utils/notificationUtils';
+
+// Lazy load components for better initial loading performance
+const PaymentAmountForm = lazy(() => import('./payment/PaymentAmountForm'));
+const PaymentMethodComponent = lazy(() => import('./payment/PaymentMethod'));
+const PaymentSuccess = lazy(() => import('./payment/PaymentSuccess'));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="p-4 flex justify-center">
+    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+  </div>
+);
 
 const PaymentFlow = () => {
   const navigate = useNavigate();
@@ -35,6 +48,7 @@ const PaymentFlow = () => {
     bankName: ''
   });
 
+  // Generate transaction ID only once on component mount
   useEffect(() => {
     const randomId = 'RIZZPAY' + Math.floor(Math.random() * 10000000);
     setPaymentData(prev => ({
@@ -43,6 +57,7 @@ const PaymentFlow = () => {
     }));
   }, []);
 
+  // Reset QR code error state when UPI ID changes
   useEffect(() => {
     setQrCodeError(false);
   }, [paymentData.upiId]);
@@ -158,7 +173,7 @@ const PaymentFlow = () => {
             processor: 'Instamojo',
             recipientName: paymentData.name,
             recipientEmail: paymentData.email,
-            paymentMethod: type
+            processorMethod: type // Using processorMethod instead of paymentMethod
           }
         );
         
@@ -193,12 +208,14 @@ const PaymentFlow = () => {
     }
   };
 
+  // Validate UPI ID using a regex pattern
   const validateUpiId = (value: string) => {
     if (!value) return false;
     const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
     return upiRegex.test(value);
   };
 
+  // Generate UPI payment link
   const getUpiPaymentLink = () => {
     try {
       if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) return '';
@@ -215,16 +232,15 @@ const PaymentFlow = () => {
     }
   };
 
+  // Generate UPI QR code URL with caching
   const getUpiQrCodeUrl = () => {
     try {
       if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
-        console.log("Invalid UPI ID");
         return '';
       }
       
       const upiUrl = getUpiPaymentLink();
       if (!upiUrl) {
-        console.log("No UPI URL generated");
         return '';
       }
       
@@ -274,12 +290,12 @@ const PaymentFlow = () => {
     return 'txn_' + Math.random().toString(36).substr(2, 9);
   };
 
+  // Use memo to avoid recalculating the QR code URL on every render
   const qrCodeUrl = useMemo(() => {
     if (step === 2 && 
         paymentData.paymentMethod === 'upi' && 
         paymentData.upiId && 
         validateUpiId(paymentData.upiId)) {
-      console.log("Generating QR code URL");
       return getUpiQrCodeUrl();
     }
     return '';
@@ -293,36 +309,38 @@ const PaymentFlow = () => {
       </CardHeader>
       
       <CardContent className="pt-6">
-        {step === 1 && (
-          <PaymentAmountForm 
-            paymentData={paymentData}
-            handleInputChange={handleInputChange}
-            handleSelectChange={handleSelectChange}
-            getCurrencySymbol={getCurrencySymbol}
-          />
-        )}
-        
-        {step === 2 && (
-          <PaymentMethodComponent
-            paymentMethod={paymentData.paymentMethod}
-            paymentData={paymentData}
-            handleInputChange={handleInputChange}
-            validateUpiId={validateUpiId}
-            qrCodeUrl={qrCodeUrl}
-            qrCodeError={qrCodeError}
-            handleQrCodeError={handleQrCodeError}
-            handleUpiPayment={handleUpiPayment}
-            loading={loading}
-            initiateInstamojoPayment={initiateInstamojoPayment}
-          />
-        )}
-        
-        {step === 3 && (
-          <PaymentSuccess
-            paymentData={paymentData}
-            getCurrencySymbol={getCurrencySymbol}
-          />
-        )}
+        <Suspense fallback={<LoadingFallback />}>
+          {step === 1 && (
+            <PaymentAmountForm 
+              paymentData={paymentData}
+              handleInputChange={handleInputChange}
+              handleSelectChange={handleSelectChange}
+              getCurrencySymbol={getCurrencySymbol}
+            />
+          )}
+          
+          {step === 2 && (
+            <PaymentMethodComponent
+              paymentMethod={paymentData.paymentMethod}
+              paymentData={paymentData}
+              handleInputChange={handleInputChange}
+              validateUpiId={validateUpiId}
+              qrCodeUrl={qrCodeUrl}
+              qrCodeError={qrCodeError}
+              handleQrCodeError={handleQrCodeError}
+              handleUpiPayment={handleUpiPayment}
+              loading={loading}
+              initiateInstamojoPayment={initiateInstamojoPayment}
+            />
+          )}
+          
+          {step === 3 && (
+            <PaymentSuccess
+              paymentData={paymentData}
+              getCurrencySymbol={getCurrencySymbol}
+            />
+          )}
+        </Suspense>
       </CardContent>
       
       <CardFooter className={`flex ${step === 3 ? 'justify-center flex-col space-y-2' : 'justify-end'} pt-2 pb-6`}>
@@ -380,4 +398,4 @@ const PaymentFlow = () => {
   );
 };
 
-export default PaymentFlow;
+export default React.memo(PaymentFlow);
