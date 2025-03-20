@@ -1,7 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { jwtDecode, jwtEncode } from './jwtHelper';
-import { useTransactionStore, addTransaction } from '@/stores/transactionStore';
+import { useTransactionStore, Transaction, TransactionStatus } from '@/stores/transactionStore';
 import { toast } from 'sonner';
 
 // Create a webhook token
@@ -133,14 +133,14 @@ export const completeWebhookPayment = (transactionId: string, status: 'success' 
     if (status === 'success') {
       const store = useTransactionStore.getState();
       
-      // Add transaction to store
-      const transaction = {
+      // Add transaction to store with correct TransactionStatus type
+      const transaction: Transaction = {
         id: transactionId,
         date: new Date().toISOString(),
         amount: `₹${parseFloat(paymentData.amount).toFixed(2)}`,
         rawAmount: parseFloat(paymentData.amount),
         paymentMethod: 'webhook',
-        status: 'successful',
+        status: 'successful' as TransactionStatus, // Explicitly cast to TransactionStatus
         customer: paymentData.customerEmail || paymentData.customerName,
         createdBy: paymentData.merchantEmail,
         processingState: 'completed',
