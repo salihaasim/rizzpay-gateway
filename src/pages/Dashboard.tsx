@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
@@ -8,7 +7,7 @@ import Navbar from '@/components/Navbar';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 
 // Static data that doesn't need to be recalculated
 const chartData = [
@@ -52,8 +51,13 @@ const RevenueChart = React.memo(() => (
   </div>
 ));
 
-// Memoized transaction list component
-const RecentTransactionsList = React.memo(({ transactions }) => (
+// Define a proper interface for RecentTransactionsList props
+interface RecentTransactionsListProps {
+  transactions: Transaction[];
+}
+
+// Memoized transaction list component with properly typed props
+const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsListProps) => (
   <div className="space-y-4">
     {transactions.length > 0 ? (
       transactions.map((transaction) => (
@@ -66,6 +70,8 @@ const RecentTransactionsList = React.memo(({ transactions }) => (
     )}
   </div>
 ));
+
+RecentTransactionsList.displayName = 'RecentTransactionsList';
 
 const Dashboard = () => {
   const { transactions } = useTransactionStore();
