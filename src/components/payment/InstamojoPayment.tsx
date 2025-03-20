@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Loader2, Building } from 'lucide-react';
+import { CreditCard, Loader2, Building, ExternalLink, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface InstamojoPaymentProps {
   type: 'card' | 'neft';
@@ -41,20 +42,41 @@ const InstamojoPayment: React.FC<InstamojoPaymentProps> = ({
             </div>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          {isCard 
-            ? 'You\'ll be redirected to Instamojo\'s secure payment gateway to complete your transaction.'
-            : 'You\'ll be redirected to Instamojo to receive NEFT transfer details for your payment.'}
-        </p>
+
+        {isCard ? (
+          <div className="p-3 bg-muted/50 rounded mb-4 flex items-start">
+            <div className="mr-2 mt-0.5">
+              <AlertCircle size={16} className="text-muted-foreground" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your card details are securely processed by Instamojo. All major credit & debit cards 
+              are accepted, including Visa, Mastercard, RuPay, and American Express.
+            </p>
+          </div>
+        ) : (
+          <div className="p-3 bg-muted/50 rounded mb-4 flex items-start">
+            <div className="mr-2 mt-0.5">
+              <AlertCircle size={16} className="text-muted-foreground" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              You'll receive NEFT bank details to complete your transfer. After making the NEFT payment 
+              from your bank, verify with the provided reference number.
+            </p>
+          </div>
+        )}
+        
         <Button 
           onClick={() => initiateInstamojoPayment(type)} 
-          className="w-full"
+          className="w-full flex items-center justify-center"
           disabled={loading}
         >
           {loading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
           ) : (
-            <>Proceed to {isCard ? 'Card' : 'NEFT'} Payment</>
+            <>
+              Proceed to {isCard ? 'Card' : 'NEFT'} Payment
+              <ExternalLink className="ml-2 h-3.5 w-3.5" />
+            </>
           )}
         </Button>
       </div>
