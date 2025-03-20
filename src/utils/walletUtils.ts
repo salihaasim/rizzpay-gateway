@@ -3,9 +3,24 @@ import { Transaction, TransactionStatus, useTransactionStore } from '@/stores/tr
 import { delay } from './commonUtils';
 
 export const simulateWalletProcessing = async (
-  transactionId: string
+  userEmail: string,
+  amount: number,
+  type: 'deposit' | 'withdrawal',
+  description?: string
 ): Promise<void> => {
   const store = useTransactionStore.getState();
+  
+  // Create appropriate transaction ID based on type
+  let transactionId: string;
+  
+  if (type === 'deposit') {
+    transactionId = store.depositToWallet(userEmail, amount, 'wallet');
+  } else if (type === 'withdrawal') {
+    transactionId = store.withdrawFromWallet(userEmail, amount, 'wallet');
+  } else {
+    throw new Error(`Invalid transaction type: ${type}`);
+  }
+  
   const transaction = store.transactions.find(t => t.id === transactionId);
   
   if (!transaction) {
@@ -39,7 +54,8 @@ export const simulateWalletProcessing = async (
         timestamp: new Date().toISOString(),
         message: 'Wallet transaction completed successfully'
       }
-    ]
+    ],
+    description: description || transaction.description
   });
 };
 
