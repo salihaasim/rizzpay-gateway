@@ -1,5 +1,6 @@
 
 import { Transaction, TransactionStatus, PaymentProcessingState, PaymentDetails, useTransactionStore } from '@/stores/transactionStore';
+import { toast } from 'sonner';
 
 export const generateTransactionId = (): string => {
   return Math.floor(1000 + Math.random() * 9000).toString();
@@ -46,6 +47,7 @@ export const addTransaction = (
   return transaction;
 };
 
+// Enhanced simulatePaymentProcessing function
 export const simulatePaymentProcessing = async (
   transactionId: string, 
   paymentMethod: string,
@@ -81,6 +83,42 @@ export const simulatePaymentProcessing = async (
     return store.transactions.find(t => t.id === transactionId)!;
   };
 
+  // Apply risk analysis
+  const applyRiskAnalysis = () => {
+    const riskScore = Math.floor(Math.random() * 100);
+    let riskLevel = 'low';
+    
+    if (riskScore > 80) {
+      riskLevel = 'high';
+    } else if (riskScore > 50) {
+      riskLevel = 'medium';
+    }
+    
+    return { riskScore, riskLevel };
+  };
+
+  // Apply fraud detection
+  const applyFraudDetection = () => {
+    const flaggedPatterns = [];
+    const amount = transaction.rawAmount || 0;
+    
+    // Check for suspicious amount patterns
+    if (amount === 1337 || amount === 420 || amount === 666) {
+      flaggedPatterns.push('suspicious amount pattern');
+    }
+    
+    // Random flagging for demo purposes
+    if (Math.random() > 0.95) {
+      flaggedPatterns.push('unusual transaction velocity');
+    }
+    
+    if (Math.random() > 0.97) {
+      flaggedPatterns.push('mismatched geolocation');
+    }
+    
+    return flaggedPatterns;
+  };
+
   // 1. Payment Gateway processing
   await delay(800);
   updateTransactionState(
@@ -88,7 +126,45 @@ export const simulatePaymentProcessing = async (
     'Payment received by gateway and being validated'
   );
   
-  // 2. Payment Processor routing
+  // 2. Apply risk analysis
+  await delay(600);
+  const { riskScore, riskLevel } = applyRiskAnalysis();
+  
+  if (riskLevel === 'high' && Math.random() > 0.7) {
+    updateTransactionState(
+      'declined',
+      `Payment declined: High risk score (${riskScore}/100)`,
+      {
+        status: 'declined',
+        paymentDetails: {
+          ...transaction.paymentDetails,
+          declineReason: `High risk score (${riskScore}/100)`
+        }
+      }
+    );
+    return store.transactions.find(t => t.id === transactionId)!;
+  }
+  
+  // 3. Apply fraud detection
+  await delay(700);
+  const fraudFlags = applyFraudDetection();
+  
+  if (fraudFlags.length > 0 && Math.random() > 0.7) {
+    updateTransactionState(
+      'declined',
+      `Payment declined: Suspected fraud (${fraudFlags.join(', ')})`,
+      {
+        status: 'declined',
+        paymentDetails: {
+          ...transaction.paymentDetails,
+          declineReason: `Suspected fraud (${fraudFlags.join(', ')})`
+        }
+      }
+    );
+    return store.transactions.find(t => t.id === transactionId)!;
+  }
+  
+  // 4. Payment Processor routing
   await delay(1000);
   const processor = getRandomProcessor();
   updateTransactionState(
@@ -102,7 +178,7 @@ export const simulatePaymentProcessing = async (
     }
   );
   
-  // 3. Card Network Processing
+  // 5. Card Network Processing
   await delay(1200);
   const cardNetwork = getRandomCardNetwork(paymentMethod);
   updateTransactionState(
@@ -116,7 +192,7 @@ export const simulatePaymentProcessing = async (
     }
   );
 
-  // 4. Bank Authorization
+  // 6. Bank Authorization
   await delay(1000);
   const issuingBank = getRandomBank();
   updateTransactionState(
@@ -130,7 +206,7 @@ export const simulatePaymentProcessing = async (
     }
   );
   
-  // 5. Authorization Decision
+  // 7. Authorization Decision
   await delay(1500);
   
   if (!shouldSucceed) {
@@ -152,7 +228,7 @@ export const simulatePaymentProcessing = async (
   }
   
   // Payment approved path
-  // 6. Authorization Approved
+  // 8. Authorization Approved
   const authCode = generateAuthorizationCode();
   updateTransactionState(
     'authorization_decision',
@@ -166,35 +242,38 @@ export const simulatePaymentProcessing = async (
     }
   );
   
-  // 7. Settlement Recording
+  // 9. Settlement Recording
   await delay(1000);
   const settlementId = generateSettlementId();
+  const processingFee = calculateProcessingFee(transaction.rawAmount || 0);
+  
   updateTransactionState(
     'settlement_recording',
     `Settlement process initiated with ID: ${settlementId}`,
     {
       paymentDetails: {
         ...transaction.paymentDetails,
-        settlementId
+        settlementId,
+        processingFee: `₹${processingFee.toFixed(2)}`
       }
     }
   );
   
-  // 8. Settlement Initiated
+  // 10. Settlement Initiated
   await delay(1000);
   updateTransactionState(
     'settlement_initiated',
     'Processor initiated settlement'
   );
   
-  // 9. Settlement Processing
+  // 11. Settlement Processing
   await delay(1000);
   updateTransactionState(
     'settlement_processing',
     'Batch settlement processing'
   );
   
-  // 10. Funds Transferred
+  // 12. Funds Transferred
   await delay(1000);
   const acquiringBank = getRandomBank();
   updateTransactionState(
@@ -208,15 +287,14 @@ export const simulatePaymentProcessing = async (
     }
   );
   
-  // 11. Merchant Credited
-  const processingFee = calculateProcessingFee(transaction.rawAmount || 0);
+  // 13. Merchant Credited
   await delay(1000);
   updateTransactionState(
     'merchant_credited',
     `Merchant account credited with ₹${(transaction.rawAmount || 0) - processingFee}`
   );
   
-  // 12. Completed
+  // 14. Completed
   await delay(500);
   updateTransactionState(
     'completed',
@@ -230,14 +308,197 @@ export const simulatePaymentProcessing = async (
     }
   );
   
+  // Notify user of successful transaction
+  toast.success("Transaction processed successfully", {
+    description: `Your payment of ${transaction.amount} has been processed.`
+  });
+  
   return store.transactions.find(t => t.id === transactionId)!;
+};
+
+// Modified simulateWalletProcessing function
+export const simulateWalletProcessing = async (
+  email: string,
+  amount: number,
+  transactionType: 'deposit' | 'withdrawal',
+  description?: string
+): Promise<string> => {
+  const store = useTransactionStore.getState();
+  
+  // Create a pending transaction first
+  const transactionId = generateTransactionId();
+  const date = new Date().toISOString();
+  
+  // Calculate processing fee
+  const processingFee = calculateWalletFee(amount, transactionType);
+  const finalAmount = transactionType === 'deposit' 
+    ? amount - processingFee 
+    : amount;
+  
+  // Create initial pending transaction
+  const transaction: Transaction = {
+    id: transactionId,
+    date,
+    amount: `₹${amount.toFixed(2)}`,
+    rawAmount: amount,
+    paymentMethod: 'wallet',
+    status: 'pending',
+    customer: email,
+    createdBy: email,
+    walletTransactionType: transactionType,
+    description: description || `${transactionType} to wallet`,
+    processingState: 'initiated',
+    processingTimeline: [{
+      stage: 'initiated',
+      timestamp: date,
+      message: `${transactionType} of ₹${amount.toFixed(2)} initiated`
+    }],
+    paymentDetails: {
+      processingFee: `₹${processingFee.toFixed(2)}`
+    }
+  };
+  
+  store.addTransaction(transaction);
+  
+  // Simulate processing
+  await delay(1500);
+  
+  // Update to processing
+  store.updateTransaction(transactionId, {
+    status: 'processing',
+    processingState: 'processor_routing',
+    processingTimeline: [
+      ...(transaction.processingTimeline || []),
+      {
+        stage: 'processor_routing',
+        timestamp: new Date().toISOString(),
+        message: `${transactionType} request sent to payment processor`
+      }
+    ]
+  });
+  
+  await delay(2000);
+  
+  // Randomly determine if transaction should succeed
+  const shouldSucceed = Math.random() > 0.1; // 90% success rate
+  
+  if (!shouldSucceed) {
+    const failureReason = transactionType === 'withdrawal' 
+      ? 'Bank rejected the transaction' 
+      : 'Payment gateway declined the transaction';
+    
+    store.updateTransaction(transactionId, {
+      status: 'failed',
+      processingState: 'declined',
+      processingTimeline: [
+        ...(transaction.processingTimeline || []),
+        {
+          stage: 'declined',
+          timestamp: new Date().toISOString(),
+          message: failureReason
+        }
+      ],
+      paymentDetails: {
+        ...transaction.paymentDetails,
+        declineReason: failureReason
+      }
+    });
+    
+    toast.error(`${transactionType} failed`, {
+      description: failureReason
+    });
+    
+    return transactionId;
+  }
+  
+  // Complete transaction successfully
+  
+  // For deposits, add funds to wallet
+  if (transactionType === 'deposit') {
+    try {
+      store.depositToWallet(email, finalAmount, 'wallet');
+    } catch (error) {
+      console.error('Failed to deposit to wallet:', error);
+      
+      store.updateTransaction(transactionId, {
+        status: 'failed',
+        processingState: 'declined',
+        processingTimeline: [
+          ...(transaction.processingTimeline || []),
+          {
+            stage: 'declined',
+            timestamp: new Date().toISOString(),
+            message: 'Failed to credit user wallet'
+          }
+        ]
+      });
+      
+      toast.error("Deposit failed", {
+        description: "Failed to credit your wallet. Please try again."
+      });
+      
+      return transactionId;
+    }
+  } 
+  // For withdrawals, remove funds from wallet
+  else if (transactionType === 'withdrawal') {
+    try {
+      store.withdrawFromWallet(email, finalAmount, 'wallet');
+    } catch (error) {
+      console.error('Failed to withdraw from wallet:', error);
+      
+      store.updateTransaction(transactionId, {
+        status: 'failed',
+        processingState: 'declined',
+        processingTimeline: [
+          ...(transaction.processingTimeline || []),
+          {
+            stage: 'declined',
+            timestamp: new Date().toISOString(),
+            message: 'Insufficient funds in wallet'
+          }
+        ]
+      });
+      
+      toast.error("Withdrawal failed", {
+        description: "Insufficient funds in your wallet."
+      });
+      
+      return transactionId;
+    }
+  }
+  
+  // Mark original transaction as successful
+  store.updateTransaction(transactionId, {
+    status: 'successful',
+    processingState: 'completed',
+    processingTimeline: [
+      ...(transaction.processingTimeline || []),
+      {
+        stage: 'authorization_decision',
+        timestamp: new Date().toISOString(),
+        message: 'Transaction authorized'
+      },
+      {
+        stage: 'completed',
+        timestamp: new Date().toISOString(),
+        message: `${transactionType} completed successfully`
+      }
+    ]
+  });
+  
+  toast.success(`${transactionType} successful`, {
+    description: `Your ${transactionType} of ₹${amount.toFixed(2)} was processed successfully.`
+  });
+  
+  return transactionId;
 };
 
 // Helper functions
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const getRandomProcessor = () => {
-  const processors = ['PayU', 'Razorpay', 'CCAvenue', 'Stripe', 'PayPal'];
+  const processors = ['PayU', 'Razorpay', 'CCAvenue', 'Stripe', 'PayPal', 'RizzPay'];
   return processors[Math.floor(Math.random() * processors.length)];
 };
 
@@ -264,7 +525,10 @@ const getRandomDeclineReason = () => {
     'Suspected fraud',
     'Transaction limit exceeded',
     'Invalid card details',
-    'Bank declined transaction'
+    'Bank declined transaction',
+    'Account temporarily locked',
+    'International transactions disabled',
+    'Security verification required'
   ];
   return reasons[Math.floor(Math.random() * reasons.length)];
 };
@@ -280,6 +544,16 @@ const generateSettlementId = () => {
 const calculateProcessingFee = (amount: number) => {
   // Typically 2-3% of transaction amount
   return amount * 0.025;
+};
+
+const calculateWalletFee = (amount: number, type: 'deposit' | 'withdrawal') => {
+  if (type === 'deposit') {
+    // 1.2% for deposits
+    return amount * 0.012;
+  } else {
+    // ₹25 or 1.5%, whichever is higher, for withdrawals
+    return Math.max(25, amount * 0.015);
+  }
 };
 
 export const getStatusIndicatorClass = (status: TransactionStatus) => {
@@ -319,3 +593,6 @@ export const getPaymentStateLabel = (state: PaymentProcessingState) => {
   
   return stateLabels[state] || state;
 };
+
+// Export new simulator for wallet payments
+export { simulateWalletProcessing };
