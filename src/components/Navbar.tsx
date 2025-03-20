@@ -10,13 +10,15 @@ import {
   Home,
   Menu,
   X,
-  LogOut
+  LogOut,
+  Wallet
 } from 'lucide-react';
 
 const navItems = [
   { name: 'Home', path: '/', icon: Home },
   { name: 'Dashboard', path: '/dashboard', icon: BarChart2 },
   { name: 'Transactions', path: '/transactions', icon: CreditCard },
+  { name: 'Wallet', path: '/wallet', icon: Wallet },
   { name: 'Settings', path: '/settings', icon: Settings },
 ];
 
