@@ -1,46 +1,289 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowRight, Loader2, CreditCard } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { addTransaction, simulatePaymentProcessing } from './TransactionUtils';
+import { PaymentMethod } from '@/stores/transactionStore';
+import { useNavigate } from 'react-router-dom';
+import { createCardPayment, createNeftPayment } from './webhook/instamojoUtils';
+import { showTransactionNotification } from '@/utils/notificationUtils';
 
 const PaymentFlow = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [qrCodeError, setQrCodeError] = useState(false);
+  const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
+  const [paymentData, setPaymentData] = useState({
     amount: '',
     currency: 'INR',
-    paymentMethod: 'upi'
+    paymentMethod: 'upi' as PaymentMethod,
+    upiId: '',
+    name: '',
+    email: '',
+    phone: '',
+    purpose: '',
+    transactionId: '',
+    paymentStatus: '',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCvv: '',
+    cardName: '',
+    bankAccount: '',
+    bankIfsc: '',
+    bankName: ''
   });
+
+  useEffect(() => {
+    const randomId = 'RIZZPAY' + Math.floor(Math.random() * 10000000);
+    setPaymentData(prev => ({
+      ...prev,
+      transactionId: randomId
+    }));
+  }, []);
+
+  useEffect(() => {
+    setQrCodeError(false);
+  }, [paymentData.upiId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setPaymentData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setPaymentData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleNext = () => {
     if (step === 1) {
-      if (!formData.amount) {
-        toast.error('Please enter an amount');
+      if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
+        toast.error('Please enter a valid amount');
         return;
       }
+      
+      if (!paymentData.name) {
+        toast.error('Please enter your name');
+        return;
+      }
+      
+      if (paymentData.email && !/\S+@\S+\.\S+/.test(paymentData.email)) {
+        toast.error('Please enter a valid email address');
+        return;
+      }
+      
       setStep(2);
     } else if (step === 2) {
-      // Simulate payment processing
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        setStep(3);
-      }, 1500);
+      if (paymentData.paymentMethod === 'upi' && !validateUpiId(paymentData.upiId)) {
+        toast.error('Please enter a valid UPI ID');
+        return;
+      } else if (paymentData.paymentMethod === 'instamojo_card') {
+        initiateInstamojoPayment('card');
+        return;
+      } else if (paymentData.paymentMethod === 'instamojo_neft') {
+        initiateInstamojoPayment('neft');
+        return;
+      }
+      
+      initiatePayment();
     }
   };
+
+  const initiatePayment = async () => {
+    setLoading(true);
+    
+    try {
+      const transaction = addTransaction(
+        paymentData.amount,
+        paymentData.paymentMethod,
+        'pending',
+        paymentData.name,
+        {
+          upiId: paymentData.paymentMethod === 'upi' ? paymentData.upiId : undefined,
+          cardNumber: paymentData.paymentMethod === 'card' ? '•••• •••• •••• 4242' : undefined,
+          cardHolderName: paymentData.paymentMethod === 'card' ? paymentData.name : undefined,
+          bankName: paymentData.paymentMethod === 'netbanking' ? paymentData.bankName || 'HDFC Bank' : undefined,
+        }
+      );
+      
+      setCurrentTransactionId(transaction.id);
+      
+      showTransactionNotification(
+        'info',
+        'Processing Payment',
+        `Processing payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`
+      );
+      
+      await simulatePaymentProcessing(
+        transaction.id, 
+        paymentData.paymentMethod,
+        Math.random() > 0.2
+      );
+      
+      setLoading(false);
+      setStep(3);
+    } catch (error) {
+      console.error("Payment processing error:", error);
+      toast.error("An error occurred during payment processing");
+      setLoading(false);
+    }
+  };
+
+  const initiateInstamojoPayment = async (type: 'card' | 'neft') => {
+    setLoading(true);
+    
+    try {
+      const internalTxnId = generateTransactionId();
+      
+      const paymentFunction = type === 'card' ? createCardPayment : createNeftPayment;
+      const response = await paymentFunction({
+        purpose: paymentData.purpose || `Payment via RizzPay (${type})`,
+        amount: paymentData.amount,
+        buyer_name: paymentData.name,
+        email: paymentData.email || undefined,
+        phone: paymentData.phone || undefined,
+        redirect_url: `${window.location.origin}/dashboard?transaction_id=${internalTxnId}`,
+        webhook_url: `${window.location.origin}/api/webhooks/instamojo`,
+        allow_repeated_payments: false
+      });
+      
+      if (response.success && response.payment_request) {
+        const transaction = addTransaction(
+          paymentData.amount,
+          type === 'card' ? 'instamojo_card' : 'instamojo_neft',
+          'pending',
+          paymentData.name,
+          {
+            processor: 'Instamojo',
+            recipientName: paymentData.name,
+            recipientEmail: paymentData.email,
+            paymentMethod: type
+          }
+        );
+        
+        setCurrentTransactionId(transaction.id);
+        
+        showTransactionNotification(
+          'info',
+          'Redirecting to Payment Gateway',
+          `You'll be redirected to complete your ${type === 'card' ? 'card' : 'NEFT'} payment`
+        );
+        
+        setTimeout(() => {
+          window.location.href = response.payment_request.longurl;
+        }, 1500);
+      } else {
+        toast.error(response.message || "Failed to create payment request");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Instamojo payment error:", error);
+      toast.error("An error occurred during payment setup");
+      setLoading(false);
+    }
+  };
+
+  const getCurrencySymbol = (currency: string) => {
+    switch (currency) {
+      case 'INR': return '₹';
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      default: return '₹';
+    }
+  };
+
+  const validateUpiId = (value: string) => {
+    if (!value) return false;
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    return upiRegex.test(value);
+  };
+
+  const getUpiPaymentLink = () => {
+    try {
+      if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) return '';
+      
+      const amount = paymentData.amount;
+      const upiId = encodeURIComponent(paymentData.upiId);
+      const txnId = encodeURIComponent(paymentData.transactionId);
+      const purpose = encodeURIComponent(paymentData.purpose || 'Payment via Rizzpay');
+      
+      return `upi://pay?pa=${upiId}&pn=Rizzpay&am=${amount}&cu=${paymentData.currency}&tn=${purpose}&tr=${txnId}`;
+    } catch (error) {
+      console.error("Error generating UPI link:", error);
+      return '';
+    }
+  };
+
+  const getUpiQrCodeUrl = () => {
+    try {
+      if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
+        console.log("Invalid UPI ID");
+        return '';
+      }
+      
+      const upiUrl = getUpiPaymentLink();
+      if (!upiUrl) {
+        console.log("No UPI URL generated");
+        return '';
+      }
+      
+      const encodedUpiUrl = encodeURIComponent(upiUrl);
+      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUpiUrl}`;
+    } catch (error) {
+      console.error("Error generating QR code URL:", error);
+      return '';
+    }
+  };
+
+  const handleUpiPayment = () => {
+    if (!validateUpiId(paymentData.upiId)) {
+      toast.error('Please enter a valid UPI ID');
+      return;
+    }
+
+    const upiUrl = getUpiPaymentLink();
+    
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      try {
+        window.location.href = upiUrl;
+        initiatePayment();
+      } catch (error) {
+        setLoading(false);
+        toast.error("Error opening UPI app. Please try another payment method.");
+      }
+    } else {
+      toast.info("Scan the QR code with your UPI app or use your mobile device");
+      initiatePayment();
+    }
+  };
+
+  const handleQrCodeError = () => {
+    console.error("QR code failed to load");
+    setQrCodeError(true);
+    toast.error("Error loading QR code. Please check your UPI ID.");
+  };
+
+  const handleViewTransaction = () => {
+    if (currentTransactionId) {
+      navigate(`/transactions?id=${currentTransactionId}`);
+    }
+  };
+
+  const generateTransactionId = (): string => {
+    return 'txn_' + Math.random().toString(36).substr(2, 9);
+  };
+
+  const qrCodeUrl = useMemo(() => {
+    if (step === 2 && 
+        paymentData.paymentMethod === 'upi' && 
+        paymentData.upiId && 
+        validateUpiId(paymentData.upiId)) {
+      console.log("Generating QR code URL");
+      return getUpiQrCodeUrl();
+    }
+    return '';
+  }, [step, paymentData.paymentMethod, paymentData.upiId, paymentData.amount, paymentData.transactionId, paymentData.purpose]);
 
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
@@ -51,105 +294,38 @@ const PaymentFlow = () => {
       
       <CardContent className="pt-6">
         {step === 1 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Amount</label>
-              <div className="relative">
-                <Input
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleInputChange}
-                  placeholder="Enter amount"
-                  className="pl-8"
-                />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Currency</label>
-              <Select
-                value={formData.currency}
-                onValueChange={(value) => handleSelectChange('currency', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
-                  <SelectItem value="USD">US Dollar ($)</SelectItem>
-                  <SelectItem value="EUR">Euro (€)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Payment Method</label>
-              <Select
-                value={formData.paymentMethod}
-                onValueChange={(value) => handleSelectChange('paymentMethod', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select payment method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="upi">Google Pay (UPI)</SelectItem>
-                  <SelectItem value="card">Credit/Debit Card</SelectItem>
-                  <SelectItem value="netbanking">Net Banking</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <PaymentAmountForm 
+            paymentData={paymentData}
+            handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
+            getCurrencySymbol={getCurrencySymbol}
+          />
         )}
         
         {step === 2 && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-secondary rounded-lg p-4">
-              <div className="text-sm text-muted-foreground mb-1">Amount</div>
-              <div className="text-2xl font-semibold">₹ {formData.amount}</div>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="text-sm font-medium mb-2">Google Pay (UPI)</div>
-              <div className="rounded-lg border p-4 flex items-center">
-                <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                  <CreditCard className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <div className="font-medium">Pay with Google Pay</div>
-                  <div className="text-sm text-muted-foreground">Quick, secure UPI payment</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <PaymentMethodComponent
+            paymentMethod={paymentData.paymentMethod}
+            paymentData={paymentData}
+            handleInputChange={handleInputChange}
+            validateUpiId={validateUpiId}
+            qrCodeUrl={qrCodeUrl}
+            qrCodeError={qrCodeError}
+            handleQrCodeError={handleQrCodeError}
+            handleUpiPayment={handleUpiPayment}
+            loading={loading}
+            initiateInstamojoPayment={initiateInstamojoPayment}
+          />
         )}
         
         {step === 3 && (
-          <div className="text-center py-6 animate-fade-in">
-            <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="h-8 w-8 text-emerald-500" strokeWidth={3} />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Payment Successful!</h3>
-            <p className="text-muted-foreground mb-6">Your transaction has been completed.</p>
-            <div className="bg-secondary rounded-lg p-4 max-w-xs mx-auto">
-              <div className="flex justify-between mb-2">
-                <span className="text-muted-foreground">Transaction ID:</span>
-                <span className="font-medium">UPI87654321</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span className="text-muted-foreground">Amount:</span>
-                <span className="font-medium">₹ {formData.amount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Date:</span>
-                <span className="font-medium">{new Date().toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
+          <PaymentSuccess
+            paymentData={paymentData}
+            getCurrencySymbol={getCurrencySymbol}
+          />
         )}
       </CardContent>
       
-      <CardFooter className={`flex ${step === 3 ? 'justify-center' : 'justify-end'} pt-2 pb-6`}>
+      <CardFooter className={`flex ${step === 3 ? 'justify-center flex-col space-y-2' : 'justify-end'} pt-2 pb-6`}>
         {step === 1 && (
           <Button onClick={handleNext} className="rounded-full px-6">
             Continue <ArrowRight className="ml-2 h-4 w-4" />
@@ -157,7 +333,11 @@ const PaymentFlow = () => {
         )}
         
         {step === 2 && (
-          <Button onClick={handleNext} disabled={loading} className="rounded-full px-6">
+          <Button 
+            onClick={paymentData.paymentMethod === 'upi' ? handleUpiPayment : handleNext} 
+            disabled={loading} 
+            className="rounded-full px-6 w-full"
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
@@ -171,32 +351,33 @@ const PaymentFlow = () => {
         )}
         
         {step === 3 && (
-          <Button variant="outline" onClick={() => {
-            setStep(1);
-            setFormData({ amount: '', currency: 'INR', paymentMethod: 'upi' });
-          }} className="rounded-full px-6">
-            Make Another Payment
-          </Button>
+          <>
+            <Button onClick={handleViewTransaction} variant="default" className="rounded-full px-6 w-full">
+              View Transaction Details
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setStep(1);
+                setPaymentData(prev => ({ 
+                  ...prev,
+                  amount: '',
+                  upiId: '',
+                  purpose: '',
+                  paymentStatus: '',
+                  transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000)
+                }));
+                setCurrentTransactionId(null);
+              }} 
+              className="rounded-full px-6 w-full"
+            >
+              Make Another Payment
+            </Button>
+          </>
         )}
       </CardFooter>
     </Card>
   );
 };
-
-// Internal component for success icon
-const Check = ({ className, ...props }: React.ComponentProps<typeof ArrowRight>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    {...props}
-  >
-    <path d="M20 6L9 17L4 12" />
-  </svg>
-);
 
 export default PaymentFlow;

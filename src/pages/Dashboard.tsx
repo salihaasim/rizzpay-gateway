@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
@@ -8,8 +8,10 @@ import Navbar from '@/components/Navbar';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 
-// Mock data
+// TODO: Replace with actual API data when backend is ready
+// For now using static data to test chart rendering
 const chartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -20,14 +22,107 @@ const chartData = [
   { name: 'Jul', value: 3490 },
 ];
 
-const transactions = [
-  { id: '8721', date: 'Today, 2:30 PM', amount: '₹12,500', paymentMethod: 'Google Pay', status: 'successful', customer: 'Ajay Sharma' },
-  { id: '8720', date: 'Today, 11:15 AM', amount: '₹3,200', paymentMethod: 'UPI', status: 'pending', customer: 'Priya Patel' },
-  { id: '8719', date: 'Yesterday, 5:45 PM', amount: '₹8,750', paymentMethod: 'Credit Card', status: 'successful', customer: 'Rahul Verma' },
-  { id: '8718', date: 'Yesterday, 1:20 PM', amount: '₹950', paymentMethod: 'Google Pay', status: 'failed', customer: 'Neha Singh' },
-] as const;
+// Revenue chart - extracted to avoid re-renders when dashboard state changes
+// FIXME: Should probably move this to its own file if it gets more complex
+const RevenueChart = React.memo(() => (
+  <div className="h-[300px]">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        data={chartData}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+        <XAxis dataKey="name" stroke="#888" fontSize={12} />
+        <YAxis stroke="#888" fontSize={12} />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "white",
+            border: "1px solid #f0f0f0",
+            borderRadius: "8px",
+          }}
+        />
+        <Line
+          type="monotone"
+          dataKey="value"
+          stroke="hsl(var(--primary))"
+          strokeWidth={2}
+          dot={{ strokeWidth: 2, r: 4 }}
+          activeDot={{ r: 6 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+));
+
+interface RecentTransactionsListProps {
+  transactions: Transaction[];
+}
+
+// Shows the most recent transactions in a vertical list
+const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsListProps) => (
+  <div className="space-y-4">
+    {transactions.length > 0 ? (
+      transactions.map((transaction) => (
+        <TransactionCard key={transaction.id} {...transaction} />
+      ))
+    ) : (
+      <div className="text-center py-12 border rounded-lg">
+        <p className="text-muted-foreground">No transactions yet</p>
+      </div>
+    )}
+  </div>
+));
+
+// Add displayName to help with debugging in React DevTools
+RecentTransactionsList.displayName = 'RecentTransactionsList';
 
 const Dashboard = () => {
+  const { transactions } = useTransactionStore();
+  const [activeTab, setActiveTab] = useState('merchant');
+  
+  // Calculate derived values from transactions
+  // Only recalculate when transactions change
+  const stats = useMemo(() => {
+    // Filter successful txns first to avoid multiple iterations
+    const successfulTxns = transactions.filter(t => t.status === 'successful');
+    
+    // Calculate total revenue (seems to work fine but double-check the logic later)
+    let revenue = 0;
+    for (let i = 0; i < successfulTxns.length; i++) {
+      const t = successfulTxns[i];
+      const cleanAmount = t.amount.replace(/[^0-9.-]+/g, '');
+      const num = Number(cleanAmount);
+      if (!isNaN(num)) {
+        revenue += num;
+      }
+    }
+    
+    // Get unique customer count
+    const customerEmails = [];
+    for (const t of transactions) {
+      if (!customerEmails.includes(t.customer)) {
+        customerEmails.push(t.customer);
+      }
+    }
+
+    // Avg transaction amount (avoid division by zero)
+    const avgTxn = successfulTxns.length > 0 ? revenue / successfulTxns.length : 0;
+    
+    return { 
+      totalRevenue: revenue, 
+      uniqueCustomers: customerEmails.length, 
+      avgTransaction: avgTxn 
+    };
+  }, [transactions]);
+  
+  // Get last 4 transactions to show in the recent list
+  const recentTxns = useMemo(() => {
+    // Use slice to avoid modifying the original array
+    return [...transactions].slice(0, 4);
+  }, [transactions]);
+
+  const { totalRevenue, uniqueCustomers, avgTransaction } = stats;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -39,7 +134,12 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Welcome back, Merchant Account</p>
           </div>
           
-          <Tabs defaultValue="merchant" className="w-[260px]">
+          <Tabs 
+            defaultValue="merchant" 
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-[260px]"
+          >
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="admin">Admin</TabsTrigger>
               <TabsTrigger value="merchant">Merchant</TabsTrigger>
@@ -48,36 +148,38 @@ const Dashboard = () => {
           </Tabs>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        {/* Stats cards - 4 column grid on large screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Revenue"
-            value="₹86,429"
+            value={`₹${totalRevenue.toLocaleString('en-IN')}`}
             icon={<DollarSign className="h-4 w-4" />}
-            trend={{ value: 12.8, isPositive: true }}
+            trend={{ value: transactions.length > 0 ? 12.8 : 0, isPositive: true }}
           />
           
           <StatCard
             title="Transactions"
-            value="924"
+            value={transactions.length.toString()}
             icon={<CreditCard className="h-4 w-4" />}
-            trend={{ value: 8.3, isPositive: true }}
+            trend={{ value: transactions.length > 0 ? 8.3 : 0, isPositive: true }}
           />
           
           <StatCard
             title="Customers"
-            value="512"
+            value={uniqueCustomers.toString()}
             icon={<Users className="h-4 w-4" />}
-            trend={{ value: 2.1, isPositive: true }}
+            trend={{ value: uniqueCustomers > 0 ? 2.1 : 0, isPositive: true }}
           />
           
           <StatCard
             title="Avg. Transaction"
-            value="₹935"
+            value={`₹${avgTransaction.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
             icon={<BarChart3 className="h-4 w-4" />}
-            trend={{ value: 1.2, isPositive: false }}
+            trend={{ value: avgTransaction > 0 ? 1.2 : 0, isPositive: false }}
           />
         </div>
         
+        {/* Main content area with chart and activity feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="lg:col-span-2 border-0 shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
@@ -85,33 +187,7 @@ const Dashboard = () => {
               <CardDescription>Daily transaction volume</CardDescription>
             </CardHeader>
             <CardContent className="pt-4 pb-1">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" stroke="#888" fontSize={12} />
-                    <YAxis stroke="#888" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #f0f0f0",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      dot={{ strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              <RevenueChart />
             </CardContent>
           </Card>
           
@@ -130,7 +206,7 @@ const Dashboard = () => {
                     <p className="font-medium">Incoming</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-emerald-500 font-semibold ml-auto">+₹24,500</p>
+                  <p className="text-emerald-500 font-semibold ml-auto">+₹{totalRevenue.toLocaleString('en-IN')}</p>
                 </div>
                 
                 <div className="flex items-center">
@@ -141,13 +217,13 @@ const Dashboard = () => {
                     <p className="font-medium">Outgoing</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-rose-500 font-semibold ml-auto">-₹8,250</p>
+                  <p className="text-rose-500 font-semibold ml-auto">-₹0</p>
                 </div>
                 
                 <div className="pt-4 border-t">
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-muted-foreground">Available Balance</div>
-                    <div className="text-xl font-semibold">₹62,390</div>
+                    <div className="text-xl font-semibold">₹{totalRevenue.toLocaleString('en-IN')}</div>
                   </div>
                 </div>
               </div>
@@ -155,20 +231,18 @@ const Dashboard = () => {
           </Card>
         </div>
         
+        {/* Transactions and payment section */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-6">
             <h2 className="text-xl font-semibold">Recent Transactions</h2>
-            
-            <div className="space-y-4">
-              {transactions.map((transaction) => (
-                <TransactionCard key={transaction.id} {...transaction} />
-              ))}
-            </div>
+            <RecentTransactionsList transactions={recentTxns} />
           </div>
           
           <div className="lg:col-span-2">
             <h2 className="text-xl font-semibold mb-6">Quick Payment</h2>
-            <PaymentFlow />
+            <div className="p-4 h-full">
+              <PaymentFlow />
+            </div>
           </div>
         </div>
       </div>
@@ -176,4 +250,5 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+// Export with memo to prevent unnecessary re-renders of the entire dashboard
+export default React.memo(Dashboard);
