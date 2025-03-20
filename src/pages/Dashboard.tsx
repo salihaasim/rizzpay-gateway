@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
@@ -9,7 +10,8 @@ import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 
-// Static data that doesn't need to be recalculated
+// TODO: Replace with actual API data when backend is ready
+// For now using static data to test chart rendering
 const chartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -20,7 +22,8 @@ const chartData = [
   { name: 'Jul', value: 3490 },
 ];
 
-// Memoized chart component to avoid re-renders
+// Revenue chart - extracted to avoid re-renders when dashboard state changes
+// FIXME: Should probably move this to its own file if it gets more complex
 const RevenueChart = React.memo(() => (
   <div className="h-[300px]">
     <ResponsiveContainer width="100%" height="100%">
@@ -51,12 +54,11 @@ const RevenueChart = React.memo(() => (
   </div>
 ));
 
-// Define a proper interface for RecentTransactionsList props
 interface RecentTransactionsListProps {
   transactions: Transaction[];
 }
 
-// Memoized transaction list component with properly typed props
+// Shows the most recent transactions in a vertical list
 const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsListProps) => (
   <div className="space-y-4">
     {transactions.length > 0 ? (
@@ -71,36 +73,55 @@ const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsL
   </div>
 ));
 
+// Add displayName to help with debugging in React DevTools
 RecentTransactionsList.displayName = 'RecentTransactionsList';
 
 const Dashboard = () => {
   const { transactions } = useTransactionStore();
   const [activeTab, setActiveTab] = useState('merchant');
   
-  // Use useMemo to calculate derived values only when transactions change
-  const calculatedValues = useMemo(() => {
-    const totalRevenue = transactions
-      .filter(t => t.status === 'successful')
-      .reduce((sum, t) => {
-        const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
-        return sum + (isNaN(amount) ? 0 : amount);
-      }, 0);
+  // Calculate derived values from transactions
+  // Only recalculate when transactions change
+  const stats = useMemo(() => {
+    // Filter successful txns first to avoid multiple iterations
+    const successfulTxns = transactions.filter(t => t.status === 'successful');
     
-    const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
+    // Calculate total revenue (seems to work fine but double-check the logic later)
+    let revenue = 0;
+    for (let i = 0; i < successfulTxns.length; i++) {
+      const t = successfulTxns[i];
+      const cleanAmount = t.amount.replace(/[^0-9.-]+/g, '');
+      const num = Number(cleanAmount);
+      if (!isNaN(num)) {
+        revenue += num;
+      }
+    }
     
-    const avgTransaction = transactions.length > 0 
-      ? totalRevenue / transactions.filter(t => t.status === 'successful').length 
-      : 0;
+    // Get unique customer count
+    const customerEmails = [];
+    for (const t of transactions) {
+      if (!customerEmails.includes(t.customer)) {
+        customerEmails.push(t.customer);
+      }
+    }
+
+    // Avg transaction amount (avoid division by zero)
+    const avgTxn = successfulTxns.length > 0 ? revenue / successfulTxns.length : 0;
     
-    return { totalRevenue, uniqueCustomers, avgTransaction };
+    return { 
+      totalRevenue: revenue, 
+      uniqueCustomers: customerEmails.length, 
+      avgTransaction: avgTxn 
+    };
   }, [transactions]);
   
-  // Use useMemo for derived data
-  const recentTransactions = useMemo(() => {
+  // Get last 4 transactions to show in the recent list
+  const recentTxns = useMemo(() => {
+    // Use slice to avoid modifying the original array
     return [...transactions].slice(0, 4);
   }, [transactions]);
 
-  const { totalRevenue, uniqueCustomers, avgTransaction } = calculatedValues;
+  const { totalRevenue, uniqueCustomers, avgTransaction } = stats;
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,6 +148,7 @@ const Dashboard = () => {
           </Tabs>
         </div>
         
+        {/* Stats cards - 4 column grid on large screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Revenue"
@@ -157,6 +179,7 @@ const Dashboard = () => {
           />
         </div>
         
+        {/* Main content area with chart and activity feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="lg:col-span-2 border-0 shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
@@ -208,10 +231,11 @@ const Dashboard = () => {
           </Card>
         </div>
         
+        {/* Transactions and payment section */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-6">
             <h2 className="text-xl font-semibold">Recent Transactions</h2>
-            <RecentTransactionsList transactions={recentTransactions} />
+            <RecentTransactionsList transactions={recentTxns} />
           </div>
           
           <div className="lg:col-span-2">
@@ -226,4 +250,5 @@ const Dashboard = () => {
   );
 };
 
+// Export with memo to prevent unnecessary re-renders of the entire dashboard
 export default React.memo(Dashboard);
