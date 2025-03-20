@@ -1,14 +1,15 @@
 
 import { Transaction, TransactionStatus, PaymentDetails, useTransactionStore } from '@/stores/transactionStore';
 import { generateTransactionId, formatDate } from './formatUtils';
+import { syncTransactionToSupabase } from './supabaseClient';
 
-export const addTransaction = (
+export const addTransaction = async (
   amount: string,
   paymentMethod: string,
   status: TransactionStatus,
   customer: string,
   paymentDetails?: PaymentDetails
-): Transaction => {
+): Promise<Transaction> => {
   const store = useTransactionStore.getState();
   
   const transaction: Transaction = {
@@ -30,5 +31,9 @@ export const addTransaction = (
   };
   
   store.addTransaction(transaction);
+  
+  // Sync with Supabase
+  await syncTransactionToSupabase(transaction);
+  
   return transaction;
 };

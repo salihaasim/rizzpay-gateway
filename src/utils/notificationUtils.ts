@@ -1,5 +1,7 @@
 
 import { toast } from 'sonner';
+import { syncTransactionToSupabase } from './supabaseClient';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 // Helper for displaying transaction status updates
 export const showTransactionNotification = (
@@ -23,7 +25,7 @@ export const showTransactionNotification = (
 // Function to simulate a successful payment callback
 // This is used for testing only, when the real payment gateway
 // isn't available or we want to bypass it
-export const simulateSuccessfulPayment = (transactionId: string) => {
+export const simulateSuccessfulPayment = async (transactionId: string) => {
   // Create a simulated webhook event
   const simulatedEvent = new CustomEvent('payment_callback', {
     detail: {
@@ -44,6 +46,14 @@ export const simulateSuccessfulPayment = (transactionId: string) => {
     'Payment Successful',
     'Your test payment has been processed successfully'
   );
+  
+  // Get the transaction and sync it to Supabase
+  const store = useTransactionStore.getState();
+  const transaction = store.transactions.find(t => t.id === transactionId);
+  
+  if (transaction) {
+    await syncTransactionToSupabase(transaction);
+  }
   
   // Redirect to the success page
   window.location.href = `/dashboard?transaction_id=${transactionId}&status=success`;

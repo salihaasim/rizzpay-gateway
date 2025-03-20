@@ -25,3 +25,9 @@ export { simulatePaymentProcessing } from '@/utils/paymentProcessingUtils';
 export { updateTransactionFromWebhook } from '@/utils/webhookUtils';
 
 export { addTransaction } from '@/utils/transactionCreateUtils';
+
+export { 
+  checkSupabaseConnection,
+  syncTransactionToSupabase,
+  fetchTransactionsFromSupabase
+} from '@/utils/supabaseClient';

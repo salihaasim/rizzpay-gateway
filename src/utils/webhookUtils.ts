@@ -2,14 +2,15 @@
 import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
 import { showTransactionNotification } from './notificationUtils';
+import { syncTransactionToSupabase } from './supabaseClient';
 
 // Update the transactionStore to include new Instamojo payment methods
-export const updateTransactionFromWebhook = (
+export const updateTransactionFromWebhook = async (
   paymentRequestId: string,
   status: 'success' | 'failure',
   paymentId?: string,
   additionalDetails?: Record<string, string>
-): boolean => {
+): Promise<boolean> => {
   try {
     const store = useTransactionStore.getState();
     const transaction = store.transactions.find(t => 
@@ -53,6 +54,12 @@ export const updateTransactionFromWebhook = (
         : additionalDetails?.error || "Your payment could not be processed."
     );
     
+    // Sync updated transaction to Supabase
+    const updatedTransaction = store.transactions.find(t => t.id === transaction.id);
+    if (updatedTransaction) {
+      await syncTransactionToSupabase(updatedTransaction);
+    }
+    
     return true;
   } catch (error) {
     console.error("Error updating transaction from webhook:", error);
@@ -61,10 +68,10 @@ export const updateTransactionFromWebhook = (
 };
 
 // Process payment gateway webhook
-export const processPaymentGatewayWebhook = (
+export const processPaymentGatewayWebhook = async (
   gatewayName: string,
   webhookData: Record<string, string>
-): boolean => {
+): Promise<boolean> => {
   console.log(`Processing ${gatewayName} webhook:`, webhookData);
   
   // Extract transaction status based on gateway-specific format
