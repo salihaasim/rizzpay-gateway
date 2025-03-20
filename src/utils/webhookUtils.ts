@@ -57,7 +57,12 @@ export const updateTransactionFromWebhook = async (
     // Sync updated transaction to Supabase
     const updatedTransaction = store.transactions.find(t => t.id === transaction.id);
     if (updatedTransaction) {
-      await syncTransactionToSupabase(updatedTransaction);
+      try {
+        await syncTransactionToSupabase(updatedTransaction);
+      } catch (error) {
+        console.error("Error syncing transaction to Supabase:", error);
+        // Continue even if syncing fails
+      }
     }
     
     return true;
@@ -75,26 +80,31 @@ export const processPaymentGatewayWebhook = async (
   console.log(`Processing ${gatewayName} webhook:`, webhookData);
   
   // Extract transaction status based on gateway-specific format
-  switch (gatewayName.toLowerCase()) {
-    case 'instamojo':
-      // Handle Instamojo webhook format from docs
-      const paymentId = webhookData.payment_id;
-      const paymentRequestId = webhookData.payment_request_id;
-      const status = webhookData.status === 'Credit' ? 'success' : 'failure';
-      
-      return updateTransactionFromWebhook(
-        paymentRequestId,
-        status,
-        paymentId,
-        {
-          gatewayName: 'Instamojo',
-          paidAmount: webhookData.amount,
-          paymentMethod: webhookData.instrument_type || 'unknown'
-        }
-      );
-      
-    default:
-      console.error(`Unsupported payment gateway: ${gatewayName}`);
-      return false;
+  try {
+    switch (gatewayName.toLowerCase()) {
+      case 'instamojo':
+        // Handle Instamojo webhook format from docs
+        const paymentId = webhookData.payment_id;
+        const paymentRequestId = webhookData.payment_request_id;
+        const status = webhookData.status === 'Credit' ? 'success' : 'failure';
+        
+        return await updateTransactionFromWebhook(
+          paymentRequestId,
+          status,
+          paymentId,
+          {
+            gatewayName: 'Instamojo',
+            paidAmount: webhookData.amount,
+            paymentMethod: webhookData.instrument_type || 'unknown'
+          }
+        );
+        
+      default:
+        console.error(`Unsupported payment gateway: ${gatewayName}`);
+        return false;
+    }
+  } catch (error) {
+    console.error(`Error processing ${gatewayName} webhook:`, error);
+    return false;
   }
 };

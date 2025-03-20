@@ -99,10 +99,10 @@ export const getWebhookPaymentDetails = (transactionId: string) => {
 };
 
 // Process webhook callbacks from payment gateways
-export const processGatewayWebhookCallback = (
+export const processGatewayWebhookCallback = async (
   gatewayName: string,
   callbackData: Record<string, any>
-): boolean => {
+): Promise<boolean> => {
   try {
     console.log(`Processing ${gatewayName} webhook callback:`, callbackData);
     
@@ -125,7 +125,7 @@ export const processGatewayWebhookCallback = (
       }
       
       // Update transaction
-      return updateTransactionFromWebhook(
+      return await updateTransactionFromWebhook(
         payment_request_id, 
         internalStatus,
         payment_id,

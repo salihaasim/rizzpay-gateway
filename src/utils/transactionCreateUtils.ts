@@ -30,10 +30,13 @@ export const addTransaction = async (
     paymentDetails
   };
   
+  // Add transaction to store first
   store.addTransaction(transaction);
   
-  // Sync with Supabase
-  await syncTransactionToSupabase(transaction);
+  // Sync with Supabase - but don't wait for the result
+  syncTransactionToSupabase(transaction)
+    .catch(error => console.error('Error syncing transaction to Supabase:', error));
   
+  // Return the transaction object directly, not a Promise
   return transaction;
 };

@@ -2,9 +2,10 @@
 import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
 import type { Transaction, TransactionStatus } from '@/stores/transactionStore';
+import { syncTransactionToSupabase } from '@/utils/supabaseClient';
 
 // Function to handle webhook payment completion
-export const completeWebhookPayment = (transactionId: string, status: 'success' | 'failed'): boolean => {
+export const completeWebhookPayment = async (transactionId: string, status: 'success' | 'failed'): Promise<boolean> => {
   try {
     // Get transaction details from local storage
     const paymentDataStr = localStorage.getItem(`webhook_payment_${transactionId}`);
@@ -40,6 +41,14 @@ export const completeWebhookPayment = (transactionId: string, status: 'success' 
       };
       
       store.addTransaction(transaction);
+      
+      // Sync to Supabase
+      try {
+        await syncTransactionToSupabase(transaction);
+      } catch (error) {
+        console.error('Error syncing webhook transaction to Supabase:', error);
+        // Continue even if sync fails
+      }
       
       // Add funds to merchant wallet
       if (paymentData.merchantEmail) {
