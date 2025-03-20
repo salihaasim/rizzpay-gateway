@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +7,7 @@ import { ArrowRight, Building2, UserCircle, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 const roles = [
   {
@@ -34,9 +35,9 @@ const roles = [
 
 // Demo credentials - simplified for easier login
 const demoCredentials = {
-  admin: { username: 'admin', password: 'admin' },
-  merchant: { username: 'merchant', password: 'merchant' },
-  client: { username: 'client', password: 'client' },
+  admin: { username: 'admin@rizzpay.com', password: 'admin' },
+  merchant: { username: 'merchant@rizzpay.com', password: 'merchant' },
+  client: { username: 'client@rizzpay.com', password: 'client' },
 };
 
 const RoleSelector = () => {
@@ -44,6 +45,14 @@ const RoleSelector = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
+  const { setUserRole, userRole, userEmail } = useTransactionStore();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (userRole) {
+      navigate('/dashboard');
+    }
+  }, [userRole, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,20 +79,16 @@ const RoleSelector = () => {
     // Simplified login logic - accept credentials as is for demo
     const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
     
-    // Allow login with just the username part (before @) for flexibility
-    const enteredUsername = credentials.email.split('@')[0].toLowerCase();
-    const expectedUsername = demoUser.username.split('@')[0].toLowerCase();
-    
-    if (enteredUsername === expectedUsername && 
+    // Allow login with email checking
+    if ((credentials.email === demoUser.username || 
+        credentials.email.toLowerCase() === selectedRole.toLowerCase()) && 
         (credentials.password === demoUser.password || credentials.password === 'password')) {
+      
+      // Store role in Zustand store
+      setUserRole(selectedRole as 'admin' | 'merchant' | 'client', credentials.email);
+      
       // Successful login
       toast.success(`Logged in as ${selectedRole}`);
-      
-      // Store user role in session for persistence
-      sessionStorage.setItem('userRole', selectedRole);
-      sessionStorage.setItem('userEmail', credentials.email);
-      
-      // Navigate based on role
       navigate('/dashboard');
     } else {
       toast.error("Invalid credentials. Try the demo credentials shown below.");
@@ -163,13 +168,14 @@ const RoleSelector = () => {
           ) : (
             <div className="space-y-4 py-4 animate-fade-in">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Username</label>
+                <label className="text-sm font-medium">Email</label>
                 <Input
                   name="email"
                   value={credentials.email}
                   onChange={handleInputChange}
-                  placeholder="Enter your username"
+                  placeholder="Enter your email"
                   onKeyDown={handleKeyDown}
+                  type="email"
                 />
                 <p className="text-xs text-muted-foreground">
                   Demo: {demoCredentials[selectedRole as keyof typeof demoCredentials].username}

@@ -29,7 +29,8 @@ export const addTransaction = (
     amount: `₹${amount}`,
     paymentMethod,
     status,
-    customer
+    customer,
+    createdBy: store.userEmail || undefined
   };
   
   store.addTransaction(transaction);
