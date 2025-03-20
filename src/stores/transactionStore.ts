@@ -1,9 +1,10 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
 export type UserRole = 'admin' | 'merchant' | null;
-export type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'instamojo_card' | 'instamojo_neft' | 'wallet' | 'webhook';
+export type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'neft' | 'wallet' | 'webhook';
 export type PaymentProcessingState = 
   | 'initiated' 
   | 'gateway_processing'
@@ -27,6 +28,8 @@ export interface PaymentDetails {
   expiryDate?: string;
   cvv?: string;
   bankName?: string;
+  bankAccount?: string;
+  bankIfsc?: string;
   upiId?: string;
   processor?: string;
   cardNetwork?: string;
