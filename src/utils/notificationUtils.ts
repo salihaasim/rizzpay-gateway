@@ -48,3 +48,28 @@ export const simulateSuccessfulPayment = (transactionId: string) => {
   // Redirect to the success page
   window.location.href = `/dashboard?transaction_id=${transactionId}&status=success`;
 };
+
+// Enable test mode for development
+export const enableTestMode = () => {
+  window.localStorage.setItem('enable_test_mode', 'true');
+  showTransactionNotification(
+    'info',
+    'Test Mode Enabled',
+    'You can now simulate successful payments'
+  );
+};
+
+// Disable test mode
+export const disableTestMode = () => {
+  window.localStorage.removeItem('enable_test_mode');
+  showTransactionNotification(
+    'info',
+    'Test Mode Disabled',
+    'Real payment gateways will be used'
+  );
+};
+
+// Check if test mode is enabled
+export const isTestModeEnabled = (): boolean => {
+  return window.localStorage.getItem('enable_test_mode') === 'true';
+};

@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2, Building, ExternalLink, AlertCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { showTransactionNotification, simulateSuccessfulPayment } from '@/utils/notificationUtils';
 
 interface InstamojoPaymentProps {
   type: 'card' | 'neft';
@@ -18,7 +19,36 @@ const InstamojoPayment: React.FC<InstamojoPaymentProps> = ({
   const isCard = type === 'card';
   
   const handlePaymentClick = () => {
-    toast.info(`Preparing ${isCard ? 'card' : 'NEFT'} payment via Instamojo...`);
+    // Show friendly toast per the Instamojo docs recommendation
+    showTransactionNotification(
+      'info',
+      `Preparing ${isCard ? 'card' : 'NEFT'} payment via Instamojo`,
+      'You will be redirected to Instamojo\'s secure payment gateway'
+    );
+    
+    // When in development/test, offer a way to simulate successful payments
+    if (process.env.NODE_ENV === 'development') {
+      const simulateId = `sim_${Math.random().toString(36).substring(2, 10)}`;
+      
+      // Store a simulated amount for the demo
+      localStorage.setItem(`instamojo_payment_amount_${simulateId}`, '500.00');
+      
+      // Add a hidden test button for development only
+      const testMode = window.localStorage.getItem('enable_test_mode') === 'true';
+      if (testMode) {
+        toast.info(
+          "Test Mode Enabled", 
+          {
+            description: "Click here to simulate a successful payment",
+            action: {
+              label: "Simulate Success",
+              onClick: () => simulateSuccessfulPayment(simulateId)
+            }
+          }
+        );
+      }
+    }
+    
     initiateInstamojoPayment(type);
   };
   
@@ -69,6 +99,15 @@ const InstamojoPayment: React.FC<InstamojoPaymentProps> = ({
             </p>
           </div>
         </div>
+        
+        {process.env.NODE_ENV === 'development' && (
+          <div className="p-3 bg-amber-50 rounded mb-4 border border-amber-200">
+            <p className="text-xs text-amber-700 flex items-center">
+              <AlertCircle size={14} className="mr-1" />
+              Test Mode: In a real implementation, you'll be redirected to the Instamojo payment page.
+            </p>
+          </div>
+        )}
         
         <Button 
           onClick={handlePaymentClick} 

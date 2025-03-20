@@ -1,6 +1,7 @@
 
 import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
+import { showTransactionNotification } from './notificationUtils';
 
 // Update the transactionStore to include new Instamojo payment methods
 export const updateTransactionFromWebhook = (
@@ -44,19 +45,49 @@ export const updateTransactionFromWebhook = (
     });
     
     // Show notification to user
-    if (status === 'success') {
-      toast.success("Payment successful", {
-        description: `Your payment of ${transaction.amount} has been confirmed.`
-      });
-    } else {
-      toast.error("Payment failed", {
-        description: additionalDetails?.error || "Your payment could not be processed."
-      });
-    }
+    showTransactionNotification(
+      status === 'success' ? 'success' : 'error',
+      status === 'success' ? "Payment successful" : "Payment failed",
+      status === 'success' 
+        ? `Your payment of ${transaction.amount} has been confirmed.`
+        : additionalDetails?.error || "Your payment could not be processed."
+    );
     
     return true;
   } catch (error) {
     console.error("Error updating transaction from webhook:", error);
     return false;
+  }
+};
+
+// Process payment gateway webhook
+export const processPaymentGatewayWebhook = (
+  gatewayName: string,
+  webhookData: Record<string, string>
+): boolean => {
+  console.log(`Processing ${gatewayName} webhook:`, webhookData);
+  
+  // Extract transaction status based on gateway-specific format
+  switch (gatewayName.toLowerCase()) {
+    case 'instamojo':
+      // Handle Instamojo webhook format from docs
+      const paymentId = webhookData.payment_id;
+      const paymentRequestId = webhookData.payment_request_id;
+      const status = webhookData.status === 'Credit' ? 'success' : 'failure';
+      
+      return updateTransactionFromWebhook(
+        paymentRequestId,
+        status,
+        paymentId,
+        {
+          gatewayName: 'Instamojo',
+          paidAmount: webhookData.amount,
+          paymentMethod: webhookData.instrument_type || 'unknown'
+        }
+      );
+      
+    default:
+      console.error(`Unsupported payment gateway: ${gatewayName}`);
+      return false;
   }
 };
