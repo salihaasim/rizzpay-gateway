@@ -34,7 +34,8 @@ export const completeWebhookPayment = (transactionId: string, status: 'success' 
         paymentDetails: {
           // Using existing fields in PaymentDetails that are compatible 
           cardHolderName: paymentData.customerName,
-          email: paymentData.customerEmail
+          // We'll use recipientEmail instead of email since that exists in the type
+          recipientEmail: paymentData.customerEmail
         }
       };
       
