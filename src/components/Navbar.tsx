@@ -1,6 +1,6 @@
 
-import React, { useState, useMemo } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,68 +10,19 @@ import {
   Home,
   Menu,
   X,
-  LogOut,
-  Wallet,
-  LogIn,
-  Shield
+  LogOut
 } from 'lucide-react';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { useToast } from '@/hooks/use-toast';
 
-// Define NavItem type to fix TypeScript errors
-interface NavItem {
-  name: string;
-  path: string;
-  icon: React.ElementType;
-  isAdminOnly?: boolean;
-}
+const navItems = [
+  { name: 'Home', path: '/', icon: Home },
+  { name: 'Dashboard', path: '/dashboard', icon: BarChart2 },
+  { name: 'Transactions', path: '/transactions', icon: CreditCard },
+  { name: 'Settings', path: '/settings', icon: Settings },
+];
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { userRole, userEmail, clearUserData } = useTransactionStore();
-  const { toast } = useToast();
-
-  // Build navItems based on user role using useMemo to prevent recalculation on every render
-  const navItems = useMemo(() => {
-    const items: NavItem[] = [
-      { name: 'Home', path: '/', icon: Home },
-    ];
-
-    if (userRole) {
-      items.push({ name: 'Dashboard', path: '/dashboard', icon: BarChart2 });
-      items.push({ name: 'Transactions', path: '/transactions', icon: CreditCard });
-      items.push({ name: 'Wallet', path: '/wallet', icon: Wallet });
-      items.push({ name: 'Webhook', path: '/webhook', icon: Shield });
-      items.push({ name: 'Settings', path: '/settings', icon: Settings });
-
-      // Admin-only items
-      if (userRole === 'admin') {
-        items.push({ 
-          name: 'Payment', 
-          path: '/payment', 
-          icon: CreditCard,
-          isAdminOnly: true
-        });
-      }
-    }
-
-    return items;
-  }, [userRole]);
-
-  const handleLogout = () => {
-    clearUserData();
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
-    });
-    navigate('/');
-  };
-
-  const handleLogin = () => {
-    navigate('/auth');
-  };
 
   return (
     <>
@@ -82,25 +33,12 @@ const Navbar = () => {
             <span className="bg-primary text-primary-foreground p-2 rounded-md">
               <CreditCard size={20} />
             </span>
-            <span className="font-bold text-xl">Rizzpay</span>
-            {userRole === 'admin' && (
-              <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                Admin
-              </span>
-            )}
-            {userRole === 'merchant' && userEmail && (
-              <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                {userEmail}
-              </span>
-            )}
+            <span className="font-bold text-xl">FlowPay</span>
           </Link>
           
           <div className="flex items-center space-x-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
-              // Skip admin-only items for non-admin users
-              if (item.isAdminOnly && userRole !== 'admin') return null;
-              
               return (
                 <Link key={item.path} to={item.path}>
                   <Button
@@ -116,26 +54,9 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            
-            {userRole ? (
-              <Button 
-                variant="ghost" 
-                className="ml-2 rounded-full" 
-                size="icon"
-                onClick={handleLogout}
-              >
-                <LogOut size={18} />
-              </Button>
-            ) : (
-              <Button 
-                variant="outline" 
-                className="ml-2 rounded-full"
-                onClick={handleLogin}
-              >
-                <LogIn size={18} className="mr-2" />
-                Login
-              </Button>
-            )}
+            <Button variant="ghost" className="ml-2 rounded-full" size="icon">
+              <LogOut size={18} />
+            </Button>
           </div>
         </div>
       </nav>
@@ -147,17 +68,7 @@ const Navbar = () => {
             <span className="bg-primary text-primary-foreground p-1.5 rounded-md">
               <CreditCard size={18} />
             </span>
-            <span className="font-bold text-lg">Rizzpay</span>
-            {userRole === 'admin' && (
-              <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">
-                Admin
-              </span>
-            )}
-            {userRole === 'merchant' && userEmail && (
-              <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full truncate max-w-[100px]">
-                {userEmail}
-              </span>
-            )}
+            <span className="font-bold text-lg">FlowPay</span>
           </Link>
 
           <Button
@@ -177,9 +88,6 @@ const Navbar = () => {
           <div className="flex flex-col space-y-2 p-4 animate-slide-in">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
-              // Skip admin-only items for non-admin users
-              if (item.isAdminOnly && userRole !== 'admin') return null;
-              
               return (
                 <Link
                   key={item.path}
@@ -197,33 +105,11 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            
             <div className="pt-4 mt-4 border-t border-border">
-              {userRole ? (
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start" 
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <LogOut size={20} className="mr-3" />
-                  <span>Logout</span>
-                </Button>
-              ) : (
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start" 
-                  onClick={() => {
-                    handleLogin();
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <LogIn size={20} className="mr-3" />
-                  <span>Login</span>
-                </Button>
-              )}
+              <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <LogOut size={20} className="mr-3" />
+                <span>Logout</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -232,5 +118,4 @@ const Navbar = () => {
   );
 };
 
-// Memoize the Navbar component to prevent unnecessary re-renders
-export default React.memo(Navbar);
+export default Navbar;
