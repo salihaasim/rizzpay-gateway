@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -147,8 +148,13 @@ const PaymentFlow = () => {
   };
 
   const getUpiQrCodeUrl = () => {
-    const upiUrl = encodeURIComponent(getUpiPaymentLink());
-    return `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${upiUrl}&choe=UTF-8`;
+    if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) return '';
+    
+    const upiUrl = getUpiPaymentLink();
+    if (!upiUrl) return '';
+    
+    const encodedUpiUrl = encodeURIComponent(upiUrl);
+    return `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodedUpiUrl}&choe=UTF-8`;
   };
 
   const copyToClipboard = (text: string) => {
@@ -169,6 +175,11 @@ const PaymentFlow = () => {
     const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
     return upiRegex.test(value);
   };
+
+  // Get QR code URL only when needed
+  const qrCodeUrl = step === 2 && paymentData.paymentMethod === 'upi' && 
+                    paymentData.upiId && validateUpiId(paymentData.upiId) ? 
+                    getUpiQrCodeUrl() : '';
 
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
@@ -305,11 +316,17 @@ const PaymentFlow = () => {
                       <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okaxis, name@ybl)</p>
                     </div>
                     
-                    {paymentData.upiId && validateUpiId(paymentData.upiId) && (
+                    {paymentData.upiId && validateUpiId(paymentData.upiId) && qrCodeUrl && (
                       <div className="mt-4">
                         <p className="text-sm font-medium mb-2">Scan QR Code</p>
                         <div className="bg-white p-2 rounded-lg inline-block">
-                          <img src={getUpiQrCodeUrl()} alt="UPI QR Code" width={200} height={200} />
+                          <img 
+                            src={qrCodeUrl} 
+                            alt="UPI QR Code" 
+                            width={200} 
+                            height={200} 
+                            onError={() => toast.error("Error loading QR code. Please check your UPI ID.")}
+                          />
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">Scan this QR code with any UPI app</p>
                       </div>
