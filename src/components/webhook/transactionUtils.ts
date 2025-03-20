@@ -1,6 +1,7 @@
 
-import { useTransactionStore, Transaction, TransactionStatus } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
+import type { Transaction, TransactionStatus } from '@/stores/transactionStore';
 
 // Function to handle webhook payment completion
 export const completeWebhookPayment = (transactionId: string, status: 'success' | 'failed'): boolean => {
@@ -31,8 +32,9 @@ export const completeWebhookPayment = (transactionId: string, status: 'success' 
         processingState: 'completed',
         description: paymentData.description,
         paymentDetails: {
-          upiId: paymentData.customerEmail, // Using existing fields in PaymentDetails
-          cardHolderName: paymentData.customerName // Using existing fields in PaymentDetails
+          // Using existing fields in PaymentDetails that are compatible 
+          cardHolderName: paymentData.customerName,
+          email: paymentData.customerEmail
         }
       };
       

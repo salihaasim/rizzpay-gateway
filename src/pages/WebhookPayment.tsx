@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -23,16 +24,22 @@ const WebhookPayment: React.FC = () => {
       return;
     }
     
-    // Get payment details
-    const details = getWebhookPaymentDetails(transactionId);
-    if (!details) {
-      setError('Payment request not found or expired');
+    try {
+      // Get payment details
+      const details = getWebhookPaymentDetails(transactionId);
+      if (!details) {
+        setError('Payment request not found or expired');
+        setLoading(false);
+        return;
+      }
+      
+      setPaymentData(details);
       setLoading(false);
-      return;
+    } catch (err) {
+      console.error('Error loading payment details:', err);
+      setError('An error occurred while loading payment details');
+      setLoading(false);
     }
-    
-    setPaymentData(details);
-    setLoading(false);
   }, [transactionId]);
   
   const handlePayment = (status: 'success' | 'failed') => {
@@ -40,8 +47,8 @@ const WebhookPayment: React.FC = () => {
     
     setProcessing(true);
     
-    // Simulate payment processing
-    setTimeout(() => {
+    try {
+      // Complete the payment
       const result = completeWebhookPayment(transactionId, status);
       
       if (result) {
@@ -54,7 +61,11 @@ const WebhookPayment: React.FC = () => {
         setError('Failed to complete payment. Please try again.');
         setProcessing(false);
       }
-    }, 1500);
+    } catch (err) {
+      console.error('Payment processing error:', err);
+      setError('An error occurred while processing the payment');
+      setProcessing(false);
+    }
   };
   
   if (loading) {
