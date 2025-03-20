@@ -43,16 +43,11 @@ const Navbar = () => {
       items.push({ name: 'Dashboard', path: '/dashboard', icon: BarChart2 });
       items.push({ name: 'Transactions', path: '/transactions', icon: CreditCard });
       items.push({ name: 'Wallet', path: '/wallet', icon: Wallet });
+      items.push({ name: 'Webhook', path: '/webhook', icon: Shield }); // Making webhook available to all users
       items.push({ name: 'Settings', path: '/settings', icon: Settings });
 
       // Admin-only items
       if (userRole === 'admin') {
-        items.push({ 
-          name: 'Webhook', 
-          path: '/webhook', 
-          icon: Shield,
-          isAdminOnly: true
-        });
         items.push({ 
           name: 'Payment', 
           path: '/payment', 

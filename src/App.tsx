@@ -70,13 +70,13 @@ const App = () => (
               <Settings />
             </ProtectedRoute>
           } />
+          <Route path="/webhook" element={
+            <ProtectedRoute>
+              <WebhookPage />
+            </ProtectedRoute>
+          } />
           
           {/* Admin-only routes */}
-          <Route path="/webhook" element={
-            <AdminRoute>
-              <WebhookPage />
-            </AdminRoute>
-          } />
           <Route path="/payment" element={
             <AdminRoute>
               <WebhookPayment />
