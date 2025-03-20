@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check, AlertTriangle, BuildingBank } from 'lucide-react';
 import { addTransaction, simulatePaymentProcessing } from './TransactionUtils';
 import { PaymentMethod } from '@/stores/transactionStore';
 import { useNavigate } from 'react-router-dom';
+import { createInstamojoPayment } from './webhook/instamojoUtils';
 
 const PaymentFlow = () => {
   const navigate = useNavigate();
@@ -27,7 +27,14 @@ const PaymentFlow = () => {
     phone: '',
     purpose: '',
     transactionId: '',
-    paymentStatus: ''
+    paymentStatus: '',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCvv: '',
+    cardName: '',
+    bankAccount: '',
+    bankIfsc: '',
+    bankName: ''
   });
 
   useEffect(() => {
@@ -73,6 +80,12 @@ const PaymentFlow = () => {
       if (paymentData.paymentMethod === 'upi' && !validateUpiId(paymentData.upiId)) {
         toast.error('Please enter a valid UPI ID');
         return;
+      } else if (paymentData.paymentMethod === 'instamojo_card') {
+        initiateInstamojoPayment('card');
+        return;
+      } else if (paymentData.paymentMethod === 'instamojo_neft') {
+        initiateInstamojoPayment('neft');
+        return;
       }
       
       initiatePayment();
@@ -114,6 +127,54 @@ const PaymentFlow = () => {
     } catch (error) {
       console.error("Payment processing error:", error);
       toast.error("An error occurred during payment processing");
+      setLoading(false);
+    }
+  };
+
+  const initiateInstamojoPayment = async (type: 'card' | 'neft') => {
+    setLoading(true);
+    
+    try {
+      // Create a transaction ID for internal tracking
+      const internalTxnId = generateTransactionId();
+      
+      // Create payment request with Instamojo
+      const response = await createInstamojoPayment({
+        purpose: paymentData.purpose || `Payment via Rizzpay (${type})`,
+        amount: paymentData.amount,
+        buyer_name: paymentData.name,
+        email: paymentData.email || undefined,
+        phone: paymentData.phone || undefined,
+        redirect_url: `${window.location.origin}/dashboard?transaction_id=${internalTxnId}`,
+        webhook_url: `${window.location.origin}/api/webhooks/instamojo`,
+        allow_repeated_payments: false
+      });
+      
+      if (response.success && response.payment_request) {
+        // Create a transaction in our store
+        const transaction = addTransaction(
+          paymentData.amount,
+          type === 'card' ? 'instamojo_card' : 'instamojo_neft',
+          'pending',
+          paymentData.name,
+          {
+            processor: 'Instamojo',
+            recipientName: paymentData.name,
+            recipientEmail: paymentData.email
+          }
+        );
+        
+        setCurrentTransactionId(transaction.id);
+        
+        // Redirect to Instamojo payment page
+        window.location.href = response.payment_request.longurl;
+      } else {
+        toast.error("Failed to create payment request");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Instamojo payment error:", error);
+      toast.error("An error occurred during payment setup");
       setLoading(false);
     }
   };
@@ -228,6 +289,10 @@ const PaymentFlow = () => {
     }
   };
 
+  const generateTransactionId = (): string => {
+    return 'txn_' + Math.random().toString(36).substr(2, 9);
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b pb-8">
@@ -285,6 +350,8 @@ const PaymentFlow = () => {
                   <SelectItem value="upi">UPI / Google Pay</SelectItem>
                   <SelectItem value="card">Credit/Debit Card</SelectItem>
                   <SelectItem value="netbanking">Net Banking</SelectItem>
+                  <SelectItem value="instamojo_card">Card via Instamojo</SelectItem>
+                  <SelectItem value="instamojo_neft">NEFT via Instamojo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -457,6 +524,68 @@ const PaymentFlow = () => {
                       </Select>
                       <p className="text-xs text-muted-foreground">You will be redirected to the bank's website to complete the payment</p>
                     </div>
+                  </div>
+                </>
+              )}
+
+              {paymentData.paymentMethod === 'instamojo_card' && (
+                <>
+                  <div className="text-sm font-medium mb-2">Card Payment (Instamojo)</div>
+                  <div className="rounded-lg border p-4">
+                    <div className="flex items-center mb-4">
+                      <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                        <CreditCard className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="font-medium">Secure Card Payment</div>
+                        <div className="text-sm text-muted-foreground">Process through Instamojo secure portal</div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      You'll be redirected to Instamojo's secure payment gateway to complete your transaction.
+                    </p>
+                    <Button 
+                      onClick={() => initiateInstamojoPayment('card')} 
+                      className="w-full"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
+                      ) : (
+                        <>Proceed to Card Payment</>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {paymentData.paymentMethod === 'instamojo_neft' && (
+                <>
+                  <div className="text-sm font-medium mb-2">NEFT Payment (Instamojo)</div>
+                  <div className="rounded-lg border p-4">
+                    <div className="flex items-center mb-4">
+                      <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                        <BuildingBank className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="font-medium">NEFT Bank Transfer</div>
+                        <div className="text-sm text-muted-foreground">Process using your bank's NEFT facility</div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      You'll be redirected to Instamojo to receive NEFT transfer details for your payment.
+                    </p>
+                    <Button 
+                      onClick={() => initiateInstamojoPayment('neft')} 
+                      className="w-full"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
+                      ) : (
+                        <>Proceed to NEFT Payment</>
+                      )}
+                    </Button>
                   </div>
                 </>
               )}

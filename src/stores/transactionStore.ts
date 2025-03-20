@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
 export type UserRole = 'admin' | 'merchant' | null;
-export type PaymentMethod = 'upi' | 'card' | 'netbanking';
+export type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'instamojo_card' | 'instamojo_neft' | 'wallet' | 'webhook';
 export type PaymentProcessingState = 
   | 'initiated' 
   | 'gateway_processing'
@@ -38,6 +38,11 @@ export interface PaymentDetails {
   processingFee?: string;
   recipientEmail?: string;
   recipientName?: string;
+  gateway?: string;
+  buyerName?: string;
+  buyerEmail?: string;
+  paidAmount?: string;
+  neftReference?: string;
 }
 
 export interface Transaction {

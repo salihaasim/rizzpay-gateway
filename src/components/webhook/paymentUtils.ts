@@ -1,6 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { validateWebhookToken } from './tokenUtils';
+import { updateTransactionFromWebhook } from '../TransactionUtils';
 
 // Process a webhook payment request
 export const processWebhookPayment = async (paymentData: {
@@ -11,6 +12,7 @@ export const processWebhookPayment = async (paymentData: {
   customer_name: string;
   customer_email?: string;
   callback_url?: string;
+  payment_method?: string; // Optional payment method preference
 }): Promise<{
   status: 'success' | 'error';
   message: string;
@@ -49,6 +51,9 @@ export const processWebhookPayment = async (paymentData: {
     // Generate payment URL 
     const paymentUrl = `${window.location.origin}/payment?source=webhook&id=${transactionId}`;
     
+    // Determine preferred payment method
+    const paymentMethod = paymentData.payment_method || 'default';
+    
     // Store transaction details in local storage to be picked up by the payment page
     localStorage.setItem(`webhook_payment_${transactionId}`, JSON.stringify({
       id: transactionId,
@@ -59,6 +64,7 @@ export const processWebhookPayment = async (paymentData: {
       customerEmail: paymentData.customer_email || '',
       callbackUrl,
       merchantEmail: tokenValidation.email,
+      preferredPaymentMethod: paymentMethod,
       createdAt: new Date().toISOString()
     }));
     
@@ -89,5 +95,54 @@ export const getWebhookPaymentDetails = (transactionId: string) => {
   } catch (error) {
     console.error('Error getting webhook payment details:', error);
     return null;
+  }
+};
+
+// Process webhook callbacks from payment gateways
+export const processGatewayWebhookCallback = (
+  gatewayName: string,
+  callbackData: Record<string, any>
+): boolean => {
+  try {
+    console.log(`Processing ${gatewayName} webhook callback:`, callbackData);
+    
+    // Handle different gateway formats
+    if (gatewayName === 'instamojo') {
+      // Extract data from Instamojo webhook format
+      const { 
+        payment_id, 
+        payment_request_id,
+        status,
+        buyer_name,
+        buyer_email,
+        amount
+      } = callbackData;
+      
+      // Translate Instamojo status to our internal status
+      let internalStatus: 'success' | 'failure' = 'failure';
+      if (status === 'Credit' || status === 'Completed') {
+        internalStatus = 'success';
+      }
+      
+      // Update transaction
+      return updateTransactionFromWebhook(
+        payment_request_id, 
+        internalStatus,
+        payment_id,
+        {
+          buyerName: buyer_name,
+          buyerEmail: buyer_email,
+          paidAmount: amount,
+          gateway: 'Instamojo'
+        }
+      );
+    }
+    
+    // Default case - unknown gateway
+    console.error(`Unsupported payment gateway: ${gatewayName}`);
+    return false;
+  } catch (error) {
+    console.error(`Error processing ${gatewayName} webhook:`, error);
+    return false;
   }
 };
