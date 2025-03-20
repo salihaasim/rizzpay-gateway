@@ -1,7 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { validateWebhookToken } from './tokenUtils';
-import { updateTransactionFromWebhook } from '../TransactionUtils';
+import { updateTransactionFromWebhook } from '@/utils/webhookUtils';
 
 // Process a webhook payment request
 export const processWebhookPayment = async (paymentData: {
@@ -11,6 +11,7 @@ export const processWebhookPayment = async (paymentData: {
   description?: string;
   customer_name: string;
   customer_email?: string;
+  customer_phone?: string;
   callback_url?: string;
   payment_method?: string; // Optional payment method preference
 }): Promise<{
@@ -52,7 +53,7 @@ export const processWebhookPayment = async (paymentData: {
     const paymentUrl = `${window.location.origin}/payment?source=webhook&id=${transactionId}`;
     
     // Determine preferred payment method
-    const paymentMethod = paymentData.payment_method || 'default';
+    const paymentMethod = paymentData.payment_method?.toLowerCase() || 'default';
     
     // Store transaction details in local storage to be picked up by the payment page
     localStorage.setItem(`webhook_payment_${transactionId}`, JSON.stringify({
@@ -62,6 +63,7 @@ export const processWebhookPayment = async (paymentData: {
       description: paymentData.description || 'Payment via webhook',
       customerName: paymentData.customer_name,
       customerEmail: paymentData.customer_email || '',
+      customerPhone: paymentData.customer_phone || '',
       callbackUrl,
       merchantEmail: tokenValidation.email,
       preferredPaymentMethod: paymentMethod,
@@ -107,7 +109,7 @@ export const processGatewayWebhookCallback = async (
     console.log(`Processing ${gatewayName} webhook callback:`, callbackData);
     
     // Handle different gateway formats
-    if (gatewayName === 'instamojo') {
+    if (gatewayName.toLowerCase() === 'instamojo') {
       // Extract data from Instamojo webhook format
       const { 
         payment_id, 
@@ -115,12 +117,23 @@ export const processGatewayWebhookCallback = async (
         status,
         buyer_name,
         buyer_email,
-        amount
+        amount,
+        instrument_type,
+        mac
       } = callbackData;
+      
+      // Validate webhook signature for production
+      if (process.env.NODE_ENV === 'production' && process.env.VITE_INSTAMOJO_SALT) {
+        // In a real implementation, you would validate the MAC signature here
+        // if (!validateSignature(callbackData, process.env.VITE_INSTAMOJO_SALT)) {
+        //   console.error('Invalid Instamojo webhook signature');
+        //   return false;
+        // }
+      }
       
       // Translate Instamojo status to our internal status
       let internalStatus: 'success' | 'failure' = 'failure';
-      if (status === 'Credit' || status === 'Completed') {
+      if (status === 'Credit' || status === 'Completed' || status.toLowerCase() === 'credit') {
         internalStatus = 'success';
       }
       
@@ -133,7 +146,8 @@ export const processGatewayWebhookCallback = async (
           buyerName: buyer_name,
           buyerEmail: buyer_email,
           paidAmount: amount,
-          gateway: 'Instamojo'
+          gateway: 'Instamojo',
+          paymentMethod: instrument_type || 'unknown'
         }
       );
     }
@@ -146,3 +160,9 @@ export const processGatewayWebhookCallback = async (
     return false;
   }
 };
+
+// This function would validate the Instamojo webhook signature in production
+// const validateSignature = (callbackData: Record<string, any>, salt: string): boolean => {
+//   // Implementation would depend on Instamojo's signature calculation algorithm
+//   return true; 
+// }

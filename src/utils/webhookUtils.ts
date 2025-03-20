@@ -83,10 +83,27 @@ export const processPaymentGatewayWebhook = async (
   try {
     switch (gatewayName.toLowerCase()) {
       case 'instamojo':
-        // Handle Instamojo webhook format from docs
+        // Handle Instamojo webhook format according to their documentation
         const paymentId = webhookData.payment_id;
         const paymentRequestId = webhookData.payment_request_id;
-        const status = webhookData.status === 'Credit' ? 'success' : 'failure';
+        const status = webhookData.status?.toLowerCase() === 'credit' ? 'success' : 'failure';
+        
+        // Additional validation for production
+        if (process.env.NODE_ENV === 'production') {
+          // In production, you would validate the webhook signature here
+          // if (!validateInstamojoSignature(webhookData)) {
+          //   console.error('Invalid Instamojo webhook signature');
+          //   return false;
+          // }
+        }
+        
+        // Extract payment method details from the webhook data
+        let paymentMethod = webhookData.instrument_type || 'unknown';
+        if (paymentMethod.toLowerCase().includes('neft')) {
+          paymentMethod = 'neft';
+        } else if (paymentMethod.toLowerCase().includes('card')) {
+          paymentMethod = 'card';
+        }
         
         return await updateTransactionFromWebhook(
           paymentRequestId,
@@ -95,7 +112,13 @@ export const processPaymentGatewayWebhook = async (
           {
             gatewayName: 'Instamojo',
             paidAmount: webhookData.amount,
-            paymentMethod: webhookData.instrument_type || 'unknown'
+            paymentMethod,
+            buyerName: webhookData.buyer_name || undefined,
+            buyerEmail: webhookData.buyer_email || undefined,
+            buyerPhone: webhookData.buyer_phone || undefined,
+            // Include additional payment details that might be useful
+            cardNetwork: webhookData.card_network || undefined,
+            issuingBank: webhookData.bank_name || undefined
           }
         );
         
@@ -107,4 +130,11 @@ export const processPaymentGatewayWebhook = async (
     console.error(`Error processing ${gatewayName} webhook:`, error);
     return false;
   }
+};
+
+// Function to validate Instamojo webhook signature (would be implemented in production)
+const validateInstamojoSignature = (webhookData: Record<string, string>): boolean => {
+  // This is a placeholder for the actual implementation
+  // In production, you would validate the MAC signature using the salt provided by Instamojo
+  return true;
 };

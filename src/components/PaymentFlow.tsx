@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,12 +6,8 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { addTransaction, simulatePaymentProcessing } from './TransactionUtils';
 import { PaymentMethod } from '@/stores/transactionStore';
 import { useNavigate } from 'react-router-dom';
-import { createInstamojoPayment } from './webhook/instamojoUtils';
-
-// Import the new components
-import PaymentAmountForm from './payment/PaymentAmountForm';
-import PaymentMethodComponent from './payment/PaymentMethod';
-import PaymentSuccess from './payment/PaymentSuccess';
+import { createCardPayment, createNeftPayment } from './webhook/instamojoUtils';
+import { showTransactionNotification } from '@/utils/notificationUtils';
 
 const PaymentFlow = () => {
   const navigate = useNavigate();
@@ -99,7 +94,6 @@ const PaymentFlow = () => {
     setLoading(true);
     
     try {
-      // Create the transaction in the store - this now returns a Transaction object directly, not a Promise
       const transaction = addTransaction(
         paymentData.amount,
         paymentData.paymentMethod,
@@ -109,20 +103,22 @@ const PaymentFlow = () => {
           upiId: paymentData.paymentMethod === 'upi' ? paymentData.upiId : undefined,
           cardNumber: paymentData.paymentMethod === 'card' ? '•••• •••• •••• 4242' : undefined,
           cardHolderName: paymentData.paymentMethod === 'card' ? paymentData.name : undefined,
-          bankName: paymentData.paymentMethod === 'netbanking' ? 'HDFC Bank' : undefined,
+          bankName: paymentData.paymentMethod === 'netbanking' ? paymentData.bankName || 'HDFC Bank' : undefined,
         }
       );
       
       setCurrentTransactionId(transaction.id);
       
-      // Start the payment processing simulation
-      toast.info(`Processing payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`);
+      showTransactionNotification(
+        'info',
+        'Processing Payment',
+        `Processing payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`
+      );
       
-      // Simulate payment processing with 80% success rate
       await simulatePaymentProcessing(
         transaction.id, 
         paymentData.paymentMethod,
-        Math.random() > 0.2 // 80% success rate
+        Math.random() > 0.2
       );
       
       setLoading(false);
@@ -138,12 +134,11 @@ const PaymentFlow = () => {
     setLoading(true);
     
     try {
-      // Create a transaction ID for internal tracking
       const internalTxnId = generateTransactionId();
       
-      // Create payment request with Instamojo
-      const response = await createInstamojoPayment({
-        purpose: paymentData.purpose || `Payment via Rizzpay (${type})`,
+      const paymentFunction = type === 'card' ? createCardPayment : createNeftPayment;
+      const response = await paymentFunction({
+        purpose: paymentData.purpose || `Payment via RizzPay (${type})`,
         amount: paymentData.amount,
         buyer_name: paymentData.name,
         email: paymentData.email || undefined,
@@ -154,7 +149,6 @@ const PaymentFlow = () => {
       });
       
       if (response.success && response.payment_request) {
-        // Create a transaction in our store - this now returns a Transaction object directly, not a Promise
         const transaction = addTransaction(
           paymentData.amount,
           type === 'card' ? 'instamojo_card' : 'instamojo_neft',
@@ -163,21 +157,24 @@ const PaymentFlow = () => {
           {
             processor: 'Instamojo',
             recipientName: paymentData.name,
-            recipientEmail: paymentData.email
+            recipientEmail: paymentData.email,
+            paymentMethod: type
           }
         );
         
         setCurrentTransactionId(transaction.id);
         
-        // Show success message before redirect
-        toast.success("Redirecting to Instamojo payment page...");
+        showTransactionNotification(
+          'info',
+          'Redirecting to Payment Gateway',
+          `You'll be redirected to complete your ${type === 'card' ? 'card' : 'NEFT'} payment`
+        );
         
-        // Redirect to Instamojo payment page after a short delay
         setTimeout(() => {
           window.location.href = response.payment_request.longurl;
-        }, 1000);
+        }, 1500);
       } else {
-        toast.error("Failed to create payment request");
+        toast.error(response.message || "Failed to create payment request");
         setLoading(false);
       }
     } catch (error) {
@@ -218,6 +215,27 @@ const PaymentFlow = () => {
     }
   };
 
+  const getUpiQrCodeUrl = () => {
+    try {
+      if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
+        console.log("Invalid UPI ID");
+        return '';
+      }
+      
+      const upiUrl = getUpiPaymentLink();
+      if (!upiUrl) {
+        console.log("No UPI URL generated");
+        return '';
+      }
+      
+      const encodedUpiUrl = encodeURIComponent(upiUrl);
+      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUpiUrl}`;
+    } catch (error) {
+      console.error("Error generating QR code URL:", error);
+      return '';
+    }
+  };
+
   const handleUpiPayment = () => {
     if (!validateUpiId(paymentData.upiId)) {
       toast.error('Please enter a valid UPI ID');
@@ -237,27 +255,6 @@ const PaymentFlow = () => {
     } else {
       toast.info("Scan the QR code with your UPI app or use your mobile device");
       initiatePayment();
-    }
-  };
-
-  const getUpiQrCodeUrl = () => {
-    try {
-      if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
-        console.log("Invalid UPI ID");
-        return '';
-      }
-      
-      const upiUrl = getUpiPaymentLink();
-      if (!upiUrl) {
-        console.log("No UPI URL generated");
-        return '';
-      }
-      
-      const encodedUpiUrl = encodeURIComponent(upiUrl);
-      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUpiUrl}`;
-    } catch (error) {
-      console.error("Error generating QR code URL:", error);
-      return '';
     }
   };
 

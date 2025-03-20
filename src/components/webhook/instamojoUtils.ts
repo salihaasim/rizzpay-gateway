@@ -1,19 +1,20 @@
 
 // Instamojo API integration utility
-// This is a frontend implementation - in a production app, the API key and auth token
-// should be handled through a backend for security
+// This file handles integration with Instamojo payment gateway for card and NEFT payments
 
 // Instamojo API endpoints
 const INSTAMOJO_TEST_API = 'https://test.instamojo.com/api/1.1';
 const INSTAMOJO_PROD_API = 'https://api.instamojo.com/api/1.1';
 
-// Use test API by default (should be changed to PROD for production)
-const API_ENDPOINT = INSTAMOJO_TEST_API;
+// Use test API in development, production API in production
+const API_ENDPOINT = process.env.NODE_ENV === 'production' 
+  ? INSTAMOJO_PROD_API 
+  : INSTAMOJO_TEST_API;
 
-// Test credentials - in production, these would be stored securely in environment variables
-// and accessed through a backend API
-const TEST_API_KEY = 'test_xxxxxxxxxxxxxxxxxxxxxxxx';
-const TEST_AUTH_TOKEN = 'test_xxxxxxxxxxxxxxxxxxxxxxxx';
+// API credentials - should be stored in environment variables
+// For production, these should be accessed through environment variables
+const API_KEY = process.env.VITE_INSTAMOJO_API_KEY || 'test_xxxxxxxxxxxxxxxxxxxxxxxx';
+const AUTH_TOKEN = process.env.VITE_INSTAMOJO_AUTH_TOKEN || 'test_xxxxxxxxxxxxxxxxxxxxxxxx';
 
 // Interface for payment request data
 export interface InstamojoPaymentRequest {
@@ -47,16 +48,19 @@ export const createInstamojoPayment = async (
   paymentData: InstamojoPaymentRequest
 ): Promise<InstamojoPaymentResponse> => {
   try {
-    // In a real implementation, this request would be made through your backend
-    // to protect your API credentials
     console.log('Creating Instamojo payment request:', paymentData);
     
-    // Custom payment method handling
-    const paymentMethod = paymentData.payment_method || 'all';
+    // Validate essential fields
+    if (!paymentData.purpose || !paymentData.amount || !paymentData.buyer_name) {
+      return {
+        success: false,
+        message: 'Missing required fields (purpose, amount, or buyer_name)'
+      };
+    }
     
     // Email validation check - Instamojo requires a valid email
     if (!paymentData.email || paymentData.email === "undefined") {
-      paymentData.email = "test@example.com";
+      paymentData.email = "customer@example.com";
     }
     
     // Handle phone number validation
@@ -64,27 +68,45 @@ export const createInstamojoPayment = async (
       paymentData.phone = "9999999999"; // Default test phone number
     }
     
-    // In a real implementation, you would make an actual API call:
-    /*
-    const response = await fetch(`${API_ENDPOINT}/payment-requests/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': TEST_API_KEY,
-        'X-Auth-Token': TEST_AUTH_TOKEN,
-      },
-      body: JSON.stringify(paymentData)
-    });
+    // Custom payment method handling
+    const paymentMethod = paymentData.payment_method || 'all';
     
-    const data = await response.json();
-    return {
-      success: data.success,
-      payment_request: data.payment_request,
-      message: data.message
-    };
-    */
+    // This is where the actual API call would happen in production
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        const headers = new Headers();
+        headers.append('X-Api-Key', API_KEY);
+        headers.append('X-Auth-Token', AUTH_TOKEN);
+        headers.append('Content-Type', 'application/json');
+        
+        const response = await fetch(`${API_ENDPOINT}/payment-requests/`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(paymentData)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Instamojo API response:', data);
+        
+        return {
+          success: data.success,
+          payment_request: data.payment_request,
+          message: data.message
+        };
+      } catch (error) {
+        console.error('Error making API call to Instamojo:', error);
+        return {
+          success: false,
+          message: 'API call to Instamojo failed'
+        };
+      }
+    }
     
-    // According to Instamojo docs, we need to simulate the API response with key fields
+    // Demo/development mode - simulate API response
     const paymentId = 'PRID_' + Math.random().toString(36).substring(2, 12);
     
     // Store amount for later reference
@@ -95,7 +117,6 @@ export const createInstamojoPayment = async (
       payment_request: {
         id: paymentId,
         // Using a simulated URL - in production this would be the real Instamojo URL
-        // Per the docs: https://test.instamojo.com/@username/payment-id
         longurl: `https://test.instamojo.com/@demo/payment-${paymentId}`,
         status: 'Pending',
         payment_method: paymentMethod
@@ -103,7 +124,6 @@ export const createInstamojoPayment = async (
     };
     
     // Store payment request in localStorage for demo purposes
-    // In production, you would track this in your database
     localStorage.setItem(`instamojo_payment_${simulatedResponse.payment_request?.id}`, JSON.stringify({
       ...paymentData,
       payment_id: simulatedResponse.payment_request?.id,
@@ -121,22 +141,26 @@ export const createInstamojoPayment = async (
   }
 };
 
-// Handle Instamojo webhook callback - following official webhook structure
+// Handle Instamojo webhook callback
 export const handleInstamojoWebhook = (webhookData: any): boolean => {
   try {
-    // According to Instamojo docs, webhook data includes:
-    // payment_id, payment_request_id, status, etc.
     const { payment_id, payment_request_id, status } = webhookData;
     
-    // In production, you would verify the webhook signature using the salt
-    // const providedSignature = webhookData.mac;
-    // const calculatedSignature = calculateSignature(webhookData, WEBHOOK_SALT);
-    // if (providedSignature !== calculatedSignature) return false;
+    // In production, verify the webhook signature using the salt
+    if (process.env.NODE_ENV === 'production' && process.env.VITE_INSTAMOJO_SALT) {
+      // Validate mac (signature)
+      // const providedSignature = webhookData.mac;
+      // const calculatedSignature = calculateSignature(webhookData, process.env.VITE_INSTAMOJO_SALT);
+      // if (providedSignature !== calculatedSignature) {
+      //   console.error('Invalid webhook signature');
+      //   return false;
+      // }
+    }
     
-    // Update payment status in your database
+    // Log webhook details
     console.log('Instamojo webhook received:', webhookData);
     
-    // For demo: update local storage entry
+    // Update payment status in your database or local storage (for demo)
     const paymentRequestId = payment_request_id || payment_id;
     const paymentDataStr = localStorage.getItem(`instamojo_payment_${paymentRequestId}`);
     if (paymentDataStr) {
@@ -153,7 +177,7 @@ export const handleInstamojoWebhook = (webhookData: any): boolean => {
   }
 };
 
-// Get payment status from Instamojo - per API docs
+// Get payment status from Instamojo
 export const getInstamojoPaymentStatus = async (paymentRequestId: string): Promise<{
   status: string;
   paymentId?: string;
@@ -161,27 +185,37 @@ export const getInstamojoPaymentStatus = async (paymentRequestId: string): Promi
   paymentMethod?: string;
 }> => {
   try {
-    // In a real implementation, you would check the payment status from Instamojo API:
-    /*
-    const response = await fetch(`${API_ENDPOINT}/payment-requests/${paymentRequestId}`, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': TEST_API_KEY,
-        'X-Auth-Token': TEST_AUTH_TOKEN,
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        const headers = new Headers();
+        headers.append('X-Api-Key', API_KEY);
+        headers.append('X-Auth-Token', AUTH_TOKEN);
+        
+        const response = await fetch(`${API_ENDPOINT}/payment-requests/${paymentRequestId}`, {
+          method: 'GET',
+          headers
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Instamojo payment status response:', data);
+        
+        return {
+          status: data.payment_request.status,
+          paymentId: data.payment_request.payments?.[0]?.payment_id,
+          amount: data.payment_request.amount,
+          paymentMethod: data.payment_request.payments?.[0]?.instrument_type
+        };
+      } catch (error) {
+        console.error('Error checking payment status with Instamojo API:', error);
+        return { status: 'Error' };
       }
-    });
+    }
     
-    const data = await response.json();
-    
-    return {
-      status: data.payment_request.status,
-      paymentId: data.payment_request.payments?.[0]?.payment_id,
-      amount: data.payment_request.amount,
-      paymentMethod: data.payment_request.payments?.[0]?.instrument_type
-    };
-    */
-    
-    // For demo: check local storage
+    // Demo mode - check local storage
     const paymentDataStr = localStorage.getItem(`instamojo_payment_${paymentRequestId}`);
     if (paymentDataStr) {
       const paymentData = JSON.parse(paymentDataStr);
@@ -200,19 +234,34 @@ export const getInstamojoPaymentStatus = async (paymentRequestId: string): Promi
   }
 };
 
-// Helper function to calculate webhook signature (for use in production)
-const calculateSignature = (data: any, salt: string): string => {
-  // In a real implementation, you would calculate the HMAC signature
-  // This is just a placeholder
-  return 'calculated_signature';
+// Create a card payment request
+export const createCardPayment = async (
+  paymentData: InstamojoPaymentRequest
+): Promise<InstamojoPaymentResponse> => {
+  try {
+    // For card payments, specify payment_method as documented by Instamojo
+    const cardPaymentData = {
+      ...paymentData,
+      payment_method: 'Card',
+      send_email: true // Send payment details to email
+    };
+    
+    return await createInstamojoPayment(cardPaymentData);
+  } catch (error) {
+    console.error('Error creating card payment:', error);
+    return {
+      success: false,
+      message: 'Failed to create card payment request'
+    };
+  }
 };
 
-// Create a NEFT payment request (per Instamojo API docs)
+// Create a NEFT payment request
 export const createNeftPayment = async (
   paymentData: InstamojoPaymentRequest
 ): Promise<InstamojoPaymentResponse> => {
   try {
-    // According to docs, for NEFT we need to specify the payment_method
+    // For NEFT payments, specify payment_method as documented
     const neftPaymentData = {
       ...paymentData,
       payment_method: 'NEFT',
@@ -229,28 +278,7 @@ export const createNeftPayment = async (
   }
 };
 
-// Create a card payment request
-export const createCardPayment = async (
-  paymentData: InstamojoPaymentRequest
-): Promise<InstamojoPaymentResponse> => {
-  try {
-    // For card payments, we specify payment_method as documented
-    const cardPaymentData = {
-      ...paymentData,
-      payment_method: 'Card'
-    };
-    
-    return await createInstamojoPayment(cardPaymentData);
-  } catch (error) {
-    console.error('Error creating card payment:', error);
-    return {
-      success: false,
-      message: 'Failed to create card payment request'
-    };
-  }
-};
-
-// Get NEFT payment details for a payment request (per Instamojo API)
+// Get NEFT payment details for a payment request
 export const getNeftDetails = async (paymentRequestId: string): Promise<{
   accountNumber?: string;
   ifsc?: string;
@@ -259,32 +287,42 @@ export const getNeftDetails = async (paymentRequestId: string): Promise<{
   status: string;
 }> => {
   try {
-    // In a real implementation, you would fetch NEFT details from Instamojo API
-    /*
-    const response = await fetch(`${API_ENDPOINT}/payment-requests/${paymentRequestId}/neft-details`, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': TEST_API_KEY,
-        'X-Auth-Token': TEST_AUTH_TOKEN,
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        const headers = new Headers();
+        headers.append('X-Api-Key', API_KEY);
+        headers.append('X-Auth-Token', AUTH_TOKEN);
+        
+        const response = await fetch(`${API_ENDPOINT}/payment-requests/${paymentRequestId}/neft-details`, {
+          method: 'GET',
+          headers
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Instamojo NEFT details response:', data);
+        
+        return {
+          accountNumber: data.neft_details.account_number,
+          ifsc: data.neft_details.ifsc,
+          bankName: data.neft_details.bank_name,
+          reference: data.neft_details.reference,
+          status: data.neft_details.status
+        };
+      } catch (error) {
+        console.error('Error fetching NEFT details from Instamojo API:', error);
+        return { status: 'Error' };
       }
-    });
+    }
     
-    const data = await response.json();
-    
+    // Demo mode - simulate NEFT details
     return {
-      accountNumber: data.neft_details.account_number,
-      ifsc: data.neft_details.ifsc,
-      bankName: data.neft_details.bank_name,
-      reference: data.neft_details.reference,
-      status: data.neft_details.status
-    };
-    */
-    
-    // Per Instamojo docs, simulate NEFT details
-    return {
-      accountNumber: '123456789012345', // Example format from docs
-      ifsc: 'INST0000001',              // Example format
-      bankName: 'Instamojo Demo Bank',  // Example name
+      accountNumber: '123456789012345', // Example format
+      ifsc: 'INST0000001',              
+      bankName: 'Demo Bank for NEFT', 
       reference: 'NEFT' + Math.random().toString(36).substring(2, 10).toUpperCase(),
       status: 'Pending'
     };
