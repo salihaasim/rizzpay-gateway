@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
 import WalletPage from "./pages/WalletPage";
+import WebhookPage from "./pages/WebhookPage";
+import WebhookPayment from "./pages/WebhookPayment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/webhook" element={<WebhookPage />} />
+          <Route path="/payment" element={<WebhookPayment />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
