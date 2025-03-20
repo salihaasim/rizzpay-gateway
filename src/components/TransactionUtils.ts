@@ -31,3 +31,7 @@ export {
   syncTransactionToSupabase,
   fetchTransactionsFromSupabase
 } from '@/utils/supabaseClient';
+
+export {
+  processDirectPaymentCallback
+} from '@/components/webhook/paymentUtils';

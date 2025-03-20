@@ -1,34 +1,20 @@
 
 import React from 'react';
-import UpiPayment from './UpiPayment';
 import CardPayment from './CardPayment';
 import NetBankingPayment from './NetBankingPayment';
-import InstamojoPayment from './InstamojoPayment';
 
 interface PaymentMethodProps {
   paymentMethod: string;
   paymentData: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  validateUpiId: (value: string) => boolean;
-  qrCodeUrl: string;
-  qrCodeError: boolean;
-  handleQrCodeError: () => void;
-  handleUpiPayment: () => void;
   loading: boolean;
-  initiateInstamojoPayment: (type: 'card' | 'neft') => void;
 }
 
 const PaymentMethod: React.FC<PaymentMethodProps> = ({
   paymentMethod,
   paymentData,
   handleInputChange,
-  validateUpiId,
-  qrCodeUrl,
-  qrCodeError,
-  handleQrCodeError,
-  handleUpiPayment,
-  loading,
-  initiateInstamojoPayment
+  loading
 }) => {
   return (
     <div className="space-y-6 animate-fade-in">
@@ -43,39 +29,34 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
       </div>
       
       <div className="space-y-4">
-        {paymentMethod === 'upi' && (
-          <UpiPayment
-            paymentData={paymentData}
-            handleInputChange={handleInputChange}
-            validateUpiId={validateUpiId}
-            qrCodeUrl={qrCodeUrl}
-            qrCodeError={qrCodeError}
-            handleQrCodeError={handleQrCodeError}
-            handleUpiPayment={handleUpiPayment}
-          />
-        )}
-
         {paymentMethod === 'card' && (
-          <CardPayment name={paymentData.name} />
-        )}
-
-        {paymentMethod === 'netbanking' && (
-          <NetBankingPayment />
-        )}
-
-        {paymentMethod === 'instamojo_card' && (
-          <InstamojoPayment 
-            type="card" 
-            loading={loading} 
-            initiateInstamojoPayment={initiateInstamojoPayment} 
+          <CardPayment 
+            name={paymentData.name} 
+            onSubmit={(cardData) => {
+              // Update card data in parent component
+              handleInputChange({
+                target: { name: 'cardNumber', value: cardData.cardNumber }
+              } as React.ChangeEvent<HTMLInputElement>);
+              handleInputChange({
+                target: { name: 'cardExpiry', value: cardData.expiryDate }
+              } as React.ChangeEvent<HTMLInputElement>);
+              handleInputChange({
+                target: { name: 'cardCvv', value: cardData.cvv }
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
+            isLoading={loading}
           />
         )}
 
-        {paymentMethod === 'instamojo_neft' && (
-          <InstamojoPayment 
-            type="neft" 
-            loading={loading} 
-            initiateInstamojoPayment={initiateInstamojoPayment} 
+        {paymentMethod === 'neft' && (
+          <NetBankingPayment 
+            onBankSelect={(bank) => {
+              handleInputChange({
+                target: { name: 'bankName', value: bank }
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
+            selectedBank={paymentData.bankName || "hdfc"}
+            isLoading={loading}
           />
         )}
       </div>

@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ExternalLink } from 'lucide-react';
+import { Building, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface NetBankingPaymentProps {
   onBankSelect?: (bank: string) => void;
@@ -17,13 +18,28 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
   onProceed,
   isLoading = false
 }) => {
+  const [accountNumber, setAccountNumber] = useState('');
+  const [ifscCode, setIfscCode] = useState('');
+  
   return (
     <>
-      <div className="text-sm font-medium mb-2">Net Banking</div>
+      <div className="text-sm font-medium mb-2">NEFT Bank Transfer</div>
       <div className="rounded-lg border p-4">
+        <div className="flex items-center mb-4">
+          <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+            <Building className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <div className="font-medium">Secure NEFT Bank Transfer</div>
+            <div className="text-sm text-muted-foreground">
+              Process using direct bank transfer
+            </div>
+          </div>
+        </div>
+        
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Select Bank</label>
+            <label className="text-sm font-medium">Select Your Bank</label>
             <Select 
               defaultValue={selectedBank}
               onValueChange={(value) => onBankSelect && onBankSelect(value)}
@@ -46,26 +62,32 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
             </Select>
           </div>
           
-          <p className="text-xs text-muted-foreground">
-            You will be redirected to the bank's website to complete the payment
-          </p>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Account Number</label>
+            <Input 
+              placeholder="Enter your account number"
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value)}
+            />
+          </div>
           
-          {onProceed && (
-            <Button 
-              onClick={onProceed} 
-              className="w-full flex items-center justify-center"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>Processing...</>
-              ) : (
-                <>
-                  Proceed to Net Banking
-                  <ExternalLink className="ml-2 h-3.5 w-3.5" />
-                </>
-              )}
-            </Button>
-          )}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">IFSC Code</label>
+            <Input 
+              placeholder="Enter IFSC code"
+              value={ifscCode}
+              onChange={(e) => setIfscCode(e.target.value)}
+            />
+          </div>
+          
+          <div className="p-3 bg-muted/50 rounded flex items-start">
+            <div className="mr-2 mt-0.5">
+              <AlertCircle size={16} className="text-muted-foreground" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your bank details will be used to verify your NEFT transfer. After completing the payment, you'll receive confirmation details.
+            </p>
+          </div>
         </div>
       </div>
     </>
