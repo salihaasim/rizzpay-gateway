@@ -326,4 +326,3 @@ document.getElementById("payment-button").addEventListener("click", () => {
 };
 
 export default WebhookIntegration;
-
