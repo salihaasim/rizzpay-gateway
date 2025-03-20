@@ -99,7 +99,7 @@ const PaymentFlow = () => {
     setLoading(true);
     
     try {
-      // Create the transaction in the store
+      // Create the transaction in the store - this now returns a Transaction object directly, not a Promise
       const transaction = addTransaction(
         paymentData.amount,
         paymentData.paymentMethod,
@@ -154,7 +154,7 @@ const PaymentFlow = () => {
       });
       
       if (response.success && response.payment_request) {
-        // Create a transaction in our store
+        // Create a transaction in our store - this now returns a Transaction object directly, not a Promise
         const transaction = addTransaction(
           paymentData.amount,
           type === 'card' ? 'instamojo_card' : 'instamojo_neft',

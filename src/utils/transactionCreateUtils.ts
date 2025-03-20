@@ -3,13 +3,13 @@ import { Transaction, TransactionStatus, PaymentDetails, useTransactionStore } f
 import { generateTransactionId, formatDate } from './formatUtils';
 import { syncTransactionToSupabase } from './supabaseClient';
 
-export const addTransaction = async (
+export const addTransaction = (
   amount: string,
   paymentMethod: string,
   status: TransactionStatus,
   customer: string,
   paymentDetails?: PaymentDetails
-): Promise<Transaction> => {
+): Transaction => {
   const store = useTransactionStore.getState();
   
   const transaction: Transaction = {
