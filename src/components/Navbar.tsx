@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,20 +11,55 @@ import {
   Menu,
   X,
   LogOut,
-  Wallet
+  Wallet,
+  LogIn,
+  Shield
 } from 'lucide-react';
-
-const navItems = [
-  { name: 'Home', path: '/', icon: Home },
-  { name: 'Dashboard', path: '/dashboard', icon: BarChart2 },
-  { name: 'Transactions', path: '/transactions', icon: CreditCard },
-  { name: 'Wallet', path: '/wallet', icon: Wallet },
-  { name: 'Settings', path: '/settings', icon: Settings },
-];
+import { useTransactionStore } from '@/stores/transactionStore';
+import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { userRole, clearUserData } = useTransactionStore();
+  const { toast } = useToast();
+
+  // Build navItems based on user role
+  const getNavItems = () => {
+    const items = [
+      { name: 'Home', path: '/', icon: Home },
+    ];
+
+    if (userRole) {
+      items.push({ name: 'Dashboard', path: '/dashboard', icon: BarChart2 });
+      items.push({ name: 'Transactions', path: '/transactions', icon: CreditCard });
+      items.push({ name: 'Wallet', path: '/wallet', icon: Wallet });
+      items.push({ name: 'Settings', path: '/settings', icon: Settings });
+
+      // Admin-only items
+      if (userRole === 'admin') {
+        items.push({ name: 'Webhook', path: '/webhook', icon: Shield });
+      }
+    }
+
+    return items;
+  };
+
+  const navItems = getNavItems();
+
+  const handleLogout = () => {
+    clearUserData();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
+    navigate('/');
+  };
+
+  const handleLogin = () => {
+    navigate('/auth');
+  };
 
   return (
     <>
@@ -36,6 +71,11 @@ const Navbar = () => {
               <CreditCard size={20} />
             </span>
             <span className="font-bold text-xl">Rizzpay</span>
+            {userRole === 'admin' && (
+              <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                Admin
+              </span>
+            )}
           </Link>
           
           <div className="flex items-center space-x-1">
@@ -56,9 +96,26 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            <Button variant="ghost" className="ml-2 rounded-full" size="icon">
-              <LogOut size={18} />
-            </Button>
+            
+            {userRole ? (
+              <Button 
+                variant="ghost" 
+                className="ml-2 rounded-full" 
+                size="icon"
+                onClick={handleLogout}
+              >
+                <LogOut size={18} />
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="ml-2 rounded-full"
+                onClick={handleLogin}
+              >
+                <LogIn size={18} className="mr-2" />
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </nav>
@@ -71,6 +128,11 @@ const Navbar = () => {
               <CreditCard size={18} />
             </span>
             <span className="font-bold text-lg">Rizzpay</span>
+            {userRole === 'admin' && (
+              <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">
+                Admin
+              </span>
+            )}
           </Link>
 
           <Button
@@ -107,11 +169,33 @@ const Navbar = () => {
                 </Link>
               );
             })}
+            
             <div className="pt-4 mt-4 border-t border-border">
-              <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <LogOut size={20} className="mr-3" />
-                <span>Logout</span>
-              </Button>
+              {userRole ? (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start" 
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut size={20} className="mr-3" />
+                  <span>Logout</span>
+                </Button>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  onClick={() => {
+                    handleLogin();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LogIn size={20} className="mr-3" />
+                  <span>Login</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>
