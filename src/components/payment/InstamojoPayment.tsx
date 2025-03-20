@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Loader2, Building, ExternalLink, AlertCircle } from 'lucide-react';
+import { CreditCard, Loader2, Building, ExternalLink, AlertCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface InstamojoPaymentProps {
@@ -16,6 +16,11 @@ const InstamojoPayment: React.FC<InstamojoPaymentProps> = ({
   initiateInstamojoPayment 
 }) => {
   const isCard = type === 'card';
+  
+  const handlePaymentClick = () => {
+    toast.info(`Preparing ${isCard ? 'card' : 'NEFT'} payment via Instamojo...`);
+    initiateInstamojoPayment(type);
+  };
   
   return (
     <>
@@ -43,30 +48,30 @@ const InstamojoPayment: React.FC<InstamojoPaymentProps> = ({
           </div>
         </div>
 
-        {isCard ? (
-          <div className="p-3 bg-muted/50 rounded mb-4 flex items-start">
+        <div className="p-3 bg-muted/50 rounded mb-4 space-y-2">
+          <div className="flex items-start">
             <div className="mr-2 mt-0.5">
               <AlertCircle size={16} className="text-muted-foreground" />
             </div>
             <p className="text-xs text-muted-foreground">
-              Your card details are securely processed by Instamojo. All major credit & debit cards 
-              are accepted, including Visa, Mastercard, RuPay, and American Express.
+              {isCard
+                ? 'Your card details are securely processed by Instamojo. All major credit & debit cards are accepted, including Visa, Mastercard, RuPay, and American Express.'
+                : 'You\'ll receive NEFT bank details to complete your transfer. After making the NEFT payment from your bank, verify with the provided reference number.'}
             </p>
           </div>
-        ) : (
-          <div className="p-3 bg-muted/50 rounded mb-4 flex items-start">
+          
+          <div className="flex items-start">
             <div className="mr-2 mt-0.5">
-              <AlertCircle size={16} className="text-muted-foreground" />
+              <CheckCircle size={16} className="text-emerald-500" />
             </div>
             <p className="text-xs text-muted-foreground">
-              You'll receive NEFT bank details to complete your transfer. After making the NEFT payment 
-              from your bank, verify with the provided reference number.
+              You'll be redirected to Instamojo's secure payment portal to complete your transaction.
             </p>
           </div>
-        )}
+        </div>
         
         <Button 
-          onClick={() => initiateInstamojoPayment(type)} 
+          onClick={handlePaymentClick} 
           className="w-full flex items-center justify-center"
           disabled={loading}
         >

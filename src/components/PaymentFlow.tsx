@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,8 +169,13 @@ const PaymentFlow = () => {
         
         setCurrentTransactionId(transaction.id);
         
-        // Redirect to Instamojo payment page
-        window.location.href = response.payment_request.longurl;
+        // Show success message before redirect
+        toast.success("Redirecting to Instamojo payment page...");
+        
+        // Redirect to Instamojo payment page after a short delay
+        setTimeout(() => {
+          window.location.href = response.payment_request.longurl;
+        }, 1000);
       } else {
         toast.error("Failed to create payment request");
         setLoading(false);

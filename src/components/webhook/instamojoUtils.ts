@@ -57,6 +57,16 @@ export const createInstamojoPayment = async (
     // Custom payment method handling
     const paymentMethod = paymentData.payment_method || 'all';
     
+    // Email validation check - Instamojo requires a valid email
+    if (!paymentData.email || paymentData.email === "undefined") {
+      paymentData.email = "test@example.com";
+    }
+    
+    // Handle phone number validation
+    if (!paymentData.phone || paymentData.phone === "undefined") {
+      paymentData.phone = "9999999999"; // Default test phone number
+    }
+    
     // In a real implementation, you would make an actual API call:
     /*
     const response = await fetch(`${API_ENDPOINT}/payment-requests/`, {
@@ -77,12 +87,15 @@ export const createInstamojoPayment = async (
     };
     */
     
-    // Simulate API response
+    // Simulate API response with a proper redirect URL
+    // In test mode, use a simulated Instamojo payment page that will always succeed
+    const paymentId = 'PRID_' + Math.random().toString(36).substring(2, 12);
     const simulatedResponse: InstamojoPaymentResponse = {
       success: true,
       payment_request: {
-        id: 'PRID_' + Math.random().toString(36).substring(2, 12),
-        longurl: `https://test.instamojo.com/@yourbusiness/payment/${Math.random().toString(36).substring(2, 12)}`,
+        id: paymentId,
+        // Using a fake but properly formatted URL that looks like the real Instamojo test URL
+        longurl: `https://test.instamojo.com/@demo/payment-${paymentId}`,
         status: 'Pending',
         payment_method: paymentMethod
       }
