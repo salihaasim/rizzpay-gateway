@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
@@ -10,6 +10,7 @@ import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTransactionStore } from '@/stores/transactionStore';
 
+// Static data that doesn't need to be recalculated
 const chartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -20,24 +21,80 @@ const chartData = [
   { name: 'Jul', value: 3490 },
 ];
 
+// Memoized chart component to avoid re-renders
+const RevenueChart = React.memo(() => (
+  <div className="h-[300px]">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        data={chartData}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+        <XAxis dataKey="name" stroke="#888" fontSize={12} />
+        <YAxis stroke="#888" fontSize={12} />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "white",
+            border: "1px solid #f0f0f0",
+            borderRadius: "8px",
+          }}
+        />
+        <Line
+          type="monotone"
+          dataKey="value"
+          stroke="hsl(var(--primary))"
+          strokeWidth={2}
+          dot={{ strokeWidth: 2, r: 4 }}
+          activeDot={{ r: 6 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+));
+
+// Memoized transaction list component
+const RecentTransactionsList = React.memo(({ transactions }) => (
+  <div className="space-y-4">
+    {transactions.length > 0 ? (
+      transactions.map((transaction) => (
+        <TransactionCard key={transaction.id} {...transaction} />
+      ))
+    ) : (
+      <div className="text-center py-12 border rounded-lg">
+        <p className="text-muted-foreground">No transactions yet</p>
+      </div>
+    )}
+  </div>
+));
+
 const Dashboard = () => {
   const { transactions } = useTransactionStore();
   const [activeTab, setActiveTab] = useState('merchant');
   
-  const totalRevenue = transactions
-    .filter(t => t.status === 'successful')
-    .reduce((sum, t) => {
-      const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
+  // Use useMemo to calculate derived values only when transactions change
+  const calculatedValues = useMemo(() => {
+    const totalRevenue = transactions
+      .filter(t => t.status === 'successful')
+      .reduce((sum, t) => {
+        const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+    
+    const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
+    
+    const avgTransaction = transactions.length > 0 
+      ? totalRevenue / transactions.filter(t => t.status === 'successful').length 
+      : 0;
+    
+    return { totalRevenue, uniqueCustomers, avgTransaction };
+  }, [transactions]);
   
-  const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
-  
-  const avgTransaction = transactions.length > 0 
-    ? totalRevenue / transactions.filter(t => t.status === 'successful').length 
-    : 0;
-  
-  const recentTransactions = [...transactions].slice(0, 4);
+  // Use useMemo for derived data
+  const recentTransactions = useMemo(() => {
+    return [...transactions].slice(0, 4);
+  }, [transactions]);
+
+  const { totalRevenue, uniqueCustomers, avgTransaction } = calculatedValues;
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +121,7 @@ const Dashboard = () => {
           </Tabs>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Revenue"
             value={`₹${totalRevenue.toLocaleString('en-IN')}`}
@@ -101,33 +158,7 @@ const Dashboard = () => {
               <CardDescription>Daily transaction volume</CardDescription>
             </CardHeader>
             <CardContent className="pt-4 pb-1">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" stroke="#888" fontSize={12} />
-                    <YAxis stroke="#888" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #f0f0f0",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      dot={{ strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              <RevenueChart />
             </CardContent>
           </Card>
           
@@ -174,18 +205,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-6">
             <h2 className="text-xl font-semibold">Recent Transactions</h2>
-            
-            <div className="space-y-4">
-              {recentTransactions.length > 0 ? (
-                recentTransactions.map((transaction) => (
-                  <TransactionCard key={transaction.id} {...transaction} />
-                ))
-              ) : (
-                <div className="text-center py-12 border rounded-lg">
-                  <p className="text-muted-foreground">No transactions yet</p>
-                </div>
-              )}
-            </div>
+            <RecentTransactionsList transactions={recentTransactions} />
           </div>
           
           <div className="lg:col-span-2">
@@ -200,4 +220,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default React.memo(Dashboard);

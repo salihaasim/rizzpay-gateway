@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,8 +33,8 @@ const Navbar = () => {
   const { userRole, userEmail, clearUserData } = useTransactionStore();
   const { toast } = useToast();
 
-  // Build navItems based on user role
-  const getNavItems = (): NavItem[] => {
+  // Build navItems based on user role using useMemo to prevent recalculation on every render
+  const navItems = useMemo(() => {
     const items: NavItem[] = [
       { name: 'Home', path: '/', icon: Home },
     ];
@@ -43,7 +43,7 @@ const Navbar = () => {
       items.push({ name: 'Dashboard', path: '/dashboard', icon: BarChart2 });
       items.push({ name: 'Transactions', path: '/transactions', icon: CreditCard });
       items.push({ name: 'Wallet', path: '/wallet', icon: Wallet });
-      items.push({ name: 'Webhook', path: '/webhook', icon: Shield }); // Making webhook available to all users
+      items.push({ name: 'Webhook', path: '/webhook', icon: Shield });
       items.push({ name: 'Settings', path: '/settings', icon: Settings });
 
       // Admin-only items
@@ -58,9 +58,7 @@ const Navbar = () => {
     }
 
     return items;
-  };
-
-  const navItems = getNavItems();
+  }, [userRole]);
 
   const handleLogout = () => {
     clearUserData();
@@ -234,4 +232,5 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+// Memoize the Navbar component to prevent unnecessary re-renders
+export default React.memo(Navbar);

@@ -7,7 +7,7 @@ interface WalletBalanceProps {
   balance: number;
 }
 
-const WalletBalance: React.FC<WalletBalanceProps> = ({ balance }) => {
+const WalletBalance: React.FC<WalletBalanceProps> = React.memo(({ balance }) => {
   return (
     <div className="flex items-center justify-between mb-6 p-4 bg-primary/5 rounded-lg">
       <div>
@@ -17,6 +17,9 @@ const WalletBalance: React.FC<WalletBalanceProps> = ({ balance }) => {
       <WalletIcon className="h-12 w-12 text-primary/50" />
     </div>
   );
-};
+});
+
+// Add display name for debugging
+WalletBalance.displayName = 'WalletBalance';
 
 export default WalletBalance;
