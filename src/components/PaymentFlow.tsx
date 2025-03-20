@@ -1,20 +1,22 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check, AlertTriangle, BuildingBank } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { addTransaction, simulatePaymentProcessing } from './TransactionUtils';
 import { PaymentMethod } from '@/stores/transactionStore';
 import { useNavigate } from 'react-router-dom';
 import { createInstamojoPayment } from './webhook/instamojoUtils';
 
+// Import the new components
+import PaymentAmountForm from './payment/PaymentAmountForm';
+import PaymentMethodComponent from './payment/PaymentMethod';
+import PaymentSuccess from './payment/PaymentSuccess';
+
 const PaymentFlow = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [qrCodeError, setQrCodeError] = useState(false);
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [paymentData, setPaymentData] = useState({
@@ -253,30 +255,6 @@ const PaymentFlow = () => {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      toast.success('Copied to clipboard!');
-      
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    }).catch(() => {
-      toast.error('Failed to copy. Please try again.');
-    });
-  };
-
-  const qrCodeUrl = useMemo(() => {
-    if (step === 2 && 
-        paymentData.paymentMethod === 'upi' && 
-        paymentData.upiId && 
-        validateUpiId(paymentData.upiId)) {
-      console.log("Generating QR code URL");
-      return getUpiQrCodeUrl();
-    }
-    return '';
-  }, [step, paymentData.paymentMethod, paymentData.upiId, paymentData.amount, paymentData.transactionId, paymentData.purpose]);
-
   const handleQrCodeError = () => {
     console.error("QR code failed to load");
     setQrCodeError(true);
@@ -293,6 +271,17 @@ const PaymentFlow = () => {
     return 'txn_' + Math.random().toString(36).substr(2, 9);
   };
 
+  const qrCodeUrl = useMemo(() => {
+    if (step === 2 && 
+        paymentData.paymentMethod === 'upi' && 
+        paymentData.upiId && 
+        validateUpiId(paymentData.upiId)) {
+      console.log("Generating QR code URL");
+      return getUpiQrCodeUrl();
+    }
+    return '';
+  }, [step, paymentData.paymentMethod, paymentData.upiId, paymentData.amount, paymentData.transactionId, paymentData.purpose]);
+
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b pb-8">
@@ -302,327 +291,34 @@ const PaymentFlow = () => {
       
       <CardContent className="pt-6">
         {step === 1 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Amount</label>
-              <div className="relative">
-                <Input
-                  name="amount"
-                  value={paymentData.amount}
-                  onChange={handleInputChange}
-                  placeholder="Enter amount"
-                  className="pl-8"
-                  type="number"
-                />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  {getCurrencySymbol(paymentData.currency)}
-                </span>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Currency</label>
-              <Select
-                value={paymentData.currency}
-                onValueChange={(value) => handleSelectChange('currency', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
-                  <SelectItem value="USD">US Dollar ($)</SelectItem>
-                  <SelectItem value="EUR">Euro (€)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Payment Method</label>
-              <Select
-                value={paymentData.paymentMethod}
-                onValueChange={(value) => handleSelectChange('paymentMethod', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select payment method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="upi">UPI / Google Pay</SelectItem>
-                  <SelectItem value="card">Credit/Debit Card</SelectItem>
-                  <SelectItem value="netbanking">Net Banking</SelectItem>
-                  <SelectItem value="instamojo_card">Card via Instamojo</SelectItem>
-                  <SelectItem value="instamojo_neft">NEFT via Instamojo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Purpose (Optional)</label>
-              <Input
-                name="purpose"
-                value={paymentData.purpose}
-                onChange={handleInputChange}
-                placeholder="Enter payment purpose"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Your Name</label>
-              <Input
-                name="name"
-                value={paymentData.name}
-                onChange={handleInputChange}
-                placeholder="Enter your name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email (Optional)</label>
-              <Input
-                name="email"
-                value={paymentData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email"
-                type="email"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Phone (Optional)</label>
-              <Input
-                name="phone"
-                value={paymentData.phone}
-                onChange={handleInputChange}
-                placeholder="Enter your phone number"
-              />
-            </div>
-          </div>
+          <PaymentAmountForm 
+            paymentData={paymentData}
+            handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
+            getCurrencySymbol={getCurrencySymbol}
+          />
         )}
         
         {step === 2 && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-secondary rounded-lg p-4">
-              <div className="text-sm text-muted-foreground mb-1">Amount</div>
-              <div className="text-2xl font-semibold">
-                {getCurrencySymbol(paymentData.currency)} {paymentData.amount}
-              </div>
-              <div className="text-xs text-muted-foreground mt-2">
-                Transaction ID: {paymentData.transactionId}
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {paymentData.paymentMethod === 'upi' && (
-                <>
-                  <div className="text-sm font-medium mb-2">UPI Payment</div>
-                  <div className="rounded-lg border p-4">
-                    <div className="space-y-3">
-                      <label className="text-sm font-medium">UPI ID</label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          name="upiId"
-                          value={paymentData.upiId}
-                          onChange={handleInputChange}
-                          placeholder="yourname@upi"
-                          className="flex-1"
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okaxis, name@ybl)</p>
-                    </div>
-                    
-                    {paymentData.upiId && validateUpiId(paymentData.upiId) && (
-                      <div className="mt-4">
-                        <p className="text-sm font-medium mb-2">Scan QR Code</p>
-                        {qrCodeError ? (
-                          <div className="bg-red-50 p-3 rounded-lg text-center">
-                            <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-2" />
-                            <p className="text-sm text-red-600">Could not generate QR code</p>
-                            <button 
-                              onClick={() => setQrCodeError(false)} 
-                              className="text-xs text-primary mt-2 hover:underline"
-                            >
-                              Try again
-                            </button>
-                          </div>
-                        ) : qrCodeUrl ? (
-                          <div className="bg-white p-2 rounded-lg inline-block">
-                            <img 
-                              src={qrCodeUrl} 
-                              alt="UPI QR Code" 
-                              width={200} 
-                              height={200} 
-                              onError={handleQrCodeError}
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center h-[200px] w-[200px] bg-gray-100 rounded-lg">
-                            <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                          </div>
-                        )}
-                        <p className="text-xs text-muted-foreground mt-2">Scan this QR code with any UPI app</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={handleUpiPayment}>
-                    <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                      <Smartphone className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Pay with UPI</div>
-                      <div className="text-sm text-muted-foreground">Quick, secure UPI payment</div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {paymentData.paymentMethod === 'card' && (
-                <>
-                  <div className="text-sm font-medium mb-2">Credit/Debit Card</div>
-                  <div className="rounded-lg border p-4">
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Card Number</label>
-                        <Input placeholder="1234 5678 9012 3456" className="flex-1" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Expiry Date</label>
-                          <Input placeholder="MM/YY" />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">CVV</label>
-                          <Input placeholder="123" type="password" maxLength={3} />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Card Holder Name</label>
-                        <Input placeholder="Name on card" value={paymentData.name} />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {paymentData.paymentMethod === 'netbanking' && (
-                <>
-                  <div className="text-sm font-medium mb-2">Net Banking</div>
-                  <div className="rounded-lg border p-4">
-                    <div className="space-y-3">
-                      <label className="text-sm font-medium">Select Bank</label>
-                      <Select defaultValue="hdfc">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Bank" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="hdfc">HDFC Bank</SelectItem>
-                          <SelectItem value="sbi">State Bank of India</SelectItem>
-                          <SelectItem value="icici">ICICI Bank</SelectItem>
-                          <SelectItem value="axis">Axis Bank</SelectItem>
-                          <SelectItem value="kotak">Kotak Mahindra Bank</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground">You will be redirected to the bank's website to complete the payment</p>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {paymentData.paymentMethod === 'instamojo_card' && (
-                <>
-                  <div className="text-sm font-medium mb-2">Card Payment (Instamojo)</div>
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center mb-4">
-                      <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                        <CreditCard className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-medium">Secure Card Payment</div>
-                        <div className="text-sm text-muted-foreground">Process through Instamojo secure portal</div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      You'll be redirected to Instamojo's secure payment gateway to complete your transaction.
-                    </p>
-                    <Button 
-                      onClick={() => initiateInstamojoPayment('card')} 
-                      className="w-full"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
-                      ) : (
-                        <>Proceed to Card Payment</>
-                      )}
-                    </Button>
-                  </div>
-                </>
-              )}
-
-              {paymentData.paymentMethod === 'instamojo_neft' && (
-                <>
-                  <div className="text-sm font-medium mb-2">NEFT Payment (Instamojo)</div>
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-center mb-4">
-                      <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                        <BuildingBank className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-medium">NEFT Bank Transfer</div>
-                        <div className="text-sm text-muted-foreground">Process using your bank's NEFT facility</div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      You'll be redirected to Instamojo to receive NEFT transfer details for your payment.
-                    </p>
-                    <Button 
-                      onClick={() => initiateInstamojoPayment('neft')} 
-                      className="w-full"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
-                      ) : (
-                        <>Proceed to NEFT Payment</>
-                      )}
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+          <PaymentMethodComponent
+            paymentMethod={paymentData.paymentMethod}
+            paymentData={paymentData}
+            handleInputChange={handleInputChange}
+            validateUpiId={validateUpiId}
+            qrCodeUrl={qrCodeUrl}
+            qrCodeError={qrCodeError}
+            handleQrCodeError={handleQrCodeError}
+            handleUpiPayment={handleUpiPayment}
+            loading={loading}
+            initiateInstamojoPayment={initiateInstamojoPayment}
+          />
         )}
         
         {step === 3 && (
-          <div className="text-center py-6 animate-fade-in">
-            <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="h-8 w-8 text-emerald-500" strokeWidth={3} />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Payment Submitted</h3>
-            <p className="text-muted-foreground mb-6">Your payment is being processed.</p>
-            <div className="bg-secondary rounded-lg p-4 max-w-xs mx-auto">
-              <div className="flex justify-between mb-2">
-                <span className="text-muted-foreground">Transaction ID:</span>
-                <div className="flex items-center">
-                  <span className="font-medium mr-2 text-sm truncate max-w-[120px]">{paymentData.transactionId}</span>
-                  <button 
-                    onClick={() => copyToClipboard(paymentData.transactionId)}
-                    className="text-primary hover:text-primary/80"
-                  >
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span className="text-muted-foreground">Amount:</span>
-                <span className="font-medium">{getCurrencySymbol(paymentData.currency)} {paymentData.amount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Date:</span>
-                <span className="font-medium">{new Date().toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
+          <PaymentSuccess
+            paymentData={paymentData}
+            getCurrencySymbol={getCurrencySymbol}
+          />
         )}
       </CardContent>
       
