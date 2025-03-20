@@ -79,6 +79,7 @@ interface TransactionState {
   setUserRole: (role: UserRole, email: string | null) => void;
   clearUserData: () => void;
   // Wallet methods
+  initializeWallet: (email: string) => void;
   getWalletBalance: (email: string) => number;
   depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
   withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
@@ -113,6 +114,23 @@ export const useTransactionStore = create<TransactionState>()(
       setUserRole: (role, email) => set({ userRole: role, userEmail: email }),
       
       clearUserData: () => set({ userRole: null, userEmail: null }),
+      
+      // New method to initialize a wallet for a user if it doesn't exist
+      initializeWallet: (email) => {
+        const state = get();
+        if (!state.wallets[email]) {
+          set((state) => ({
+            wallets: {
+              ...state.wallets,
+              [email]: {
+                balance: 0,
+                currency: '₹',
+                transactions: []
+              }
+            }
+          }));
+        }
+      },
       
       // Wallet methods
       getWalletBalance: (email) => {
@@ -213,6 +231,11 @@ export const useTransactionStore = create<TransactionState>()(
         // Check if sufficient balance
         if (senderBalance < amount) {
           throw new Error("Insufficient balance for transfer");
+        }
+        
+        // Ensure recipient wallet exists
+        if (!state.wallets[toEmail]) {
+          throw new Error("Recipient wallet does not exist");
         }
         
         const transactionId = generateTransactionId();

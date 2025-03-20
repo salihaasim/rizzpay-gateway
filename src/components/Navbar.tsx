@@ -22,7 +22,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { userRole, clearUserData } = useTransactionStore();
+  const { userRole, userEmail, clearUserData } = useTransactionStore();
   const { toast } = useToast();
 
   // Build navItems based on user role
@@ -39,7 +39,18 @@ const Navbar = () => {
 
       // Admin-only items
       if (userRole === 'admin') {
-        items.push({ name: 'Webhook', path: '/webhook', icon: Shield });
+        items.push({ 
+          name: 'Webhook', 
+          path: '/webhook', 
+          icon: Shield,
+          adminOnly: true
+        });
+        items.push({ 
+          name: 'Payment', 
+          path: '/payment', 
+          icon: CreditCard,
+          adminOnly: true
+        });
       }
     }
 
@@ -76,11 +87,19 @@ const Navbar = () => {
                 Admin
               </span>
             )}
+            {userRole === 'merchant' && userEmail && (
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                {userEmail}
+              </span>
+            )}
           </Link>
           
           <div className="flex items-center space-x-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
+              // Skip admin-only items for non-admin users
+              if (item.adminOnly && userRole !== 'admin') return null;
+              
               return (
                 <Link key={item.path} to={item.path}>
                   <Button
@@ -133,6 +152,11 @@ const Navbar = () => {
                 Admin
               </span>
             )}
+            {userRole === 'merchant' && userEmail && (
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full truncate max-w-[100px]">
+                {userEmail}
+              </span>
+            )}
           </Link>
 
           <Button
@@ -152,6 +176,9 @@ const Navbar = () => {
           <div className="flex flex-col space-y-2 p-4 animate-slide-in">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
+              // Skip admin-only items for non-admin users
+              if (item.adminOnly && userRole !== 'admin') return null;
+              
               return (
                 <Link
                   key={item.path}

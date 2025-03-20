@@ -36,7 +36,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Auth: React.FC = () => {
   const [isAdminLogin, setIsAdminLogin] = useState(false);
-  const { setUserRole } = useTransactionStore();
+  const { setUserRole, initializeWallet } = useTransactionStore();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -80,6 +80,8 @@ const Auth: React.FC = () => {
     } else {
       // Regular user login - simplified for demo
       setUserRole('merchant', data.email);
+      // Initialize wallet if it doesn't exist
+      initializeWallet(data.email);
       toast({
         title: "Login successful",
         description: "Welcome back!",
@@ -91,6 +93,8 @@ const Auth: React.FC = () => {
   const handleRegisterSubmit = (data: RegisterFormValues) => {
     // In a real app, this would create a user in the database
     setUserRole('merchant', data.email);
+    // Initialize wallet for new user
+    initializeWallet(data.email);
     toast({
       title: "Registration successful",
       description: "Your account has been created",
