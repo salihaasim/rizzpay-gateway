@@ -141,7 +141,16 @@ const Wallet = () => {
         return;
       }
       
-      addMerchant(data);
+      // Here's the fix: We're ensuring all required fields are present
+      // The merchantSchema validation ensures these values are not undefined
+      const merchantData = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        company: data.company
+      };
+      
+      addMerchant(merchantData);
       merchantForm.reset();
       setShowAddMerchant(false);
       toast.success('Merchant added successfully!');

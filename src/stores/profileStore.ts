@@ -22,7 +22,7 @@ interface ProfileState {
   };
   merchants: Merchant[];
   updateProfile: (data: Partial<ProfileState>) => void;
-  addMerchant: (merchant: Omit<Merchant, 'id' | 'createdAt'>) => Merchant;
+  addMerchant: (merchant: Omit<Merchant, "id" | "createdAt">) => Merchant;
   removeMerchant: (id: string) => void;
   getMerchantByEmail: (email: string) => Merchant | undefined;
 }
