@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRight, Building2, UserCircle, Users } from 'lucide-react';
+import { ArrowRight, Building2, UserCircle, Users, Store } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ const roles = [
     id: 'merchant',
     name: 'Merchant',
     description: 'Accept payments, manage your store, and view transaction history for your business.',
-    icon: <Users className="h-8 w-8 text-primary" />,
+    icon: <Store className="h-8 w-8 text-primary" />,
     permissions: ['Process payments', 'View your transactions', 'Business settings', 'Financial reports']
   },
   {
@@ -93,6 +93,10 @@ const RoleSelector = () => {
     } else {
       toast.error("Invalid credentials. Try the demo credentials shown below.");
     }
+  };
+
+  const handleRegisterAsMerchant = () => {
+    navigate('/auth');
   };
 
   // Handle enter key in login form
@@ -219,14 +223,25 @@ const RoleSelector = () => {
             </div>
           )}
         </CardContent>
-        <CardFooter className="border-t pt-6 pb-6 flex justify-end">
+        <CardFooter className="border-t pt-6 pb-6 flex flex-col justify-end gap-2">
           <Button 
             onClick={handleContinue}
-            className="rounded-full px-8 shadow-md transition-all"
+            className="rounded-full px-8 shadow-md transition-all w-full"
           >
             {showLogin ? "Login" : "Continue"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
+          
+          {!showLogin && selectedRole === 'merchant' && (
+            <Button 
+              variant="outline"
+              onClick={handleRegisterAsMerchant}
+              className="rounded-full px-8 shadow-sm transition-all w-full mt-2"
+            >
+              Register as a New Merchant
+              <Store className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>
