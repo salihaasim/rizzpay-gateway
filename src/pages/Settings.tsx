@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,13 +9,23 @@ import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
 import { toast } from 'sonner';
 import { CreditCard, Bell, Lock, User, ShieldCheck, Store, Smartphone, CheckCircle } from 'lucide-react';
+import { useProfileStore } from '@/stores/profileStore';
 
 const Settings = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [marketingEnabled, setMarketingEnabled] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   
+  const { firstName, lastName, email, phone, company, updateProfile } = useProfileStore();
+  
   const handleSaveProfile = () => {
+    updateProfile({
+      firstName: (document.getElementById('firstName') as HTMLInputElement).value,
+      lastName: (document.getElementById('lastName') as HTMLInputElement).value,
+      email: (document.getElementById('email') as HTMLInputElement).value,
+      phone: (document.getElementById('phone') as HTMLInputElement).value,
+      company: (document.getElementById('company') as HTMLInputElement).value,
+    });
     toast.success('Profile settings saved successfully');
   };
   
@@ -98,7 +107,6 @@ const Settings = () => {
                 <TabsTrigger value="security">Security</TabsTrigger>
               </TabsList>
               
-              {/* Profile Tab */}
               <TabsContent value="profile" className="mt-6 animate-fade-in">
                 <Card className="border-0 shadow-sm overflow-hidden">
                   <CardHeader>
@@ -109,27 +117,27 @@ const Settings = () => {
                     <div className="flex flex-col md:flex-row gap-4">
                       <div className="w-full md:w-1/2 space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" defaultValue="Rahul" />
+                        <Input id="firstName" defaultValue={firstName} />
                       </div>
                       <div className="w-full md:w-1/2 space-y-2">
                         <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" defaultValue="Sharma" />
+                        <Input id="lastName" defaultValue={lastName} />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" defaultValue="rahul.sharma@example.com" />
+                      <Input id="email" type="email" defaultValue={email} />
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" defaultValue="+91 98765 43210" />
+                      <Input id="phone" defaultValue={phone} />
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="company">Company Name</Label>
-                      <Input id="company" defaultValue="Sharma Enterprises" />
+                      <Input id="company" defaultValue={company} />
                     </div>
                   </CardContent>
                   <CardFooter className="justify-end border-t pt-6">
@@ -138,7 +146,6 @@ const Settings = () => {
                 </Card>
               </TabsContent>
               
-              {/* Payment Tab */}
               <TabsContent value="payment" className="mt-6 animate-fade-in">
                 <Card className="border-0 shadow-sm overflow-hidden">
                   <CardHeader>
@@ -206,7 +213,6 @@ const Settings = () => {
                 </Card>
               </TabsContent>
               
-              {/* Security Tab */}
               <TabsContent value="security" className="mt-6 animate-fade-in">
                 <Card className="border-0 shadow-sm overflow-hidden">
                   <CardHeader>
