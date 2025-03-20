@@ -1,16 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check } from 'lucide-react';
+import { ArrowRight, Loader2, CreditCard, Smartphone, Copy, Check, AlertTriangle } from 'lucide-react';
 
 const PaymentFlow = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [qrCodeError, setQrCodeError] = useState(false);
   const [paymentData, setPaymentData] = useState({
     amount: '',
     currency: 'INR',
@@ -31,6 +31,10 @@ const PaymentFlow = () => {
       transactionId: randomId
     }));
   }, []);
+
+  useEffect(() => {
+    setQrCodeError(false);
+  }, [paymentData.upiId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,15 +98,26 @@ const PaymentFlow = () => {
     }
   };
 
+  const validateUpiId = (value: string) => {
+    if (!value) return false;
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    return upiRegex.test(value);
+  };
+
   const getUpiPaymentLink = () => {
-    if (!paymentData.upiId) return '';
-    
-    const amount = paymentData.amount;
-    const upiId = encodeURIComponent(paymentData.upiId);
-    const txnId = encodeURIComponent(paymentData.transactionId);
-    const purpose = encodeURIComponent(paymentData.purpose || 'Payment via Rizzpay');
-    
-    return `upi://pay?pa=${upiId}&pn=Rizzpay&am=${amount}&cu=${paymentData.currency}&tn=${purpose}&tr=${txnId}`;
+    try {
+      if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) return '';
+      
+      const amount = paymentData.amount;
+      const upiId = encodeURIComponent(paymentData.upiId);
+      const txnId = encodeURIComponent(paymentData.transactionId);
+      const purpose = encodeURIComponent(paymentData.purpose || 'Payment via Rizzpay');
+      
+      return `upi://pay?pa=${upiId}&pn=Rizzpay&am=${amount}&cu=${paymentData.currency}&tn=${purpose}&tr=${txnId}`;
+    } catch (error) {
+      console.error("Error generating UPI link:", error);
+      return '';
+    }
   };
 
   const handleUpiPayment = () => {
@@ -148,13 +163,24 @@ const PaymentFlow = () => {
   };
 
   const getUpiQrCodeUrl = () => {
-    if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) return '';
-    
-    const upiUrl = getUpiPaymentLink();
-    if (!upiUrl) return '';
-    
-    const encodedUpiUrl = encodeURIComponent(upiUrl);
-    return `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodedUpiUrl}&choe=UTF-8`;
+    try {
+      if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
+        console.log("Invalid UPI ID");
+        return '';
+      }
+      
+      const upiUrl = getUpiPaymentLink();
+      if (!upiUrl) {
+        console.log("No UPI URL generated");
+        return '';
+      }
+      
+      const encodedUpiUrl = encodeURIComponent(upiUrl);
+      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUpiUrl}`;
+    } catch (error) {
+      console.error("Error generating QR code URL:", error);
+      return '';
+    }
   };
 
   const copyToClipboard = (text: string) => {
@@ -170,16 +196,22 @@ const PaymentFlow = () => {
     });
   };
 
-  const validateUpiId = (value: string) => {
-    if (!value) return false;
-    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
-    return upiRegex.test(value);
-  };
+  const qrCodeUrl = useMemo(() => {
+    if (step === 2 && 
+        paymentData.paymentMethod === 'upi' && 
+        paymentData.upiId && 
+        validateUpiId(paymentData.upiId)) {
+      console.log("Generating QR code URL");
+      return getUpiQrCodeUrl();
+    }
+    return '';
+  }, [step, paymentData.paymentMethod, paymentData.upiId, paymentData.amount, paymentData.transactionId, paymentData.purpose]);
 
-  // Get QR code URL only when needed
-  const qrCodeUrl = step === 2 && paymentData.paymentMethod === 'upi' && 
-                    paymentData.upiId && validateUpiId(paymentData.upiId) ? 
-                    getUpiQrCodeUrl() : '';
+  const handleQrCodeError = () => {
+    console.error("QR code failed to load");
+    setQrCodeError(true);
+    toast.error("Error loading QR code. Please check your UPI ID.");
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
@@ -316,18 +348,35 @@ const PaymentFlow = () => {
                       <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okaxis, name@ybl)</p>
                     </div>
                     
-                    {paymentData.upiId && validateUpiId(paymentData.upiId) && qrCodeUrl && (
+                    {paymentData.upiId && validateUpiId(paymentData.upiId) && (
                       <div className="mt-4">
                         <p className="text-sm font-medium mb-2">Scan QR Code</p>
-                        <div className="bg-white p-2 rounded-lg inline-block">
-                          <img 
-                            src={qrCodeUrl} 
-                            alt="UPI QR Code" 
-                            width={200} 
-                            height={200} 
-                            onError={() => toast.error("Error loading QR code. Please check your UPI ID.")}
-                          />
-                        </div>
+                        {qrCodeError ? (
+                          <div className="bg-red-50 p-3 rounded-lg text-center">
+                            <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-2" />
+                            <p className="text-sm text-red-600">Could not generate QR code</p>
+                            <button 
+                              onClick={() => setQrCodeError(false)} 
+                              className="text-xs text-primary mt-2 hover:underline"
+                            >
+                              Try again
+                            </button>
+                          </div>
+                        ) : qrCodeUrl ? (
+                          <div className="bg-white p-2 rounded-lg inline-block">
+                            <img 
+                              src={qrCodeUrl} 
+                              alt="UPI QR Code" 
+                              width={200} 
+                              height={200} 
+                              onError={handleQrCodeError}
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center h-[200px] w-[200px] bg-gray-100 rounded-lg">
+                            <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                          </div>
+                        )}
                         <p className="text-xs text-muted-foreground mt-2">Scan this QR code with any UPI app</p>
                       </div>
                     )}
