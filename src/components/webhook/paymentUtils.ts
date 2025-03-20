@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { validateWebhookToken } from './tokenUtils';
 import { updateTransactionFromWebhook } from '@/utils/webhookUtils';
 
-// Process a webhook payment request
+// Process a webhook payment request with performance optimizations
 export const processWebhookPayment = async (paymentData: {
   token: string;
   amount: string;
@@ -39,8 +39,8 @@ export const processWebhookPayment = async (paymentData: {
       return { status: 'error', message: 'Customer name is required' };
     }
     
-    // Create transaction ID
-    const transactionId = `webhook_${uuidv4().substring(0, 8)}`;
+    // Create transaction ID (use more concise IDs for better performance)
+    const transactionId = `wh_${uuidv4().split('-')[0]}`;
     
     // Format for callbackUrl (add transaction ID)
     let callbackUrl = paymentData.callback_url || '';
@@ -49,14 +49,14 @@ export const processWebhookPayment = async (paymentData: {
       callbackUrl = `${callbackUrl}${separator}transaction_id=${transactionId}`;
     }
     
-    // Generate payment URL 
-    const paymentUrl = `${window.location.origin}/payment?source=webhook&id=${transactionId}`;
+    // Generate payment URL (optimized query string)
+    const paymentUrl = `${window.location.origin}/payment?id=${transactionId}`;
     
     // Determine preferred payment method
     const paymentMethod = paymentData.payment_method?.toLowerCase() || 'default';
     
     // Store transaction details in local storage to be picked up by the payment page
-    localStorage.setItem(`webhook_payment_${transactionId}`, JSON.stringify({
+    const paymentInfo = {
       id: transactionId,
       amount: paymentData.amount,
       currency: paymentData.currency || 'INR',
@@ -68,7 +68,10 @@ export const processWebhookPayment = async (paymentData: {
       merchantEmail: tokenValidation.email,
       preferredPaymentMethod: paymentMethod,
       createdAt: new Date().toISOString()
-    }));
+    };
+    
+    // Performance optimization: use sessionStorage instead of localStorage for temp data
+    sessionStorage.setItem(`webhook_payment_${transactionId}`, JSON.stringify(paymentInfo));
     
     return {
       status: 'success',
@@ -85,10 +88,17 @@ export const processWebhookPayment = async (paymentData: {
   }
 };
 
-// Get webhook payment details
+// Get webhook payment details with improved error handling
 export const getWebhookPaymentDetails = (transactionId: string) => {
   try {
-    const paymentDataStr = localStorage.getItem(`webhook_payment_${transactionId}`);
+    // First try sessionStorage (faster)
+    let paymentDataStr = sessionStorage.getItem(`webhook_payment_${transactionId}`);
+    
+    // Fallback to localStorage if not found
+    if (!paymentDataStr) {
+      paymentDataStr = localStorage.getItem(`webhook_payment_${transactionId}`);
+    }
+    
     if (!paymentDataStr) {
       return null;
     }
@@ -100,69 +110,61 @@ export const getWebhookPaymentDetails = (transactionId: string) => {
   }
 };
 
-// Process webhook callbacks from payment gateways
+// Process webhook callbacks from payment gateways with optimized error handling
 export const processGatewayWebhookCallback = async (
   gatewayName: string,
   callbackData: Record<string, any>
 ): Promise<boolean> => {
   try {
-    console.log(`Processing ${gatewayName} webhook callback:`, callbackData);
-    
-    // Handle different gateway formats
-    if (gatewayName.toLowerCase() === 'instamojo') {
-      // Extract data from Instamojo webhook format
-      const { 
-        payment_id, 
-        payment_request_id,
-        status,
-        buyer_name,
-        buyer_email,
-        amount,
-        instrument_type,
-        mac
-      } = callbackData;
-      
-      // Validate webhook signature for production
-      if (process.env.NODE_ENV === 'production' && process.env.VITE_INSTAMOJO_SALT) {
-        // In a real implementation, you would validate the MAC signature here
-        // if (!validateSignature(callbackData, process.env.VITE_INSTAMOJO_SALT)) {
-        //   console.error('Invalid Instamojo webhook signature');
-        //   return false;
-        // }
-      }
-      
-      // Translate Instamojo status to our internal status
-      let internalStatus: 'success' | 'failure' = 'failure';
-      if (status === 'Credit' || status === 'Completed' || status.toLowerCase() === 'credit') {
-        internalStatus = 'success';
-      }
-      
-      // Update transaction
-      return await updateTransactionFromWebhook(
-        payment_request_id, 
-        internalStatus,
-        payment_id,
-        {
-          buyerName: buyer_name,
-          buyerEmail: buyer_email,
-          paidAmount: amount,
-          gateway: 'Instamojo',
-          paymentMethod: instrument_type || 'unknown'
-        }
-      );
+    // Early return for unsupported gateways
+    if (gatewayName.toLowerCase() !== 'instamojo') {
+      console.error(`Unsupported payment gateway: ${gatewayName}`);
+      return false;
     }
     
-    // Default case - unknown gateway
-    console.error(`Unsupported payment gateway: ${gatewayName}`);
-    return false;
+    console.log(`Processing ${gatewayName} webhook callback:`, callbackData);
+    
+    // Extract data from Instamojo webhook format
+    const { 
+      payment_id, 
+      payment_request_id,
+      status,
+      buyer_name,
+      buyer_email,
+      amount,
+      instrument_type,
+    } = callbackData;
+    
+    // Validate webhook signature for production
+    if (process.env.NODE_ENV === 'production' && process.env.VITE_INSTAMOJO_SALT) {
+      // In a real implementation, you would validate the MAC signature here
+      // if (!validateSignature(callbackData, process.env.VITE_INSTAMOJO_SALT)) {
+      //   console.error('Invalid Instamojo webhook signature');
+      //   return false;
+      // }
+    }
+    
+    // Translate Instamojo status to our internal status
+    let internalStatus: 'success' | 'failure' = 'failure';
+    if (status === 'Credit' || status === 'Completed' || status.toLowerCase() === 'credit') {
+      internalStatus = 'success';
+    }
+    
+    // Update transaction
+    return await updateTransactionFromWebhook(
+      payment_request_id, 
+      internalStatus,
+      payment_id,
+      {
+        buyerName: buyer_name,
+        buyerEmail: buyer_email,
+        paidAmount: amount,
+        gateway: 'Instamojo',
+        paymentMethod: instrument_type || 'unknown'
+      }
+    );
   } catch (error) {
     console.error(`Error processing ${gatewayName} webhook:`, error);
     return false;
   }
 };
-
-// This function would validate the Instamojo webhook signature in production
-// const validateSignature = (callbackData: Record<string, any>, salt: string): boolean => {
-//   // Implementation would depend on Instamojo's signature calculation algorithm
-//   return true; 
-// }

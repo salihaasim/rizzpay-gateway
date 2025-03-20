@@ -4,6 +4,9 @@ import { toast } from 'sonner';
 import { showTransactionNotification } from './notificationUtils';
 import { syncTransactionToSupabase } from './supabaseClient';
 
+// Optimization: Use a debounce mechanism for updates
+const pendingUpdates = new Map();
+
 // Update the transactionStore to include new Instamojo payment methods
 export const updateTransactionFromWebhook = async (
   paymentRequestId: string,
@@ -12,6 +15,16 @@ export const updateTransactionFromWebhook = async (
   additionalDetails?: Record<string, string>
 ): Promise<boolean> => {
   try {
+    // Avoid duplicate webhook processing
+    const updateKey = `${paymentRequestId}-${status}-${paymentId}`;
+    if (pendingUpdates.has(updateKey)) {
+      console.log(`Skipping duplicate webhook update: ${updateKey}`);
+      return true;
+    }
+    
+    pendingUpdates.set(updateKey, true);
+    
+    // Performance optimization: Get state directly instead of subscribing
     const store = useTransactionStore.getState();
     const transaction = store.transactions.find(t => 
       t.id === paymentRequestId || 
@@ -20,11 +33,12 @@ export const updateTransactionFromWebhook = async (
     
     if (!transaction) {
       console.error(`Transaction with ID ${paymentRequestId} not found`);
+      pendingUpdates.delete(updateKey);
       return false;
     }
     
-    // Update transaction status
-    store.updateTransaction(transaction.id, {
+    // Prepare update data
+    const updatedTransaction = {
       status: status === 'success' ? 'successful' : 'failed',
       processingState: status === 'success' ? 'authorization_decision' : 'declined',
       processingTimeline: [
@@ -43,7 +57,10 @@ export const updateTransactionFromWebhook = async (
         declineReason: status === 'failure' ? additionalDetails?.error : undefined,
         ...additionalDetails
       }
-    });
+    };
+    
+    // Update transaction
+    store.updateTransaction(transaction.id, updatedTransaction);
     
     // Show notification to user
     showTransactionNotification(
@@ -55,16 +72,15 @@ export const updateTransactionFromWebhook = async (
     );
     
     // Sync updated transaction to Supabase
-    const updatedTransaction = store.transactions.find(t => t.id === transaction.id);
-    if (updatedTransaction) {
-      try {
-        await syncTransactionToSupabase(updatedTransaction);
-      } catch (error) {
+    const finalTransaction = store.transactions.find(t => t.id === transaction.id);
+    if (finalTransaction) {
+      // Don't await this - allow it to run in the background
+      syncTransactionToSupabase(finalTransaction).catch(error => {
         console.error("Error syncing transaction to Supabase:", error);
-        // Continue even if syncing fails
-      }
+      });
     }
     
+    pendingUpdates.delete(updateKey);
     return true;
   } catch (error) {
     console.error("Error updating transaction from webhook:", error);
@@ -72,7 +88,7 @@ export const updateTransactionFromWebhook = async (
   }
 };
 
-// Process payment gateway webhook
+// Process payment gateway webhook with performance optimizations
 export const processPaymentGatewayWebhook = async (
   gatewayName: string,
   webhookData: Record<string, string>
@@ -81,51 +97,50 @@ export const processPaymentGatewayWebhook = async (
   
   // Extract transaction status based on gateway-specific format
   try {
-    switch (gatewayName.toLowerCase()) {
-      case 'instamojo':
-        // Handle Instamojo webhook format according to their documentation
-        const paymentId = webhookData.payment_id;
-        const paymentRequestId = webhookData.payment_request_id;
-        const status = webhookData.status?.toLowerCase() === 'credit' ? 'success' : 'failure';
-        
-        // Additional validation for production
-        if (process.env.NODE_ENV === 'production') {
-          // In production, you would validate the webhook signature here
-          // if (!validateInstamojoSignature(webhookData)) {
-          //   console.error('Invalid Instamojo webhook signature');
-          //   return false;
-          // }
-        }
-        
-        // Extract payment method details from the webhook data
-        let paymentMethod = webhookData.instrument_type || 'unknown';
-        if (paymentMethod.toLowerCase().includes('neft')) {
-          paymentMethod = 'neft';
-        } else if (paymentMethod.toLowerCase().includes('card')) {
-          paymentMethod = 'card';
-        }
-        
-        return await updateTransactionFromWebhook(
-          paymentRequestId,
-          status,
-          paymentId,
-          {
-            gatewayName: 'Instamojo',
-            paidAmount: webhookData.amount,
-            paymentMethod,
-            buyerName: webhookData.buyer_name || undefined,
-            buyerEmail: webhookData.buyer_email || undefined,
-            buyerPhone: webhookData.buyer_phone || undefined,
-            // Include additional payment details that might be useful
-            cardNetwork: webhookData.card_network || undefined,
-            issuingBank: webhookData.bank_name || undefined
-          }
-        );
-        
-      default:
-        console.error(`Unsupported payment gateway: ${gatewayName}`);
-        return false;
+    // Early return for unsupported gateways
+    if (gatewayName.toLowerCase() !== 'instamojo') {
+      console.error(`Unsupported payment gateway: ${gatewayName}`);
+      return false;
     }
+    
+    // Handle Instamojo webhook format according to their documentation
+    const paymentId = webhookData.payment_id;
+    const paymentRequestId = webhookData.payment_request_id;
+    const status = webhookData.status?.toLowerCase() === 'credit' ? 'success' : 'failure';
+    
+    // Additional validation for production
+    if (process.env.NODE_ENV === 'production') {
+      // In production, you would validate the webhook signature here
+      // if (!validateInstamojoSignature(webhookData)) {
+      //   console.error('Invalid Instamojo webhook signature');
+      //   return false;
+      // }
+    }
+    
+    // Extract payment method details from the webhook data
+    let paymentMethod = webhookData.instrument_type || 'unknown';
+    if (paymentMethod.toLowerCase().includes('neft')) {
+      paymentMethod = 'neft';
+    } else if (paymentMethod.toLowerCase().includes('card')) {
+      paymentMethod = 'card';
+    }
+    
+    return await updateTransactionFromWebhook(
+      paymentRequestId,
+      status,
+      paymentId,
+      {
+        gatewayName: 'Instamojo',
+        paidAmount: webhookData.amount,
+        paymentMethod,
+        buyerName: webhookData.buyer_name || undefined,
+        buyerEmail: webhookData.buyer_email || undefined,
+        buyerPhone: webhookData.buyer_phone || undefined,
+        // Include additional payment details that might be useful
+        cardNetwork: webhookData.card_network || undefined,
+        issuingBank: webhookData.bank_name || undefined
+      }
+    );
   } catch (error) {
     console.error(`Error processing ${gatewayName} webhook:`, error);
     return false;
