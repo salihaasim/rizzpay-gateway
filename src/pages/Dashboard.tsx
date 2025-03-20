@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
@@ -21,6 +22,7 @@ const chartData = [
 
 const Dashboard = () => {
   const { transactions } = useTransactionStore();
+  const [activeTab, setActiveTab] = useState('merchant');
   
   const totalRevenue = transactions
     .filter(t => t.status === 'successful')
@@ -48,7 +50,12 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Welcome back, Merchant Account</p>
           </div>
           
-          <Tabs defaultValue="merchant" className="w-[260px]">
+          <Tabs 
+            defaultValue="merchant" 
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-[260px]"
+          >
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="admin">Admin</TabsTrigger>
               <TabsTrigger value="merchant">Merchant</TabsTrigger>
@@ -183,7 +190,9 @@ const Dashboard = () => {
           
           <div className="lg:col-span-2">
             <h2 className="text-xl font-semibold mb-6">Quick Payment</h2>
-            <PaymentFlow />
+            <div className="p-4 h-full">
+              <PaymentFlow />
+            </div>
           </div>
         </div>
       </div>
