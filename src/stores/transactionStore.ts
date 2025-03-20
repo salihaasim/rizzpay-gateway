@@ -20,7 +20,7 @@ export type PaymentProcessingState =
   | 'merchant_credited'
   | 'completed';
 
-export type WalletTransactionType = 'deposit' | 'withdrawal' | 'payment';
+export type WalletTransactionType = 'deposit' | 'withdrawal' | 'payment' | 'transfer';
 
 export interface PaymentDetails {
   cardNumber?: string;
@@ -37,6 +37,8 @@ export interface PaymentDetails {
   declineReason?: string;
   settlementId?: string;
   processingFee?: string;
+  recipientEmail?: string;
+  recipientName?: string;
 }
 
 export interface Transaction {
@@ -80,6 +82,8 @@ interface TransactionState {
   getWalletBalance: (email: string) => number;
   depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
   withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
+  // New methods for merchant transfers
+  transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
 }
 
 export const useTransactionStore = create<TransactionState>()(
@@ -200,6 +204,62 @@ export const useTransactionStore = create<TransactionState>()(
         
         return transactionId;
       },
+      
+      // New method for merchant transfers
+      transferFunds: (fromEmail, toEmail, amount, description = 'Fund transfer') => {
+        const state = get();
+        const senderBalance = state.wallets[fromEmail]?.balance || 0;
+        
+        // Check if sufficient balance
+        if (senderBalance < amount) {
+          throw new Error("Insufficient balance for transfer");
+        }
+        
+        const transactionId = generateTransactionId();
+        const date = new Date().toISOString();
+        
+        // Create transaction
+        const transaction: Transaction = {
+          id: transactionId,
+          date,
+          amount: `₹${amount.toFixed(2)}`,
+          rawAmount: amount,
+          paymentMethod: 'wallet',
+          status: 'successful',
+          customer: toEmail,
+          createdBy: fromEmail,
+          walletTransactionType: 'transfer',
+          description,
+          paymentDetails: {
+            recipientEmail: toEmail,
+          }
+        };
+        
+        // Update both wallets
+        set((state) => {
+          const senderWallet = state.wallets[fromEmail] || { balance: 0, currency: '₹', transactions: [] };
+          const recipientWallet = state.wallets[toEmail] || { balance: 0, currency: '₹', transactions: [] };
+          
+          return {
+            transactions: [transaction, ...state.transactions],
+            wallets: {
+              ...state.wallets,
+              [fromEmail]: {
+                ...senderWallet,
+                balance: senderWallet.balance - amount,
+                transactions: [transactionId, ...senderWallet.transactions],
+              },
+              [toEmail]: {
+                ...recipientWallet,
+                balance: recipientWallet.balance + amount,
+                transactions: [transactionId, ...recipientWallet.transactions],
+              }
+            }
+          };
+        });
+        
+        return transactionId;
+      },
     }),
     {
       name: 'transactions-storage',
@@ -234,4 +294,3 @@ export const getFilteredTransactions = (state: TransactionState) => {
 const generateTransactionId = () => {
   return 'txn_' + Math.random().toString(36).substr(2, 9);
 };
-
