@@ -18,6 +18,14 @@ import {
 import { useTransactionStore } from '@/stores/transactionStore';
 import { useToast } from '@/hooks/use-toast';
 
+// Define NavItem type to fix TypeScript errors
+interface NavItem {
+  name: string;
+  path: string;
+  icon: React.ElementType;
+  isAdminOnly?: boolean;
+}
+
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -26,8 +34,8 @@ const Navbar = () => {
   const { toast } = useToast();
 
   // Build navItems based on user role
-  const getNavItems = () => {
-    const items = [
+  const getNavItems = (): NavItem[] => {
+    const items: NavItem[] = [
       { name: 'Home', path: '/', icon: Home },
     ];
 
@@ -43,13 +51,13 @@ const Navbar = () => {
           name: 'Webhook', 
           path: '/webhook', 
           icon: Shield,
-          adminOnly: true
+          isAdminOnly: true
         });
         items.push({ 
           name: 'Payment', 
           path: '/payment', 
           icon: CreditCard,
-          adminOnly: true
+          isAdminOnly: true
         });
       }
     }
@@ -98,7 +106,7 @@ const Navbar = () => {
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               // Skip admin-only items for non-admin users
-              if (item.adminOnly && userRole !== 'admin') return null;
+              if (item.isAdminOnly && userRole !== 'admin') return null;
               
               return (
                 <Link key={item.path} to={item.path}>
@@ -177,7 +185,7 @@ const Navbar = () => {
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               // Skip admin-only items for non-admin users
-              if (item.adminOnly && userRole !== 'admin') return null;
+              if (item.isAdminOnly && userRole !== 'admin') return null;
               
               return (
                 <Link

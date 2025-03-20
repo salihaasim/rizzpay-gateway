@@ -36,7 +36,7 @@ export const addTransaction = (
     createdBy: store.userEmail || undefined,
     processingState: 'initiated',
     processingTimeline: [{
-      stage: 'Payment Initiated',
+      stage: 'initiated',
       timestamp: new Date().toISOString(),
       message: `Payment of ₹${amount} initiated by ${customer} using ${paymentMethod}`
     }],
@@ -47,7 +47,7 @@ export const addTransaction = (
   return transaction;
 };
 
-// Enhanced simulatePaymentProcessing function
+// Simplified payment processing simulation
 export const simulatePaymentProcessing = async (
   transactionId: string, 
   paymentMethod: string,
@@ -83,42 +83,6 @@ export const simulatePaymentProcessing = async (
     return store.transactions.find(t => t.id === transactionId)!;
   };
 
-  // Apply risk analysis
-  const applyRiskAnalysis = () => {
-    const riskScore = Math.floor(Math.random() * 100);
-    let riskLevel = 'low';
-    
-    if (riskScore > 80) {
-      riskLevel = 'high';
-    } else if (riskScore > 50) {
-      riskLevel = 'medium';
-    }
-    
-    return { riskScore, riskLevel };
-  };
-
-  // Apply fraud detection
-  const applyFraudDetection = () => {
-    const flaggedPatterns = [];
-    const amount = transaction.rawAmount || 0;
-    
-    // Check for suspicious amount patterns
-    if (amount === 1337 || amount === 420 || amount === 666) {
-      flaggedPatterns.push('suspicious amount pattern');
-    }
-    
-    // Random flagging for demo purposes
-    if (Math.random() > 0.95) {
-      flaggedPatterns.push('unusual transaction velocity');
-    }
-    
-    if (Math.random() > 0.97) {
-      flaggedPatterns.push('mismatched geolocation');
-    }
-    
-    return flaggedPatterns;
-  };
-
   // 1. Payment Gateway processing
   await delay(800);
   updateTransactionState(
@@ -126,45 +90,7 @@ export const simulatePaymentProcessing = async (
     'Payment received by gateway and being validated'
   );
   
-  // 2. Apply risk analysis
-  await delay(600);
-  const { riskScore, riskLevel } = applyRiskAnalysis();
-  
-  if (riskLevel === 'high' && Math.random() > 0.7) {
-    updateTransactionState(
-      'declined',
-      `Payment declined: High risk score (${riskScore}/100)`,
-      {
-        status: 'declined',
-        paymentDetails: {
-          ...transaction.paymentDetails,
-          declineReason: `High risk score (${riskScore}/100)`
-        }
-      }
-    );
-    return store.transactions.find(t => t.id === transactionId)!;
-  }
-  
-  // 3. Apply fraud detection
-  await delay(700);
-  const fraudFlags = applyFraudDetection();
-  
-  if (fraudFlags.length > 0 && Math.random() > 0.7) {
-    updateTransactionState(
-      'declined',
-      `Payment declined: Suspected fraud (${fraudFlags.join(', ')})`,
-      {
-        status: 'declined',
-        paymentDetails: {
-          ...transaction.paymentDetails,
-          declineReason: `Suspected fraud (${fraudFlags.join(', ')})`
-        }
-      }
-    );
-    return store.transactions.find(t => t.id === transactionId)!;
-  }
-  
-  // 4. Payment Processor routing
+  // 2. Payment Processor routing
   await delay(1000);
   const processor = getRandomProcessor();
   updateTransactionState(
@@ -178,35 +104,7 @@ export const simulatePaymentProcessing = async (
     }
   );
   
-  // 5. Card Network Processing
-  await delay(1200);
-  const cardNetwork = getRandomCardNetwork(paymentMethod);
-  updateTransactionState(
-    'card_network_processing',
-    `Transaction sent to ${cardNetwork} for processing`,
-    {
-      paymentDetails: {
-        ...transaction.paymentDetails,
-        cardNetwork
-      }
-    }
-  );
-
-  // 6. Bank Authorization
-  await delay(1000);
-  const issuingBank = getRandomBank();
-  updateTransactionState(
-    'bank_authorization',
-    `Awaiting authorization from ${issuingBank}`,
-    {
-      paymentDetails: {
-        ...transaction.paymentDetails,
-        issuingBank
-      }
-    }
-  );
-  
-  // 7. Authorization Decision
+  // 3. Authorization Decision
   await delay(1500);
   
   if (!shouldSucceed) {
@@ -228,82 +126,15 @@ export const simulatePaymentProcessing = async (
   }
   
   // Payment approved path
-  // 8. Authorization Approved
   const authCode = generateAuthorizationCode();
   updateTransactionState(
     'authorization_decision',
     `Payment authorized with code: ${authCode}`,
     {
-      status: 'processing',
-      paymentDetails: {
-        ...transaction.paymentDetails,
-        authorizationCode: authCode
-      }
-    }
-  );
-  
-  // 9. Settlement Recording
-  await delay(1000);
-  const settlementId = generateSettlementId();
-  const processingFee = calculateProcessingFee(transaction.rawAmount || 0);
-  
-  updateTransactionState(
-    'settlement_recording',
-    `Settlement process initiated with ID: ${settlementId}`,
-    {
-      paymentDetails: {
-        ...transaction.paymentDetails,
-        settlementId,
-        processingFee: `₹${processingFee.toFixed(2)}`
-      }
-    }
-  );
-  
-  // 10. Settlement Initiated
-  await delay(1000);
-  updateTransactionState(
-    'settlement_initiated',
-    'Processor initiated settlement'
-  );
-  
-  // 11. Settlement Processing
-  await delay(1000);
-  updateTransactionState(
-    'settlement_processing',
-    'Batch settlement processing'
-  );
-  
-  // 12. Funds Transferred
-  await delay(1000);
-  const acquiringBank = getRandomBank();
-  updateTransactionState(
-    'funds_transferred',
-    `Funds transferred from ${transaction.paymentDetails?.issuingBank} to ${acquiringBank}`,
-    {
-      paymentDetails: {
-        ...transaction.paymentDetails,
-        acquiringBank
-      }
-    }
-  );
-  
-  // 13. Merchant Credited
-  await delay(1000);
-  updateTransactionState(
-    'merchant_credited',
-    `Merchant account credited with ₹${(transaction.rawAmount || 0) - processingFee}`
-  );
-  
-  // 14. Completed
-  await delay(500);
-  updateTransactionState(
-    'completed',
-    'Transaction completed successfully',
-    {
       status: 'successful',
       paymentDetails: {
         ...transaction.paymentDetails,
-        processingFee: `₹${processingFee.toFixed(2)}`
+        authorizationCode: authCode
       }
     }
   );
@@ -316,7 +147,7 @@ export const simulatePaymentProcessing = async (
   return store.transactions.find(t => t.id === transactionId)!;
 };
 
-// Modified simulateWalletProcessing function
+// Wallet processing simulation
 export const simulateWalletProcessing = async (
   email: string,
   amount: number,
@@ -471,18 +302,13 @@ export const simulateWalletProcessing = async (
   // Mark original transaction as successful
   store.updateTransaction(transactionId, {
     status: 'successful',
-    processingState: 'completed',
+    processingState: 'authorization_decision',
     processingTimeline: [
       ...(transaction.processingTimeline || []),
       {
         stage: 'authorization_decision',
         timestamp: new Date().toISOString(),
         message: 'Transaction authorized'
-      },
-      {
-        stage: 'completed',
-        timestamp: new Date().toISOString(),
-        message: `${transactionType} completed successfully`
       }
     ]
   });
@@ -502,48 +328,19 @@ const getRandomProcessor = () => {
   return processors[Math.floor(Math.random() * processors.length)];
 };
 
-const getRandomCardNetwork = (paymentMethod: string) => {
-  if (paymentMethod === 'card') {
-    const networks = ['Visa', 'Mastercard', 'RuPay', 'American Express'];
-    return networks[Math.floor(Math.random() * networks.length)];
-  } else if (paymentMethod === 'upi') {
-    return 'UPI Network';
-  } else {
-    return 'Banking Network';
-  }
-};
-
-const getRandomBank = () => {
-  const banks = ['HDFC Bank', 'SBI', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'Yes Bank'];
-  return banks[Math.floor(Math.random() * banks.length)];
-};
-
 const getRandomDeclineReason = () => {
   const reasons = [
     'Insufficient funds',
     'Card expired',
-    'Suspected fraud',
     'Transaction limit exceeded',
     'Invalid card details',
-    'Bank declined transaction',
-    'Account temporarily locked',
-    'International transactions disabled',
-    'Security verification required'
+    'Bank declined transaction'
   ];
   return reasons[Math.floor(Math.random() * reasons.length)];
 };
 
 const generateAuthorizationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-const generateSettlementId = () => {
-  return `STLMT-${Math.floor(1000000 + Math.random() * 9000000).toString()}`;
-};
-
-const calculateProcessingFee = (amount: number) => {
-  // Typically 2-3% of transaction amount
-  return amount * 0.025;
 };
 
 const calculateWalletFee = (amount: number, type: 'deposit' | 'withdrawal') => {
@@ -593,6 +390,3 @@ export const getPaymentStateLabel = (state: PaymentProcessingState) => {
   
   return stateLabels[state] || state;
 };
-
-// Export new simulator for wallet payments
-export { simulateWalletProcessing };
