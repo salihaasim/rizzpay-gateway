@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRight, Building2, UserCircle, Users, Store } from 'lucide-react';
+import { ArrowRight, Building2, Store } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
@@ -23,13 +23,6 @@ const roles = [
     description: 'Accept payments, manage your store, and view transaction history for your business.',
     icon: <Store className="h-8 w-8 text-primary" />,
     permissions: ['Process payments', 'View your transactions', 'Business settings', 'Financial reports']
-  },
-  {
-    id: 'client',
-    name: 'Client',
-    description: 'Make payments, view your transaction history, and manage your payment methods.',
-    icon: <UserCircle className="h-8 w-8 text-primary" />,
-    permissions: ['Make payments', 'View your transactions', 'Manage payment methods', 'View receipts']
   }
 ];
 
@@ -37,7 +30,6 @@ const roles = [
 const demoCredentials = {
   admin: { username: 'admin@rizzpay.com', password: 'admin' },
   merchant: { username: 'merchant@rizzpay.com', password: 'merchant' },
-  client: { username: 'client@rizzpay.com', password: 'client' },
 };
 
 const RoleSelector = () => {
@@ -85,7 +77,7 @@ const RoleSelector = () => {
         (credentials.password === demoUser.password || credentials.password === 'password')) {
       
       // Store role in Zustand store
-      setUserRole(selectedRole as 'admin' | 'merchant' | 'client', credentials.email);
+      setUserRole(selectedRole as 'admin' | 'merchant', credentials.email);
       
       // Successful login
       toast.success(`Logged in as ${selectedRole}`);
@@ -127,7 +119,7 @@ const RoleSelector = () => {
               onValueChange={setSelectedRole}
               className="w-full"
             >
-              <TabsList className="grid grid-cols-3 mb-8">
+              <TabsList className="grid grid-cols-2 mb-8">
                 {roles.map((role) => (
                   <TabsTrigger
                     key={role.id}

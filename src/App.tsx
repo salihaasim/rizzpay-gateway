@@ -40,7 +40,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Protected route component for any authenticated user
+// Protected route component for any authenticated user (admin or merchant)
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { userRole } = useTransactionStore();
   
@@ -69,7 +69,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             
-            {/* Protected routes - require any user role */}
+            {/* Protected routes - require admin or merchant role */}
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />

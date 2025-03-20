@@ -11,36 +11,27 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { Lock, LogIn, UserPlus, Shield, Store } from 'lucide-react';
+import { Lock, LogIn, Shield, Store } from 'lucide-react';
 import MerchantRegistration from '@/components/auth/MerchantRegistration';
 
 // Admin credentials - in a real app, these would be stored securely
 const ADMIN_EMAIL = "admin@rizzpay.com";
 const ADMIN_PASSWORD = "admin123";
 
-// Validation schemas
+// Validation schema
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
-const registerSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  company: z.string().optional(),
-});
-
 type LoginFormValues = z.infer<typeof loginSchema>;
-type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Auth: React.FC = () => {
   const [isAdminLogin, setIsAdminLogin] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register' | 'merchant'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'merchant'>('login');
   const { setUserRole, initializeWallet } = useTransactionStore();
-  const { addMerchant, merchants } = useProfileStore();
+  const { merchants } = useProfileStore();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -50,17 +41,6 @@ const Auth: React.FC = () => {
     defaultValues: {
       email: "",
       password: "",
-    },
-  });
-
-  // Register form
-  const registerForm = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      name: "",
-      company: "",
     },
   });
 
@@ -95,29 +75,13 @@ const Auth: React.FC = () => {
         });
         navigate('/dashboard');
       } else {
-        // Regular user login - simplified for demo
-        setUserRole('client', data.email);
-        // Initialize wallet if it doesn't exist
-        initializeWallet(data.email);
         toast({
-          title: "Login successful",
-          description: "Welcome back!",
+          title: "Login failed",
+          description: "No merchant account found with this email",
+          variant: "destructive",
         });
-        navigate('/dashboard');
       }
     }
-  };
-
-  const handleRegisterSubmit = (data: RegisterFormValues) => {
-    // Add user to the system
-    setUserRole('client', data.email);
-    // Initialize wallet for new user
-    initializeWallet(data.email);
-    toast({
-      title: "Registration successful",
-      description: "Your account has been created",
-    });
-    navigate('/dashboard');
   };
 
   const toggleAdminLogin = () => {
@@ -156,7 +120,7 @@ const Auth: React.FC = () => {
                 ? "Login to access the admin dashboard"
                 : authMode === 'merchant'
                 ? "Register your business to start accepting payments"
-                : "Login or create a new account to continue"}
+                : "Login to access your merchant account"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -200,111 +164,41 @@ const Auth: React.FC = () => {
               // Merchant registration form
               <MerchantRegistration />
             ) : (
-              // Regular user login/register tabs
-              <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
-                </TabsList>
-                <TabsContent value="login">
-                  <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
-                      <FormField
-                        control={loginForm.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input placeholder="your@email.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={loginForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit" className="w-full">
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Login
-                      </Button>
-                    </form>
-                  </Form>
-                </TabsContent>
-                <TabsContent value="register">
-                  <Form {...registerForm}>
-                    <form onSubmit={registerForm.handleSubmit(handleRegisterSubmit)} className="space-y-4">
-                      <FormField
-                        control={registerForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input placeholder="your@email.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="company"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Company (Optional)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Your Company" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit" className="w-full">
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Create Account
-                      </Button>
-                    </form>
-                  </Form>
-                </TabsContent>
-              </Tabs>
+              // Merchant login form
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="merchant@email.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Merchant Login
+                  </Button>
+                </form>
+              </Form>
             )}
           </CardContent>
           <CardFooter className="flex flex-col">
@@ -316,7 +210,7 @@ const Auth: React.FC = () => {
                 onClick={toggleAdminLogin}
               >
                 <Lock className="mr-2 h-4 w-4" />
-                {isAdminLogin ? "Switch to User Login" : "Admin Login"}
+                {isAdminLogin ? "Switch to Merchant Login" : "Admin Login"}
               </Button>
             )}
             {!isAdminLogin && authMode !== 'merchant' && (

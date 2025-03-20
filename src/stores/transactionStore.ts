@@ -1,9 +1,8 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
-export type UserRole = 'admin' | 'merchant' | 'client' | null;
+export type UserRole = 'admin' | 'merchant' | null;
 export type PaymentMethod = 'upi' | 'card' | 'netbanking';
 export type PaymentProcessingState = 
   | 'initiated' 
@@ -301,12 +300,6 @@ export const getFilteredTransactions = (state: TransactionState) => {
     return transactions.filter(t => 
       t.createdBy === userEmail || 
       t.customer === userEmail
-    );
-  } else if (userRole === 'client') {
-    // Clients only see transactions they're involved in
-    return transactions.filter(t => 
-      t.customer === userEmail || 
-      t.createdBy === userEmail
     );
   }
   
