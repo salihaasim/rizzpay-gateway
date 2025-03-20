@@ -1,15 +1,7 @@
 
 import React from 'react';
 import { ArrowUpCircle, ArrowDownCircle, RefreshCw } from 'lucide-react';
-
-interface Transaction {
-  id: string;
-  date: string;
-  amount: string | number;
-  customer: string;
-  createdBy: string;
-  walletTransactionType?: 'deposit' | 'withdrawal' | 'transfer';
-}
+import { Transaction } from '@/stores/transactionStore';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
