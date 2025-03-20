@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { CopyIcon, CheckIcon, CodeIcon, RefreshCwIcon, ExternalLinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
-import { createWebhookToken, validateWebhookToken } from '@/components/webhook/webhookUtils';
+import { createWebhookToken, validateWebhookToken } from '@/components/webhook/tokenUtils';
 
 const WebhookIntegration: React.FC = () => {
   const [copied, setCopied] = useState<string | null>(null);
@@ -15,7 +14,6 @@ const WebhookIntegration: React.FC = () => {
   const [regenerating, setRegenerating] = useState(false);
   const { userEmail } = useTransactionStore();
 
-  // Generate webhook token on component mount if not already set
   React.useEffect(() => {
     if (!webhookToken && userEmail) {
       const token = createWebhookToken(userEmail);
@@ -107,7 +105,6 @@ document.getElementById("payment-button").addEventListener("click", () => {
 
   const exampleRequestUrl = `${webhookEndpoint}?token=${webhookToken}&amount=100.00&currency=INR&description=Product+Purchase&customer_name=John+Doe&customer_email=john@example.com&callback_url=https://yourwebsite.com/payment-callback`;
 
-  // Document format for the webhook endpoint
   const apiDocumentation = [
     { param: 'token', required: true, description: 'Your unique webhook token (found on this page)' },
     { param: 'amount', required: true, description: 'Payment amount (e.g., 100.00)' },
@@ -131,7 +128,6 @@ document.getElementById("payment-button").addEventListener("click", () => {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Webhook Token Section */}
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium">Your Webhook Token</h3>
@@ -177,7 +173,6 @@ document.getElementById("payment-button").addEventListener("click", () => {
           </p>
         </div>
 
-        {/* Webhook Endpoint Section */}
         <div className="space-y-3">
           <h3 className="text-sm font-medium">Webhook Endpoint</h3>
           <div className="flex">
@@ -200,7 +195,6 @@ document.getElementById("payment-button").addEventListener("click", () => {
           </p>
         </div>
 
-        {/* Integration Examples */}
         <div className="space-y-4">
           <h3 className="text-sm font-medium">Integration Examples</h3>
           
@@ -286,7 +280,6 @@ document.getElementById("payment-button").addEventListener("click", () => {
           </div>
         </div>
 
-        {/* API Parameters Documentation */}
         <div className="space-y-3">
           <h3 className="text-sm font-medium">API Parameters</h3>
           <div className="border rounded-md">
@@ -333,3 +326,4 @@ document.getElementById("payment-button").addEventListener("click", () => {
 };
 
 export default WebhookIntegration;
+
