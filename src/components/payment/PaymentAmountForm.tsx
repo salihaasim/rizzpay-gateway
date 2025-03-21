@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CreditCard, Bank, Smartphone } from 'lucide-react';
+import { CreditCard, Building, Smartphone } from 'lucide-react';
 
 interface PaymentAmountFormProps {
   paymentData: {
@@ -101,7 +100,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
             <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
               <RadioGroupItem value="neft" id="neft" className="sr-only" />
               <Label htmlFor="neft" className="flex items-center cursor-pointer">
-                <Bank className="mr-3 h-5 w-5" />
+                <Building className="mr-3 h-5 w-5" />
                 <div>
                   <div className="font-medium">Net Banking</div>
                   <div className="text-sm text-muted-foreground">Pay through your bank account</div>

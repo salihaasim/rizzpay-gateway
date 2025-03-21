@@ -60,6 +60,13 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
             isLoading={loading}
           />
         )}
+        
+        {paymentMethod === 'upi' && (
+          <UpiPayment
+            paymentData={paymentData}
+            isLoading={loading}
+          />
+        )}
       </div>
     </div>
   );
