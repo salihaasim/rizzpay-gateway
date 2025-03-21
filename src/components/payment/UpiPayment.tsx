@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label'; 
 import { Loader2, Smartphone, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface UpiPaymentProps {
   paymentData: {
     upiId: string;
+    receiverUpiId?: string;
     amount: string;
     currency: string;
     transactionId: string;
@@ -43,12 +45,17 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     }
   }, [paymentData.upiId, validateUpiId, qrCodeUrl, generating]);
 
+  // Determine which UPI ID to use for payment - receiver's UPI ID if provided, otherwise user's UPI ID
+  const paymentUpiId = paymentData.receiverUpiId && validateUpiId(paymentData.receiverUpiId) 
+    ? paymentData.receiverUpiId 
+    : paymentData.upiId;
+
   return (
     <>
       <div className="text-sm font-medium mb-2">UPI Payment</div>
       <div className="rounded-lg border p-4">
         <div className="space-y-3">
-          <label className="text-sm font-medium">UPI ID</label>
+          <label className="text-sm font-medium">Your UPI ID</label>
           <div className="flex items-center gap-2">
             <Input
               name="upiId"
@@ -59,6 +66,21 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
             />
           </div>
           <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okaxis, name@ybl)</p>
+          
+          <div className="space-y-1 mt-4">
+            <Label htmlFor="receiverUpiId">Receiver's UPI ID (Optional)</Label>
+            <Input
+              id="receiverUpiId"
+              name="receiverUpiId"
+              value={paymentData.receiverUpiId || ''}
+              onChange={handleInputChange}
+              placeholder="receiver@upi"
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">
+              If provided, payment will be directed to this UPI ID instead of yours
+            </p>
+          </div>
         </div>
         
         {paymentData.upiId && validateUpiId(paymentData.upiId) && (
@@ -102,7 +124,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                 <div className="text-muted-foreground">Amount:</div>
                 <div className="font-medium">₹{paymentData.amount}</div>
                 <div className="text-muted-foreground">To:</div>
-                <div className="font-medium">{paymentData.upiId}</div>
+                <div className="font-medium">{paymentUpiId}</div>
                 <div className="text-muted-foreground">Transaction ID:</div>
                 <div className="font-medium text-xs">{paymentData.transactionId}</div>
               </div>
