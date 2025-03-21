@@ -2,6 +2,7 @@
 import React from 'react';
 import CardPayment from './CardPayment';
 import NetBankingPayment from './NetBankingPayment';
+import UpiPayment from './UpiPayment';
 
 interface PaymentMethodProps {
   paymentMethod: string;

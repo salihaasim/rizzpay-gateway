@@ -1,14 +1,23 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { CreditCard, Bank, Smartphone } from 'lucide-react';
 
 interface PaymentAmountFormProps {
   paymentData: {
     amount: string;
     currency: string;
-    paymentMethod: string;
     name: string;
+    paymentMethod: string;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
@@ -19,73 +28,101 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   paymentData,
   handleInputChange,
   handleSelectChange,
-  getCurrencySymbol
+  getCurrencySymbol,
 }) => {
   return (
-    <div className="space-y-4 animate-fade-in">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Amount</label>
-        <div className="relative">
+    <>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              {getCurrencySymbol(paymentData.currency)}
+            </span>
+            <Input
+              id="amount"
+              name="amount"
+              type="number"
+              placeholder="0.00"
+              className="pl-8"
+              value={paymentData.amount}
+              onChange={handleInputChange}
+              min="1"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="currency">Currency</Label>
+          <Select
+            value={paymentData.currency}
+            onValueChange={(value) => handleSelectChange('currency', value)}
+          >
+            <SelectTrigger id="currency">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
+              <SelectItem value="USD">US Dollar ($)</SelectItem>
+              <SelectItem value="EUR">Euro (€)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="name">Your Name</Label>
           <Input
-            name="amount"
-            value={paymentData.amount}
+            id="name"
+            name="name"
+            placeholder="John Doe"
+            value={paymentData.name}
             onChange={handleInputChange}
-            placeholder="Enter amount"
-            className="pl-8"
-            type="number"
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-            {getCurrencySymbol(paymentData.currency)}
-          </span>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Payment Method</Label>
+          <RadioGroup 
+            value={paymentData.paymentMethod} 
+            onValueChange={(value) => handleSelectChange('paymentMethod', value)}
+            className="grid grid-cols-1 gap-4 pt-2"
+          >
+            <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
+              <RadioGroupItem value="card" id="card" className="sr-only" />
+              <Label htmlFor="card" className="flex items-center cursor-pointer">
+                <CreditCard className="mr-3 h-5 w-5" />
+                <div>
+                  <div className="font-medium">Credit/Debit Card</div>
+                  <div className="text-sm text-muted-foreground">Pay with Visa, Mastercard or RuPay</div>
+                </div>
+              </Label>
+            </div>
+            
+            <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
+              <RadioGroupItem value="neft" id="neft" className="sr-only" />
+              <Label htmlFor="neft" className="flex items-center cursor-pointer">
+                <Bank className="mr-3 h-5 w-5" />
+                <div>
+                  <div className="font-medium">Net Banking</div>
+                  <div className="text-sm text-muted-foreground">Pay through your bank account</div>
+                </div>
+              </Label>
+            </div>
+            
+            <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
+              <RadioGroupItem value="upi" id="upi" className="sr-only" />
+              <Label htmlFor="upi" className="flex items-center cursor-pointer">
+                <Smartphone className="mr-3 h-5 w-5" />
+                <div>
+                  <div className="font-medium">UPI</div>
+                  <div className="text-sm text-muted-foreground">Pay with BHIM, Google Pay, PhonePe etc.</div>
+                </div>
+              </Label>
+            </div>
+          </RadioGroup>
         </div>
       </div>
-      
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Currency</label>
-        <Select
-          value={paymentData.currency}
-          onValueChange={(value) => handleSelectChange('currency', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select currency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
-            <SelectItem value="USD">US Dollar ($)</SelectItem>
-            <SelectItem value="EUR">Euro (€)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Payment Method</label>
-        <Select
-          value={paymentData.paymentMethod}
-          onValueChange={(value) => handleSelectChange('paymentMethod', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select payment method" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="upi">UPI / Google Pay</SelectItem>
-            <SelectItem value="card">Credit/Debit Card</SelectItem>
-            <SelectItem value="netbanking">Net Banking</SelectItem>
-            <SelectItem value="instamojo_card">Card via Instamojo</SelectItem>
-            <SelectItem value="instamojo_neft">NEFT via Instamojo</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Your Name</label>
-        <Input
-          name="name"
-          value={paymentData.name}
-          onChange={handleInputChange}
-          placeholder="Enter your name"
-        />
-      </div>
-    </div>
+    </>
   );
 };
 

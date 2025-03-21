@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Loader2, Smartphone, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ interface UpiPaymentProps {
     currency: string;
     transactionId: string;
     purpose: string;
+    name: string;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   validateUpiId: (value: string) => boolean;
@@ -29,6 +30,19 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   handleQrCodeError,
   handleUpiPayment
 }) => {
+  const [generating, setGenerating] = useState(false);
+
+  // Generate QR code whenever valid UPI ID changes
+  useEffect(() => {
+    if (paymentData.upiId && validateUpiId(paymentData.upiId) && !qrCodeUrl && !generating) {
+      setGenerating(true);
+      // This timeout simulates the generation process
+      setTimeout(() => {
+        setGenerating(false);
+      }, 1500);
+    }
+  }, [paymentData.upiId, validateUpiId, qrCodeUrl, generating]);
+
   return (
     <>
       <div className="text-sm font-medium mb-2">UPI Payment</div>
@@ -55,11 +69,15 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                 <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-2" />
                 <p className="text-sm text-red-600">Could not generate QR code</p>
                 <button 
-                  onClick={() => qrCodeError}
+                  onClick={handleQrCodeError}
                   className="text-xs text-primary mt-2 hover:underline"
                 >
                   Try again
                 </button>
+              </div>
+            ) : generating ? (
+              <div className="flex items-center justify-center h-[200px] w-[200px] bg-gray-100 rounded-lg">
+                <Loader2 className="h-8 w-8 text-primary animate-spin" />
               </div>
             ) : qrCodeUrl ? (
               <div className="bg-white p-2 rounded-lg inline-block">
@@ -77,6 +95,18 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
               </div>
             )}
             <p className="text-xs text-muted-foreground mt-2">Scan this QR code with any UPI app</p>
+            
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg text-sm">
+              <p className="font-medium mb-1">Payment Details:</p>
+              <div className="grid grid-cols-2 gap-1">
+                <div className="text-muted-foreground">Amount:</div>
+                <div className="font-medium">₹{paymentData.amount}</div>
+                <div className="text-muted-foreground">To:</div>
+                <div className="font-medium">{paymentData.upiId}</div>
+                <div className="text-muted-foreground">Transaction ID:</div>
+                <div className="font-medium text-xs">{paymentData.transactionId}</div>
+              </div>
+            </div>
           </div>
         )}
       </div>
