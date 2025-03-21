@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label'; 
-import { Loader2, Smartphone, AlertTriangle } from 'lucide-react';
+import { Loader2, Smartphone, AlertTriangle, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UpiPaymentProps {
   paymentData: {
@@ -34,12 +35,14 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
 }) => {
   const [generating, setGenerating] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const isMobile = useIsMobile();
 
-  // Check if device is Android
+  // Check device platform
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const isAndroidDevice = /android/i.test(userAgent);
-    setIsAndroid(isAndroidDevice);
+    setIsAndroid(/android/i.test(userAgent));
+    setIsIOS(/iphone|ipad|ipod/i.test(userAgent) || /mac/i.test(userAgent) && navigator.maxTouchPoints > 1);
   }, []);
 
   // Generate QR code whenever valid UPI ID changes
@@ -58,7 +61,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     ? paymentData.receiverUpiId 
     : paymentData.upiId;
 
-  // Handle UPI deep link for Android
+  // Handle UPI deep link for mobile devices
   const handleUpiDeepLink = () => {
     if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
       toast.error('Please enter a valid UPI ID');
@@ -73,13 +76,46 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     // Format the UPI payment URL (upi://pay format)
     const upiUrl = `upi://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}&tr=${paymentData.transactionId}`;
     
-    // Open the UPI URL, which will trigger the Android system to show UPI app options
-    window.location.href = upiUrl;
+    // Different handling based on platform
+    if (isAndroid) {
+      // Android uses intent:// scheme which opens the app selector
+      window.location.href = upiUrl;
+    } else if (isIOS) {
+      // iOS doesn't have a universal deep link for UPI, but we can try
+      // to open common UPI apps directly
+      const apps = [
+        { name: 'Google Pay', url: `gpay://upi/pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name)}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}` },
+        { name: 'PhonePe', url: `phonepe://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name)}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}` },
+        { name: 'Paytm', url: `paytmmp://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name)}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}` }
+      ];
+      
+      // Try opening the first app
+      window.location.href = apps[0].url;
+      
+      // Show user instructions to use QR code if deep link fails
+      toast.info('If no UPI app opens, please scan the QR code or copy the UPI ID manually', {
+        duration: 5000
+      });
+    } else {
+      // On desktop, suggest QR code scanning
+      toast.info('Please scan the QR code using your mobile UPI app', {
+        duration: 5000
+      });
+    }
 
     // Call the original UPI payment handler too
     setTimeout(() => {
       handleUpiPayment();
     }, 1000);
+  };
+
+  // Function to handle copy to clipboard
+  const handleCopyUpiId = () => {
+    navigator.clipboard.writeText(paymentUpiId).then(() => {
+      toast.success('UPI ID copied to clipboard');
+    }).catch(() => {
+      toast.error('Failed to copy UPI ID');
+    });
   };
 
   return (
@@ -115,24 +151,37 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
           </div>
         </div>
         
-        {isAndroid && (
+        {isMobile && (
           <div className="mt-4 bg-primary/5 p-3 rounded-lg">
             <p className="text-sm text-center">
-              On Android, you can directly open UPI apps by clicking the button below
+              {isAndroid ? 'Open UPI apps directly' : isIOS ? 'Open UPI app' : 'Pay using UPI'}
             </p>
             <button 
               onClick={handleUpiDeepLink}
               className="mt-2 bg-primary text-white w-full py-3 rounded-lg flex items-center justify-center gap-2"
             >
               <Smartphone className="h-5 w-5" />
-              Open UPI Apps
+              {isAndroid ? 'Open UPI Apps' : isIOS ? 'Open UPI App' : 'Pay with UPI'}
             </button>
+            {isIOS && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Note: If the app doesn't open, please use the QR code below
+              </p>
+            )}
           </div>
         )}
         
         {paymentData.upiId && validateUpiId(paymentData.upiId) && (
           <div className="mt-4">
-            <p className="text-sm font-medium mb-2">Scan QR Code</p>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-sm font-medium">Scan QR Code</p>
+              <button 
+                onClick={handleCopyUpiId}
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+              >
+                Copy UPI ID
+              </button>
+            </div>
             {qrCodeError ? (
               <div className="bg-red-50 p-3 rounded-lg text-center">
                 <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-2" />
@@ -149,7 +198,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                 <Loader2 className="h-8 w-8 text-primary animate-spin" />
               </div>
             ) : qrCodeUrl ? (
-              <div className="bg-white p-2 rounded-lg inline-block">
+              <div className="bg-white p-2 rounded-lg inline-block shadow-sm">
                 <img 
                   src={qrCodeUrl} 
                   alt="UPI QR Code" 
@@ -169,24 +218,26 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
               <p className="font-medium mb-1">Payment Details:</p>
               <div className="grid grid-cols-2 gap-1">
                 <div className="text-muted-foreground">Amount:</div>
-                <div className="font-medium">₹{paymentData.amount}</div>
+                <div className="font-medium">{paymentData.currency === 'INR' ? '₹' : paymentData.currency} {paymentData.amount}</div>
                 <div className="text-muted-foreground">To:</div>
-                <div className="font-medium">{paymentUpiId}</div>
+                <div className="font-medium truncate max-w-[150px]">{paymentUpiId}</div>
                 <div className="text-muted-foreground">Transaction ID:</div>
-                <div className="font-medium text-xs">{paymentData.transactionId}</div>
+                <div className="font-medium text-xs truncate max-w-[150px]">{paymentData.transactionId}</div>
               </div>
             </div>
           </div>
         )}
       </div>
       
-      <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={isAndroid ? handleUpiDeepLink : handleUpiPayment}>
+      <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={isMobile ? handleUpiDeepLink : handleUpiPayment}>
         <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-          <Smartphone className="h-6 w-6 text-primary" />
+          {isMobile ? <Smartphone className="h-6 w-6 text-primary" /> : <QrCode className="h-6 w-6 text-primary" />}
         </div>
         <div>
           <div className="font-medium">Pay with UPI</div>
-          <div className="text-sm text-muted-foreground">Quick, secure UPI payment</div>
+          <div className="text-sm text-muted-foreground">
+            {isMobile ? 'Quick, secure UPI payment' : 'Scan QR code to pay'}
+          </div>
         </div>
       </div>
     </>
