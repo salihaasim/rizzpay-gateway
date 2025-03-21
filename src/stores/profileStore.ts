@@ -30,11 +30,11 @@ interface ProfileState {
 export const useProfileStore = create<ProfileState>()(
   persist(
     (set, get) => ({
-      firstName: 'Rahul',
-      lastName: 'Sharma',
-      email: 'rahul.sharma@example.com',
-      phone: '+91 98765 43210',
-      company: 'Sharma Enterprises',
+      firstName: 'Saalih',
+      lastName: 'Aasim',
+      email: 'salihaasimdevloper@gmail.com',
+      phone: '7550248887',
+      company: 'Aasim Enterprise',
       profile: {},
       merchants: [],
       

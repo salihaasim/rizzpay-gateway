@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -117,27 +118,27 @@ const Settings = () => {
                     <div className="flex flex-col md:flex-row gap-4">
                       <div className="w-full md:w-1/2 space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" defaultValue={firstName} />
+                        <Input id="firstName" defaultValue="Saalih" />
                       </div>
                       <div className="w-full md:w-1/2 space-y-2">
                         <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" defaultValue={lastName} />
+                        <Input id="lastName" defaultValue="Aasim" />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" defaultValue={email} />
+                      <Input id="email" type="email" defaultValue="salihaasimdevloper@gmail.com" />
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" defaultValue={phone} />
+                      <Input id="phone" defaultValue="7550248887" />
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="company">Company Name</Label>
-                      <Input id="company" defaultValue={company} />
+                      <Input id="company" defaultValue="Aasim Enterprise" />
                     </div>
                   </CardContent>
                   <CardFooter className="justify-end border-t pt-6">
@@ -171,7 +172,7 @@ const Settings = () => {
                       
                       <div className="space-y-2">
                         <Label htmlFor="upiId">UPI ID</Label>
-                        <Input id="upiId" defaultValue="rahul.sharma@okicici" />
+                        <Input id="upiId" defaultValue="salihaasimdevloper-4@okaxis" />
                       </div>
                       
                       <div className="flex items-center">
@@ -188,11 +189,11 @@ const Settings = () => {
                       <div className="flex flex-col md:flex-row gap-4">
                         <div className="w-full md:w-1/2 space-y-2">
                           <Label htmlFor="merchantId">Merchant ID</Label>
-                          <Input id="merchantId" defaultValue="MERCH1234567" />
+                          <Input id="merchantId" defaultValue="MERCH001" />
                         </div>
                         <div className="w-full md:w-1/2 space-y-2">
                           <Label htmlFor="merchantName">Store Name</Label>
-                          <Input id="merchantName" defaultValue="Sharma's Electronics" />
+                          <Input id="merchantName" defaultValue="Aasim Kadai" />
                         </div>
                       </div>
                       
