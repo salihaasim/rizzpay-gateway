@@ -1,89 +1,78 @@
 
-import React from 'react';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowUpCircle } from 'lucide-react';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-
-const depositSchema = z.object({
-  amount: z.string()
-    .min(1, { message: "Amount is required" })
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be a positive number",
-    }),
-  description: z.string().optional(),
-});
-
-type DepositFormValues = z.infer<typeof depositSchema>;
+import { Loader2 } from 'lucide-react';
 
 interface DepositFormProps {
   onDeposit: (amount: number, description?: string) => void;
+  isProcessing?: boolean;
 }
 
-const DepositForm: React.FC<DepositFormProps> = ({ onDeposit }) => {
-  const form = useForm<DepositFormValues>({
-    resolver: zodResolver(depositSchema),
-    defaultValues: {
-      amount: '',
-      description: '',
-    },
-  });
+const DepositForm: React.FC<DepositFormProps> = ({ onDeposit, isProcessing = false }) => {
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
 
-  const handleSubmit = (data: DepositFormValues) => {
-    onDeposit(Number(data.amount), data.description);
-    form.reset();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      return;
+    }
+    
+    onDeposit(parsedAmount, description);
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2">₹</span>
-                  <Input {...field} type="text" placeholder="0.00" className="pl-8" />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="amount">Amount</Label>
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
+          <Input 
+            id="amount"
+            type="number" 
+            min="1"
+            step="0.01"
+            value={amount} 
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="0.00"
+            className="pl-8"
+            disabled={isProcessing}
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="description">Description (Optional)</Label>
+        <Textarea 
+          id="description"
+          value={description} 
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Add a note to this deposit"
+          className="resize-none" 
+          rows={3}
+          disabled={isProcessing}
         />
-        
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Note (optional)</FormLabel>
-              <FormControl>
-                <Textarea {...field} placeholder="Add a note for this deposit" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        
-        <Button type="submit" className="w-full" size="lg">
-          <ArrowUpCircle className="mr-2 h-4 w-4" />
-          Deposit Funds
-        </Button>
-      </form>
-    </Form>
+      </div>
+      
+      <Button 
+        type="submit" 
+        disabled={isProcessing || !amount || parseFloat(amount) <= 0}
+        className="w-full"
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+          </>
+        ) : (
+          'Deposit Funds'
+        )}
+      </Button>
+    </form>
   );
 };
 

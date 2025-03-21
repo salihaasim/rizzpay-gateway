@@ -9,7 +9,6 @@ import WithdrawForm from '@/components/wallet/WithdrawForm';
 import TransferForm from '@/components/wallet/TransferForm';
 import RecentTransactions from '@/components/wallet/RecentTransactions';
 import { useProfileStore } from '@/stores/profileStore';
-import { simulateWalletProcessing } from '@/components/TransactionUtils';
 import { toast } from 'sonner';
 
 const Wallet = () => {
@@ -43,7 +42,16 @@ const Wallet = () => {
     
     try {
       toast.info("Processing deposit...");
-      await simulateWalletProcessing(userEmail, amount, 'deposit', description);
+      
+      // Add processing delay to simulate real deposit
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const { depositToWallet } = useTransactionStore.getState();
+      depositToWallet(userEmail, amount, 'wallet');
+      
+      toast.success("Deposit successful", {
+        description: `₹${amount.toFixed(2)} has been added to your wallet.`
+      });
     } catch (error) {
       console.error('Deposit error:', error);
       toast.error("Deposit failed", {
@@ -68,11 +76,20 @@ const Wallet = () => {
     
     try {
       toast.info("Processing withdrawal...");
-      await simulateWalletProcessing(userEmail, amount, 'withdrawal', description);
+      
+      // Add processing delay to simulate real withdrawal
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const { withdrawFromWallet } = useTransactionStore.getState();
+      withdrawFromWallet(userEmail, amount, 'wallet');
+      
+      toast.success("Withdrawal successful", {
+        description: `₹${amount.toFixed(2)} has been withdrawn from your wallet.`
+      });
     } catch (error) {
       console.error('Withdrawal error:', error);
       toast.error("Withdrawal failed", {
-        description: "An unexpected error occurred. Please try again."
+        description: error instanceof Error ? error.message : "An unexpected error occurred."
       });
     } finally {
       setIsProcessing(false);
@@ -98,7 +115,7 @@ const Wallet = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const { transferFunds } = useTransactionStore.getState();
-      const transactionId = transferFunds(userEmail, recipient, amount, description);
+      transferFunds(userEmail, recipient, amount, description);
       
       toast.success("Transfer successful", {
         description: `₹${amount.toFixed(2)} has been sent successfully.`
@@ -128,17 +145,18 @@ const Wallet = () => {
               </TabsList>
               
               <TabsContent value="deposit" className="mt-4">
-                <DepositForm onDeposit={handleDeposit} />
+                <DepositForm onDeposit={handleDeposit} isProcessing={isProcessing} />
               </TabsContent>
               
               <TabsContent value="withdraw" className="mt-4">
-                <WithdrawForm onWithdraw={handleWithdraw} />
+                <WithdrawForm onWithdraw={handleWithdraw} isProcessing={isProcessing} />
               </TabsContent>
               
               <TabsContent value="transfer" className="mt-4">
                 <TransferForm 
                   merchants={merchants}
-                  onTransfer={handleTransfer} 
+                  onTransfer={handleTransfer}
+                  isProcessing={isProcessing}
                 />
               </TabsContent>
             </Tabs>
