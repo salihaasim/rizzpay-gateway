@@ -4,41 +4,20 @@ import { createClient } from '@supabase/supabase-js';
 // Create a singleton Supabase client with lazy initialization
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
+// Default Supabase URL and key from environment or hardcoded values
+// In production, these should be in environment variables
+const SUPABASE_URL = "https://mogqmymxnienxqactuym.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZ3FteW14bmllbnhxYWN0dXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MzEwNTgsImV4cCI6MjA1ODEwNzA1OH0.Z2bzbA8aQQha2NhgA0M1F2R56Ewv8npqRgCj2S_70h4";
+
 export const supabase = () => {
   if (supabaseInstance) return supabaseInstance;
   
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_KEY;
   
-  // Return a mock client if credentials are missing (prevents app from crashing)
-  if (!supabaseUrl || !supabaseKey) {
-    console.warn('Supabase credentials missing, using mock client');
-    return createMockSupabaseClient();
-  }
-  
+  // Create real Supabase client with the provided credentials
   supabaseInstance = createClient(supabaseUrl, supabaseKey);
   return supabaseInstance;
-};
-
-// Create a mock client that won't crash the app when credentials are missing
-const createMockSupabaseClient = () => {
-  const mockResponse = { data: null, error: new Error('Mock client - no credentials') };
-  
-  return {
-    from: () => ({
-      select: () => Promise.resolve(mockResponse),
-      insert: () => Promise.resolve(mockResponse),
-      upsert: () => Promise.resolve(mockResponse),
-      update: () => Promise.resolve(mockResponse),
-      delete: () => Promise.resolve(mockResponse),
-    }),
-    auth: {
-      getUser: () => Promise.resolve(mockResponse),
-      signUp: () => Promise.resolve(mockResponse),
-      signIn: () => Promise.resolve(mockResponse),
-      signOut: () => Promise.resolve(mockResponse),
-    },
-  } as unknown as ReturnType<typeof createClient>;
 };
 
 // Helper function to check if Supabase connection is working
