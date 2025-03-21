@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,16 +13,21 @@ import { toast } from 'sonner';
 import { simulateWalletProcessing } from '@/utils/walletUtils';
 
 const Wallet = () => {
-  const { userEmail, getWalletBalance } = useTransactionStore();
+  // Use destructuring to get only the needed values from store
+  const store = useTransactionStore();
   const { merchants } = useProfileStore();
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Get transactions from store
-  const recentWalletTransactions = useTransactionStore(state => 
-    state.transactions
+  // Extract values from store in a way that prevents infinite updates
+  const userEmail = store.userEmail;
+  
+  // Memoize data derived from store to prevent infinite renders
+  const recentWalletTransactions = useMemo(() => {
+    if (!userEmail) return [];
+    return store.transactions
       .filter(t => t.walletTransactionType && (t.customer === userEmail || t.createdBy === userEmail))
-      .slice(0, 5)
-  );
+      .slice(0, 5);
+  }, [store.transactions, userEmail]);
   
   if (!userEmail) {
     return (
@@ -35,7 +40,7 @@ const Wallet = () => {
   }
   
   // Get current wallet balance
-  const walletBalance = getWalletBalance(userEmail);
+  const walletBalance = store.getWalletBalance(userEmail);
   
   const handleDeposit = async (amount: number, description?: string) => {
     if (isProcessing) return;
@@ -110,8 +115,9 @@ const Wallet = () => {
       // Add processing delay to simulate real transfer
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const { transferFunds } = useTransactionStore.getState();
-      transferFunds(userEmail, recipient, amount, description);
+      // Use direct access to avoid hook rules violations
+      const storeState = useTransactionStore.getState();
+      storeState.transferFunds(userEmail, recipient, amount, description);
       
       toast.success("Transfer successful", {
         description: `₹${amount.toFixed(2)} has been sent successfully.`
