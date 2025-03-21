@@ -8,10 +8,7 @@ interface PaymentAmountFormProps {
     amount: string;
     currency: string;
     paymentMethod: string;
-    purpose: string;
     name: string;
-    email: string;
-    phone: string;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
@@ -80,43 +77,12 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Purpose (Optional)</label>
-        <Input
-          name="purpose"
-          value={paymentData.purpose}
-          onChange={handleInputChange}
-          placeholder="Enter payment purpose"
-        />
-      </div>
-
-      <div className="space-y-2">
         <label className="text-sm font-medium">Your Name</label>
         <Input
           name="name"
           value={paymentData.name}
           onChange={handleInputChange}
           placeholder="Enter your name"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Email (Optional)</label>
-        <Input
-          name="email"
-          value={paymentData.email}
-          onChange={handleInputChange}
-          placeholder="Enter your email"
-          type="email"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Phone (Optional)</label>
-        <Input
-          name="phone"
-          value={paymentData.phone}
-          onChange={handleInputChange}
-          placeholder="Enter your phone number"
         />
       </div>
     </div>

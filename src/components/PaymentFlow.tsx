@@ -33,9 +33,6 @@ const PaymentFlow = () => {
     paymentMethod: 'card' as PaymentMethod,
     upiId: '',
     name: '',
-    email: '',
-    phone: '',
-    purpose: '',
     transactionId: '',
     paymentStatus: '',
     cardNumber: '',
@@ -82,11 +79,6 @@ const PaymentFlow = () => {
         return;
       }
       
-      if (paymentData.email && !/\S+@\S+\.\S+/.test(paymentData.email)) {
-        toast.error('Please enter a valid email address');
-        return;
-      }
-      
       setStep(2);
     } else if (step === 2) {
       initiatePayment();
@@ -109,7 +101,6 @@ const PaymentFlow = () => {
           bankAccount: paymentData.paymentMethod === 'neft' ? paymentData.bankAccount : undefined,
           bankIfsc: paymentData.paymentMethod === 'neft' ? paymentData.bankIfsc : undefined,
           recipientName: paymentData.name,
-          recipientEmail: paymentData.email,
           processor: 'Direct' + (paymentData.paymentMethod === 'card' ? 'Card' : 'NEFT')
         }
       );
@@ -163,8 +154,16 @@ const PaymentFlow = () => {
     }
   };
 
-  const generateTransactionId = (): string => {
-    return 'txn_' + Math.random().toString(36).substr(2, 9);
+  // Updated the resetForm function to only reset relevant fields
+  const resetForm = () => {
+    setStep(1);
+    setPaymentData(prev => ({
+      ...prev,
+      amount: '',
+      paymentStatus: '',
+      transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000)
+    }));
+    setCurrentTransactionId(null);
   };
 
   return (
@@ -235,17 +234,7 @@ const PaymentFlow = () => {
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => {
-                setStep(1);
-                setPaymentData(prev => ({ 
-                  ...prev,
-                  amount: '',
-                  purpose: '',
-                  paymentStatus: '',
-                  transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000)
-                }));
-                setCurrentTransactionId(null);
-              }} 
+              onClick={resetForm} 
               className="rounded-full px-6 w-full"
             >
               Make Another Payment
