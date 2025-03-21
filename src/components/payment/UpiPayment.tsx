@@ -33,6 +33,14 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   handleUpiPayment
 }) => {
   const [generating, setGenerating] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+
+  // Check if device is Android
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroidDevice = /android/i.test(userAgent);
+    setIsAndroid(isAndroidDevice);
+  }, []);
 
   // Generate QR code whenever valid UPI ID changes
   useEffect(() => {
@@ -49,6 +57,30 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   const paymentUpiId = paymentData.receiverUpiId && validateUpiId(paymentData.receiverUpiId) 
     ? paymentData.receiverUpiId 
     : paymentData.upiId;
+
+  // Handle UPI deep link for Android
+  const handleUpiDeepLink = () => {
+    if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
+      toast.error('Please enter a valid UPI ID');
+      return;
+    }
+
+    if (paymentData.amount === '' || parseFloat(paymentData.amount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    // Format the UPI payment URL (upi://pay format)
+    const upiUrl = `upi://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}&tr=${paymentData.transactionId}`;
+    
+    // Open the UPI URL, which will trigger the Android system to show UPI app options
+    window.location.href = upiUrl;
+
+    // Call the original UPI payment handler too
+    setTimeout(() => {
+      handleUpiPayment();
+    }, 1000);
+  };
 
   return (
     <>
@@ -82,6 +114,21 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
             </p>
           </div>
         </div>
+        
+        {isAndroid && (
+          <div className="mt-4 bg-primary/5 p-3 rounded-lg">
+            <p className="text-sm text-center">
+              On Android, you can directly open UPI apps by clicking the button below
+            </p>
+            <button 
+              onClick={handleUpiDeepLink}
+              className="mt-2 bg-primary text-white w-full py-3 rounded-lg flex items-center justify-center gap-2"
+            >
+              <Smartphone className="h-5 w-5" />
+              Open UPI Apps
+            </button>
+          </div>
+        )}
         
         {paymentData.upiId && validateUpiId(paymentData.upiId) && (
           <div className="mt-4">
@@ -133,7 +180,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
         )}
       </div>
       
-      <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={handleUpiPayment}>
+      <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={isAndroid ? handleUpiDeepLink : handleUpiPayment}>
         <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
           <Smartphone className="h-6 w-6 text-primary" />
         </div>
