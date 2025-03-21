@@ -1,13 +1,12 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { RoleSelector } from '@/components/RoleSelector';
+import RoleSelector from '@/components/RoleSelector';
 import { Home, CreditCard, Settings, Menu, X, LayoutDashboard, Wallet, Webhook, ShieldCheck } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { cn } from '@/lib/utils';
-import { SupabaseStatus } from './SupabaseStatus';
+import SupabaseStatus from './SupabaseStatus';
 
 const Navbar = () => {
   const location = useLocation();

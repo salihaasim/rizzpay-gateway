@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProfileStore, Merchant } from '@/stores/profileStore';
@@ -22,12 +21,10 @@ const MerchantWalletDetails = ({ merchant }: { merchant: Merchant }) => {
   const { getWalletBalance, transactions } = useTransactionStore();
   const walletBalance = getWalletBalance(merchant.email);
   
-  // Get transactions for this merchant
   const merchantTransactions = transactions.filter(t => 
     t.customer === merchant.email || t.createdBy === merchant.email
   ).slice(0, 5);
   
-  // Calculate merchant stats
   const totalDeposits = transactions
     .filter(t => t.walletTransactionType === 'deposit' && t.customer === merchant.email)
     .reduce((sum, t) => sum + (t.rawAmount || 0), 0);
@@ -120,7 +117,7 @@ const MerchantWalletDetails = ({ merchant }: { merchant: Merchant }) => {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={transaction.status === 'successful' ? 'success' : 'outline'}>
+                      <Badge variant={transaction.status === 'successful' ? 'secondary' : 'outline'}>
                         {transaction.status}
                       </Badge>
                     </TableCell>
