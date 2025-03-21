@@ -1,17 +1,20 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import RoleSelector from '@/components/RoleSelector';
-import { Home, CreditCard, Settings, Menu, X, LayoutDashboard, Wallet, Webhook, ShieldCheck } from 'lucide-react';
+import { Home, CreditCard, Settings, Menu, X, LayoutDashboard, Wallet, Webhook, ShieldCheck, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { cn } from '@/lib/utils';
 import SupabaseStatus from './SupabaseStatus';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { userRole, userEmail } = useTransactionStore();
+  const { userRole, userEmail, resetUserRole } = useTransactionStore();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -58,6 +61,12 @@ const Navbar = () => {
       icon: <ShieldCheck className="h-4 w-4 mr-2" />,
     });
   }
+
+  const handleLogout = () => {
+    resetUserRole();
+    toast.success('Logged out successfully');
+    navigate('/auth');
+  };
   
   return (
     <header className="fixed w-full border-b bg-background z-10">
@@ -92,7 +101,12 @@ const Navbar = () => {
             <SupabaseStatus />
           </div>
           
-          <RoleSelector />
+          {userRole && (
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="flex items-center">
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          )}
           
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -133,6 +147,21 @@ const Navbar = () => {
                   <div className="mt-4">
                     <SupabaseStatus />
                   </div>
+                  
+                  {userRole && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }} 
+                      className="w-full mt-4 justify-start"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </Button>
+                  )}
                 </div>
               </div>
             </SheetContent>

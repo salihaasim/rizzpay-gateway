@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import { Toaster } from '@/components/ui/sonner';
 import Dashboard from '@/pages/Dashboard';
@@ -13,6 +13,18 @@ import WebhookPage from '@/pages/WebhookPage';
 import WebhookPayment from '@/pages/WebhookPayment';
 import WalletPage from '@/pages/WalletPage';
 import AdminDashboard from '@/pages/AdminDashboard';
+import { useTransactionStore } from '@/stores/transactionStore';
+
+// Protected route component to prevent unauthorized access
+const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { userRole } = useTransactionStore();
+  
+  if (userRole !== 'admin') {
+    return <Navigate to="/dashboard" />;
+  }
+  
+  return <>{children}</>;
+};
 
 const App = () => {
   return (
@@ -27,7 +39,11 @@ const App = () => {
         <Route path="/webhook" element={<WebhookPage />} />
         <Route path="/webhook-payment/:token" element={<WebhookPayment />} />
         <Route path="/wallet" element={<WalletPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

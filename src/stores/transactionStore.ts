@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -94,7 +93,27 @@ interface TransactionState {
   transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
 }
 
-export const useTransactionStore = create<TransactionState>()(
+export interface TransactionStore {
+  transactions: Transaction[];
+  userRole: UserRole;
+  userEmail: string | null;
+  wallets: Record<string, Wallet>; // Email -> Wallet mapping
+  addTransaction: (transaction: Transaction) => void;
+  updateTransaction: (id: string, updates: Partial<Transaction>) => void;
+  clearTransactions: () => void;
+  setUserRole: (role: UserRole, email: string | null) => void;
+  clearUserData: () => void;
+  // Wallet methods
+  initializeWallet: (email: string) => void;
+  getWalletBalance: (email: string) => number;
+  depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
+  withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
+  // New methods for merchant transfers
+  transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
+  resetUserRole: () => void;
+}
+
+export const useTransactionStore = create<TransactionStore>()(
   persist(
     (set, get) => ({
       transactions: [],
@@ -289,6 +308,10 @@ export const useTransactionStore = create<TransactionState>()(
         });
         
         return transactionId;
+      },
+      
+      resetUserRole: () => {
+        set({ userRole: null, userEmail: null });
       },
     }),
     {
