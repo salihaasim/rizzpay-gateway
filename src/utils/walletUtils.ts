@@ -5,8 +5,9 @@ import { delay } from './commonUtils';
 export const simulateWalletProcessing = async (
   userEmail: string,
   amount: number,
-  type: 'deposit' | 'withdrawal',
-  description?: string
+  type: 'deposit' | 'withdrawal' | 'transfer',
+  description?: string,
+  recipient?: string
 ): Promise<void> => {
   const store = useTransactionStore.getState();
   
@@ -17,10 +18,13 @@ export const simulateWalletProcessing = async (
     transactionId = store.depositToWallet(userEmail, amount, 'wallet');
   } else if (type === 'withdrawal') {
     transactionId = store.withdrawFromWallet(userEmail, amount, 'wallet');
+  } else if (type === 'transfer' && recipient) {
+    transactionId = store.transferFunds(userEmail, recipient, amount, description);
   } else {
-    throw new Error(`Invalid transaction type: ${type}`);
+    throw new Error(`Invalid transaction type: ${type} or missing recipient for transfer`);
   }
   
+  // Find the created transaction
   const transaction = store.transactions.find(t => t.id === transactionId);
   
   if (!transaction) {

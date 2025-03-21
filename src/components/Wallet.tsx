@@ -107,17 +107,20 @@ const Wallet = () => {
       return;
     }
     
+    if (!recipient) {
+      toast.error("Invalid recipient", {
+        description: "Please select a valid recipient for the transfer."
+      });
+      return;
+    }
+    
     setIsProcessing(true);
     
     try {
       toast.info("Processing transfer...");
       
-      // Add processing delay to simulate real transfer
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Use direct access to avoid hook rules violations
-      const storeState = useTransactionStore.getState();
-      storeState.transferFunds(userEmail, recipient, amount, description);
+      // Use the utility function to simulate processing for transfers too
+      await simulateWalletProcessing(userEmail, amount, 'transfer', description, recipient);
       
       toast.success("Transfer successful", {
         description: `₹${amount.toFixed(2)} has been sent successfully.`
