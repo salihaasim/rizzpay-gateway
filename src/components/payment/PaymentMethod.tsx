@@ -17,6 +17,24 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   handleInputChange,
   loading
 }) => {
+  // Simple UPI ID validation function
+  const validateUpiId = (upiId: string): boolean => {
+    // Basic UPI ID validation (alphanumeric@provider format)
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    return upiRegex.test(upiId);
+  };
+
+  // Placeholder functions needed for UpiPayment props
+  const handleQrCodeError = () => {
+    // This is just a placeholder - actual implementation is in PaymentFlow
+    console.log("QR code error handled in PaymentMethod");
+  };
+
+  const handleUpiPayment = () => {
+    // This is just a placeholder - actual implementation is in PaymentFlow
+    console.log("UPI payment handled in PaymentMethod");
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="bg-secondary rounded-lg p-4">
@@ -64,7 +82,12 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         {paymentMethod === 'upi' && (
           <UpiPayment
             paymentData={paymentData}
-            isLoading={loading}
+            handleInputChange={handleInputChange}
+            validateUpiId={validateUpiId}
+            qrCodeUrl=""
+            qrCodeError={false}
+            handleQrCodeError={handleQrCodeError}
+            handleUpiPayment={handleUpiPayment}
           />
         )}
       </div>

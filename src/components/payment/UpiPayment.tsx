@@ -10,7 +10,7 @@ interface UpiPaymentProps {
     amount: string;
     currency: string;
     transactionId: string;
-    purpose: string;
+    purpose?: string;
     name: string;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
