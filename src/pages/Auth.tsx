@@ -145,7 +145,7 @@ const Auth: React.FC = () => {
           </CardContent>
           <CardFooter className="flex flex-col">
             <Separator className="my-2" />
-            {!authMode === 'merchant' && (
+            {authMode !== 'merchant' && (
               <Button 
                 variant="outline" 
                 className="w-full mt-2" 
