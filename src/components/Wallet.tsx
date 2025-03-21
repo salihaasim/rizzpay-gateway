@@ -1,33 +1,24 @@
 
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { useTransactionStore } from '@/stores/transactionStore';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import WalletBalance from '@/components/wallet/WalletBalance';
-import DepositForm from '@/components/wallet/DepositForm';
-import WithdrawForm from '@/components/wallet/WithdrawForm';
-import TransferForm from '@/components/wallet/TransferForm';
 import RecentTransactions from '@/components/wallet/RecentTransactions';
+import WalletActionTabs from '@/components/wallet/WalletActionTabs';
 import { useProfileStore } from '@/stores/profileStore';
-import { toast } from 'sonner';
-import { simulateWalletProcessing } from '@/utils/walletUtils';
+import { useWalletActions } from '@/hooks/useWalletActions';
+import { useWalletTransactions } from '@/hooks/useWalletTransactions';
 
 const Wallet = () => {
-  // Use destructuring to get only the needed values from store
-  const store = useTransactionStore();
+  // Extract just the email from store to prevent re-renders
+  const userEmail = useTransactionStore(state => state.userEmail);
   const { merchants } = useProfileStore();
-  const [isProcessing, setIsProcessing] = useState(false);
   
-  // Extract values from store in a way that prevents infinite updates
-  const userEmail = store.userEmail;
-  
-  // Memoize data derived from store to prevent infinite renders
-  const recentWalletTransactions = useMemo(() => {
-    if (!userEmail) return [];
-    return store.transactions
-      .filter(t => t.walletTransactionType && (t.customer === userEmail || t.createdBy === userEmail))
-      .slice(0, 5);
-  }, [store.transactions, userEmail]);
+  // Use custom hooks to handle wallet functionality
+  const { isProcessing, walletBalance, handleDeposit, handleWithdraw, handleTransfer } = 
+    useWalletActions(userEmail);
+    
+  const { recentWalletTransactions } = useWalletTransactions(userEmail);
   
   if (!userEmail) {
     return (
@@ -39,102 +30,6 @@ const Wallet = () => {
     );
   }
   
-  // Get current wallet balance
-  const walletBalance = store.getWalletBalance(userEmail);
-  
-  const handleDeposit = async (amount: number, description?: string) => {
-    if (isProcessing) return;
-    
-    setIsProcessing(true);
-    
-    try {
-      toast.info("Processing deposit...");
-      
-      // Use the utility function to simulate processing
-      await simulateWalletProcessing(userEmail, amount, 'deposit', description);
-      
-      toast.success("Deposit successful", {
-        description: `₹${amount.toFixed(2)} has been added to your wallet.`
-      });
-    } catch (error) {
-      console.error('Deposit error:', error);
-      toast.error("Deposit failed", {
-        description: "An unexpected error occurred. Please try again."
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
-  const handleWithdraw = async (amount: number, description?: string) => {
-    if (isProcessing) return;
-    
-    if (amount > walletBalance) {
-      toast.error("Insufficient balance", {
-        description: "Your wallet balance is insufficient for this withdrawal."
-      });
-      return;
-    }
-    
-    setIsProcessing(true);
-    
-    try {
-      toast.info("Processing withdrawal...");
-      
-      // Use the utility function to simulate processing
-      await simulateWalletProcessing(userEmail, amount, 'withdrawal', description);
-      
-      toast.success("Withdrawal successful", {
-        description: `₹${amount.toFixed(2)} has been withdrawn from your wallet.`
-      });
-    } catch (error) {
-      console.error('Withdrawal error:', error);
-      toast.error("Withdrawal failed", {
-        description: error instanceof Error ? error.message : "An unexpected error occurred."
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
-  const handleTransfer = async (recipient: string, amount: number, description?: string) => {
-    if (isProcessing) return;
-    
-    if (amount > walletBalance) {
-      toast.error("Insufficient balance", {
-        description: "Your wallet balance is insufficient for this transfer."
-      });
-      return;
-    }
-    
-    if (!recipient) {
-      toast.error("Invalid recipient", {
-        description: "Please select a valid recipient for the transfer."
-      });
-      return;
-    }
-    
-    setIsProcessing(true);
-    
-    try {
-      toast.info("Processing transfer...");
-      
-      // Use the utility function to simulate processing for transfers too
-      await simulateWalletProcessing(userEmail, amount, 'transfer', description, recipient);
-      
-      toast.success("Transfer successful", {
-        description: `₹${amount.toFixed(2)} has been sent successfully.`
-      });
-    } catch (error) {
-      console.error('Transfer error:', error);
-      toast.error("Transfer failed", {
-        description: error instanceof Error ? error.message : "An unexpected error occurred."
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
   return (
     <Card className="mb-8 border-0 shadow-sm">
       <CardContent className="p-6">
@@ -142,29 +37,13 @@ const Wallet = () => {
           <div className="md:col-span-2">
             <WalletBalance balance={walletBalance} />
             
-            <Tabs defaultValue="deposit" className="mt-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="deposit">Deposit</TabsTrigger>
-                <TabsTrigger value="withdraw">Withdraw</TabsTrigger>
-                <TabsTrigger value="transfer" disabled={merchants.length === 0}>Transfer</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="deposit" className="mt-4">
-                <DepositForm onDeposit={handleDeposit} isProcessing={isProcessing} />
-              </TabsContent>
-              
-              <TabsContent value="withdraw" className="mt-4">
-                <WithdrawForm onWithdraw={handleWithdraw} isProcessing={isProcessing} />
-              </TabsContent>
-              
-              <TabsContent value="transfer" className="mt-4">
-                <TransferForm 
-                  merchants={merchants}
-                  onTransfer={handleTransfer}
-                  isProcessing={isProcessing}
-                />
-              </TabsContent>
-            </Tabs>
+            <WalletActionTabs 
+              merchants={merchants}
+              isProcessing={isProcessing}
+              onDeposit={handleDeposit}
+              onWithdraw={handleWithdraw}
+              onTransfer={handleTransfer}
+            />
           </div>
           
           <div className="md:border-l md:pl-6">
