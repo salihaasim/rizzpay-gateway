@@ -1,5 +1,5 @@
 
-import { Transaction, TransactionStatus, useTransactionStore } from '@/stores/transactionStore';
+import { TransactionStatus, useTransactionStore } from '@/stores/transactionStore';
 import { delay } from './commonUtils';
 
 export const simulateWalletProcessing = async (

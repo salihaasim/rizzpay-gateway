@@ -10,11 +10,19 @@ import TransferForm from '@/components/wallet/TransferForm';
 import RecentTransactions from '@/components/wallet/RecentTransactions';
 import { useProfileStore } from '@/stores/profileStore';
 import { toast } from 'sonner';
+import { simulateWalletProcessing } from '@/utils/walletUtils';
 
 const Wallet = () => {
-  const { wallets, userEmail, getWalletBalance } = useTransactionStore();
+  const { userEmail, getWalletBalance } = useTransactionStore();
   const { merchants } = useProfileStore();
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Get transactions from store
+  const recentWalletTransactions = useTransactionStore(state => 
+    state.transactions
+      .filter(t => t.walletTransactionType && (t.customer === userEmail || t.createdBy === userEmail))
+      .slice(0, 5)
+  );
   
   if (!userEmail) {
     return (
@@ -26,14 +34,8 @@ const Wallet = () => {
     );
   }
   
+  // Get current wallet balance
   const walletBalance = getWalletBalance(userEmail);
-  
-  // Get recent transactions for this user
-  const recentWalletTransactions = useTransactionStore(state => 
-    state.transactions
-      .filter(t => t.walletTransactionType && (t.customer === userEmail || t.createdBy === userEmail))
-      .slice(0, 5)
-  );
   
   const handleDeposit = async (amount: number, description?: string) => {
     if (isProcessing) return;
@@ -43,11 +45,8 @@ const Wallet = () => {
     try {
       toast.info("Processing deposit...");
       
-      // Add processing delay to simulate real deposit
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const { depositToWallet } = useTransactionStore.getState();
-      depositToWallet(userEmail, amount, 'wallet');
+      // Use the utility function to simulate processing
+      await simulateWalletProcessing(userEmail, amount, 'deposit', description);
       
       toast.success("Deposit successful", {
         description: `₹${amount.toFixed(2)} has been added to your wallet.`
@@ -77,11 +76,8 @@ const Wallet = () => {
     try {
       toast.info("Processing withdrawal...");
       
-      // Add processing delay to simulate real withdrawal
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const { withdrawFromWallet } = useTransactionStore.getState();
-      withdrawFromWallet(userEmail, amount, 'wallet');
+      // Use the utility function to simulate processing
+      await simulateWalletProcessing(userEmail, amount, 'withdrawal', description);
       
       toast.success("Withdrawal successful", {
         description: `₹${amount.toFixed(2)} has been withdrawn from your wallet.`
