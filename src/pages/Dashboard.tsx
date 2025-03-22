@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
@@ -10,8 +9,6 @@ import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 
-// TODO: Replace with actual API data when backend is ready
-// For now using static data to test chart rendering
 const chartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -22,8 +19,6 @@ const chartData = [
   { name: 'Jul', value: 3490 },
 ];
 
-// Revenue chart - extracted to avoid re-renders when dashboard state changes
-// FIXME: Should probably move this to its own file if it gets more complex
 const RevenueChart = React.memo(() => (
   <div className="h-[300px]">
     <ResponsiveContainer width="100%" height="100%">
@@ -58,7 +53,6 @@ interface RecentTransactionsListProps {
   transactions: Transaction[];
 }
 
-// Shows the most recent transactions in a vertical list
 const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsListProps) => (
   <div className="space-y-4">
     {transactions.length > 0 ? (
@@ -73,20 +67,15 @@ const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsL
   </div>
 ));
 
-// Add displayName to help with debugging in React DevTools
 RecentTransactionsList.displayName = 'RecentTransactionsList';
 
 const Dashboard = () => {
-  const { transactions } = useTransactionStore();
-  const [activeTab, setActiveTab] = useState('merchant');
+  const { transactions, userRole } = useTransactionStore();
+  const [activeTab, setActiveTab] = useState(userRole === 'admin' ? 'admin' : 'merchant');
   
-  // Calculate derived values from transactions
-  // Only recalculate when transactions change
   const stats = useMemo(() => {
-    // Filter successful txns first to avoid multiple iterations
     const successfulTxns = transactions.filter(t => t.status === 'successful');
     
-    // Calculate total revenue (seems to work fine but double-check the logic later)
     let revenue = 0;
     for (let i = 0; i < successfulTxns.length; i++) {
       const t = successfulTxns[i];
@@ -97,7 +86,6 @@ const Dashboard = () => {
       }
     }
     
-    // Get unique customer count
     const customerEmails = [];
     for (const t of transactions) {
       if (!customerEmails.includes(t.customer)) {
@@ -105,7 +93,6 @@ const Dashboard = () => {
       }
     }
 
-    // Avg transaction amount (avoid division by zero)
     const avgTxn = successfulTxns.length > 0 ? revenue / successfulTxns.length : 0;
     
     return { 
@@ -115,9 +102,7 @@ const Dashboard = () => {
     };
   }, [transactions]);
   
-  // Get last 4 transactions to show in the recent list
   const recentTxns = useMemo(() => {
-    // Use slice to avoid modifying the original array
     return [...transactions].slice(0, 4);
   }, [transactions]);
 
@@ -131,24 +116,26 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row items-baseline justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, Merchant Account</p>
+            <p className="text-muted-foreground">
+              {userRole === 'admin' ? 'Admin Control Panel' : 'Merchant Dashboard'}
+            </p>
           </div>
           
-          <Tabs 
-            defaultValue="merchant" 
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-[260px]"
-          >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="admin">Admin</TabsTrigger>
-              <TabsTrigger value="merchant">Merchant</TabsTrigger>
-              <TabsTrigger value="client">Client</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          {userRole === 'admin' && (
+            <Tabs 
+              defaultValue="admin" 
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-[180px]"
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="admin">Admin</TabsTrigger>
+                <TabsTrigger value="merchant">Merchant</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
         </div>
         
-        {/* Stats cards - 4 column grid on large screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Revenue"
@@ -179,7 +166,6 @@ const Dashboard = () => {
           />
         </div>
         
-        {/* Main content area with chart and activity feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="lg:col-span-2 border-0 shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
@@ -231,7 +217,6 @@ const Dashboard = () => {
           </Card>
         </div>
         
-        {/* Transactions and payment section */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-6">
             <h2 className="text-xl font-semibold">Recent Transactions</h2>
@@ -250,5 +235,4 @@ const Dashboard = () => {
   );
 };
 
-// Export with memo to prevent unnecessary re-renders of the entire dashboard
 export default React.memo(Dashboard);

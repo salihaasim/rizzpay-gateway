@@ -51,6 +51,19 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
    - Implemented webhook payment processing flow
    - Added callback handling for payment confirmations
 
+### UI Improvements
+
+1. **Navigation**
+   - Improved navigation bar UI for cleaner experience
+   - Implemented role-based navigation (admin/merchant)
+   - Removed client option from navigation tabs
+   - Added visual indicators for current user role
+
+2. **Dashboard**
+   - Enhanced dashboard UI with role-specific views
+   - Updated tab system to show only relevant options based on user role
+   - Improved mobile navigation drawer with better role information
+
 ### Technical Issues & Resolutions
 
 #### TypeScript Errors
@@ -184,4 +197,3 @@ npm install @supabase/supabase-js
 ---
 
 *This documentation will be continuously updated as the project evolves. For each major change, please add details about what was changed, why it was changed, and the outcome of those changes.*
-

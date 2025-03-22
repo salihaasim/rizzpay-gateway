@@ -20,47 +20,69 @@ const Navbar = () => {
     return location.pathname === path;
   };
   
-  const navLinks = [
-    {
-      name: 'Home',
-      href: '/',
-      icon: <Home className="h-4 w-4 mr-2" />,
-    },
-    {
-      name: 'Dashboard',
-      href: '/dashboard',
-      icon: <LayoutDashboard className="h-4 w-4 mr-2" />,
-    },
-    {
-      name: 'Transactions',
-      href: '/transactions',
-      icon: <CreditCard className="h-4 w-4 mr-2" />,
-    },
-    {
-      name: 'Wallet',
-      href: '/wallet',
-      icon: <Wallet className="h-4 w-4 mr-2" />,
-    },
-    {
-      name: 'Webhook',
-      href: '/webhook',
-      icon: <Webhook className="h-4 w-4 mr-2" />,
-    },
-    {
+  // Define navigation links based on user role
+  const getNavLinks = () => {
+    const commonLinks = [
+      {
+        name: 'Home',
+        href: '/',
+        icon: <Home className="h-4 w-4 mr-2" />,
+      },
+      {
+        name: 'Dashboard',
+        href: '/dashboard',
+        icon: <LayoutDashboard className="h-4 w-4 mr-2" />,
+      },
+      {
+        name: 'Transactions',
+        href: '/transactions',
+        icon: <CreditCard className="h-4 w-4 mr-2" />,
+      }
+    ];
+    
+    // Merchant-specific links
+    const merchantLinks = [
+      {
+        name: 'Wallet',
+        href: '/wallet',
+        icon: <Wallet className="h-4 w-4 mr-2" />,
+      },
+      {
+        name: 'Webhook',
+        href: '/webhook',
+        icon: <Webhook className="h-4 w-4 mr-2" />,
+      }
+    ];
+    
+    // Admin-specific links
+    const adminLinks = [
+      {
+        name: 'Admin',
+        href: '/admin',
+        icon: <ShieldCheck className="h-4 w-4 mr-2" />,
+      }
+    ];
+    
+    const links = [...commonLinks];
+    
+    // Add role-specific links
+    if (userRole === 'merchant') {
+      links.push(...merchantLinks);
+    } else if (userRole === 'admin') {
+      links.push(...adminLinks);
+    }
+    
+    // Settings is available to all authenticated users
+    links.push({
       name: 'Settings',
       href: '/settings',
       icon: <Settings className="h-4 w-4 mr-2" />,
-    },
-  ];
-
-  // Add admin link if user is admin
-  if (userRole === 'admin') {
-    navLinks.push({
-      name: 'Admin',
-      href: '/admin',
-      icon: <ShieldCheck className="h-4 w-4 mr-2" />,
     });
-  }
+    
+    return links;
+  };
+  
+  const navLinks = getNavLinks();
 
   const handleLogout = () => {
     resetUserRole();
@@ -97,6 +119,21 @@ const Navbar = () => {
         </div>
         
         <div className="flex items-center space-x-2">
+          {userRole && (
+            <div className="hidden sm:flex items-center mr-2">
+              <span className="text-sm text-muted-foreground mr-2">
+                {userRole === 'admin' ? (
+                  <span className="flex items-center">
+                    <ShieldCheck className="h-3 w-3 mr-1 text-primary" />
+                    Admin
+                  </span>
+                ) : (
+                  <span>Merchant</span>
+                )}
+              </span>
+            </div>
+          )}
+          
           <div className="hidden sm:flex">
             <SupabaseStatus />
           </div>
@@ -140,9 +177,25 @@ const Navbar = () => {
                 </nav>
                 
                 <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {userEmail ? `Logged in as: ${userEmail}` : 'Not logged in'}
-                  </p>
+                  {userRole && (
+                    <div className="px-4 py-2 rounded-md bg-muted mb-4">
+                      <p className="text-sm font-medium">
+                        {userRole === 'admin' ? (
+                          <span className="flex items-center">
+                            <ShieldCheck className="h-4 w-4 mr-1 text-primary" />
+                            Admin Account
+                          </span>
+                        ) : (
+                          <span>Merchant Account</span>
+                        )}
+                      </p>
+                      {userEmail && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {userEmail}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   
                   <div className="mt-4">
                     <SupabaseStatus />
