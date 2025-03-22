@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,11 @@ import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { supabase } from '@/utils/supabaseClient';
 import PaymentMethod from '@/components/payment/PaymentMethod';
+
+interface PaymentDetails {
+  callbackUrl?: string;
+  [key: string]: any;
+}
 
 const PaymentPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -51,6 +57,9 @@ const PaymentPage: React.FC = () => {
           return;
         }
         
+        // Extract payment details and ensure proper typing
+        const paymentDetails = data.payment_details as PaymentDetails | null;
+        
         // Format the payment data
         setPaymentData({
           transactionId: data.id,
@@ -61,7 +70,7 @@ const PaymentPage: React.FC = () => {
           merchantEmail: data.merchants?.email,
           customerName: data.customer_name,
           customerEmail: data.customer_email,
-          callbackUrl: data.payment_details?.callbackUrl,
+          callbackUrl: paymentDetails?.callbackUrl,
           date: new Date(data.date).toLocaleString()
         });
         
