@@ -9,7 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      merchants: {
+        Row: {
+          api_key: string | null
+          business_name: string
+          business_type: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          status: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          business_name: string
+          business_type?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          business_name?: string
+          business_type?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          currency: string
+          customer_email: string | null
+          customer_name: string | null
+          date: string
+          description: string | null
+          id: string
+          merchant_id: string | null
+          payment_details: Json | null
+          payment_method: string
+          processing_state: string | null
+          processing_timeline: Json | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          date?: string
+          description?: string | null
+          id: string
+          merchant_id?: string | null
+          payment_details?: Json | null
+          payment_method: string
+          processing_state?: string | null
+          processing_timeline?: Json | null
+          status: string
+        }
+        Update: {
+          amount?: number
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          merchant_id?: string | null
+          payment_details?: Json | null
+          payment_method?: string
+          processing_state?: string | null
+          processing_timeline?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

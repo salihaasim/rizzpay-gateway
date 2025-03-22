@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
 
 // Create a singleton Supabase client with lazy initialization
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
@@ -16,7 +17,13 @@ export const supabase = () => {
   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_KEY;
   
   // Create real Supabase client with the provided credentials
-  supabaseInstance = createClient(supabaseUrl, supabaseKey);
+  supabaseInstance = createClient<Database>(supabaseUrl, supabaseKey, {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  });
   return supabaseInstance;
 };
 
@@ -43,19 +50,16 @@ export const syncTransactionToSupabase = async (transaction: any) => {
       .from('transactions')
       .upsert({
         id: transaction.id,
-        date: transaction.date,
-        amount: transaction.amount,
+        merchant_id: transaction.createdBy,
+        amount: parseFloat(transaction.amount.replace(/[^0-9.-]+/g, '')),
         payment_method: transaction.paymentMethod,
         status: transaction.status,
-        customer: transaction.customer,
-        created_by: transaction.createdBy,
+        customer_name: transaction.customer,
+        date: transaction.date,
+        description: transaction.description,
         processing_state: transaction.processingState,
-        detailed_status: transaction.detailedStatus,
-        raw_amount: transaction.rawAmount,
         payment_details: transaction.paymentDetails,
-        processing_timeline: transaction.processingTimeline,
-        wallet_transaction_type: transaction.walletTransactionType,
-        description: transaction.description
+        processing_timeline: transaction.processingTimeline
       });
 
     if (error) {
@@ -78,7 +82,7 @@ export const fetchTransactionsFromSupabase = async (userEmail?: string) => {
     
     // Filter by user email if provided
     if (userEmail) {
-      query = query.or(`created_by.eq.${userEmail},customer.eq.${userEmail}`);
+      query = query.eq('merchant_id', userEmail);
     }
     
     const { data, error } = await query.order('date', { ascending: false });
@@ -91,17 +95,14 @@ export const fetchTransactionsFromSupabase = async (userEmail?: string) => {
     return (data || []).map(transaction => ({
       id: transaction.id,
       date: transaction.date,
-      amount: transaction.amount,
+      amount: `₹${transaction.amount}`,
       paymentMethod: transaction.payment_method,
       status: transaction.status,
-      customer: transaction.customer,
-      createdBy: transaction.created_by,
+      customer: transaction.customer_name,
+      createdBy: transaction.merchant_id,
       processingState: transaction.processing_state,
-      detailedStatus: transaction.detailed_status,
-      rawAmount: transaction.raw_amount,
       paymentDetails: transaction.payment_details,
       processingTimeline: transaction.processing_timeline,
-      walletTransactionType: transaction.wallet_transaction_type,
       description: transaction.description
     }));
   } catch (error) {

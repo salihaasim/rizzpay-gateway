@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -12,12 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { LogIn, Store } from 'lucide-react';
+import { LogIn, Store, Loader2 } from 'lucide-react';
 import MerchantRegistration from '@/components/auth/MerchantRegistration';
-
-// Admin credentials - in a real app, these would be stored securely
-const ADMIN_EMAIL = "admin@rizzpay.com";
-const ADMIN_PASSWORD = "admin123";
+import { supabase } from '@/utils/supabaseClient';
 
 // Validation schema
 const loginSchema = z.object({
@@ -29,10 +26,33 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Auth: React.FC = () => {
   const [authMode, setAuthMode] = useState<'login' | 'merchant'>('login');
+  const [loading, setLoading] = useState(false);
   const { setUserRole, initializeWallet } = useTransactionStore();
   const { merchants } = useProfileStore();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase().auth.getSession();
+      if (data.session) {
+        const { data: userData } = await supabase().auth.getUser();
+        if (userData.user) {
+          // Check if admin
+          if (userData.user.email === 'admin@rizzpay.com') {
+            setUserRole('admin', userData.user.email);
+          } else {
+            setUserRole('merchant', userData.user.email);
+            initializeWallet(userData.user.email);
+          }
+          navigate('/dashboard');
+        }
+      }
+    };
+    
+    checkSession();
+  }, [navigate, setUserRole, initializeWallet]);
 
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -43,37 +63,51 @@ const Auth: React.FC = () => {
     },
   });
 
-  const handleLoginSubmit = (data: LoginFormValues) => {
-    // Check if it's admin credentials
-    if (data.email === ADMIN_EMAIL && data.password === ADMIN_PASSWORD) {
-      setUserRole('admin', data.email);
-      toast({
-        title: "Admin login successful",
-        description: "Welcome back, admin!",
+  const handleLoginSubmit = async (data: LoginFormValues) => {
+    setLoading(true);
+    try {
+      const { data: authData, error } = await supabase().auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       });
-      navigate('/dashboard');
-      return;
-    }
-    
-    // Check if merchant with this email exists
-    const merchant = merchants.find(m => m.email === data.email);
-    
-    if (merchant) {
-      // This is a registered merchant - in a real app, you'd verify the password
-      setUserRole('merchant', data.email);
-      initializeWallet(data.email);
-      toast({
-        title: "Merchant login successful",
-        description: `Welcome back, ${merchant.name}!`,
-      });
-      navigate('/dashboard');
-    } else {
+
+      if (error) {
+        toast({
+          title: "Login failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (authData.user) {
+        // Check if admin
+        if (authData.user.email === 'admin@rizzpay.com') {
+          setUserRole('admin', authData.user.email);
+          toast({
+            title: "Admin login successful",
+            description: "Welcome back, admin!",
+          });
+        } else {
+          setUserRole('merchant', authData.user.email);
+          initializeWallet(authData.user.email);
+          toast({
+            title: "Merchant login successful",
+            description: `Welcome back!`,
+          });
+        }
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Login failed",
-        description: "No merchant account found with this email",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     }
+    setLoading(false);
   };
 
   const switchToMerchantRegistration = () => {
@@ -135,9 +169,18 @@ const Auth: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Login
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Logging in...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Login
+                      </>
+                    )}
                   </Button>
                 </form>
               </Form>

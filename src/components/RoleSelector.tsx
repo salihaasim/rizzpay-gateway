@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,7 +50,7 @@ const RoleSelector = () => {
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!showLogin) {
       setShowLogin(true);
       // Pre-fill with demo credentials for better UX
@@ -68,22 +67,48 @@ const RoleSelector = () => {
       return;
     }
 
-    // Simplified login logic - accept credentials as is for demo
-    const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
-    
-    // Allow login with email checking
-    if ((credentials.email === demoUser.username || 
-        credentials.email.toLowerCase() === selectedRole.toLowerCase()) && 
-        (credentials.password === demoUser.password || credentials.password === 'password')) {
-      
-      // Store role in Zustand store
-      setUserRole(selectedRole as 'admin' | 'merchant', credentials.email);
-      
-      // Successful login
-      toast.success(`Logged in as ${selectedRole}`);
-      navigate('/dashboard');
-    } else {
-      toast.error("Invalid credentials. Try the demo credentials shown below.");
+    try {
+      // Try to sign in with Supabase
+      const { data, error } = await supabase().auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password
+      });
+
+      if (error) {
+        // Fallback to demo credentials for testing
+        const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
+        
+        if ((credentials.email === demoUser.username || 
+            credentials.email.toLowerCase() === selectedRole.toLowerCase()) && 
+            (credentials.password === demoUser.password || credentials.password === 'password')) {
+          
+          // Store role in Zustand store
+          setUserRole(selectedRole as 'admin' | 'merchant', credentials.email);
+          
+          // Successful login
+          toast.success(`Logged in as ${selectedRole}`);
+          navigate('/dashboard');
+          return;
+        }
+        
+        toast.error(error.message || "Invalid credentials. Try the demo credentials shown below.");
+        return;
+      }
+
+      if (data.user) {
+        // Check role and redirect
+        if (data.user.email === 'admin@rizzpay.com' && selectedRole === 'admin') {
+          setUserRole('admin', data.user.email);
+        } else {
+          setUserRole('merchant', data.user.email);
+        }
+        
+        toast.success(`Logged in as ${selectedRole}`);
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error("An error occurred during login");
     }
   };
 
