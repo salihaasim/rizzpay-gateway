@@ -30,7 +30,7 @@ export const processRazorpayPayment = async (
     // Return a promise that resolves when payment completes
     return new Promise((resolve, reject) => {
       const options = {
-        key: "rzp_test_1DP5mmOlF5G5ag", // Replace with your Razorpay Key ID
+        key: "rzp_test_JXIkZl2p0iUbRw", // Using your Razorpay Key ID
         amount: amountInPaise,
         currency: orderData.currency,
         name: "Rizzpay",

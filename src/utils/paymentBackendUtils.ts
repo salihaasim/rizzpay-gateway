@@ -16,55 +16,13 @@ export const processNeftPayment = async (
   }
 ): Promise<Transaction | null> => {
   try {
-    // Generate a unique transaction ID
-    const transactionId = `NEFT_${uuidv4().substring(0, 8)}`;
-    
-    // Create payment details for NEFT transaction
-    const paymentDetails = {
-      bankName: bankDetails.bankName,
-      accountNumber: `xxxx${bankDetails.accountNumber.slice(-4)}`, // Mask account number for security
-      ifscCode: bankDetails.ifscCode,
-      processor: 'DirectNEFT',
-      paymentType: 'neft',
-      verificationStatus: 'pending'
-    };
-    
-    // Store the transaction in Supabase
-    // Convert the amount to a number before storing it (amount column is numeric type)
-    const { data, error } = await supabase()
-      .from('transactions')
-      .insert({
-        id: transactionId,
-        amount: amount, // This is already a number
-        currency: 'INR',
-        status: 'pending',
-        payment_method: 'neft',
-        customer_name: customerName,
-        customer_email: customerEmail,
-        payment_details: paymentDetails,
-        processing_state: 'initiated'
-      })
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('Error storing NEFT payment:', error);
-      toast.error('Failed to process NEFT payment');
-      return null;
-    }
-    
-    // Return the created transaction with formatted data
-    return {
-      id: data.id,
-      date: new Date(data.date).toISOString(),
-      amount: `₹${data.amount}`,
-      rawAmount: parseFloat(data.amount.toString()), // Convert to number in case it returns as string
-      paymentMethod: 'neft' as PaymentMethod,
-      status: 'pending',
-      customer: customerName,
-      processingState: 'initiated',
-      paymentDetails
-    };
+    // For real payments, we'll use Razorpay instead of direct NEFT
+    return await processRazorpayNeftPayment(
+      amount,
+      customerName,
+      customerEmail,
+      bankDetails
+    );
   } catch (error) {
     console.error('NEFT payment processing error:', error);
     toast.error('An error occurred while processing NEFT payment');
@@ -84,54 +42,13 @@ export const processCardPayment = async (
   }
 ): Promise<Transaction | null> => {
   try {
-    // Generate a unique transaction ID
-    const transactionId = `CARD_${uuidv4().substring(0, 8)}`;
-    
-    // Create payment details for card transaction
-    const paymentDetails = {
-      cardNumber: `xxxx xxxx xxxx ${cardDetails.cardNumber.slice(-4)}`, // Mask card number for security
-      cardHolderName: cardDetails.cardHolderName,
-      cardExpiry: cardDetails.cardExpiry,
-      processor: 'DirectCard',
-      paymentType: 'card',
-      authorizationStatus: 'pending'
-    };
-    
-    // Store the transaction in Supabase
-    const { data, error } = await supabase()
-      .from('transactions')
-      .insert({
-        id: transactionId,
-        amount: amount, // This is already a number
-        currency: 'INR',
-        status: 'pending',
-        payment_method: 'card',
-        customer_name: customerName,
-        customer_email: customerEmail,
-        payment_details: paymentDetails,
-        processing_state: 'initiated'
-      })
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('Error storing card payment:', error);
-      toast.error('Failed to process card payment');
-      return null;
-    }
-    
-    // Return the created transaction with formatted data
-    return {
-      id: data.id,
-      date: new Date(data.date).toISOString(),
-      amount: `₹${data.amount}`,
-      rawAmount: parseFloat(data.amount.toString()), // Convert to number in case it returns as string
-      paymentMethod: 'card' as PaymentMethod,
-      status: 'pending',
-      customer: customerName,
-      processingState: 'initiated',
-      paymentDetails
-    };
+    // For real payments, we'll use Razorpay instead of direct card processing
+    return await processRazorpayCardPayment(
+      amount,
+      customerName,
+      customerEmail,
+      cardDetails
+    );
   } catch (error) {
     console.error('Card payment processing error:', error);
     toast.error('An error occurred while processing card payment');

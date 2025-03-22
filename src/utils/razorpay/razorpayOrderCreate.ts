@@ -44,9 +44,9 @@ export const createRazorpayOrder = async (
       return null;
     }
     
-    // In a real implementation, we'll create an actual Razorpay order
-    // Replace this with your actual Razorpay API key
-    const razorpayKeyId = "rzp_test_1DP5mmOlF5G5ag";
+    // Use the real Razorpay API key from the user
+    const razorpayKeyId = "rzp_test_JXIkZl2p0iUbRw";
+    const razorpayKeySecret = "sa7TIRHn3yuzJsqXLybRjBYL";
     
     // Prepare the order data
     const orderData = {
@@ -68,7 +68,7 @@ export const createRazorpayOrder = async (
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${btoa(`${razorpayKeyId}:yoursecretkeyhere`)}`
+          'Authorization': `Basic ${btoa(`${razorpayKeyId}:${razorpayKeySecret}`)}`
         },
         body: JSON.stringify(orderData)
       });
