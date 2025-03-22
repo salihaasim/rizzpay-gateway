@@ -8,14 +8,11 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { supabase } from '@/utils/supabaseClient';
 import PaymentMethod from '@/components/payment/PaymentMethod';
 import { 
-  processCardPayment, 
-  processNeftPayment, 
   processRazorpayCardPayment, 
   processRazorpayNeftPayment 
 } from '@/utils/paymentBackendUtils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
-// Define PaymentDetails interface to fix TypeScript error
 interface PaymentDetails {
   callbackUrl?: string;
   [key: string]: any;
@@ -29,7 +26,6 @@ const PaymentPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>('card');
-  const [paymentProcessor, setPaymentProcessor] = useState<'direct' | 'razorpay'>('direct');
   const { addTransaction } = useTransactionStore();
   
   const transactionId = searchParams.get('id');
@@ -45,7 +41,6 @@ const PaymentPage: React.FC = () => {
       try {
         setLoading(true);
         
-        // Fetch from Supabase
         const { data, error } = await supabase()
           .from('transactions')
           .select('*, merchants(name, email)')
@@ -65,10 +60,8 @@ const PaymentPage: React.FC = () => {
           return;
         }
         
-        // Extract payment details and ensure proper typing
         const paymentDetails = data.payment_details as PaymentDetails | null;
         
-        // Format the payment data
         setPaymentData({
           transactionId: data.id,
           amount: data.amount,
@@ -102,10 +95,6 @@ const PaymentPage: React.FC = () => {
     setPaymentMethod(method);
   };
   
-  const handlePaymentProcessorChange = (processor: 'direct' | 'razorpay') => {
-    setPaymentProcessor(processor);
-  };
-  
   const handlePayment = async () => {
     if (!transactionId || !paymentData) return;
     
@@ -114,135 +103,42 @@ const PaymentPage: React.FC = () => {
     try {
       let transaction = null;
       
-      // Process payment based on selected method and processor
-      if (paymentProcessor === 'direct') {
-        // Direct payment processing
-        if (paymentMethod === 'card') {
-          transaction = await processCardPayment(
-            parseFloat(paymentData.amount),
-            paymentData.customerName || 'Customer',
-            paymentData.customerEmail,
-            {
-              cardNumber: paymentData.cardNumber || '4242424242424242',
-              cardExpiry: paymentData.cardExpiry || '12/25',
-              cardHolderName: paymentData.customerName || 'Customer'
-            }
-          );
-        } else if (paymentMethod === 'neft') {
-          transaction = await processNeftPayment(
-            parseFloat(paymentData.amount),
-            paymentData.customerName || 'Customer',
-            paymentData.customerEmail,
-            {
-              accountNumber: paymentData.bankAccount || '1234567890',
-              ifscCode: paymentData.bankIfsc || 'HDFC0001234',
-              bankName: paymentData.bankName || 'HDFC Bank'
-            }
-          );
-        } else {
-          // Update transaction in Supabase
-          const processingTimeline = [
-            {
-              stage: 'processing',
-              timestamp: new Date().toISOString(),
-              message: `Payment initiated with ${paymentMethod}`
-            },
-            {
-              stage: 'completed',
-              timestamp: new Date().toISOString(),
-              message: 'Payment successfully processed'
-            }
-          ];
-          
-          const paymentDetails = {
-            ...paymentData,
-            processor: 'webhook',
-            paymentMethod,
-            cardNumber: paymentData.cardNumber ? `**** **** **** ${paymentData.cardNumber.slice(-4)}` : undefined,
-            upiId: paymentData.upiId,
-            bankName: paymentData.bankName
-          };
-          
-          // Update the transaction in Supabase
-          const { error } = await supabase()
-            .from('transactions')
-            .update({
-              status: 'successful',
-              processing_state: 'completed',
-              payment_method: paymentMethod,
-              processing_timeline: processingTimeline,
-              payment_details: paymentDetails
-            })
-            .eq('id', transactionId);
-          
-          if (error) {
-            console.error('Error updating transaction:', error);
-            setError('Failed to process payment');
-            setProcessing(false);
-            return;
+      if (paymentMethod === 'card') {
+        transaction = await processRazorpayCardPayment(
+          parseFloat(paymentData.amount),
+          paymentData.customerName || 'Customer',
+          paymentData.customerEmail,
+          {
+            cardNumber: paymentData.cardNumber || '4242424242424242',
+            cardExpiry: paymentData.cardExpiry || '12/25',
+            cardHolderName: paymentData.cardName || paymentData.customerName || 'Customer'
           }
-          
-          // Add transaction to local store for UI display
-          transaction = {
-            id: transactionId,
-            date: new Date().toISOString(),
-            amount: `₹${paymentData.amount}`,
-            paymentMethod,
-            status: 'successful',
-            customer: paymentData.customerName || 'Customer',
-            createdBy: paymentData.merchantEmail,
-            processingState: 'completed',
-            processingTimeline,
-            paymentDetails
-          };
-        }
-      } else if (paymentProcessor === 'razorpay') {
-        // Razorpay payment processing
-        if (paymentMethod === 'card') {
-          transaction = await processRazorpayCardPayment(
-            parseFloat(paymentData.amount),
-            paymentData.customerName || 'Customer',
-            paymentData.customerEmail,
-            {
-              cardNumber: paymentData.cardNumber || '4242424242424242',
-              cardExpiry: paymentData.cardExpiry || '12/25',
-              cardHolderName: paymentData.customerName || 'Customer'
-            }
-          );
-        } else if (paymentMethod === 'neft') {
-          transaction = await processRazorpayNeftPayment(
-            parseFloat(paymentData.amount),
-            paymentData.customerName || 'Customer',
-            paymentData.customerEmail,
-            {
-              accountNumber: paymentData.bankAccount || '1234567890',
-              ifscCode: paymentData.bankIfsc || 'HDFC0001234',
-              bankName: paymentData.bankName || 'HDFC Bank'
-            }
-          );
-        } else {
-          // Handle other Razorpay payment methods
-          setError('This payment method is not yet supported with Razorpay');
-          setProcessing(false);
-          return;
-        }
+        );
+      } else if (paymentMethod === 'neft') {
+        transaction = await processRazorpayNeftPayment(
+          parseFloat(paymentData.amount),
+          paymentData.customerName || 'Customer',
+          paymentData.customerEmail,
+          {
+            accountNumber: paymentData.bankAccount || '1234567890',
+            ifscCode: paymentData.bankIfsc || 'HDFC0001234',
+            bankName: paymentData.bankName || 'HDFC Bank'
+          }
+        );
       }
       
       if (!transaction) {
         throw new Error('Failed to process payment');
       }
       
-      // Add transaction to local store for UI display
       addTransaction(transaction);
       
-      // If there's a callback URL, redirect
       const paymentDetails = paymentData.payment_details as PaymentDetails | null;
       if (paymentDetails?.callbackUrl) {
         window.location.href = `${paymentDetails.callbackUrl}&status=success`;
         return;
       }
       
-      // Otherwise, navigate to success page
       navigate(`/payment/success?id=${transactionId}`);
       
     } catch (err) {
@@ -301,57 +197,22 @@ const PaymentPage: React.FC = () => {
           )}
         </div>
         
-        <Tabs defaultValue="direct" className="w-full" onValueChange={(value) => handlePaymentProcessorChange(value as 'direct' | 'razorpay')}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="direct">Direct Processing</TabsTrigger>
-            <TabsTrigger value="razorpay">Razorpay</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="direct" className="mt-4">
-            <div className="flex space-x-2 justify-center">
-              <Button 
-                variant={paymentMethod === 'card' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => handlePaymentMethodChange('card')}
-              >
-                Card
-              </Button>
-              <Button 
-                variant={paymentMethod === 'upi' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => handlePaymentMethodChange('upi')}
-              >
-                UPI
-              </Button>
-              <Button 
-                variant={paymentMethod === 'neft' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => handlePaymentMethodChange('neft')}
-              >
-                Net Banking
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="razorpay" className="mt-4">
-            <div className="flex space-x-2 justify-center">
-              <Button 
-                variant={paymentMethod === 'card' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => handlePaymentMethodChange('card')}
-              >
-                Card
-              </Button>
-              <Button 
-                variant={paymentMethod === 'neft' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => handlePaymentMethodChange('neft')}
-              >
-                Net Banking
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <div className="flex space-x-2 justify-center">
+          <Button 
+            variant={paymentMethod === 'card' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => handlePaymentMethodChange('card')}
+          >
+            Card
+          </Button>
+          <Button 
+            variant={paymentMethod === 'neft' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => handlePaymentMethodChange('neft')}
+          >
+            Net Banking
+          </Button>
+        </div>
         
         <PaymentMethod
           paymentMethod={paymentMethod}

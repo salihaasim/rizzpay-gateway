@@ -44,7 +44,7 @@ export const createRazorpayOrder = async (
       return null;
     }
     
-    // Use the real Razorpay API key from the config
+    // Use the Razorpay API key from the config
     const razorpayKeyId = "rzp_test_JXIkZl2p0iUbRw";
     const razorpayKeySecret = "sa7TIRHn3yuzJsqXLybRjBYL";
     
@@ -60,6 +60,8 @@ export const createRazorpayOrder = async (
         description: description || 'Payment via Razorpay'
       }
     };
+    
+    console.log('Creating Razorpay order with data:', orderData);
     
     try {
       // Make the API call to create the order

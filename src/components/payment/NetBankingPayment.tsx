@@ -43,16 +43,16 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
   
   return (
     <>
-      <div className="text-sm font-medium mb-2">NEFT Bank Transfer</div>
+      <div className="text-sm font-medium mb-2">Razorpay NetBanking</div>
       <div className="rounded-lg border p-4">
         <div className="flex items-center mb-4">
           <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
             <Building className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <div className="font-medium">Secure NEFT Bank Transfer</div>
+            <div className="font-medium">Secure NetBanking via Razorpay</div>
             <div className="text-sm text-muted-foreground">
-              Process using Razorpay NEFT transfer
+              Process using Razorpay's secure payment gateway
             </div>
           </div>
         </div>
@@ -107,7 +107,7 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
               <AlertCircle size={16} className="text-muted-foreground" />
             </div>
             <p className="text-xs text-muted-foreground">
-              Your bank details are securely processed through Razorpay's payment gateway. After completing the payment, you'll receive confirmation details.
+              Your bank details will be securely processed through Razorpay. Click "Proceed to Pay" to continue to Razorpay's secure payment page.
             </p>
           </div>
           
