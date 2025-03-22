@@ -1,0 +1,4 @@
+
+project_id = "mogqmymxnienxqactuym"
+[global.env_vars]
+PUBLIC_URL = "https://yourdomain.com"

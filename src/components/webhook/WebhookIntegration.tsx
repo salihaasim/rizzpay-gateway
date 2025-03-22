@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,31 +7,45 @@ import { Textarea } from '@/components/ui/textarea';
 import { CopyIcon, CheckIcon, CodeIcon, RefreshCwIcon, ExternalLinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
-import { createWebhookToken, validateWebhookToken } from '@/components/webhook/tokenUtils';
+import { supabase } from '@/utils/supabaseClient';
 
-const WebhookIntegration: React.FC = () => {
+interface WebhookIntegrationProps {
+  apiKey: string | null;
+}
+
+const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
   const [copied, setCopied] = useState<string | null>(null);
-  const [webhookToken, setWebhookToken] = useState<string>('');
   const [regenerating, setRegenerating] = useState(false);
   const { userEmail } = useTransactionStore();
 
-  React.useEffect(() => {
-    if (!webhookToken && userEmail) {
-      const token = createWebhookToken(userEmail);
-      setWebhookToken(token);
-    }
-  }, [userEmail, webhookToken]);
-
-  const handleRegenerate = () => {
+  const handleRegenerate = async () => {
     if (!userEmail) return;
     
     setRegenerating(true);
-    setTimeout(() => {
-      const token = createWebhookToken(userEmail);
-      setWebhookToken(token);
+    try {
+      // Generate a new API key
+      const newApiKey = `wh_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Update in Supabase
+      const { error } = await supabase()
+        .from('merchants')
+        .update({ api_key: newApiKey })
+        .eq('email', userEmail);
+      
+      if (error) {
+        console.error('Error regenerating API key:', error);
+        toast.error('Failed to regenerate API key');
+      } else {
+        // Update local state with new API key
+        apiKey = newApiKey;
+        toast.success('Webhook token regenerated successfully');
+      }
+    } catch (err) {
+      console.error('Unexpected error regenerating API key:', err);
+      toast.error('An unexpected error occurred');
+    } finally {
       setRegenerating(false);
-      toast.success('Webhook token regenerated');
-    }, 800);
+    }
   };
 
   const copyToClipboard = (text: string, type: string) => {
@@ -46,10 +61,11 @@ const WebhookIntegration: React.FC = () => {
     });
   };
 
+  // Get webhook URL from current origin
   const webhookEndpoint = `${window.location.origin}/api/webhook`;
   
   const htmlCode = `<form action="${webhookEndpoint}" method="POST">
-  <input type="hidden" name="token" value="${webhookToken}" />
+  <input type="hidden" name="token" value="${apiKey || 'YOUR_WEBHOOK_TOKEN'}" />
   <input type="hidden" name="amount" value="100.00" />
   <input type="hidden" name="currency" value="INR" />
   <input type="hidden" name="description" value="Payment for Product X" />
@@ -68,7 +84,7 @@ async function initiateRizzpayPayment(paymentDetails) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token: "${webhookToken}",
+        token: "${apiKey || 'YOUR_WEBHOOK_TOKEN'}",
         amount: paymentDetails.amount,
         currency: paymentDetails.currency || "INR",
         description: paymentDetails.description,
@@ -103,10 +119,10 @@ document.getElementById("payment-button").addEventListener("click", () => {
   });
 });`;
 
-  const exampleRequestUrl = `${webhookEndpoint}?token=${webhookToken}&amount=100.00&currency=INR&description=Product+Purchase&customer_name=John+Doe&customer_email=john@example.com&callback_url=https://yourwebsite.com/payment-callback`;
+  const exampleRequestUrl = `${webhookEndpoint}?token=${apiKey || 'YOUR_WEBHOOK_TOKEN'}&amount=100.00&currency=INR&description=Product+Purchase&customer_name=John+Doe&customer_email=john@example.com&callback_url=https://yourwebsite.com/payment-callback`;
 
   const apiDocumentation = [
-    { param: 'token', required: true, description: 'Your unique webhook token (found on this page)' },
+    { param: 'token', required: true, description: 'Your unique webhook token (merchant API key)' },
     { param: 'amount', required: true, description: 'Payment amount (e.g., 100.00)' },
     { param: 'currency', required: false, description: 'Currency code (default: INR)' },
     { param: 'description', required: false, description: 'Payment description or purpose' },
@@ -153,23 +169,23 @@ document.getElementById("payment-button").addEventListener("click", () => {
           
           <div className="flex">
             <Input
-              value={webhookToken || 'Please login to generate a token'}
+              value={apiKey || 'Please login to see your token'}
               readOnly
               className="font-mono text-sm"
-              disabled={!userEmail}
+              disabled={!apiKey}
             />
             <Button
-              onClick={() => copyToClipboard(webhookToken, 'Token')}
+              onClick={() => apiKey && copyToClipboard(apiKey, 'Token')}
               variant="outline"
               size="icon"
               className="ml-2"
-              disabled={!webhookToken}
+              disabled={!apiKey}
             >
               {copied === 'Token' ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            This token is used to authenticate webhook requests to your account. Keep it secure.
+            This token is your merchant API key. Keep it secure and use it for webhook integrations.
           </p>
         </div>
 
@@ -313,10 +329,10 @@ document.getElementById("payment-button").addEventListener("click", () => {
 
       <CardFooter className="flex flex-col items-start space-y-2">
         <p className="text-xs text-muted-foreground">
-          Need more help? Check out our 
+          Need more details? Check our 
           <Button variant="link" className="h-auto p-0 px-1 text-xs" asChild>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              documentation <ExternalLinkIcon className="h-3 w-3 inline" />
+            <a href="/WEBHOOK_README.md" target="_blank" rel="noopener noreferrer">
+              complete webhook documentation <ExternalLinkIcon className="h-3 w-3 inline" />
             </a>
           </Button>
         </p>
