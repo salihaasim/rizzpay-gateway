@@ -3,16 +3,29 @@ import React from 'react';
 import { Check, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface PaymentSuccessProps {
-  paymentData: {
-    transactionId: string;
-    amount: string;
-    currency: string;
+interface PaymentSuccessData {
+  transactionId: string;
+  amount: string;
+  currency: string;
+  paymentDetails?: {
+    upiId?: string;
+    [key: string]: any;
   };
-  getCurrencySymbol: (currency: string) => string;
+  qrCodeUrl?: string;
+  qrCodeError?: boolean;
 }
 
-const PaymentSuccess: React.FC<PaymentSuccessProps> = ({ paymentData, getCurrencySymbol }) => {
+interface PaymentSuccessProps {
+  paymentData: PaymentSuccessData;
+  getCurrencySymbol: (currency: string) => string;
+  handleQrCodeError?: () => void;
+}
+
+const PaymentSuccess: React.FC<PaymentSuccessProps> = ({ 
+  paymentData, 
+  getCurrencySymbol,
+  handleQrCodeError 
+}) => {
   const [copied, setCopied] = React.useState(false);
 
   const copyToClipboard = (text: string) => {

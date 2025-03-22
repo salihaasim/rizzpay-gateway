@@ -1,4 +1,5 @@
 
+
 # Rizzpay - Payment Processing Platform
 
 A modern, responsive payment processing application built with React and TypeScript.
@@ -20,6 +21,16 @@ The application has been optimized for performance in the following ways:
 6. **Caching Strategy**: API responses are cached to reduce the number of network requests.
 
 7. **Route Prefetching**: Common routes are prefetched to improve navigation performance.
+
+## Code Structure
+
+The codebase is organized into small, focused components for better maintainability:
+
+1. **Component Decomposition**: Large components are broken down into smaller, reusable pieces.
+   
+2. **Clear Separation of Concerns**: Components are designed with single responsibilities.
+
+3. **Custom Hooks**: Business logic is extracted into reusable hooks.
 
 ## Key Components
 

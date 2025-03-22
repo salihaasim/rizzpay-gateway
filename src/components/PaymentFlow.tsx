@@ -128,7 +128,6 @@ const PaymentFlow = () => {
                 transactionId: paymentData.transactionId,
                 amount: paymentData.amount,
                 currency: paymentData.currency,
-                // Additional properties need to be defined in the type
                 paymentDetails: {
                   upiId: paymentData.upiId
                 },
