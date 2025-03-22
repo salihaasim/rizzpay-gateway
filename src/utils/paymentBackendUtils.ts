@@ -16,69 +16,20 @@ export const processNeftPayment = async (
   }
 ): Promise<Transaction | null> => {
   try {
-    // For real payments, we'll use Razorpay instead of direct NEFT
-    return await processRazorpayNeftPayment(
-      amount,
-      customerName,
-      customerEmail,
-      bankDetails
-    );
-  } catch (error) {
-    console.error('NEFT payment processing error:', error);
-    toast.error('An error occurred while processing NEFT payment');
-    return null;
-  }
-};
-
-// Process card payment
-export const processCardPayment = async (
-  amount: number,
-  customerName: string,
-  customerEmail: string | undefined,
-  cardDetails: {
-    cardNumber: string;
-    cardExpiry: string;
-    cardHolderName: string;
-  }
-): Promise<Transaction | null> => {
-  try {
-    // For real payments, we'll use Razorpay instead of direct card processing
-    return await processRazorpayCardPayment(
-      amount,
-      customerName,
-      customerEmail,
-      cardDetails
-    );
-  } catch (error) {
-    console.error('Card payment processing error:', error);
-    toast.error('An error occurred while processing card payment');
-    return null;
-  }
-};
-
-// Process Razorpay payment
-export const processRazorpayNeftPayment = async (
-  amount: number,
-  customerName: string,
-  customerEmail: string | undefined,
-  bankDetails: {
-    accountNumber: string;
-    ifscCode: string;
-    bankName: string;
-  }
-): Promise<Transaction | null> => {
-  try {
+    console.log('Processing NEFT payment via Razorpay:', { amount, customerName, bankDetails });
+    
     // Create Razorpay order
     const orderResult = await createRazorpayOrder(
       amount,
       'INR',
-      'razorpay_neft',
+      'netbanking',
       customerName,
       customerEmail,
       `NEFT Payment via ${bankDetails.bankName}`
     );
     
     if (!orderResult) {
+      toast.error('Failed to create payment order');
       return null;
     }
     
@@ -99,8 +50,8 @@ export const processRazorpayNeftPayment = async (
   }
 };
 
-// Process Razorpay card payment
-export const processRazorpayCardPayment = async (
+// Process card payment
+export const processCardPayment = async (
   amount: number,
   customerName: string,
   customerEmail: string | undefined,
@@ -111,17 +62,20 @@ export const processRazorpayCardPayment = async (
   }
 ): Promise<Transaction | null> => {
   try {
+    console.log('Processing card payment via Razorpay:', { amount, customerName });
+    
     // Create Razorpay order
     const orderResult = await createRazorpayOrder(
       amount,
       'INR',
-      'razorpay_card',
+      'card',
       customerName,
       customerEmail,
       'Card Payment'
     );
     
     if (!orderResult) {
+      toast.error('Failed to create payment order');
       return null;
     }
     
@@ -140,6 +94,34 @@ export const processRazorpayCardPayment = async (
     toast.error('An error occurred while processing Razorpay card payment');
     return null;
   }
+};
+
+// Process Razorpay payment
+export const processRazorpayNeftPayment = async (
+  amount: number,
+  customerName: string,
+  customerEmail: string | undefined,
+  bankDetails: {
+    accountNumber: string;
+    ifscCode: string;
+    bankName: string;
+  }
+): Promise<Transaction | null> => {
+  return processNeftPayment(amount, customerName, customerEmail, bankDetails);
+};
+
+// Process Razorpay card payment
+export const processRazorpayCardPayment = async (
+  amount: number,
+  customerName: string,
+  customerEmail: string | undefined,
+  cardDetails: {
+    cardNumber: string;
+    cardExpiry: string;
+    cardHolderName: string;
+  }
+): Promise<Transaction | null> => {
+  return processCardPayment(amount, customerName, customerEmail, cardDetails);
 };
 
 // Verify payment status

@@ -23,7 +23,7 @@ export const createRazorpayOrder = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount, // Pass as number directly
+        amount: amount,
         currency: currency,
         status: 'pending',
         payment_method: paymentMethod,
@@ -44,7 +44,7 @@ export const createRazorpayOrder = async (
       return null;
     }
     
-    // Use the real Razorpay API key from the user
+    // Use the real Razorpay API key from the config
     const razorpayKeyId = "rzp_test_JXIkZl2p0iUbRw";
     const razorpayKeySecret = "sa7TIRHn3yuzJsqXLybRjBYL";
     
@@ -62,8 +62,7 @@ export const createRazorpayOrder = async (
     };
     
     try {
-      // In production, you should have a backend endpoint to create the order
-      // For now, we'll simulate it with a direct API call
+      // Make the API call to create the order
       const response = await fetch('https://api.razorpay.com/v1/orders', {
         method: 'POST',
         headers: {
@@ -74,22 +73,49 @@ export const createRazorpayOrder = async (
       });
       
       if (!response.ok) {
-        throw new Error('Failed to create Razorpay order');
+        const errorData = await response.json();
+        console.error('Razorpay API error:', errorData);
+        throw new Error(`Failed to create Razorpay order: ${errorData.error?.description || 'Unknown error'}`);
       }
       
       const data = await response.json();
+      console.log('Razorpay order created successfully:', data);
       const orderId = data.id;
+      
+      // Update transaction with order ID
+      await supabase()
+        .from('transactions')
+        .update({
+          payment_details: {
+            processor: 'Razorpay',
+            paymentType: paymentMethod,
+            amountInPaise: amountInPaise,
+            razorpayOrderId: orderId
+          }
+        })
+        .eq('id', transactionId);
       
       // Return both the order ID and transaction ID
       return { orderId, transactionId };
     } catch (apiError) {
       console.error('Razorpay API error:', apiError);
+      toast.error('Payment gateway error. Please try again later.');
       
-      // For development purposes, generate a fake order ID
-      // In production, you should handle this more gracefully
-      console.log('Using simulated order ID for development');
-      const orderId = `order_${Math.random().toString(36).substring(2, 15)}`;
-      return { orderId, transactionId };
+      // Update transaction to failed state
+      await supabase()
+        .from('transactions')
+        .update({
+          status: 'failed',
+          processing_state: 'failed',
+          payment_details: {
+            processor: 'Razorpay',
+            paymentType: paymentMethod,
+            error: String(apiError)
+          }
+        })
+        .eq('id', transactionId);
+      
+      return null;
     }
   } catch (error) {
     console.error('Error creating Razorpay order:', error);

@@ -24,13 +24,15 @@ export const processRazorpayPayment = async (
       return null;
     }
     
+    console.log('Processing Razorpay payment with order ID:', orderData.orderId);
+    
     // Convert amount to paise (Razorpay requires amount in smallest currency unit)
     const amountInPaise = Math.round(orderData.amount * 100);
     
     // Return a promise that resolves when payment completes
     return new Promise((resolve, reject) => {
       const options = {
-        key: "rzp_test_JXIkZl2p0iUbRw", // Using your Razorpay Key ID
+        key: "rzp_test_JXIkZl2p0iUbRw", // Using the Razorpay Key ID
         amount: amountInPaise,
         currency: orderData.currency,
         name: "Rizzpay",
@@ -45,6 +47,7 @@ export const processRazorpayPayment = async (
         },
         handler: async function(response: any) {
           try {
+            console.log('Razorpay payment successful:', response);
             // Process successful payment
             // response contains: razorpay_payment_id, razorpay_order_id, razorpay_signature
             
@@ -118,14 +121,22 @@ export const processRazorpayPayment = async (
         },
         modal: {
           ondismiss: function() {
+            console.log('Razorpay payment dismissed by user');
             toast.info('Payment cancelled');
             reject(new Error('Payment cancelled by user'));
           }
         }
       };
       
+      console.log('Opening Razorpay checkout with options:', options);
+      
       // Open Razorpay checkout
       const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function (response: any) {
+        console.error('Razorpay payment failed:', response.error);
+        toast.error(`Payment failed: ${response.error.description}`);
+        reject(new Error(response.error.description));
+      });
       razorpay.open();
     });
   } catch (error) {

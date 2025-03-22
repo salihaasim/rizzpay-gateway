@@ -110,6 +110,16 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
               Your bank details are securely processed through Razorpay's payment gateway. After completing the payment, you'll receive confirmation details.
             </p>
           </div>
+          
+          {onProceed && (
+            <Button 
+              onClick={onProceed}
+              disabled={isLoading || !accountNumber || !ifscCode}
+              className="w-full"
+            >
+              {isLoading ? 'Processing...' : 'Proceed to Pay'}
+            </Button>
+          )}
         </div>
       </div>
     </>
