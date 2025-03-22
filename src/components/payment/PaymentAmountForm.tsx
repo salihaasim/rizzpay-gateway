@@ -1,8 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { loadRazorpayScript } from '@/utils/razorpay/razorpayLoader';
+import { Loader2 } from 'lucide-react';
 
 interface PaymentAmountFormProps {
   paymentData: any;
@@ -17,6 +21,86 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   handleSelectChange,
   getCurrencySymbol
 }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Direct Razorpay payment handling
+  const handleDirectRazorpayPayment = async () => {
+    // Validate form
+    if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    
+    if (!paymentData.name) {
+      toast.error('Please enter your name');
+      return;
+    }
+
+    if (paymentData.paymentMethod !== 'card' && paymentData.paymentMethod !== 'neft') {
+      toast.error('Please select either Card or NEFT payment method');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      
+      // Load Razorpay script
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        toast.error('Failed to load payment gateway');
+        setIsProcessing(false);
+        return;
+      }
+      
+      // Convert amount to paise (Razorpay requires amount in smallest currency unit)
+      const amountInPaise = Math.round(parseFloat(paymentData.amount) * 100);
+      
+      // Create Razorpay options
+      const options = {
+        key: "rzp_test_JXIkZl2p0iUbRw", // Using the Razorpay Key ID
+        amount: amountInPaise,
+        currency: paymentData.currency,
+        name: "Rizzpay",
+        description: paymentData.purpose || "Payment Processing",
+        prefill: {
+          name: paymentData.name,
+          email: paymentData.customerEmail || '',
+        },
+        theme: {
+          color: "#2563eb", // Primary color
+        },
+        handler: function(response: any) {
+          console.log('Razorpay payment successful:', response);
+          toast.success('Payment successful!', {
+            description: `Payment ID: ${response.razorpay_payment_id}`
+          });
+          setIsProcessing(false);
+        },
+        modal: {
+          ondismiss: function() {
+            console.log('Razorpay payment dismissed by user');
+            toast.info('Payment cancelled');
+            setIsProcessing(false);
+          }
+        }
+      };
+      
+      // Open Razorpay checkout
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function (response: any) {
+        console.error('Razorpay payment failed:', response.error);
+        toast.error(`Payment failed: ${response.error.description}`);
+        setIsProcessing(false);
+      });
+      
+      razorpay.open();
+    } catch (error) {
+      console.error('Error processing direct Razorpay payment:', error);
+      toast.error('Payment processing failed');
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -110,6 +194,23 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           onChange={handleInputChange}
         />
       </div>
+
+      {(paymentData.paymentMethod === 'card' || paymentData.paymentMethod === 'neft') && (
+        <Button 
+          onClick={handleDirectRazorpayPayment}
+          className="w-full mt-4"
+          disabled={isProcessing}
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>Pay with Razorpay</>
+          )}
+        </Button>
+      )}
     </div>
   );
 };
