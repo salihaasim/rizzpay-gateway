@@ -1,27 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label'; 
-import { Loader2, Smartphone, AlertTriangle, QrCode } from 'lucide-react';
-import { toast } from 'sonner';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { Loader2, QrCode, Send, AlertCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface UpiPaymentProps {
-  paymentData: {
-    upiId: string;
-    receiverUpiId?: string;
-    amount: string;
-    currency: string;
-    transactionId: string;
-    purpose?: string;
-    name: string;
-  };
+  paymentData: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  validateUpiId: (value: string) => boolean;
+  validateUpiId: (upiId: string) => boolean;
   qrCodeUrl: string;
   qrCodeError: boolean;
   handleQrCodeError: () => void;
   handleUpiPayment: () => void;
+  isLoading?: boolean;
 }
 
 const UpiPayment: React.FC<UpiPaymentProps> = ({
@@ -31,213 +23,121 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   qrCodeUrl,
   qrCodeError,
   handleQrCodeError,
-  handleUpiPayment
+  handleUpiPayment,
+  isLoading = false
 }) => {
-  const [generating, setGenerating] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const isMobile = useIsMobile();
-
-  // Check device platform
-  useEffect(() => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    setIsAndroid(/android/i.test(userAgent));
-    setIsIOS(/iphone|ipad|ipod/i.test(userAgent) || /mac/i.test(userAgent) && navigator.maxTouchPoints > 1);
-  }, []);
-
-  // Generate QR code whenever valid UPI ID changes
-  useEffect(() => {
-    if (paymentData.upiId && validateUpiId(paymentData.upiId) && !qrCodeUrl && !generating) {
-      setGenerating(true);
-      // This timeout simulates the generation process
-      setTimeout(() => {
-        setGenerating(false);
-      }, 1500);
-    }
-  }, [paymentData.upiId, validateUpiId, qrCodeUrl, generating]);
-
-  // Determine which UPI ID to use for payment - receiver's UPI ID if provided, otherwise user's UPI ID
-  const paymentUpiId = paymentData.receiverUpiId && validateUpiId(paymentData.receiverUpiId) 
-    ? paymentData.receiverUpiId 
-    : paymentData.upiId;
-
-  // Handle UPI deep link for mobile devices
-  const handleUpiDeepLink = () => {
-    if (!paymentData.upiId || !validateUpiId(paymentData.upiId)) {
-      toast.error('Please enter a valid UPI ID');
-      return;
-    }
-
-    if (paymentData.amount === '' || parseFloat(paymentData.amount) <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
-
-    // Format the UPI payment URL (upi://pay format)
-    const upiUrl = `upi://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}&tr=${paymentData.transactionId}`;
+  const [upiId, setUpiId] = useState(paymentData.upiId || '');
+  const [isValid, setIsValid] = useState(false);
+  const [qrLoading, setQrLoading] = useState(true);
+  
+  // Update parent component when UPI ID changes
+  const handleUpiIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUpiId(value);
+    const valid = validateUpiId(value);
+    setIsValid(valid);
     
-    // Different handling based on platform
-    if (isAndroid) {
-      // Android uses intent:// scheme which opens the app selector
-      window.location.href = upiUrl;
-    } else if (isIOS) {
-      // iOS doesn't have a universal deep link for UPI, but we can try
-      // to open common UPI apps directly
-      const apps = [
-        { name: 'Google Pay', url: `gpay://upi/pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name)}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}` },
-        { name: 'PhonePe', url: `phonepe://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name)}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}` },
-        { name: 'Paytm', url: `paytmmp://pay?pa=${paymentUpiId}&pn=${encodeURIComponent(paymentData.name)}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}` }
-      ];
-      
-      // Try opening the first app
-      window.location.href = apps[0].url;
-      
-      // Show user instructions to use QR code if deep link fails
-      toast.info('If no UPI app opens, please scan the QR code or copy the UPI ID manually', {
-        duration: 5000
-      });
-    } else {
-      // On desktop, suggest QR code scanning
-      toast.info('Please scan the QR code using your mobile UPI app', {
-        duration: 5000
-      });
+    // Update in parent component
+    handleInputChange({
+      target: { name: 'upiId', value }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+  
+  // Handle QR code load events
+  const handleQrCodeLoad = () => {
+    setQrLoading(false);
+  };
+  
+  const handleQrCodeLoadError = () => {
+    setQrLoading(false);
+    handleQrCodeError();
+  };
+  
+  useEffect(() => {
+    if (qrCodeUrl) {
+      setQrLoading(true);
     }
-
-    // Call the original UPI payment handler too
-    setTimeout(() => {
-      handleUpiPayment();
-    }, 1000);
-  };
-
-  // Function to handle copy to clipboard
-  const handleCopyUpiId = () => {
-    navigator.clipboard.writeText(paymentUpiId).then(() => {
-      toast.success('UPI ID copied to clipboard');
-    }).catch(() => {
-      toast.error('Failed to copy UPI ID');
-    });
-  };
-
+  }, [qrCodeUrl]);
+  
   return (
     <>
       <div className="text-sm font-medium mb-2">UPI Payment</div>
       <div className="rounded-lg border p-4">
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Your UPI ID</label>
-          <div className="flex items-center gap-2">
-            <Input
-              name="upiId"
-              value={paymentData.upiId}
-              onChange={handleInputChange}
-              placeholder="yourname@upi"
-              className="flex-1"
-            />
+        <div className="flex items-center mb-4">
+          <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+            <QrCode className="h-5 w-5 text-primary" />
           </div>
-          <p className="text-xs text-muted-foreground">Enter your UPI ID (e.g., name@okaxis, name@ybl)</p>
-          
-          <div className="space-y-1 mt-4">
-            <Label htmlFor="receiverUpiId">Receiver's UPI ID (Optional)</Label>
-            <Input
-              id="receiverUpiId"
-              name="receiverUpiId"
-              value={paymentData.receiverUpiId || ''}
-              onChange={handleInputChange}
-              placeholder="receiver@upi"
-              className="w-full"
-            />
-            <p className="text-xs text-muted-foreground">
-              If provided, payment will be directed to this UPI ID instead of yours
-            </p>
+          <div>
+            <div className="font-medium">UPI Transfer</div>
+            <div className="text-sm text-muted-foreground">
+              Pay using your UPI app
+            </div>
           </div>
         </div>
         
-        {isMobile && (
-          <div className="mt-4 bg-primary/5 p-3 rounded-lg">
-            <p className="text-sm text-center">
-              {isAndroid ? 'Open UPI apps directly' : isIOS ? 'Open UPI app' : 'Pay using UPI'}
-            </p>
-            <button 
-              onClick={handleUpiDeepLink}
-              className="mt-2 bg-primary text-white w-full py-3 rounded-lg flex items-center justify-center gap-2"
-            >
-              <Smartphone className="h-5 w-5" />
-              {isAndroid ? 'Open UPI Apps' : isIOS ? 'Open UPI App' : 'Pay with UPI'}
-            </button>
-            {isIOS && (
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Note: If the app doesn't open, please use the QR code below
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">UPI ID</label>
+            <Input 
+              placeholder="your-name@upi" 
+              value={upiId}
+              onChange={handleUpiIdChange}
+            />
+            {upiId && !isValid && (
+              <p className="text-xs text-destructive mt-1 flex items-center">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                Please enter a valid UPI ID (e.g. name@bank)
               </p>
             )}
           </div>
-        )}
-        
-        {paymentData.upiId && validateUpiId(paymentData.upiId) && (
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-sm font-medium">Scan QR Code</p>
-              <button 
-                onClick={handleCopyUpiId}
-                className="text-xs text-primary hover:underline flex items-center gap-1"
-              >
-                Copy UPI ID
-              </button>
+          
+          {qrCodeUrl && (
+            <div className="flex flex-col items-center space-y-2 py-2">
+              <p className="text-sm font-medium">Or scan QR code</p>
+              <div className="relative h-48 w-48 bg-white p-2 rounded-lg border">
+                {qrLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Skeleton className="h-40 w-40" />
+                  </div>
+                )}
+                {qrCodeError ? (
+                  <div className="h-full w-full flex flex-col items-center justify-center text-destructive">
+                    <AlertCircle className="h-10 w-10 mb-2" />
+                    <p className="text-xs text-center">Failed to load QR code</p>
+                  </div>
+                ) : (
+                  <img 
+                    src={qrCodeUrl} 
+                    alt="UPI QR Code"
+                    className="h-full w-full object-contain"
+                    onLoad={handleQrCodeLoad}
+                    onError={handleQrCodeLoadError}
+                  />
+                )}
+              </div>
             </div>
-            {qrCodeError ? (
-              <div className="bg-red-50 p-3 rounded-lg text-center">
-                <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-2" />
-                <p className="text-sm text-red-600">Could not generate QR code</p>
-                <button 
-                  onClick={handleQrCodeError}
-                  className="text-xs text-primary mt-2 hover:underline"
-                >
-                  Try again
-                </button>
-              </div>
-            ) : generating ? (
-              <div className="flex items-center justify-center h-[200px] w-[200px] bg-gray-100 rounded-lg">
-                <Loader2 className="h-8 w-8 text-primary animate-spin" />
-              </div>
-            ) : qrCodeUrl ? (
-              <div className="bg-white p-2 rounded-lg inline-block shadow-sm">
-                <img 
-                  src={qrCodeUrl} 
-                  alt="UPI QR Code" 
-                  width={200} 
-                  height={200} 
-                  onError={handleQrCodeError}
-                />
-              </div>
+          )}
+          
+          <div className="p-3 bg-muted/50 rounded flex items-start">
+            <div className="mr-2 mt-0.5">
+              <AlertCircle size={16} className="text-muted-foreground" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Please ensure you enter a correct UPI ID. After payment, you'll receive confirmation from your UPI app.
+            </p>
+          </div>
+          
+          <Button 
+            onClick={handleUpiPayment}
+            disabled={isLoading || (!isValid && !qrCodeUrl)}
+            className="w-full"
+          >
+            {isLoading ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
             ) : (
-              <div className="flex items-center justify-center h-[200px] w-[200px] bg-gray-100 rounded-lg">
-                <Loader2 className="h-8 w-8 text-primary animate-spin" />
-              </div>
+              <><Send className="mr-2 h-4 w-4" /> Pay Now</>
             )}
-            <p className="text-xs text-muted-foreground mt-2">Scan this QR code with any UPI app</p>
-            
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg text-sm">
-              <p className="font-medium mb-1">Payment Details:</p>
-              <div className="grid grid-cols-2 gap-1">
-                <div className="text-muted-foreground">Amount:</div>
-                <div className="font-medium">{paymentData.currency === 'INR' ? '₹' : paymentData.currency} {paymentData.amount}</div>
-                <div className="text-muted-foreground">To:</div>
-                <div className="font-medium truncate max-w-[150px]">{paymentUpiId}</div>
-                <div className="text-muted-foreground">Transaction ID:</div>
-                <div className="font-medium text-xs truncate max-w-[150px]">{paymentData.transactionId}</div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      <div className="rounded-lg border p-4 flex items-center cursor-pointer hover:bg-secondary/50 transition-colors" onClick={isMobile ? handleUpiDeepLink : handleUpiPayment}>
-        <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-          {isMobile ? <Smartphone className="h-6 w-6 text-primary" /> : <QrCode className="h-6 w-6 text-primary" />}
-        </div>
-        <div>
-          <div className="font-medium">Pay with UPI</div>
-          <div className="text-sm text-muted-foreground">
-            {isMobile ? 'Quick, secure UPI payment' : 'Scan QR code to pay'}
-          </div>
+          </Button>
         </div>
       </div>
     </>
