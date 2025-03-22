@@ -1,4 +1,3 @@
-
 import React from 'react';
 import CardPayment from './CardPayment';
 import NetBankingPayment from './NetBankingPayment';
@@ -62,6 +61,9 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
               handleInputChange({
                 target: { name: 'cardCvv', value: cardData.cvv }
               } as React.ChangeEvent<HTMLInputElement>);
+              handleInputChange({
+                target: { name: 'cardName', value: cardData.cardHolderName }
+              } as React.ChangeEvent<HTMLInputElement>);
             }}
             isLoading={loading}
           />
@@ -75,6 +77,16 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
               } as React.ChangeEvent<HTMLInputElement>);
             }}
             selectedBank={paymentData.bankName || "hdfc"}
+            onAccountChange={(account) => {
+              handleInputChange({
+                target: { name: 'bankAccount', value: account }
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
+            onIfscChange={(ifsc) => {
+              handleInputChange({
+                target: { name: 'bankIfsc', value: ifsc }
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
             isLoading={loading}
           />
         )}

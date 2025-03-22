@@ -51,6 +51,12 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
    - Implemented webhook payment processing flow
    - Added callback handling for payment confirmations
 
+6. **Backend Payment Processing**
+   - Added backend support for NEFT and card payments
+   - Created payment storage and verification capabilities
+   - Implemented secure payment data handling
+   - Added transaction status management
+
 ### UI Improvements
 
 1. **Navigation**
@@ -63,6 +69,10 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
    - Enhanced dashboard UI with role-specific views
    - Updated tab system to show only relevant options based on user role
    - Improved mobile navigation drawer with better role information
+
+3. **Brand Elements**
+   - Changed favicon from default to credit card symbol
+   - Updated visual identity to reflect payment focus
 
 ### Technical Issues & Resolutions
 

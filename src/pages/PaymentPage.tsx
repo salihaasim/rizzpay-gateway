@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,9 @@ import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { supabase } from '@/utils/supabaseClient';
 import PaymentMethod from '@/components/payment/PaymentMethod';
+import { processCardPayment, processNeftPayment } from '@/utils/paymentBackendUtils';
 
+// Define PaymentDetails interface to fix TypeScript error
 interface PaymentDetails {
   callbackUrl?: string;
   [key: string]: any;
@@ -100,65 +101,100 @@ const PaymentPage: React.FC = () => {
     setProcessing(true);
     
     try {
-      // Update transaction in Supabase
-      const processingTimeline = [
-        {
-          stage: 'processing',
-          timestamp: new Date().toISOString(),
-          message: `Payment initiated with ${paymentMethod}`
-        },
-        {
-          stage: 'completed',
-          timestamp: new Date().toISOString(),
-          message: 'Payment successfully processed'
+      let transaction = null;
+      
+      // Process payment based on selected method using backend utilities
+      if (paymentMethod === 'card') {
+        transaction = await processCardPayment(
+          parseFloat(paymentData.amount),
+          paymentData.customerName || 'Customer',
+          paymentData.customerEmail,
+          {
+            cardNumber: paymentData.cardNumber || '4242424242424242',
+            cardExpiry: paymentData.cardExpiry || '12/25',
+            cardHolderName: paymentData.customerName || 'Customer'
+          }
+        );
+      } else if (paymentMethod === 'neft') {
+        transaction = await processNeftPayment(
+          parseFloat(paymentData.amount),
+          paymentData.customerName || 'Customer',
+          paymentData.customerEmail,
+          {
+            accountNumber: paymentData.bankAccount || '1234567890',
+            ifscCode: paymentData.bankIfsc || 'HDFC0001234',
+            bankName: paymentData.bankName || 'HDFC Bank'
+          }
+        );
+      } else {
+        // Update transaction in Supabase
+        const processingTimeline = [
+          {
+            stage: 'processing',
+            timestamp: new Date().toISOString(),
+            message: `Payment initiated with ${paymentMethod}`
+          },
+          {
+            stage: 'completed',
+            timestamp: new Date().toISOString(),
+            message: 'Payment successfully processed'
+          }
+        ];
+        
+        const paymentDetails = {
+          ...paymentData,
+          processor: 'webhook',
+          paymentMethod,
+          cardNumber: paymentData.cardNumber ? `**** **** **** ${paymentData.cardNumber.slice(-4)}` : undefined,
+          upiId: paymentData.upiId,
+          bankName: paymentData.bankName
+        };
+        
+        // Update the transaction in Supabase
+        const { error } = await supabase()
+          .from('transactions')
+          .update({
+            status: 'successful',
+            processing_state: 'completed',
+            payment_method: paymentMethod,
+            processing_timeline: processingTimeline,
+            payment_details: paymentDetails
+          })
+          .eq('id', transactionId);
+        
+        if (error) {
+          console.error('Error updating transaction:', error);
+          setError('Failed to process payment');
+          setProcessing(false);
+          return;
         }
-      ];
-      
-      const paymentDetails = {
-        ...paymentData,
-        processor: 'webhook',
-        paymentMethod,
-        cardNumber: paymentData.cardNumber ? `**** **** **** ${paymentData.cardNumber.slice(-4)}` : undefined,
-        upiId: paymentData.upiId,
-        bankName: paymentData.bankName
-      };
-      
-      // Update the transaction in Supabase
-      const { error } = await supabase()
-        .from('transactions')
-        .update({
+        
+        // Add transaction to local store for UI display
+        transaction = {
+          id: transactionId,
+          date: new Date().toISOString(),
+          amount: `₹${paymentData.amount}`,
+          paymentMethod,
           status: 'successful',
-          processing_state: 'completed',
-          payment_method: paymentMethod,
-          processing_timeline: processingTimeline,
-          payment_details: paymentDetails
-        })
-        .eq('id', transactionId);
+          customer: paymentData.customerName || 'Customer',
+          createdBy: paymentData.merchantEmail,
+          processingState: 'completed',
+          processingTimeline,
+          paymentDetails
+        };
+      }
       
-      if (error) {
-        console.error('Error updating transaction:', error);
-        setError('Failed to process payment');
-        setProcessing(false);
-        return;
+      if (!transaction) {
+        throw new Error('Failed to process payment');
       }
       
       // Add transaction to local store for UI display
-      addTransaction({
-        id: transactionId,
-        date: new Date().toISOString(),
-        amount: `₹${paymentData.amount}`,
-        paymentMethod,
-        status: 'successful',
-        customer: paymentData.customerName || 'Customer',
-        createdBy: paymentData.merchantEmail,
-        processingState: 'completed',
-        processingTimeline,
-        paymentDetails
-      });
+      addTransaction(transaction);
       
       // If there's a callback URL, redirect
-      if (paymentData.callbackUrl) {
-        window.location.href = `${paymentData.callbackUrl}&status=success`;
+      const paymentDetails = paymentData.payment_details as PaymentDetails | null;
+      if (paymentDetails?.callbackUrl) {
+        window.location.href = `${paymentDetails.callbackUrl}&status=success`;
         return;
       }
       

@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 interface NetBankingPaymentProps {
   onBankSelect?: (bank: string) => void;
   selectedBank?: string;
+  onAccountChange?: (account: string) => void;
+  onIfscChange?: (ifsc: string) => void;
   onProceed?: () => void;
   isLoading?: boolean;
 }
@@ -15,11 +17,29 @@ interface NetBankingPaymentProps {
 const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({ 
   onBankSelect, 
   selectedBank = "hdfc",
+  onAccountChange,
+  onIfscChange,
   onProceed,
   isLoading = false
 }) => {
   const [accountNumber, setAccountNumber] = useState('');
   const [ifscCode, setIfscCode] = useState('');
+  
+  const handleAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    setAccountNumber(value);
+    if (onAccountChange) {
+      onAccountChange(value);
+    }
+  };
+  
+  const handleIfscChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toUpperCase(); // Convert to uppercase
+    setIfscCode(value);
+    if (onIfscChange) {
+      onIfscChange(value);
+    }
+  };
   
   return (
     <>
@@ -67,7 +87,8 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
             <Input 
               placeholder="Enter your account number"
               value={accountNumber}
-              onChange={(e) => setAccountNumber(e.target.value)}
+              onChange={handleAccountChange}
+              maxLength={18}
             />
           </div>
           
@@ -76,7 +97,8 @@ const NetBankingPayment: React.FC<NetBankingPaymentProps> = ({
             <Input 
               placeholder="Enter IFSC code"
               value={ifscCode}
-              onChange={(e) => setIfscCode(e.target.value)}
+              onChange={handleIfscChange}
+              maxLength={11}
             />
           </div>
           
