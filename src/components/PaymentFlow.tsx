@@ -1,13 +1,16 @@
-
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { addTransaction, simulatePaymentProcessing } from './TransactionUtils';
+import { addTransaction } from './TransactionUtils';
 import { PaymentMethod } from '@/stores/transactionStore';
 import { useNavigate } from 'react-router-dom';
 import { showTransactionNotification } from '@/utils/notificationUtils';
+import { 
+  processRazorpayCardPayment, 
+  processRazorpayNeftPayment 
+} from '@/utils/paymentBackendUtils';
 
 // Lazy load components for better initial loading performance
 const PaymentAmountForm = lazy(() => import('./payment/PaymentAmountForm'));
@@ -44,7 +47,8 @@ const PaymentFlow = () => {
     bankAccount: '',
     bankIfsc: '',
     bankName: '',
-    purpose: 'Payment'
+    purpose: 'Payment',
+    customerEmail: '' // Added for Razorpay
   });
 
   // Generate transaction ID only once on component mount
@@ -153,46 +157,78 @@ const PaymentFlow = () => {
     setLoading(true);
     
     try {
-      let paymentDetails: any = {
-        recipientName: paymentData.name,
-      };
-      
-      if (paymentData.paymentMethod === 'card') {
-        paymentDetails = {
-          ...paymentDetails,
-          cardNumber: paymentData.cardNumber || '•••• •••• •••• 4242',
-          cardHolderName: paymentData.name,
-          processor: 'DirectCard',
-        };
-      } else if (paymentData.paymentMethod === 'neft') {
-        paymentDetails = {
-          ...paymentDetails,
-          bankName: paymentData.bankName || 'HDFC Bank',
-          bankAccount: paymentData.bankAccount,
-          bankIfsc: paymentData.bankIfsc,
-          processor: 'DirectNEFT',
-        };
-      } else if (paymentData.paymentMethod === 'upi') {
-        paymentDetails = {
-          ...paymentDetails,
-          upiId: paymentData.upiId,
-          processor: 'UPI',
-          qrCodeUrl: qrCodeUrl,
-        };
-      }
-      
+      // Create a transaction entry first
       const transaction = addTransaction(
         paymentData.amount,
         paymentData.paymentMethod,
         'pending',
         paymentData.name,
-        paymentDetails
+        {}
       );
       
       setCurrentTransactionId(transaction.id);
       
-      // Process the real payment - this would connect to your payment gateway
-      processRealPayment(transaction.id, paymentData);
+      // Show processing notification
+      showTransactionNotification(
+        'info',
+        'Processing Payment',
+        `Processing ${paymentData.paymentMethod.toUpperCase()} payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`
+      );
+      
+      // Process the payment using Razorpay based on payment method
+      let result = null;
+      
+      if (paymentData.paymentMethod === 'card') {
+        result = await processRazorpayCardPayment(
+          parseFloat(paymentData.amount),
+          paymentData.name,
+          paymentData.customerEmail,
+          {
+            cardNumber: paymentData.cardNumber || '4242424242424242',
+            cardExpiry: paymentData.cardExpiry || '12/25',
+            cardHolderName: paymentData.cardName || paymentData.name
+          }
+        );
+      } else if (paymentData.paymentMethod === 'neft') {
+        result = await processRazorpayNeftPayment(
+          parseFloat(paymentData.amount),
+          paymentData.name,
+          paymentData.customerEmail,
+          {
+            accountNumber: paymentData.bankAccount || '1234567890',
+            ifscCode: paymentData.bankIfsc || 'SBIN0001234',
+            bankName: paymentData.bankName || 'HDFC Bank'
+          }
+        );
+      } else if (paymentData.paymentMethod === 'upi') {
+        // Handle UPI payment with existing code
+        if (!validateUpiId(paymentData.upiId)) {
+          toast.error('Please enter a valid UPI ID');
+          return;
+        }
+        
+        if (paymentData.amount === '' || parseFloat(paymentData.amount) <= 0) {
+          toast.error('Please enter a valid amount');
+          return;
+        }
+        
+        // Simulate UPI payment processing
+        console.log(`Simulating UPI payment to ${paymentData.upiId} for ${paymentData.amount}`);
+        toast.success(`Payment request sent to UPI ID: ${paymentData.upiId}`);
+      }
+      
+      if (result) {
+        // Payment was successful, update UI
+        setPaymentData(prev => ({
+          ...prev,
+          paymentStatus: 'successful'
+        }));
+        
+        toast.success('Payment successful!');
+      } else {
+        // Payment failed or was cancelled
+        toast.error('Payment was not completed');
+      }
       
       setLoading(false);
       setStep(3);
@@ -201,26 +237,6 @@ const PaymentFlow = () => {
       toast.error("An error occurred during payment processing");
       setLoading(false);
     }
-  };
-
-  const processRealPayment = (transactionId: string, paymentData: any) => {
-    // Show payment notification
-    showTransactionNotification(
-      'info',
-      'Processing Payment',
-      `Processing ${paymentData.paymentMethod.toUpperCase()} payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`
-    );
-    
-    // In a real implementation, this would call your payment gateway API
-    // This is a placeholder for where you would implement your real payment processing
-    // For now, we're simulating a successful payment
-    simulatePaymentProcessing(
-      transactionId, 
-      paymentData.paymentMethod,
-      true // Force success for this example
-    ).then(() => {
-      console.log(`Real ${paymentData.paymentMethod} payment would be processed here`);
-    });
   };
 
   const getCurrencySymbol = (currency: string) => {
@@ -255,7 +271,7 @@ const PaymentFlow = () => {
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b pb-8">
         <CardTitle className="text-xl font-semibold">Make a Payment</CardTitle>
-        <CardDescription>Complete your transaction securely</CardDescription>
+        <CardDescription>Complete your transaction securely with Razorpay</CardDescription>
       </CardHeader>
       
       <CardContent className="pt-6">

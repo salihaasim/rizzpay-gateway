@@ -45,11 +45,17 @@ export const processRazorpayPayment = async (
         theme: {
           color: "#2563eb", // Primary color
         },
+        modal: {
+          confirm_close: true,
+          ondismiss: function() {
+            console.log('Razorpay payment dismissed by user');
+            toast.info('Payment cancelled');
+            reject(new Error('Payment cancelled by user'));
+          }
+        },
         handler: async function(response: any) {
           try {
             console.log('Razorpay payment successful:', response);
-            // Process successful payment
-            // response contains: razorpay_payment_id, razorpay_order_id, razorpay_signature
             
             // Update transaction in database
             const { data, error } = await supabase()
@@ -117,13 +123,6 @@ export const processRazorpayPayment = async (
           } catch (error) {
             console.error('Error processing Razorpay success:', error);
             reject(error);
-          }
-        },
-        modal: {
-          ondismiss: function() {
-            console.log('Razorpay payment dismissed by user');
-            toast.info('Payment cancelled');
-            reject(new Error('Payment cancelled by user'));
           }
         }
       };
