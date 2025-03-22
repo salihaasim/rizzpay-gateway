@@ -1,7 +1,7 @@
 
 import { supabase } from './supabaseClient';
 import { toast } from 'sonner';
-import { Transaction } from '@/stores/transactionStore';
+import { Transaction, PaymentDetails } from '@/stores/transactionStore';
 
 // Initialize Razorpay
 const loadRazorpayScript = (): Promise<boolean> => {
@@ -48,7 +48,7 @@ export const createRazorpayOrder = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount,
+        amount: amount, // Pass as number directly
         currency: currency,
         status: 'pending',
         payment_method: paymentMethod,
@@ -163,17 +163,28 @@ export const processRazorpayPayment = async (
               return;
             }
             
+            // Convert the database payment_details to the expected PaymentDetails type
+            const paymentDetailsFromDB = data.payment_details;
+            const typedPaymentDetails: PaymentDetails = {
+              processor: paymentDetailsFromDB?.processor,
+              cardNumber: paymentDetailsFromDB?.cardNumber,
+              cardHolderName: paymentDetailsFromDB?.cardHolderName,
+              razorpay_payment_id: paymentDetailsFromDB?.razorpay_payment_id,
+              razorpay_order_id: paymentDetailsFromDB?.razorpay_order_id,
+              razorpay_signature: paymentDetailsFromDB?.razorpay_signature
+            };
+            
             // Format transaction for return
             const transaction: Transaction = {
               id: data.id,
               date: new Date(data.date).toISOString(),
               amount: `${data.currency === 'INR' ? '₹' : data.currency} ${data.amount}`,
-              rawAmount: parseFloat(data.amount),
+              rawAmount: parseFloat(data.amount.toString()),
               paymentMethod: data.payment_method,
               status: 'successful',
               customer: data.customer_name,
               processingState: 'completed',
-              paymentDetails: data.payment_details
+              paymentDetails: typedPaymentDetails
             };
             
             toast.success('Payment successful!');

@@ -36,7 +36,7 @@ export const processNeftPayment = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount, // Use number directly as the database expects it
+        amount: amount, // This is already a number
         currency: 'INR',
         status: 'pending',
         payment_method: 'neft',
@@ -59,7 +59,7 @@ export const processNeftPayment = async (
       id: data.id,
       date: new Date(data.date).toISOString(),
       amount: `₹${data.amount}`,
-      rawAmount: parseFloat(data.amount), // Convert to number in case it returns as string
+      rawAmount: parseFloat(data.amount.toString()), // Convert to number in case it returns as string
       paymentMethod: 'neft' as PaymentMethod,
       status: 'pending',
       customer: customerName,
@@ -103,7 +103,7 @@ export const processCardPayment = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount, // Use number directly as the database expects it
+        amount: amount, // This is already a number
         currency: 'INR',
         status: 'pending',
         payment_method: 'card',
@@ -126,7 +126,7 @@ export const processCardPayment = async (
       id: data.id,
       date: new Date(data.date).toISOString(),
       amount: `₹${data.amount}`,
-      rawAmount: parseFloat(data.amount), // Convert to number in case it returns as string
+      rawAmount: parseFloat(data.amount.toString()), // Convert to number in case it returns as string
       paymentMethod: 'card' as PaymentMethod,
       status: 'pending',
       customer: customerName,
