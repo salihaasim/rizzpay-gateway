@@ -125,8 +125,13 @@ const PaymentFlow = () => {
           {step === 2 && paymentData.paymentMethod === 'upi' && (
             <PaymentSuccess
               paymentData={{
-                ...paymentData,
-                upiId: paymentData.upiId,
+                transactionId: paymentData.transactionId,
+                amount: paymentData.amount,
+                currency: paymentData.currency,
+                // Additional properties need to be defined in the type
+                paymentDetails: {
+                  upiId: paymentData.upiId
+                },
                 qrCodeUrl: qrCodeUrl,
                 qrCodeError: qrCodeError
               }}
