@@ -22,6 +22,21 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   getCurrencySymbol
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+
+  // Preload Razorpay script to improve user experience
+  React.useEffect(() => {
+    const preloadScript = async () => {
+      try {
+        const isLoaded = await loadRazorpayScript();
+        setScriptLoaded(isLoaded);
+      } catch (error) {
+        console.error('Failed to preload Razorpay script:', error);
+      }
+    };
+    
+    preloadScript();
+  }, []);
 
   // Direct Razorpay payment handling
   const handleDirectRazorpayPayment = async () => {
@@ -44,12 +59,15 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
     try {
       setIsProcessing(true);
       
-      // Load Razorpay script
-      const isLoaded = await loadRazorpayScript();
-      if (!isLoaded) {
-        toast.error('Failed to load payment gateway');
-        setIsProcessing(false);
-        return;
+      // Load Razorpay script if not already loaded
+      if (!scriptLoaded) {
+        const isLoaded = await loadRazorpayScript();
+        if (!isLoaded) {
+          toast.error('Failed to load payment gateway');
+          setIsProcessing(false);
+          return;
+        }
+        setScriptLoaded(true);
       }
       
       // Convert amount to paise (Razorpay requires amount in smallest currency unit)

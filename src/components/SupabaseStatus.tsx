@@ -7,16 +7,30 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const SupabaseStatus: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isChecking, setIsChecking] = useState(true);
+  const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
     const checkConnection = async () => {
+      // Only actively check if we haven't had too many errors
+      if (errorCount > 3) {
+        setIsConnected(false);
+        setIsChecking(false);
+        return;
+      }
+      
       setIsChecking(true);
       try {
         const connected = await checkSupabaseConnection();
         setIsConnected(connected);
+        if (!connected) {
+          setErrorCount(prev => prev + 1);
+        } else {
+          setErrorCount(0); // Reset error count on success
+        }
       } catch (error) {
         console.error('Error checking Supabase connection:', error);
         setIsConnected(false);
+        setErrorCount(prev => prev + 1);
       } finally {
         setIsChecking(false);
       }
@@ -24,14 +38,18 @@ const SupabaseStatus: React.FC = () => {
 
     checkConnection();
     
-    // Re-check connection every 5 minutes
-    const interval = setInterval(checkConnection, 5 * 60 * 1000);
+    // Check less frequently if there are errors to prevent excessive refreshing
+    const interval = setInterval(
+      checkConnection, 
+      errorCount > 0 ? 30 * 60 * 1000 : 5 * 60 * 1000
+    );
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [errorCount]);
 
-  if (isChecking) {
+  if (isChecking && isConnected === null) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Database className="h-4 w-4" />
         <span>Checking Supabase...</span>
       </div>
@@ -60,13 +78,13 @@ const SupabaseStatus: React.FC = () => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center gap-2 text-sm text-red-500 cursor-help">
+          <div className="flex items-center gap-2 text-sm text-amber-500 cursor-help">
             <AlertCircle className="h-4 w-4" />
-            <span>Supabase Offline</span>
+            <span>Supabase Offline (Offline Mode)</span>
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Could not connect to Supabase. Please check your credentials.</p>
+          <p>Connection to Supabase is currently unavailable. Operating in offline mode.</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
