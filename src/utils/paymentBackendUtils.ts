@@ -34,7 +34,7 @@ export const processNeftPayment = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount,
+        amount: amount.toString(), // Convert number to string
         currency: 'INR',
         status: 'pending',
         payment_method: 'neft',
@@ -101,7 +101,7 @@ export const processCardPayment = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount,
+        amount: amount.toString(), // Convert number to string
         currency: 'INR',
         status: 'pending',
         payment_method: 'card',
