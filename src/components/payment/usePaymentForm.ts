@@ -24,7 +24,7 @@ interface PaymentFormData {
 export const usePaymentForm = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [qrCodeError, setQrCodeError] = useState(false);
+  const [qrCodeError, setQrCodeError] = useState(false); // Ensure we're exporting this state
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   
@@ -132,6 +132,7 @@ export const usePaymentForm = () => {
     loading,
     setLoading,
     qrCodeError,
+    setQrCodeError, // Make sure we're exporting this function
     qrCodeUrl,
     currentTransactionId,
     setCurrentTransactionId,

@@ -33,6 +33,7 @@ const PaymentFlow = () => {
     loading,
     setLoading,
     qrCodeError,
+    setQrCodeError, // Make sure this is included here from usePaymentForm
     qrCodeUrl,
     currentTransactionId,
     setCurrentTransactionId,
