@@ -1,9 +1,8 @@
-
 import { supabase } from './supabaseClient';
 import { toast } from 'sonner';
 import { Transaction, PaymentMethod } from '@/stores/transactionStore';
 import { v4 as uuidv4 } from 'uuid';
-import { createRazorpayOrder, processRazorpayPayment } from './razorpayUtils';
+import { createRazorpayOrder, processRazorpayPayment } from './razorpay';
 
 // Process NEFT payment
 export const processNeftPayment = async (

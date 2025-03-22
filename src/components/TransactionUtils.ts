@@ -36,9 +36,10 @@ export {
   processDirectPaymentCallback
 } from '@/components/webhook/paymentUtils';
 
-// Export Razorpay utilities
+// Export Razorpay utilities from the new location
 export {
   createRazorpayOrder,
   processRazorpayPayment,
   verifyRazorpayPayment
-} from '@/utils/razorpayUtils';
+} from '@/utils/razorpay';
+
