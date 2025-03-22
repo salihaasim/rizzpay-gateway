@@ -23,7 +23,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
       const fetchFn = fetch;
       // Add timeout to prevent hanging requests
       return Promise.race([
-        fetchFn(...args),
+        fetchFn(args[0], args[1]), // Use array indexing instead of spread
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Supabase request timeout')), 10000)
         ),
