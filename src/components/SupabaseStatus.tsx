@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { AlertCircle, CheckCircle, Database } from 'lucide-react';
 import { checkSupabaseConnection } from '@/utils/supabaseClient';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -8,38 +8,27 @@ const SupabaseStatus: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isChecking, setIsChecking] = useState(true);
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    const checkConnection = async () => {
-      if (!isMounted) return;
-      
-      setIsChecking(true);
-      try {
-        const connected = await checkSupabaseConnection();
-        if (isMounted) {
-          setIsConnected(connected);
-        }
-      } catch (error) {
-        if (isMounted) {
-          setIsConnected(false);
-        }
-      } finally {
-        if (isMounted) {
-          setIsChecking(false);
-        }
-      }
-    };
+  // Use useCallback to prevent recreating this function on every render
+  const checkConnection = useCallback(async () => {
+    setIsChecking(true);
+    try {
+      const connected = await checkSupabaseConnection();
+      setIsConnected(connected);
+    } catch (error) {
+      console.error('Error checking Supabase connection:', error);
+      setIsConnected(false);
+    } finally {
+      setIsChecking(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    // Only check connection once on mount, not on every render
     checkConnection();
     
-    // Check connection only once on mount, not periodically
-    // This prevents continuous API calls that might cause refreshes
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    // Cleanup function is empty because we're only checking once
+    return () => {};
+  }, [checkConnection]);
 
   if (isChecking && isConnected === null) {
     return (

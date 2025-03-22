@@ -1,62 +1,73 @@
 
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
+import { supabase as supabaseImport } from '@/integrations/supabase/client';
 
-// Create a singleton Supabase client with lazy initialization
-let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
+// Use imported supabase client to ensure singleton usage
+export const supabase = () => supabaseImport;
 
-// Default Supabase URL and key from environment or hardcoded values
-// In production, these should be in environment variables
-const SUPABASE_URL = "https://mogqmymxnienxqactuym.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZ3FteW14bmllbnhxYWN0dXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MzEwNTgsImV4cCI6MjA1ODEwNzA1OH0.Z2bzbA8aQQha2NhgA0M1F2R56Ewv8npqRgCj2S_70h4";
+// Cache and debounce connection checks
+let connectionStatus: boolean | null = null;
+let connectionCheckTimeout: ReturnType<typeof setTimeout> | null = null;
+let connectionCheckPromise: Promise<boolean> | null = null;
+const CONNECTION_CHECK_INTERVAL = 60000; // Only check once per minute at most
 
-// Add a flag to prevent excessive connection checks
-let connectionCheckInProgress = false;
-
-export const supabase = () => {
-  if (supabaseInstance) return supabaseInstance;
+// Helper function to check if Supabase connection is working with debouncing
+export const checkSupabaseConnection = async (): Promise<boolean> => {
+  // Return cached status if available and recent
+  if (connectionStatus !== null && connectionCheckPromise) {
+    return connectionCheckPromise;
+  }
   
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_KEY;
+  // Clear any existing timeout
+  if (connectionCheckTimeout) {
+    clearTimeout(connectionCheckTimeout);
+  }
   
-  // Create real Supabase client with the provided credentials
-  supabaseInstance = createClient<Database>(supabaseUrl, supabaseKey, {
-    auth: {
-      storage: localStorage,
-      persistSession: true,
-      autoRefreshToken: true,
+  // Create a new connection check promise
+  connectionCheckPromise = new Promise(async (resolve) => {
+    try {
+      // Simple ping to check connection
+      const { error } = await supabase()
+        .from('transactions')
+        .select('count', { count: 'exact', head: true })
+        .limit(1);
+        
+      connectionStatus = !error;
+      
+      // Schedule reset of connection status after interval
+      connectionCheckTimeout = setTimeout(() => {
+        connectionStatus = null;
+        connectionCheckPromise = null;
+      }, CONNECTION_CHECK_INTERVAL);
+      
+      resolve(connectionStatus);
+    } catch (error) {
+      console.error('Supabase connection error:', error);
+      connectionStatus = false;
+      resolve(false);
+      
+      // Still schedule reset but after shorter period on error
+      connectionCheckTimeout = setTimeout(() => {
+        connectionStatus = null;
+        connectionCheckPromise = null;
+      }, CONNECTION_CHECK_INTERVAL / 2);
     }
   });
-  return supabaseInstance;
-};
-
-// Helper function to check if Supabase connection is working
-export const checkSupabaseConnection = async (): Promise<boolean> => {
-  // Prevent multiple simultaneous connection checks
-  if (connectionCheckInProgress) {
-    return false;
-  }
   
-  connectionCheckInProgress = true;
-  
-  try {
-    // Simple ping to check connection
-    const { error } = await supabase()
-      .from('transactions')
-      .select('count', { count: 'exact', head: true });
-      
-    connectionCheckInProgress = false;
-    return !error;
-  } catch (error) {
-    console.error('Supabase connection error:', error);
-    connectionCheckInProgress = false;
-    return false;
-  }
+  return connectionCheckPromise;
 };
 
 // Function to sync transaction to Supabase - optimized to fail gracefully
 export const syncTransactionToSupabase = async (transaction: any) => {
   try {
+    // First check if we're connected before attempting sync
+    const isConnected = await checkSupabaseConnection();
+    if (!isConnected) {
+      console.warn('Skipping Supabase sync due to connection issues');
+      return false;
+    }
+    
     const { error } = await supabase()
       .from('transactions')
       .upsert({
@@ -70,7 +81,8 @@ export const syncTransactionToSupabase = async (transaction: any) => {
         description: transaction.description,
         processing_state: transaction.processingState,
         payment_details: transaction.paymentDetails,
-        processing_timeline: transaction.processingTimeline
+        processing_timeline: transaction.processingTimeline,
+        currency: 'INR' // Default currency
       });
 
     return !error;
@@ -80,10 +92,10 @@ export const syncTransactionToSupabase = async (transaction: any) => {
   }
 };
 
-// Function to fetch transactions from Supabase - optimized with caching
+// Improved caching for transactions
 let cachedTransactions: any[] = [];
 let lastFetchTime = 0;
-const CACHE_DURATION = 60000; // 1 minute
+const CACHE_DURATION = 300000; // 5 minutes cache
 
 export const fetchTransactionsFromSupabase = async (userEmail?: string) => {
   // Use cached transactions if available and not expired
@@ -94,6 +106,14 @@ export const fetchTransactionsFromSupabase = async (userEmail?: string) => {
   }
   
   try {
+    // Check connection first
+    const isConnected = await checkSupabaseConnection();
+    if (!isConnected) {
+      console.warn('Using cached transactions due to connection issues');
+      if (!userEmail) return cachedTransactions;
+      return cachedTransactions.filter(t => t.createdBy === userEmail);
+    }
+    
     let query = supabase()
       .from('transactions')
       .select('*');

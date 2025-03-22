@@ -1,57 +1,33 @@
 
-
-# Rizzpay - Payment Processing Platform
-
-A modern, responsive payment processing application built with React and TypeScript.
+# RizzPay Payment Gateway
 
 ## Performance Optimizations
 
-The application has been optimized for performance in the following ways:
+The application has been optimized to prevent unnecessary refreshes and improve performance:
 
-1. **React.memo and useCallback**: Critical components are wrapped with React.memo and event handlers use useCallback to prevent unnecessary re-renders.
+### Supabase Optimizations:
+- Singleton Supabase client pattern to prevent multiple instance creation
+- Debounced connection checks to reduce API calls
+- Connection timeouts to prevent hanging requests
+- Enhanced error handling for failed network requests
+- Improved caching strategy for transactions (5-minute cache)
 
-2. **Lazy Loading**: Components are loaded lazily using React's built-in lazy loading functionality to improve initial load time.
+### React Optimizations:
+- Components wrapped with React.memo to prevent unnecessary re-renders
+- Event handlers wrapped with useCallback to maintain referential equality
+- Optimized lazy loading with improved suspense boundaries
+- Added replace flag to navigations to prevent history stack issues
 
-3. **Suspense Boundaries**: Suspense is used to show loading states while components are being loaded.
+### Loading States:
+- Better loading indicators with fallback UI
+- Graceful degradation when Supabase is offline
+- Optimistic UI updates where possible
 
-4. **useMemo for Expensive Calculations**: Expensive calculations like statistics are wrapped in useMemo to avoid recalculation on every render.
+## Development Recommendations
 
-5. **Supabase Connection Optimization**: The connection to Supabase is optimized to reduce API calls and prevent excessive refreshing.
-
-6. **Caching Strategy**: API responses are cached to reduce the number of network requests.
-
-7. **Route Prefetching**: Common routes are prefetched to improve navigation performance.
-
-## Code Structure
-
-The codebase is organized into small, focused components for better maintainability:
-
-1. **Component Decomposition**: Large components are broken down into smaller, reusable pieces.
-   
-2. **Clear Separation of Concerns**: Components are designed with single responsibilities.
-
-3. **Custom Hooks**: Business logic is extracted into reusable hooks.
-
-## Key Components
-
-- **Payment Flow**: Handles the entire payment process from amount input to payment confirmation.
-- **Dashboard**: Displays key metrics and recent transactions.
-- **Transaction Management**: View and manage transaction history.
-- **Wallet Features**: Handle deposits, withdrawals, and transfers.
-
-## Technology Stack
-
-- React with TypeScript
-- Tailwind CSS for styling
-- Shadcn UI components
-- React Router for navigation
-- Zustand for state management
-- Supabase for backend services
-- Razorpay for payment processing
-
-## Getting Started
-
-1. Install dependencies: `npm install`
-2. Run the development server: `npm run dev`
-3. Open your browser at: `http://localhost:8080`
+1. Always use the imported Supabase client from `@/integrations/supabase/client` rather than creating new instances
+2. Wrap pure components with React.memo
+3. Use useCallback for event handlers passed as props
+4. Consider implementing proper data fetching patterns with React Query
+5. Split large components into smaller, focused ones
 

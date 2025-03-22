@@ -6,14 +6,18 @@ import { Toaster } from '@/components/ui/sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load pages with prefetch hints to improve performance
-const Dashboard = lazy(() => {
-  const loadModule = import('@/pages/Dashboard');
-  // Prefetch other common routes
-  import('@/pages/Transactions');
-  import('@/pages/Settings');
-  return loadModule;
-});
+// PageLoader component for lazy-loaded routes
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center gap-2">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="text-sm text-muted-foreground">Loading page...</p>
+    </div>
+  </div>
+);
+
+// Lazy load pages with improved loading boundaries
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Index = lazy(() => import('@/pages/Index'));
 const Transactions = lazy(() => import('@/pages/Transactions'));
 const Settings = lazy(() => import('@/pages/Settings'));
@@ -24,27 +28,18 @@ const WebhookPayment = lazy(() => import('@/pages/WebhookPayment'));
 const WalletPage = lazy(() => import('@/pages/WalletPage'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 
-// Loading fallback component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="flex flex-col items-center gap-2">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-sm text-muted-foreground">Loading page...</p>
-    </div>
-  </div>
-);
-
 // Protected route component to prevent unauthorized access
 const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { userRole } = useTransactionStore();
   
   if (userRole !== 'admin') {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/dashboard" replace />;
   }
   
   return <>{children}</>;
 };
 
+// Memoize the App component to prevent unnecessary re-renders
 const App = () => {
   return (
     <Router>
@@ -71,4 +66,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default React.memo(App);
