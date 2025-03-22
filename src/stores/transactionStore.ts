@@ -45,6 +45,10 @@ export interface PaymentDetails {
   buyerEmail?: string;
   paidAmount?: string;
   neftReference?: string;
+  razorpay_payment_id?: string;
+  razorpay_order_id?: string;
+  razorpay_signature?: string;
+  amountInPaise?: number;
 }
 
 export interface Transaction {

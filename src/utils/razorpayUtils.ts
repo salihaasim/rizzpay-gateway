@@ -163,15 +163,15 @@ export const processRazorpayPayment = async (
               return;
             }
             
-            // Convert the database payment_details to the expected PaymentDetails type
-            const paymentDetailsFromDB = data.payment_details;
+            // Create a properly typed PaymentDetails object from the JSON data
+            const paymentDetailsFromDB = data.payment_details as Record<string, any>;
             const typedPaymentDetails: PaymentDetails = {
-              processor: paymentDetailsFromDB?.processor,
-              cardNumber: paymentDetailsFromDB?.cardNumber,
-              cardHolderName: paymentDetailsFromDB?.cardHolderName,
-              razorpay_payment_id: paymentDetailsFromDB?.razorpay_payment_id,
-              razorpay_order_id: paymentDetailsFromDB?.razorpay_order_id,
-              razorpay_signature: paymentDetailsFromDB?.razorpay_signature
+              processor: paymentDetailsFromDB?.processor as string,
+              cardNumber: paymentDetailsFromDB?.cardNumber as string,
+              cardHolderName: paymentDetailsFromDB?.cardHolderName as string,
+              razorpay_payment_id: paymentDetailsFromDB?.razorpay_payment_id as string,
+              razorpay_order_id: paymentDetailsFromDB?.razorpay_order_id as string,
+              razorpay_signature: paymentDetailsFromDB?.razorpay_signature as string
             };
             
             // Format transaction for return
