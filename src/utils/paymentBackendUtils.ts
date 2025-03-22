@@ -3,6 +3,7 @@ import { supabase } from './supabaseClient';
 import { toast } from 'sonner';
 import { Transaction, PaymentMethod } from '@/stores/transactionStore';
 import { v4 as uuidv4 } from 'uuid';
+import { createRazorpayOrder, processRazorpayPayment } from './razorpayUtils';
 
 // Process NEFT payment
 export const processNeftPayment = async (
@@ -135,6 +136,92 @@ export const processCardPayment = async (
   } catch (error) {
     console.error('Card payment processing error:', error);
     toast.error('An error occurred while processing card payment');
+    return null;
+  }
+};
+
+// Process Razorpay payment
+export const processRazorpayNeftPayment = async (
+  amount: number,
+  customerName: string,
+  customerEmail: string | undefined,
+  bankDetails: {
+    accountNumber: string;
+    ifscCode: string;
+    bankName: string;
+  }
+): Promise<Transaction | null> => {
+  try {
+    // Create Razorpay order
+    const orderResult = await createRazorpayOrder(
+      amount,
+      'INR',
+      'razorpay_neft',
+      customerName,
+      customerEmail,
+      `NEFT Payment via ${bankDetails.bankName}`
+    );
+    
+    if (!orderResult) {
+      return null;
+    }
+    
+    // Process the payment using Razorpay
+    return await processRazorpayPayment({
+      orderId: orderResult.orderId,
+      transactionId: orderResult.transactionId,
+      amount: amount,
+      currency: 'INR',
+      customerName: customerName,
+      customerEmail: customerEmail,
+      description: `NEFT Payment via ${bankDetails.bankName}`
+    });
+  } catch (error) {
+    console.error('Razorpay NEFT payment processing error:', error);
+    toast.error('An error occurred while processing Razorpay NEFT payment');
+    return null;
+  }
+};
+
+// Process Razorpay card payment
+export const processRazorpayCardPayment = async (
+  amount: number,
+  customerName: string,
+  customerEmail: string | undefined,
+  cardDetails: {
+    cardNumber: string;
+    cardExpiry: string;
+    cardHolderName: string;
+  }
+): Promise<Transaction | null> => {
+  try {
+    // Create Razorpay order
+    const orderResult = await createRazorpayOrder(
+      amount,
+      'INR',
+      'razorpay_card',
+      customerName,
+      customerEmail,
+      'Card Payment'
+    );
+    
+    if (!orderResult) {
+      return null;
+    }
+    
+    // Process the payment using Razorpay
+    return await processRazorpayPayment({
+      orderId: orderResult.orderId,
+      transactionId: orderResult.transactionId,
+      amount: amount,
+      currency: 'INR',
+      customerName: customerName,
+      customerEmail: customerEmail,
+      description: 'Card Payment'
+    });
+  } catch (error) {
+    console.error('Razorpay card payment processing error:', error);
+    toast.error('An error occurred while processing Razorpay card payment');
     return null;
   }
 };
