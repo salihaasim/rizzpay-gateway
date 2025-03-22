@@ -1,6 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { PaymentMethod } from '@/stores/transactionStore';
+import { delay } from '@/utils/commonUtils';
 
 interface PaymentFormData {
   amount: string;
@@ -24,7 +25,7 @@ interface PaymentFormData {
 export const usePaymentForm = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [qrCodeError, setQrCodeError] = useState(false); // Ensure we're exporting this state
+  const [qrCodeError, setQrCodeError] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   
@@ -34,7 +35,7 @@ export const usePaymentForm = () => {
     paymentMethod: 'card' as PaymentMethod,
     upiId: 'salihaasimdevloper-4@okaxis', // Default UPI ID
     name: '',
-    transactionId: '',
+    transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000),
     paymentStatus: '',
     cardNumber: '',
     cardExpiry: '',
@@ -47,36 +48,27 @@ export const usePaymentForm = () => {
     customerEmail: ''
   });
 
-  // Generate transaction ID only once on component mount
-  useEffect(() => {
-    const randomId = 'RIZZPAY' + Math.floor(Math.random() * 10000000);
-    setPaymentData(prev => ({
-      ...prev,
-      transactionId: randomId
-    }));
-  }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPaymentData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleSelectChange = (name: string, value: string) => {
+  const handleSelectChange = useCallback((name: string, value: string) => {
     setPaymentData(prev => ({ ...prev, [name]: value }));
     
     // Clear QR code when changing payment method
     if (name === 'paymentMethod') {
       setQrCodeUrl('');
     }
-  };
+  }, []);
 
-  const validateUpiId = (upiId: string): boolean => {
+  const validateUpiId = useCallback((upiId: string): boolean => {
     // Basic UPI ID validation (alphanumeric@provider format)
     const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
     return upiRegex.test(upiId);
-  };
+  }, []);
 
-  const generateUpiQrCode = () => {
+  const generateUpiQrCode = useCallback(() => {
     if (!validateUpiId(paymentData.upiId) || !paymentData.amount) {
       return;
     }
@@ -95,17 +87,17 @@ export const usePaymentForm = () => {
       console.error("QR code generation error:", error);
       setQrCodeError(true);
     }
-  };
+  }, [paymentData.upiId, paymentData.amount, paymentData.name, paymentData.currency, paymentData.transactionId, validateUpiId]);
 
-  const handleQrCodeError = () => {
+  const handleQrCodeError = useCallback(() => {
     setQrCodeError(false);
     setQrCodeUrl('');
     setTimeout(() => {
       generateUpiQrCode();
     }, 500);
-  };
+  }, [generateUpiQrCode]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setStep(1);
     setPaymentData(prev => ({
       ...prev,
@@ -115,16 +107,16 @@ export const usePaymentForm = () => {
     }));
     setCurrentTransactionId(null);
     setQrCodeUrl('');
-  };
+  }, []);
 
-  const getCurrencySymbol = (currency: string) => {
+  const getCurrencySymbol = useCallback((currency: string) => {
     switch (currency) {
       case 'INR': return '₹';
       case 'USD': return '$';
       case 'EUR': return '€';
       default: return '₹';
     }
-  };
+  }, []);
 
   return {
     step,
@@ -132,7 +124,7 @@ export const usePaymentForm = () => {
     loading,
     setLoading,
     qrCodeError,
-    setQrCodeError, // Make sure we're exporting this function
+    setQrCodeError,
     qrCodeUrl,
     currentTransactionId,
     setCurrentTransactionId,

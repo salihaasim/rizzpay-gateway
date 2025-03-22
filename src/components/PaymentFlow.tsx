@@ -1,21 +1,18 @@
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { showTransactionNotification } from '@/utils/notificationUtils';
 import { usePaymentForm } from './payment/usePaymentForm';
 
 // Lazy load components for better initial loading performance
 const PaymentAmountForm = lazy(() => import('./payment/PaymentAmountForm'));
 const PaymentMethodComponent = lazy(() => import('./payment/PaymentMethod'));
 const PaymentSuccess = lazy(() => import('./payment/PaymentSuccess'));
-const UpiPayment = lazy(() => import('./payment/UpiPayment'));
 const RazorpayPaymentHandler = lazy(() => import('./payment/RazorpayPaymentHandler'));
 const UpiPaymentHandler = lazy(() => import('./payment/UpiPaymentHandler'));
-const PaymentSummary = lazy(() => import('./payment/PaymentSummary'));
 const PaymentSuccessActions = lazy(() => import('./payment/PaymentSuccessActions'));
 
 // Loading fallback component
@@ -33,7 +30,7 @@ const PaymentFlow = () => {
     loading,
     setLoading,
     qrCodeError,
-    setQrCodeError, // Make sure this is included here from usePaymentForm
+    setQrCodeError,
     qrCodeUrl,
     currentTransactionId,
     setCurrentTransactionId,
@@ -53,16 +50,16 @@ const PaymentFlow = () => {
     if (step === 2 && paymentData.paymentMethod === 'upi' && paymentData.upiId && validateUpiId(paymentData.upiId)) {
       generateUpiQrCode();
     }
-  }, [step, paymentData.upiId, paymentData.paymentMethod, paymentData.amount]);
+  }, [step, paymentData.upiId, paymentData.paymentMethod, paymentData.amount, generateUpiQrCode, validateUpiId]);
 
   // Reset QR code error state when UPI ID changes
   useEffect(() => {
     if (paymentData.paymentMethod === 'upi') {
       setQrCodeError(false);
     }
-  }, [paymentData.upiId]);
+  }, [paymentData.upiId, paymentData.paymentMethod, setQrCodeError]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (step === 1) {
       if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
         toast.error('Please enter a valid amount');
@@ -76,9 +73,9 @@ const PaymentFlow = () => {
       
       setStep(2);
     }
-  };
+  }, [step, paymentData.amount, paymentData.name, setStep]);
 
-  const handlePaymentSuccess = (transactionId: string) => {
+  const handlePaymentSuccess = useCallback((transactionId: string) => {
     setCurrentTransactionId(transactionId);
     setPaymentData(prev => ({
       ...prev,
@@ -86,17 +83,17 @@ const PaymentFlow = () => {
     }));
     setStep(3);
     setLoading(false);
-  };
+  }, [setCurrentTransactionId, setPaymentData, setStep, setLoading]);
 
-  const handlePaymentError = () => {
+  const handlePaymentError = useCallback(() => {
     setLoading(false);
-  };
+  }, [setLoading]);
 
-  const handleViewTransaction = () => {
+  const handleViewTransaction = useCallback(() => {
     if (currentTransactionId) {
       navigate(`/transactions?id=${currentTransactionId}`);
     }
-  };
+  }, [currentTransactionId, navigate]);
 
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
@@ -117,25 +114,24 @@ const PaymentFlow = () => {
           )}
           
           {step === 2 && paymentData.paymentMethod !== 'upi' && (
-            <>
-              <PaymentMethodComponent
-                paymentMethod={paymentData.paymentMethod}
-                paymentData={paymentData}
-                handleInputChange={handleInputChange}
-                loading={loading}
-              />
-            </>
+            <PaymentMethodComponent
+              paymentMethod={paymentData.paymentMethod}
+              paymentData={paymentData}
+              handleInputChange={handleInputChange}
+              loading={loading}
+            />
           )}
           
           {step === 2 && paymentData.paymentMethod === 'upi' && (
-            <UpiPayment
-              paymentData={paymentData}
-              handleInputChange={handleInputChange}
-              validateUpiId={validateUpiId}
-              qrCodeUrl={qrCodeUrl}
-              qrCodeError={qrCodeError}
+            <PaymentSuccess
+              paymentData={{
+                ...paymentData,
+                upiId: paymentData.upiId,
+                qrCodeUrl: qrCodeUrl,
+                qrCodeError: qrCodeError
+              }}
+              getCurrencySymbol={getCurrencySymbol}
               handleQrCodeError={handleQrCodeError}
-              handleUpiPayment={() => {}}
             />
           )}
           

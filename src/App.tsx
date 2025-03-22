@@ -6,8 +6,14 @@ import { Toaster } from '@/components/ui/sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load pages to improve performance and reduce initial load time
-const Dashboard = lazy(() => import('@/pages/Dashboard'));
+// Lazy load pages with prefetch hints to improve performance
+const Dashboard = lazy(() => {
+  const loadModule = import('@/pages/Dashboard');
+  // Prefetch other common routes
+  import('@/pages/Transactions');
+  import('@/pages/Settings');
+  return loadModule;
+});
 const Index = lazy(() => import('@/pages/Index'));
 const Transactions = lazy(() => import('@/pages/Transactions'));
 const Settings = lazy(() => import('@/pages/Settings'));

@@ -7,45 +7,39 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const SupabaseStatus: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isChecking, setIsChecking] = useState(true);
-  const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const checkConnection = async () => {
-      // Only actively check if we haven't had too many errors
-      if (errorCount > 3) {
-        setIsConnected(false);
-        setIsChecking(false);
-        return;
-      }
+      if (!isMounted) return;
       
       setIsChecking(true);
       try {
         const connected = await checkSupabaseConnection();
-        setIsConnected(connected);
-        if (!connected) {
-          setErrorCount(prev => prev + 1);
-        } else {
-          setErrorCount(0); // Reset error count on success
+        if (isMounted) {
+          setIsConnected(connected);
         }
       } catch (error) {
-        console.error('Error checking Supabase connection:', error);
-        setIsConnected(false);
-        setErrorCount(prev => prev + 1);
+        if (isMounted) {
+          setIsConnected(false);
+        }
       } finally {
-        setIsChecking(false);
+        if (isMounted) {
+          setIsChecking(false);
+        }
       }
     };
 
     checkConnection();
     
-    // Check less frequently if there are errors to prevent excessive refreshing
-    const interval = setInterval(
-      checkConnection, 
-      errorCount > 0 ? 30 * 60 * 1000 : 5 * 60 * 1000
-    );
+    // Check connection only once on mount, not periodically
+    // This prevents continuous API calls that might cause refreshes
     
-    return () => clearInterval(interval);
-  }, [errorCount]);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   if (isChecking && isConnected === null) {
     return (
@@ -91,4 +85,4 @@ const SupabaseStatus: React.FC = () => {
   );
 };
 
-export default SupabaseStatus;
+export default React.memo(SupabaseStatus);

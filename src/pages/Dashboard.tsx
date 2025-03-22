@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
@@ -9,6 +10,7 @@ import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 
+// Static data to prevent recomputation
 const chartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -49,6 +51,8 @@ const RevenueChart = React.memo(() => (
   </div>
 ));
 
+RevenueChart.displayName = 'RevenueChart';
+
 interface RecentTransactionsListProps {
   transactions: Transaction[];
 }
@@ -86,18 +90,18 @@ const Dashboard = () => {
       }
     }
     
-    const customerEmails = [];
-    for (const t of transactions) {
-      if (!customerEmails.includes(t.customer)) {
-        customerEmails.push(t.customer);
+    const customerEmails = new Set();
+    transactions.forEach(t => {
+      if (t.customer) {
+        customerEmails.add(t.customer);
       }
-    }
+    });
 
     const avgTxn = successfulTxns.length > 0 ? revenue / successfulTxns.length : 0;
     
     return { 
       totalRevenue: revenue, 
-      uniqueCustomers: customerEmails.length, 
+      uniqueCustomers: customerEmails.size, 
       avgTransaction: avgTxn 
     };
   }, [transactions]);
