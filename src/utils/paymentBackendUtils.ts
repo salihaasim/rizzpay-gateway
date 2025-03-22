@@ -30,11 +30,12 @@ export const processNeftPayment = async (
     };
     
     // Store the transaction in Supabase
+    // Convert the amount to a number before storing it (amount column is numeric type)
     const { data, error } = await supabase()
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount.toString(), // Convert number to string
+        amount: amount, // Use number directly as the database expects it
         currency: 'INR',
         status: 'pending',
         payment_method: 'neft',
@@ -57,7 +58,7 @@ export const processNeftPayment = async (
       id: data.id,
       date: new Date(data.date).toISOString(),
       amount: `₹${data.amount}`,
-      rawAmount: parseFloat(data.amount),
+      rawAmount: parseFloat(data.amount), // Convert to number in case it returns as string
       paymentMethod: 'neft' as PaymentMethod,
       status: 'pending',
       customer: customerName,
@@ -101,7 +102,7 @@ export const processCardPayment = async (
       .from('transactions')
       .insert({
         id: transactionId,
-        amount: amount.toString(), // Convert number to string
+        amount: amount, // Use number directly as the database expects it
         currency: 'INR',
         status: 'pending',
         payment_method: 'card',
@@ -124,7 +125,7 @@ export const processCardPayment = async (
       id: data.id,
       date: new Date(data.date).toISOString(),
       amount: `₹${data.amount}`,
-      rawAmount: parseFloat(data.amount),
+      rawAmount: parseFloat(data.amount), // Convert to number in case it returns as string
       paymentMethod: 'card' as PaymentMethod,
       status: 'pending',
       customer: customerName,
