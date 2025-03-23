@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { addTransaction } from '../TransactionUtils';
+import { getPaymentStateLabel } from '@/utils/statusUtils';
 
 interface UpiPaymentHandlerProps {
   paymentData: {
@@ -37,18 +38,24 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     setLoading(true);
     
     try {
-      // Create a transaction entry
+      // Create a transaction entry with UPI payment details
       const transaction = addTransaction(
         paymentData.amount,
         'upi',
         'pending',
         paymentData.name,
-        {}
+        {
+          upiId: paymentData.upiId,
+          paymentMethod: 'upi',
+          paymentProcessor: 'upi_direct'
+        }
       );
       
       // Simulate UPI payment processing
       console.log(`Simulating UPI payment to ${paymentData.upiId} for ${paymentData.amount}`);
-      toast.success(`Payment request sent to UPI ID: ${paymentData.upiId}`);
+      toast.success(`Payment request sent to UPI ID: ${paymentData.upiId}`, {
+        description: "Check your UPI app for payment confirmation"
+      });
       
       // Simulate delay
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -73,10 +80,12 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
         </>
       ) : (
-        <>Pay with UPI</>
+        <>
+          <Smartphone className="mr-2 h-4 w-4" /> Pay with UPI
+        </>
       )}
     </Button>
   );
 };
 
-export default UpiPaymentHandler;
+export default React.memo(UpiPaymentHandler);

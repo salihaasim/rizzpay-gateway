@@ -2,8 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, QrCode, Send, AlertCircle } from 'lucide-react';
+import { 
+  Loader2, 
+  QrCode, 
+  Send, 
+  AlertCircle, 
+  Smartphone, 
+  Copy, 
+  Link, 
+  Check
+} from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import { toast } from 'sonner';
 
 interface UpiPaymentProps {
   paymentData: any;
@@ -15,6 +36,40 @@ interface UpiPaymentProps {
   handleUpiPayment: () => void;
   isLoading?: boolean;
 }
+
+interface UpiApp {
+  id: string;
+  name: string;
+  logo: string;
+  packageName?: string;
+}
+
+const UPI_APPS: UpiApp[] = [
+  { 
+    id: 'gpay', 
+    name: 'Google Pay',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/120px-Google_%22G%22_logo.svg.png',
+    packageName: 'com.google.android.apps.nbu.paisa.user'
+  },
+  { 
+    id: 'phonepe', 
+    name: 'PhonePe',
+    logo: 'https://play-lh.googleusercontent.com/6iyA2zVz5PyyMjK5SIxdUhrb7oh9cYVXJ93q6DZkmx07Er1o90PXYeo6mzL4VC2Gj9s=w240-h480-rw',
+    packageName: 'com.phonepe.app'
+  },
+  { 
+    id: 'paytm', 
+    name: 'Paytm',
+    logo: 'https://play-lh.googleusercontent.com/6_Qan3RBgpJUj0C2ct4l0rKKVdiJgF6vy0ctfWyQ7uw-0BxumXijwEKYgSaZZ8NU5cY=w240-h480-rw',
+    packageName: 'net.one97.paytm'
+  },
+  { 
+    id: 'bhim', 
+    name: 'BHIM',
+    logo: 'https://play-lh.googleusercontent.com/B5cNBA15IxjCT-8UTXEWgiPcGkJ1C07iHKwm2Hbs8xR3PnJvZ0swTag3abdRsNjzBKc=w240-h480-rw',
+    packageName: 'in.org.npci.upiapp'
+  }
+];
 
 const UpiPayment: React.FC<UpiPaymentProps> = ({
   paymentData,
@@ -29,6 +84,9 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   const [upiId, setUpiId] = useState(paymentData.upiId || '');
   const [isValid, setIsValid] = useState(false);
   const [qrLoading, setQrLoading] = useState(true);
+  const [paymentLink, setPaymentLink] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [selectedApp, setSelectedApp] = useState<UpiApp | null>(null);
   
   // Update parent component when UPI ID changes
   const handleUpiIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +101,21 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     } as React.ChangeEvent<HTMLInputElement>);
   };
   
+  // Generate payment link
+  useEffect(() => {
+    if (paymentData.amount && upiId && isValid) {
+      // Format the UPI payment URL (upi://pay format)
+      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}&tr=${paymentData.transactionId || ''}`;
+      
+      // Web link for sharing
+      const webLink = `https://upi.link/pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}`;
+      
+      setPaymentLink(webLink);
+    } else {
+      setPaymentLink('');
+    }
+  }, [paymentData.amount, upiId, isValid, paymentData.name, paymentData.currency, paymentData.transactionId]);
+  
   // Handle QR code load events
   const handleQrCodeLoad = () => {
     setQrLoading(false);
@@ -51,6 +124,48 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   const handleQrCodeLoadError = () => {
     setQrLoading(false);
     handleQrCodeError();
+  };
+
+  // Copy payment link to clipboard
+  const copyPaymentLink = () => {
+    if (paymentLink) {
+      navigator.clipboard.writeText(paymentLink)
+        .then(() => {
+          setLinkCopied(true);
+          toast.success('Payment link copied to clipboard');
+          setTimeout(() => setLinkCopied(false), 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy:', err);
+          toast.error('Failed to copy link');
+        });
+    }
+  };
+
+  // Open UPI app with payment data
+  const openUpiApp = (app: UpiApp) => {
+    setSelectedApp(app);
+    
+    if (!isValid || !paymentData.amount) {
+      toast.error('Please enter a valid UPI ID and amount');
+      return;
+    }
+    
+    // Format the UPI payment URL (upi://pay format)
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}&tr=${paymentData.transactionId || ''}`;
+    
+    // Try to open the UPI app
+    try {
+      window.location.href = upiUrl;
+      
+      // Display toast notification
+      toast.info(`Opening ${app.name}...`, {
+        description: 'If the app doesn\'t open, please try another method.'
+      });
+    } catch (error) {
+      console.error('Error opening UPI app:', error);
+      toast.error('Failed to open UPI app');
+    }
   };
   
   useEffect(() => {
@@ -75,25 +190,54 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
           </div>
         </div>
         
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">UPI ID</label>
-            <Input 
-              placeholder="your-name@upi" 
-              value={upiId}
-              onChange={handleUpiIdChange}
-            />
-            {upiId && !isValid && (
-              <p className="text-xs text-destructive mt-1 flex items-center">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                Please enter a valid UPI ID (e.g. name@bank)
-              </p>
-            )}
-          </div>
+        <Tabs defaultValue="upi-id" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="upi-id">UPI ID</TabsTrigger>
+            <TabsTrigger value="qr-code">QR Code</TabsTrigger>
+            <TabsTrigger value="apps">UPI Apps</TabsTrigger>
+          </TabsList>
           
-          {qrCodeUrl && (
-            <div className="flex flex-col items-center space-y-2 py-2">
-              <p className="text-sm font-medium">Or scan QR code</p>
+          <TabsContent value="upi-id" className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">UPI ID</label>
+              <Input 
+                placeholder="your-name@upi" 
+                value={upiId}
+                onChange={handleUpiIdChange}
+              />
+              {upiId && !isValid && (
+                <p className="text-xs text-destructive mt-1 flex items-center">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Please enter a valid UPI ID (e.g. name@bank)
+                </p>
+              )}
+            </div>
+            
+            {isValid && paymentLink && (
+              <div className="flex items-center space-x-2">
+                <Input 
+                  value={paymentLink}
+                  readOnly
+                  className="flex-1 text-sm pr-20"
+                />
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={copyPaymentLink}
+                  className="absolute right-6"
+                >
+                  {linkCopied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="qr-code" className="flex flex-col items-center space-y-2 py-2">
+            {qrCodeUrl ? (
               <div className="relative h-48 w-48 bg-white p-2 rounded-lg border">
                 {qrLoading && (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -115,33 +259,102 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                   />
                 )}
               </div>
-            </div>
-          )}
-          
-          <div className="p-3 bg-muted/50 rounded flex items-start">
-            <div className="mr-2 mt-0.5">
-              <AlertCircle size={16} className="text-muted-foreground" />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Please ensure you enter a correct UPI ID. After payment, you'll receive confirmation from your UPI app.
-            </p>
-          </div>
-          
-          <Button 
-            onClick={handleUpiPayment}
-            disabled={isLoading || (!isValid && !qrCodeUrl)}
-            className="w-full"
-          >
-            {isLoading ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
             ) : (
-              <><Send className="mr-2 h-4 w-4" /> Pay Now</>
+              <div className="flex flex-col items-center justify-center h-48 w-48 border rounded-lg">
+                <QrCode className="h-10 w-10 text-muted-foreground mb-2" />
+                <p className="text-sm text-center text-muted-foreground px-4">
+                  Enter a valid UPI ID to generate QR code
+                </p>
+              </div>
             )}
-          </Button>
+            
+            <p className="text-xs text-muted-foreground text-center max-w-xs">
+              Scan this QR code with any UPI app to make the payment
+            </p>
+          </TabsContent>
+          
+          <TabsContent value="apps" className="space-y-4">
+            <p className="text-sm text-muted-foreground">Choose a UPI app to pay:</p>
+            <div className="grid grid-cols-4 gap-3">
+              {UPI_APPS.map(app => (
+                <button
+                  key={app.id}
+                  onClick={() => openUpiApp(app)}
+                  className="flex flex-col items-center p-2 border rounded-lg hover:bg-accent transition-colors"
+                >
+                  <img 
+                    src={app.logo} 
+                    alt={app.name} 
+                    className="h-10 w-10 rounded-full object-contain mb-1"
+                  />
+                  <span className="text-xs text-center font-medium">{app.name}</span>
+                </button>
+              ))}
+            </div>
+            
+            <div className="flex justify-center">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="link" size="sm" className="text-xs">
+                    <Link className="h-3 w-3 mr-1" />
+                    Get payment link
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">Payment Link</h4>
+                    <div className="flex items-center space-x-2">
+                      <Input 
+                        value={paymentLink || "Enter valid UPI ID first"}
+                        readOnly
+                        className="flex-1 text-xs"
+                      />
+                      <Button 
+                        size="icon"
+                        variant="outline"
+                        onClick={copyPaymentLink}
+                        disabled={!paymentLink}
+                      >
+                        {linkCopied ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Share this link to collect payment
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </TabsContent>
+        </Tabs>
+      
+        <div className="p-3 bg-muted/50 rounded flex items-start mt-4">
+          <div className="mr-2 mt-0.5">
+            <AlertCircle size={16} className="text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Please ensure you enter a correct UPI ID. After payment, you'll receive confirmation from your UPI app.
+          </p>
         </div>
+        
+        <Button 
+          onClick={handleUpiPayment}
+          disabled={isLoading || (!isValid && !qrCodeUrl)}
+          className="w-full mt-4"
+        >
+          {isLoading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
+          ) : (
+            <><Send className="mr-2 h-4 w-4" /> Pay Now</>
+          )}
+        </Button>
       </div>
     </>
   );
 };
 
-export default UpiPayment;
+export default React.memo(UpiPayment);

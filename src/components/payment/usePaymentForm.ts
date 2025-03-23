@@ -33,7 +33,7 @@ export const usePaymentForm = () => {
     amount: '',
     currency: 'INR',
     paymentMethod: 'card' as PaymentMethod,
-    upiId: 'salihaasimdevloper-4@okaxis', // Default UPI ID
+    upiId: 'yourname@okaxis', // Default UPI ID template
     name: '',
     transactionId: 'RIZZPAY' + Math.floor(Math.random() * 10000000),
     paymentStatus: '',
@@ -63,7 +63,7 @@ export const usePaymentForm = () => {
   }, []);
 
   const validateUpiId = useCallback((upiId: string): boolean => {
-    // Basic UPI ID validation (alphanumeric@provider format)
+    // Enhanced UPI ID validation (alphanumeric@provider format)
     const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
     return upiRegex.test(upiId);
   }, []);
