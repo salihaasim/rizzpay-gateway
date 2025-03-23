@@ -46,9 +46,9 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
         paymentData.name,
         {
           upiId: paymentData.upiId,
-          // Remove paymentMethod as it's not in the PaymentDetails type
-          // Instead we set the method at the transaction level
-          paymentProcessor: 'upi_direct'
+          // We only include properties that exist in the PaymentDetails type
+          // The payment method is already passed as a separate parameter to addTransaction
+          gateway: 'upi_direct'
         }
       );
       
