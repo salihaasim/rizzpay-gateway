@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
@@ -9,6 +9,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
+import { Separator } from '@/components/ui/separator';
 
 // Static data to prevent recomputation
 const chartData = [
@@ -28,14 +29,15 @@ const RevenueChart = React.memo(() => (
         data={chartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-        <XAxis dataKey="name" stroke="#888" fontSize={12} />
-        <YAxis stroke="#888" fontSize={12} />
+        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
         <Tooltip
           contentStyle={{
-            backgroundColor: "white",
-            border: "1px solid #f0f0f0",
-            borderRadius: "8px",
+            backgroundColor: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
+            borderRadius: "var(--radius)",
+            color: "hsl(var(--card-foreground))"
           }}
         />
         <Line
@@ -43,8 +45,8 @@ const RevenueChart = React.memo(() => (
           dataKey="value"
           stroke="hsl(var(--primary))"
           strokeWidth={2}
-          dot={{ strokeWidth: 2, r: 4 }}
-          activeDot={{ r: 6 }}
+          dot={{ strokeWidth: 2, r: 4, fill: "hsl(var(--background))" }}
+          activeDot={{ r: 6, fill: "hsl(var(--primary))" }}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -64,7 +66,7 @@ const RecentTransactionsList = React.memo(({ transactions }: RecentTransactionsL
         <TransactionCard key={transaction.id} {...transaction} />
       ))
     ) : (
-      <div className="text-center py-12 border rounded-lg">
+      <div className="text-center py-12 border rounded-lg bg-secondary/30">
         <p className="text-muted-foreground">No transactions yet</p>
       </div>
     )}
@@ -116,11 +118,11 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="container px-4 pt-20 pb-16 mx-auto">
-        <div className="flex flex-col md:flex-row items-baseline justify-between mb-8">
+      <div className="content-wrapper">
+        <div className="page-header">
           <div>
-            <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
-            <p className="text-muted-foreground">
+            <h1 className="page-title">Dashboard</h1>
+            <p className="page-description">
               {userRole === 'admin' ? 'Admin Control Panel' : 'Merchant Dashboard'}
             </p>
           </div>
@@ -140,7 +142,7 @@ const Dashboard = () => {
           )}
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <StatCard
             title="Total Revenue"
             value={`₹${totalRevenue.toLocaleString('en-IN')}`}
@@ -171,7 +173,7 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2 border-0 shadow-sm overflow-hidden">
+          <Card className="lg:col-span-2 dashboard-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-medium">Revenue Overview</CardTitle>
               <CardDescription>Daily transaction volume</CardDescription>
@@ -181,36 +183,38 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           
-          <Card className="border-0 shadow-sm overflow-hidden">
+          <Card className="dashboard-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
               <CardDescription>24 hours performance</CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-4">
-                <div className="flex items-center">
+                <div className="flex items-center p-3 bg-emerald-500/5 rounded-lg">
                   <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mr-3">
                     <ArrowUpRight className="h-5 w-5 text-emerald-500" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">Incoming</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-emerald-500 font-semibold ml-auto">+₹{totalRevenue.toLocaleString('en-IN')}</p>
+                  <p className="text-emerald-500 font-semibold">+₹{totalRevenue.toLocaleString('en-IN')}</p>
                 </div>
                 
-                <div className="flex items-center">
+                <div className="flex items-center p-3 bg-rose-500/5 rounded-lg">
                   <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center mr-3">
                     <ArrowDownRight className="h-5 w-5 text-rose-500" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">Outgoing</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-rose-500 font-semibold ml-auto">-₹0</p>
+                  <p className="text-rose-500 font-semibold">-₹0</p>
                 </div>
                 
-                <div className="pt-4 border-t">
+                <Separator className="my-4" />
+                
+                <div className="px-3">
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-muted-foreground">Available Balance</div>
                     <div className="text-xl font-semibold">₹{totalRevenue.toLocaleString('en-IN')}</div>
@@ -223,15 +227,17 @@ const Dashboard = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-6">
-            <h2 className="text-xl font-semibold">Recent Transactions</h2>
+            <h2 className="section-heading">Recent Transactions</h2>
             <RecentTransactionsList transactions={recentTxns} />
           </div>
           
           <div className="lg:col-span-2">
-            <h2 className="text-xl font-semibold mb-6">Quick Payment</h2>
-            <div className="p-4 h-full">
-              <PaymentFlow />
-            </div>
+            <h2 className="section-heading">Quick Payment</h2>
+            <Card className="dashboard-card border border-border/50">
+              <CardContent className="p-4">
+                <PaymentFlow />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
