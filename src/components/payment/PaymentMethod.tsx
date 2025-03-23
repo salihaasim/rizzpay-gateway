@@ -1,7 +1,9 @@
+
 import React from 'react';
 import CardPayment from './CardPayment';
 import NetBankingPayment from './NetBankingPayment';
 import UpiPayment from './UpiPayment';
+import { AlertCircle } from 'lucide-react';
 
 interface PaymentMethodProps {
   paymentMethod: string;
@@ -21,6 +23,26 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     // Basic UPI ID validation (alphanumeric@provider format)
     const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
     return upiRegex.test(upiId);
+  };
+
+  // Generate QR code for UPI
+  const generateQrCode = () => {
+    if (!validateUpiId(paymentData.upiId) || !paymentData.amount) {
+      return "";
+    }
+    
+    try {
+      // Format the UPI payment URL (upi://pay format)
+      const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}&tr=${paymentData.transactionId}`;
+      
+      // Generate QR code URL using a third-party service
+      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+      
+      return qrCodeApiUrl;
+    } catch (error) {
+      console.error("QR code generation error:", error);
+      return "";
+    }
   };
 
   // Placeholder functions needed for UpiPayment props
@@ -96,10 +118,11 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
             paymentData={paymentData}
             handleInputChange={handleInputChange}
             validateUpiId={validateUpiId}
-            qrCodeUrl=""
+            qrCodeUrl={generateQrCode()}
             qrCodeError={false}
             handleQrCodeError={handleQrCodeError}
             handleUpiPayment={handleUpiPayment}
+            isLoading={loading}
           />
         )}
       </div>

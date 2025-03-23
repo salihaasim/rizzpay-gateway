@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
@@ -123,20 +122,35 @@ const PaymentFlow = () => {
           )}
           
           {step === 2 && paymentData.paymentMethod === 'upi' && (
-            <PaymentSuccess
-              paymentData={{
-                transactionId: paymentData.transactionId,
-                amount: paymentData.amount,
-                currency: paymentData.currency,
-                paymentDetails: {
-                  upiId: paymentData.upiId
-                },
-                qrCodeUrl: qrCodeUrl,
-                qrCodeError: qrCodeError
-              }}
-              getCurrencySymbol={getCurrencySymbol}
-              handleQrCodeError={handleQrCodeError}
-            />
+            <>
+              <div className="bg-secondary rounded-lg p-4 mb-4">
+                <div className="text-sm text-muted-foreground mb-1">Amount</div>
+                <div className="text-2xl font-semibold">
+                  {getCurrencySymbol(paymentData.currency)} {paymentData.amount}
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">
+                  Transaction ID: {paymentData.transactionId}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">UPI ID</label>
+                <input 
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="your-name@upi" 
+                  value={paymentData.upiId}
+                  onChange={(e) => handleInputChange({
+                    target: { name: 'upiId', value: e.target.value }
+                  } as React.ChangeEvent<HTMLInputElement>)}
+                />
+                {paymentData.upiId && !validateUpiId(paymentData.upiId) && (
+                  <p className="text-xs text-destructive mt-1 flex items-center">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    Please enter a valid UPI ID (e.g. name@bank)
+                  </p>
+                )}
+              </div>
+            </>
           )}
           
           {step === 3 && (

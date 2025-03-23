@@ -1,10 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Smartphone } from 'lucide-react';
+import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { addTransaction } from '../TransactionUtils';
 import { getPaymentStateLabel } from '@/utils/statusUtils';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
 
 interface UpiPaymentHandlerProps {
   paymentData: {
@@ -17,12 +24,77 @@ interface UpiPaymentHandlerProps {
   onSuccess: (transactionId: string) => void;
 }
 
+interface UpiApp {
+  id: string;
+  name: string;
+  logo: string;
+  packageName?: string;
+}
+
+const UPI_APPS: UpiApp[] = [
+  { 
+    id: 'gpay', 
+    name: 'Google Pay',
+    logo: 'https://play-lh.googleusercontent.com/6iyA2zVz5PyyMjK5SIxdUhrb7oh9cYVXJ93q6DZkmx07Er1o90PXYeo6mzL4VC2Gj9s=w240-h480-rw',
+    packageName: 'com.google.android.apps.nbu.paisa.user'
+  },
+  { 
+    id: 'phonepe', 
+    name: 'PhonePe',
+    logo: 'https://play-lh.googleusercontent.com/6iyA2zVz5PyyMjK5SIxdUhrb7oh9cYVXJ93q6DZkmx07Er1o90PXYeo6mzL4VC2Gj9s=w240-h480-rw',
+    packageName: 'com.phonepe.app'
+  },
+  { 
+    id: 'paytm', 
+    name: 'Paytm',
+    logo: 'https://play-lh.googleusercontent.com/6_Qan3RBgpJUj0C2ct4l0rKKVdiJgF6vy0ctfWyQ7uw-0BxumXijwEKYgSaZZ8NU5cY=w240-h480-rw',
+    packageName: 'net.one97.paytm'
+  }
+];
+
 const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
   paymentData,
   validateUpiId,
   onSuccess
 }) => {
   const [loading, setLoading] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [qrCodeError, setQrCodeError] = useState(false);
+  const [showQrDialog, setShowQrDialog] = useState(false);
+  const [showAppsDialog, setShowAppsDialog] = useState(false);
+  const [paymentLink, setPaymentLink] = useState('');
+
+  // Generate QR code URL
+  useEffect(() => {
+    if (validateUpiId(paymentData.upiId) && paymentData.amount) {
+      generateQrCode();
+    }
+  }, [paymentData.upiId, paymentData.amount]);
+
+  const generateQrCode = () => {
+    setQrCodeError(false);
+    try {
+      // Format the UPI payment URL (upi://pay format)
+      const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}&tr=${generateTransactionId()}`;
+      
+      // Generate QR code URL using a third-party service
+      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+      
+      setQrCodeUrl(qrCodeApiUrl);
+      
+      // Generate payment link
+      const webLink = `https://upi.link/pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}`;
+      setPaymentLink(webLink);
+    } catch (error) {
+      console.error("QR code generation error:", error);
+      setQrCodeError(true);
+    }
+  };
+
+  // Generate a simple transaction ID
+  const generateTransactionId = () => {
+    return 'UPITX' + Math.floor(Math.random() * 1000000);
+  };
 
   const handleUpiPayment = async () => {
     if (!validateUpiId(paymentData.upiId)) {
@@ -70,22 +142,173 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     }
   };
 
+  const openUpiApp = (app: UpiApp) => {
+    if (!validateUpiId(paymentData.upiId)) {
+      toast.error('Please enter a valid UPI ID');
+      return;
+    }
+    
+    // Format the UPI payment URL (upi://pay format)
+    const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}&tr=${generateTransactionId()}`;
+    
+    // Try to open the UPI app
+    try {
+      window.location.href = upiUrl;
+      
+      // Display toast notification
+      toast.info(`Opening ${app.name}...`, {
+        description: 'If the app doesn\'t open, please try another method.'
+      });
+    } catch (error) {
+      console.error('Error opening UPI app:', error);
+      toast.error('Failed to open UPI app');
+    }
+  };
+
+  const copyPaymentLink = () => {
+    if (paymentLink) {
+      navigator.clipboard.writeText(paymentLink)
+        .then(() => {
+          toast.success('Payment link copied to clipboard');
+        })
+        .catch(err => {
+          console.error('Failed to copy:', err);
+          toast.error('Failed to copy link');
+        });
+    }
+  };
+
   return (
-    <Button
-      onClick={handleUpiPayment}
-      disabled={loading}
-      className="w-full mt-4"
-    >
-      {loading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
-        </>
-      ) : (
-        <>
-          <Smartphone className="mr-2 h-4 w-4" /> Pay with UPI
-        </>
-      )}
-    </Button>
+    <>
+      <div className="flex flex-col gap-2 mt-4">
+        <Button
+          onClick={handleUpiPayment}
+          disabled={loading || !validateUpiId(paymentData.upiId)}
+          className="w-full"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
+            </>
+          ) : (
+            <>
+              <Smartphone className="mr-2 h-4 w-4" /> Pay with UPI
+            </>
+          )}
+        </Button>
+        
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowQrDialog(true)}
+            className="flex-1"
+            disabled={!validateUpiId(paymentData.upiId)}
+          >
+            <QrCode className="mr-2 h-4 w-4" /> QR Code
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => setShowAppsDialog(true)}
+            className="flex-1"
+            disabled={!validateUpiId(paymentData.upiId)}
+          >
+            <ExternalLink className="mr-2 h-4 w-4" /> UPI Apps
+          </Button>
+        </div>
+      </div>
+      
+      {/* QR Code Dialog */}
+      <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Scan QR Code</DialogTitle>
+            <DialogDescription>
+              Scan this QR code with any UPI app to make the payment of ₹{paymentData.amount}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex flex-col items-center justify-center p-4">
+            {qrCodeError ? (
+              <div className="h-48 w-48 flex flex-col items-center justify-center text-destructive">
+                <AlertCircle className="h-10 w-10 mb-2" />
+                <p className="text-sm text-center">Failed to load QR code</p>
+              </div>
+            ) : qrCodeUrl ? (
+              <div className="bg-white p-4 rounded-lg border">
+                <img 
+                  src={qrCodeUrl} 
+                  alt="UPI QR Code"
+                  className="h-48 w-48 object-contain"
+                />
+              </div>
+            ) : (
+              <div className="h-48 w-48 flex items-center justify-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              </div>
+            )}
+            
+            <div className="mt-4 text-center">
+              <p className="text-sm mb-2">Or use this payment link:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={paymentLink}
+                  readOnly
+                  className="text-xs bg-muted p-2 rounded flex-1 overflow-hidden"
+                />
+                <Button size="sm" onClick={copyPaymentLink}>Copy</Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* UPI Apps Dialog */}
+      <Dialog open={showAppsDialog} onOpenChange={setShowAppsDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choose UPI App</DialogTitle>
+            <DialogDescription>
+              Select a UPI app to make your payment
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-3 gap-4 p-4">
+            {UPI_APPS.map(app => (
+              <button
+                key={app.id}
+                onClick={() => openUpiApp(app)}
+                className="flex flex-col items-center p-3 border rounded-lg hover:bg-accent transition-colors"
+              >
+                <img 
+                  src={app.logo} 
+                  alt={app.name} 
+                  className="h-12 w-12 rounded-full object-contain mb-2"
+                />
+                <span className="text-xs text-center font-medium">{app.name}</span>
+              </button>
+            ))}
+          </div>
+          
+          <div className="p-4 border-t">
+            <p className="text-sm mb-2">Payment Link:</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={paymentLink}
+                readOnly
+                className="text-xs bg-muted p-2 rounded flex-1 overflow-hidden"
+              />
+              <Button size="sm" onClick={copyPaymentLink}>Copy</Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Share this link to collect payment
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
