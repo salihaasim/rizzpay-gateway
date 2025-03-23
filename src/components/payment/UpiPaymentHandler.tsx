@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink } from 'lucide-react';
+import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { addTransaction } from '../TransactionUtils';
-import { getPaymentStateLabel } from '@/utils/statusUtils';
 import { 
   Dialog,
   DialogContent,
@@ -12,6 +11,7 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 interface UpiPaymentHandlerProps {
   paymentData: {
@@ -35,7 +35,7 @@ const UPI_APPS: UpiApp[] = [
   { 
     id: 'gpay', 
     name: 'Google Pay',
-    logo: 'https://play-lh.googleusercontent.com/6iyA2zVz5PyyMjK5SIxdUhrb7oh9cYVXJ93q6DZkmx07Er1o90PXYeo6mzL4VC2Gj9s=w240-h480-rw',
+    logo: 'https://play-lh.googleusercontent.com/HArtbyi53u0jnqhnnxkQnMx9dHOERNcQ2hXLgtNGtOAaUlbzXYE7XUrpYT30ov6BJ1s=w240-h480-rw',
     packageName: 'com.google.android.apps.nbu.paisa.user'
   },
   { 
@@ -47,7 +47,7 @@ const UPI_APPS: UpiApp[] = [
   { 
     id: 'paytm', 
     name: 'Paytm',
-    logo: 'https://play-lh.googleusercontent.com/6_Qan3RBgpJUj0C2ct4l0rKKVdiJgF6vy0ctfWyQ7uw-0BxumXijwEKYgSaZZ8NU5cY=w240-h480-rw',
+    logo: 'https://play-lh.googleusercontent.com/uEkLdxQQYqZWgQTwG6XhQw7koOKUb7AV1GoZ7AyMe7iv5vPDV_j6BdBc9CJUb1qTPQ=w240-h480-rw',
     packageName: 'net.one97.paytm'
   }
 ];
@@ -63,6 +63,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [showAppsDialog, setShowAppsDialog] = useState(false);
   const [paymentLink, setPaymentLink] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
 
   // Generate QR code URL
   useEffect(() => {
@@ -169,7 +170,9 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     if (paymentLink) {
       navigator.clipboard.writeText(paymentLink)
         .then(() => {
+          setLinkCopied(true);
           toast.success('Payment link copied to clipboard');
+          setTimeout(() => setLinkCopied(false), 2000);
         })
         .catch(err => {
           console.error('Failed to copy:', err);
@@ -248,16 +251,22 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
               </div>
             )}
             
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center w-full">
               <p className="text-sm mb-2">Or use this payment link:</p>
-              <div className="flex gap-2">
-                <input
+              <div className="flex gap-2 w-full relative">
+                <Input
                   type="text"
                   value={paymentLink}
                   readOnly
-                  className="text-xs bg-muted p-2 rounded flex-1 overflow-hidden"
+                  className="text-xs pr-16 w-full"
                 />
-                <Button size="sm" onClick={copyPaymentLink}>Copy</Button>
+                <Button 
+                  size="sm" 
+                  onClick={copyPaymentLink} 
+                  className="absolute right-0"
+                >
+                  {linkCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
           </div>
@@ -293,14 +302,20 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
           
           <div className="p-4 border-t">
             <p className="text-sm mb-2">Payment Link:</p>
-            <div className="flex gap-2">
-              <input
+            <div className="flex gap-2 relative">
+              <Input
                 type="text"
                 value={paymentLink}
                 readOnly
-                className="text-xs bg-muted p-2 rounded flex-1 overflow-hidden"
+                className="text-xs pr-16 w-full"
               />
-              <Button size="sm" onClick={copyPaymentLink}>Copy</Button>
+              <Button 
+                size="sm" 
+                onClick={copyPaymentLink}
+                className="absolute right-0"
+              >
+                {linkCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Share this link to collect payment

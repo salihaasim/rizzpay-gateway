@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,7 @@ const UPI_APPS: UpiApp[] = [
   { 
     id: 'gpay', 
     name: 'Google Pay',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/120px-Google_%22G%22_logo.svg.png',
+    logo: 'https://play-lh.googleusercontent.com/HArtbyi53u0jnqhnnxkQnMx9dHOERNcQ2hXLgtNGtOAaUlbzXYE7XUrpYT30ov6BJ1s=w240-h480-rw',
     packageName: 'com.google.android.apps.nbu.paisa.user'
   },
   { 
@@ -60,7 +59,7 @@ const UPI_APPS: UpiApp[] = [
   { 
     id: 'paytm', 
     name: 'Paytm',
-    logo: 'https://play-lh.googleusercontent.com/6_Qan3RBgpJUj0C2ct4l0rKKVdiJgF6vy0ctfWyQ7uw-0BxumXijwEKYgSaZZ8NU5cY=w240-h480-rw',
+    logo: 'https://play-lh.googleusercontent.com/uEkLdxQQYqZWgQTwG6XhQw7koOKUb7AV1GoZ7AyMe7iv5vPDV_j6BdBc9CJUb1qTPQ=w240-h480-rw',
     packageName: 'net.one97.paytm'
   },
   { 
@@ -88,26 +87,21 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   const [linkCopied, setLinkCopied] = useState(false);
   const [selectedApp, setSelectedApp] = useState<UpiApp | null>(null);
   
-  // Update parent component when UPI ID changes
   const handleUpiIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUpiId(value);
     const valid = validateUpiId(value);
     setIsValid(valid);
     
-    // Update in parent component
     handleInputChange({
       target: { name: 'upiId', value }
     } as React.ChangeEvent<HTMLInputElement>);
   };
   
-  // Generate payment link
   useEffect(() => {
     if (paymentData.amount && upiId && isValid) {
-      // Format the UPI payment URL (upi://pay format)
       const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}&tr=${paymentData.transactionId || ''}`;
       
-      // Web link for sharing
       const webLink = `https://upi.link/pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}`;
       
       setPaymentLink(webLink);
@@ -116,7 +110,6 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     }
   }, [paymentData.amount, upiId, isValid, paymentData.name, paymentData.currency, paymentData.transactionId]);
   
-  // Handle QR code load events
   const handleQrCodeLoad = () => {
     setQrLoading(false);
   };
@@ -126,7 +119,6 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     handleQrCodeError();
   };
 
-  // Copy payment link to clipboard
   const copyPaymentLink = () => {
     if (paymentLink) {
       navigator.clipboard.writeText(paymentLink)
@@ -142,7 +134,6 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     }
   };
 
-  // Open UPI app with payment data
   const openUpiApp = (app: UpiApp) => {
     setSelectedApp(app);
     
@@ -151,14 +142,11 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
       return;
     }
     
-    // Format the UPI payment URL (upi://pay format)
     const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}&tr=${paymentData.transactionId || ''}`;
     
-    // Try to open the UPI app
     try {
       window.location.href = upiUrl;
       
-      // Display toast notification
       toast.info(`Opening ${app.name}...`, {
         description: 'If the app doesn\'t open, please try another method.'
       });
@@ -214,7 +202,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
             </div>
             
             {isValid && paymentLink && (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 relative">
                 <Input 
                   value={paymentLink}
                   readOnly
@@ -224,7 +212,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                   size="sm" 
                   variant="outline" 
                   onClick={copyPaymentLink}
-                  className="absolute right-6"
+                  className="absolute right-2"
                 >
                   {linkCopied ? (
                     <Check className="h-4 w-4" />
