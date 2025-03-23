@@ -1,7 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
 import { Toaster } from '@/components/ui/sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Loader2 } from 'lucide-react';
