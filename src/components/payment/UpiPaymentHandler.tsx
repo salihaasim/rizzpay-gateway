@@ -83,8 +83,9 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       
       setQrCodeUrl(qrCodeApiUrl);
       
-      // Generate payment link
-      const webLink = `https://upi.link/pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}`;
+      // Generate direct UPI payment link instead of using upi.link (which redirects to GoDaddy)
+      // This uses the intent format which is more widely supported
+      const webLink = `https://upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}`;
       setPaymentLink(webLink);
     } catch (error) {
       console.error("QR code generation error:", error);
@@ -268,6 +269,9 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
                   {linkCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Clicking the link will directly open a UPI payment app on your device
+              </p>
             </div>
           </div>
         </DialogContent>
@@ -318,7 +322,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Share this link to collect payment
+              Use this link to make payment directly with any UPI app
             </p>
           </div>
         </DialogContent>
