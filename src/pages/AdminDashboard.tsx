@@ -18,7 +18,8 @@ import {
   DollarSign,
   TrendingUp,
   Activity,
-  Percent
+  Percent,
+  Settings
 } from 'lucide-react';
 import { adminUI } from '@/styles/rizzpay-ui';
 import { useProfileStore } from '@/stores/profileStore';
