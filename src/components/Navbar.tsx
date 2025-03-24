@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   Home, 
@@ -13,22 +13,41 @@ import {
   Webhook, 
   ShieldCheck, 
   LogOut,
-  UserCircle
+  UserCircle,
+  Bell
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { cn } from '@/lib/utils';
 import SupabaseStatus from './SupabaseStatus';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userRole, userEmail, resetUserRole } = useTransactionStore();
+  
+  // Handle window scroll for navbar appearance
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -111,7 +130,14 @@ const Navbar = () => {
   };
   
   return (
-    <header className="fixed w-full border-b bg-background/80 backdrop-blur-md z-10">
+    <header 
+      className={cn(
+        "fixed w-full border-b z-10 transition-all duration-200",
+        scrolled 
+          ? "bg-background/95 backdrop-blur-md shadow-sm" 
+          : "bg-background/80 backdrop-blur-sm"
+      )}
+    >
       <div className="px-4 h-16 flex items-center justify-between mx-auto max-w-screen-2xl">
         <div className="flex items-center">
           <Link to="/" className="font-bold text-xl flex items-center mr-8">
@@ -173,15 +199,49 @@ const Navbar = () => {
           
           {userRole && (
             <>
-              <Avatar className="h-8 w-8 border border-border hidden sm:flex">
-                <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{userEmail}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {userRole === 'admin' ? 'Administrator' : 'Merchant Account'}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer flex items-center">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer text-rose-500 focus:text-rose-500" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden sm:flex items-center">
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
+              <Button variant="ghost" size="icon" className="hidden sm:flex relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 flex items-center justify-center text-[10px] text-white">3</span>
               </Button>
             </>
           )}
