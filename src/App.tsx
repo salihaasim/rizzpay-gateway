@@ -53,11 +53,34 @@ const App = () => {
           <Route path="/webhook" element={<WebhookPage />} />
           <Route path="/webhook-payment/:token" element={<WebhookPayment />} />
           <Route path="/wallet" element={<WalletPage />} />
+          
+          {/* Admin routes */}
           <Route path="/admin" element={
             <ProtectedAdminRoute>
               <AdminDashboard />
             </ProtectedAdminRoute>
           } />
+          <Route path="/admin/merchants" element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/transactions" element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/analytics" element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          } />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

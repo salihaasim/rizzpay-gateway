@@ -31,6 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { merchantUI } from '@/styles/rizzpay-ui';
 
 const Navbar = () => {
   const location = useLocation();
@@ -90,7 +91,7 @@ const Navbar = () => {
     // Admin-specific links
     const adminLinks = [
       {
-        name: 'Admin',
+        name: 'Admin Portal',
         href: '/admin',
         icon: <ShieldCheck className="h-4 w-4" />,
       }
@@ -160,7 +161,8 @@ const Navbar = () => {
                         size="sm"
                         className={cn(
                           "flex items-center h-9", 
-                          isActive(link.href) ? "bg-secondary text-secondary-foreground" : ""
+                          isActive(link.href) ? "bg-secondary text-secondary-foreground" : "",
+                          link.href === "/admin" ? "bg-[#9970e2] text-white hover:bg-[#8a60d3]" : ""
                         )}
                       >
                         <span className="mr-2">{link.icon}</span>
@@ -183,7 +185,7 @@ const Navbar = () => {
               <span className="text-sm text-muted-foreground">
                 {userRole === 'admin' ? (
                   <span className="flex items-center">
-                    <ShieldCheck className="h-3 w-3 mr-1 text-primary" />
+                    <ShieldCheck className="h-3 w-3 mr-1 text-[#9970e2]" />
                     Admin
                   </span>
                 ) : (
@@ -203,7 +205,10 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                      <AvatarFallback className={cn(
+                        "text-xs",
+                        userRole === 'admin' ? "bg-[#9970e2] text-white" : "bg-primary/10 text-primary"
+                      )}>
                         {getUserInitials()}
                       </AvatarFallback>
                     </Avatar>
@@ -231,6 +236,14 @@ const Navbar = () => {
                       <span>Dashboard</span>
                     </Link>
                   </DropdownMenuItem>
+                  {userRole === 'admin' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer flex items-center">
+                        <ShieldCheck className="mr-2 h-4 w-4 text-[#9970e2]" />
+                        <span>Admin Portal</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="cursor-pointer text-rose-500 focus:text-rose-500" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -276,7 +289,8 @@ const Navbar = () => {
                           "flex items-center h-10 px-3 rounded-md text-sm font-medium",
                           isActive(link.href) 
                             ? "bg-primary/10 text-primary" 
-                            : "text-foreground hover:bg-secondary"
+                            : "text-foreground hover:bg-secondary",
+                          link.href === "/admin" ? "bg-[#9970e2] text-white hover:bg-[#8a60d3]" : ""
                         )}
                       >
                         <span className="mr-3">{link.icon}</span>
@@ -291,7 +305,9 @@ const Navbar = () => {
                     <div className="bg-secondary/50 rounded-md p-3 mb-4">
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
-                          <AvatarFallback className="bg-primary/10 text-primary">
+                          <AvatarFallback className={cn(
+                            userRole === 'admin' ? "bg-[#9970e2] text-white" : "bg-primary/10 text-primary"
+                          )}>
                             {getUserInitials()}
                           </AvatarFallback>
                         </Avatar>
@@ -299,7 +315,7 @@ const Navbar = () => {
                           <p className="text-sm font-medium leading-none mb-1">
                             {userRole === 'admin' ? (
                               <span className="flex items-center">
-                                <ShieldCheck className="h-3 w-3 mr-1 text-primary" />
+                                <ShieldCheck className="h-3 w-3 mr-1 text-[#9970e2]" />
                                 Admin Account
                               </span>
                             ) : (
