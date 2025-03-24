@@ -13,7 +13,10 @@ import {
   ChevronLeft, 
   Menu, 
   Bell,
-  User
+  User,
+  Globe,
+  Monitor,
+  HelpCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,7 +24,7 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { layout, adminUI, spacing } from '@/styles/rizzpay-ui';
+import { adminUI, transitions, zIndices } from '@/styles/rizzpay-ui';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -101,23 +104,26 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <aside 
         className={cn(
           "fixed h-full z-20 transition-all duration-300 hidden lg:block",
-          collapsed ? "w-20" : `w-[${adminUI.sidebar.width}]`
+          collapsed ? "w-20" : "w-[280px]"
         )}
-        style={{ width: collapsed ? '80px' : '280px', background: adminUI.sidebar.background }}
+        style={{ 
+          width: collapsed ? adminUI.sidebar.collapsedWidth : adminUI.sidebar.width, 
+          background: adminUI.sidebar.background 
+        }}
       >
         <div className="h-16 border-b border-white/10 flex items-center px-4">
           <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between")} style={{ width: '100%' }}>
             {!collapsed && (
               <Link to="/admin" className="font-bold text-xl flex items-center">
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
-                  <ShieldCheck className="h-5 w-5 text-primary" />
+                <div className="h-8 w-8 rounded-lg bg-[#9970e2]/10 flex items-center justify-center mr-2">
+                  <ShieldCheck className="h-5 w-5 text-[#9970e2]" />
                 </div>
                 <span className="text-white">RizzAdmin</span>
               </Link>
             )}
             {collapsed && (
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ShieldCheck className="h-5 w-5 text-primary" />
+              <div className="h-8 w-8 rounded-lg bg-[#9970e2]/10 flex items-center justify-center">
+                <ShieldCheck className="h-5 w-5 text-[#9970e2]" />
               </div>
             )}
             {!collapsed && (
@@ -165,10 +171,40 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             ))}
           </div>
           
+          {/* Quick links section for common tasks */}
+          {!collapsed && (
+            <div className="mt-6 px-3">
+              <h3 className="text-white/50 text-xs uppercase font-semibold px-3 mb-2">Quick Actions</h3>
+              <div className="space-y-1">
+                <Link
+                  to="/dashboard"
+                  className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <Monitor className="h-4 w-4 mr-3" />
+                  <span className="text-sm">Merchant View</span>
+                </Link>
+                <Link
+                  to="/"
+                  className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <Globe className="h-4 w-4 mr-3" />
+                  <span className="text-sm">Main Website</span>
+                </Link>
+                <Link
+                  to="#"
+                  className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <HelpCircle className="h-4 w-4 mr-3" />
+                  <span className="text-sm">Admin Guide</span>
+                </Link>
+              </div>
+            </div>
+          )}
+          
           {!collapsed && (
             <div className="mt-8 px-6">
               <div className="bg-white/10 rounded-lg p-4">
-                <p className="text-white/90 text-sm font-medium mb-3">Admin Panel</p>
+                <p className="text-white/90 text-sm font-medium mb-3">Admin Control Panel</p>
                 <p className="text-white/70 text-xs mb-4">You have full access to manage the platform and users.</p>
                 <p className="text-white/90 text-xs flex items-center">
                   <ShieldCheck className="h-3 w-3 mr-1" />
@@ -232,7 +268,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   </Button>
                 </SheetTrigger>
                 <div className="lg:hidden flex items-center">
-                  <ShieldCheck className="h-5 w-5 text-primary mr-2" />
+                  <ShieldCheck className="h-5 w-5 text-[#9970e2] mr-2" />
                   <span className="font-semibold">RizzAdmin</span>
                 </div>
               </div>
@@ -268,13 +304,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <DropdownMenuItem asChild>
                       <Link to="/admin/settings" className="cursor-pointer flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
+                        <span>Admin Settings</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/admin" className="cursor-pointer flex items-center">
-                        <Home className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
+                      <Link to="/dashboard" className="cursor-pointer flex items-center">
+                        <Monitor className="mr-2 h-4 w-4" />
+                        <span>Merchant View</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -295,18 +331,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         
         <SheetContent side="left" className="w-72 p-0">
           <div className="flex flex-col h-full">
-            <div className="h-16 border-b flex items-center px-4">
+            <div className="h-16 border-b flex items-center px-4 bg-[#1a1d2d]">
               <Link to="/admin" className="font-bold text-xl flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
-                  <ShieldCheck className="h-5 w-5 text-primary" />
+                <div className="h-8 w-8 rounded-lg bg-[#9970e2]/10 flex items-center justify-center mr-2">
+                  <ShieldCheck className="h-5 w-5 text-[#9970e2]" />
                 </div>
-                <span className="bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent">
+                <span className="text-white">
                   RizzAdmin
                 </span>
               </Link>
             </div>
             
-            <ScrollArea className="flex-1 py-4">
+            <ScrollArea className="flex-1 py-4 bg-[#1a1d2d]">
               <div className="space-y-1 px-3">
                 {navItems.map((item) => (
                   <Link
@@ -316,8 +352,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     className={cn(
                       "flex items-center py-3 px-3 rounded-md transition-colors",
                       isActive(item.href)
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground hover:bg-secondary"
+                        ? "bg-white/10 text-white"
+                        : "text-white/70 hover:text-white hover:bg-white/10"
                     )}
                   >
                     <span className="mr-3">{item.icon}</span>
@@ -325,10 +361,32 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   </Link>
                 ))}
               </div>
+              
+              <div className="mt-6 px-3">
+                <h3 className="text-white/50 text-xs uppercase font-semibold px-3 mb-2">Quick Actions</h3>
+                <div className="space-y-1">
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
+                  >
+                    <Monitor className="h-4 w-4 mr-3" />
+                    <span className="text-sm">Merchant View</span>
+                  </Link>
+                  <Link
+                    to="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
+                  >
+                    <Globe className="h-4 w-4 mr-3" />
+                    <span className="text-sm">Main Website</span>
+                  </Link>
+                </div>
+              </div>
             </ScrollArea>
             
-            <div className="border-t p-4">
-              <div className="bg-secondary/50 rounded-md p-3 mb-4">
+            <div className="border-t p-4 bg-[#1a1d2d] border-white/10">
+              <div className="bg-white/10 rounded-md p-3 mb-4">
                 <div className="flex items-center">
                   <Avatar className="h-10 w-10 mr-3">
                     <AvatarFallback className="bg-[#9970e2] text-white">
@@ -336,14 +394,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium leading-none mb-1">
+                    <p className="text-sm text-white font-medium leading-none mb-1">
                       <span className="flex items-center">
-                        <ShieldCheck className="h-3 w-3 mr-1 text-primary" />
+                        <ShieldCheck className="h-3 w-3 mr-1 text-[#9970e2]" />
                         Admin Account
                       </span>
                     </p>
                     {userEmail && (
-                      <p className="text-xs text-muted-foreground truncate max-w-[170px]">
+                      <p className="text-xs text-white/70 truncate max-w-[170px]">
                         {userEmail}
                       </p>
                     )}
@@ -352,7 +410,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </div>
               
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs text-muted-foreground">Server Status</span>
+                <span className="text-xs text-white/50">Server Status</span>
                 <SupabaseStatus />
               </div>
               
@@ -363,7 +421,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   handleLogout();
                   setMobileMenuOpen(false);
                 }} 
-                className="w-full justify-center"
+                className="w-full justify-center bg-white/10 border-white/20 text-white hover:bg-white/20"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

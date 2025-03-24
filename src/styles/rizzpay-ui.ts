@@ -21,9 +21,13 @@ export const colors = {
   // Admin-specific colors
   admin: {
     primary: 'hsl(240 5.9% 10%)',
-    secondary: 'hsl(142 76% 36%)',
-    accent: 'hsl(321 46% 48%)',
-    background: 'hsl(220 14% 96%)'
+    secondary: 'hsl(320 70% 50%)',
+    accent: 'hsl(280 70% 60%)',
+    background: 'hsl(220 14% 96%)',
+    sidebarBg: 'hsl(240 14% 10%)',
+    sidebarText: 'hsl(0 0% 100% / 90%)',
+    sidebarAccent: 'hsl(280 70% 60%)',
+    headerBg: 'hsl(0 0% 100%)'
   },
   // Merchant-specific colors
   merchant: {
@@ -101,20 +105,21 @@ export const shadows = {
 // Admin UI components styling
 export const adminUI = {
   sidebar: {
-    background: 'hsl(240 14% 10%)',
+    background: colors.admin.sidebarBg,
     itemHover: 'hsl(240 14% 15%)',
-    text: 'hsl(0 0% 100% / 90%)',
-    iconBg: 'hsl(321 46% 48% / 15%)',
-    iconColor: 'hsl(321 46% 48%)',
-    width: '280px'
+    text: colors.admin.sidebarText,
+    iconBg: 'hsl(280 70% 60% / 15%)',
+    iconColor: colors.admin.sidebarAccent,
+    width: '280px',
+    collapsedWidth: '80px'
   },
   header: {
-    background: 'hsl(0 0% 100%)',
+    background: colors.admin.headerBg,
     borderBottom: '1px solid hsl(var(--border))',
     height: '64px'
   },
   content: {
-    background: 'hsl(220 14% 96%)',
+    background: colors.admin.background,
     padding: spacing.xl
   },
   card: {
@@ -125,14 +130,46 @@ export const adminUI = {
   },
   button: {
     primary: {
-      background: 'hsl(321 46% 48%)',
-      hover: 'hsl(321 46% 40%)',
+      background: colors.admin.accent,
+      hover: 'hsl(280 70% 50%)',
       text: 'hsl(0 0% 100%)'
     },
     secondary: {
-      background: 'hsl(142 76% 36%)',
-      hover: 'hsl(142 76% 30%)',
+      background: colors.admin.secondary,
+      hover: 'hsl(320 70% 45%)',
       text: 'hsl(0 0% 100%)'
+    }
+  },
+  stats: {
+    card: {
+      background: 'hsl(0 0% 100%)',
+      border: '1px solid hsl(var(--border) / 50%)',
+      shadow: shadows.sm,
+      radius: radii.lg,
+      padding: spacing.lg
+    },
+    iconBg: {
+      primary: 'hsl(280 70% 60% / 10%)',
+      success: 'hsl(142 71% 45% / 10%)',
+      warning: 'hsl(38 92% 50% / 10%)',
+      info: 'hsl(214 100% 60% / 10%)'
+    },
+    iconColor: {
+      primary: 'hsl(280 70% 60%)',
+      success: 'hsl(142 71% 45%)',
+      warning: 'hsl(38 92% 50%)',
+      info: 'hsl(214 100% 60%)'
+    }
+  },
+  table: {
+    header: {
+      background: 'hsl(240 5% 96%)',
+      text: 'hsl(240 5% 30%)'
+    },
+    row: {
+      background: 'hsl(0 0% 100%)',
+      hover: 'hsl(240 5% 97%)',
+      border: 'hsl(240 5% 90%)'
     }
   }
 };
@@ -165,6 +202,27 @@ export const merchantUI = {
       hover: 'hsl(224 64% 28%)',
       text: 'hsl(0 0% 100%)'
     }
+  },
+  stats: {
+    card: {
+      background: 'hsl(0 0% 100%)',
+      border: '1px solid hsl(var(--border) / 50%)',
+      shadow: shadows.sm,
+      radius: radii.md,
+      padding: spacing.md
+    },
+    iconBg: {
+      primary: 'hsl(214 100% 50% / 10%)',
+      success: 'hsl(142 71% 45% / 10%)',
+      warning: 'hsl(38 92% 50% / 10%)',
+      info: 'hsl(214 100% 60% / 10%)'
+    },
+    iconColor: {
+      primary: 'hsl(214 100% 50%)',
+      success: 'hsl(142 71% 45%)',
+      warning: 'hsl(38 92% 50%)',
+      info: 'hsl(214 100% 60%)'
+    }
   }
 };
 
@@ -192,5 +250,36 @@ export const layout = {
   contentMaxWidth: '1280px',
   containerPadding: spacing.lg,
   sidebarWidth: '280px',
+  sidebarCollapsedWidth: '80px',
   topNavHeight: '64px'
+};
+
+// Animation properties
+export const animations = {
+  slideIn: {
+    transition: 'transform 0.3s ease-out',
+    hidden: 'translateX(-100%)',
+    visible: 'translateX(0)'
+  },
+  fadeIn: {
+    transition: 'opacity 0.3s ease-out',
+    hidden: 'opacity: 0',
+    visible: 'opacity: 1'
+  },
+  scaleIn: {
+    transition: 'transform 0.3s ease-out',
+    hidden: 'scale(0.95)',
+    visible: 'scale(1)'
+  }
+};
+
+// Gradients
+export const gradients = {
+  primary: 'linear-gradient(135deg, hsl(280 70% 60%), hsl(320 70% 50%))',
+  secondary: 'linear-gradient(135deg, hsl(214 100% 50%), hsl(224 64% 33%))',
+  success: 'linear-gradient(135deg, hsl(142 71% 45%), hsl(160 71% 40%))',
+  warning: 'linear-gradient(135deg, hsl(38 92% 50%), hsl(25 95% 50%))',
+  error: 'linear-gradient(135deg, hsl(0 84% 60%), hsl(0 70% 50%))',
+  glass: 'linear-gradient(135deg, hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0.6))',
+  darkGlass: 'linear-gradient(135deg, hsla(240, 10%, 10%, 0.8), hsla(240, 10%, 10%, 0.6))'
 };

@@ -45,6 +45,7 @@ const App = () => {
       <Toaster position="top-right" />
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* Public and Merchant routes */}
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
