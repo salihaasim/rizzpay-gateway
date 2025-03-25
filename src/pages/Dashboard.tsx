@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
 import PaymentFlow from '@/components/PaymentFlow';
@@ -8,8 +9,9 @@ import Navbar from '@/components/Navbar';
 import { Separator } from '@/components/ui/separator';
 import AnalyticsChart from '@/components/AnalyticsChart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock } from 'lucide-react';
+import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight } from 'lucide-react';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
+import { Button } from '@/components/ui/button';
 import { 
   generateAnalyticsSummary, 
   getLastMonthTransactions, 
@@ -122,14 +124,14 @@ const Dashboard = () => {
             className="lg:col-span-2 dashboard-card"
           />
           
-          <Card className="dashboard-card">
-            <CardHeader className="pb-2">
+          <Card className="dashboard-card backdrop-blur-sm shadow-lg border-0">
+            <CardHeader className="pb-2 bg-gradient-to-r from-background to-secondary/10">
               <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
               <CardDescription>24 hours performance</CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-4">
-                <div className="flex items-center p-3 bg-emerald-500/5 rounded-lg">
+                <div className="flex items-center p-3 bg-emerald-500/5 rounded-lg shadow-sm">
                   <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mr-3">
                     <ArrowUpRight className="h-5 w-5 text-emerald-500" />
                   </div>
@@ -140,7 +142,7 @@ const Dashboard = () => {
                   <p className="text-emerald-500 font-semibold">+₹{analytics.revenue.today.toLocaleString('en-IN')}</p>
                 </div>
                 
-                <div className="flex items-center p-3 bg-amber-500/5 rounded-lg">
+                <div className="flex items-center p-3 bg-amber-500/5 rounded-lg shadow-sm">
                   <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mr-3">
                     <Clock className="h-5 w-5 text-amber-500" />
                   </div>
@@ -173,13 +175,21 @@ const Dashboard = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-6">
-            <h2 className="section-heading">Recent Transactions</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="section-heading">Recent Transactions</h2>
+              <Link to="/transactions">
+                <Button variant="outline" size="sm" className="gap-1 hover:bg-primary/10 hover:text-primary">
+                  View All 
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
             <RecentTransactionsList transactions={recentTxns} />
           </div>
           
           <div className="lg:col-span-2">
             <h2 className="section-heading">Quick Payment</h2>
-            <Card className="dashboard-card border border-border/50">
+            <Card className="dashboard-card backdrop-blur-sm shadow-lg border-0">
               <CardContent className="p-4">
                 <PaymentFlow />
               </CardContent>

@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from 'react';
 import { 
   LineChart, 
@@ -184,8 +185,8 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
   };
   
   return (
-    <Card className={cn("overflow-hidden", className)}>
-      <CardHeader className="pb-2">
+    <Card className={cn("overflow-hidden backdrop-blur-sm shadow-lg border-0", className)}>
+      <CardHeader className="pb-2 bg-gradient-to-r from-background to-secondary/20">
         <div className="flex flex-row justify-between items-center">
           <div>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
@@ -206,7 +207,7 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
                     variant="outline"
                     size="icon"
                     onClick={handleDownloadCSV}
-                    className="h-8 w-8"
+                    className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -222,7 +223,7 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
       <CardContent className="p-0">
         <div className="px-6 py-2">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
-            <div className="bg-muted/20 p-3 rounded-md">
+            <div className="bg-gradient-to-r from-muted/30 to-muted/10 p-3 rounded-md shadow-sm">
               <div className="text-xs text-muted-foreground">Avg. Revenue</div>
               <div className="text-lg font-semibold flex items-center gap-1">
                 ₹{avgRevenue.toFixed(0)}
@@ -230,14 +231,14 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
               </div>
             </div>
             
-            <div className="bg-muted/20 p-3 rounded-md">
+            <div className="bg-gradient-to-r from-muted/30 to-muted/10 p-3 rounded-md shadow-sm">
               <div className="text-xs text-muted-foreground">Peak Period</div>
               <div className="text-lg font-semibold">
                 {peakPeriod ? peakPeriod.name : 'N/A'}
               </div>
             </div>
             
-            <div className="bg-muted/20 p-3 rounded-md">
+            <div className="bg-gradient-to-r from-muted/30 to-muted/10 p-3 rounded-md shadow-sm">
               <div className="text-xs text-muted-foreground">Success Rate</div>
               <div className="text-lg font-semibold flex items-center gap-1">
                 {transactions.length > 0 ? 
@@ -355,7 +356,7 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
         
         <Separator className="my-1" />
         
-        <div className="flex justify-between items-center px-6 py-3 text-xs text-muted-foreground">
+        <div className="flex justify-between items-center px-6 py-3 text-xs text-muted-foreground bg-gradient-to-r from-secondary/10 to-background">
           <div className="flex items-center gap-1">
             <Info className="h-3 w-3" />
             <span>Based on {transactions.length} transactions</span>
