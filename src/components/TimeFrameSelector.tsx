@@ -2,6 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { 
+  Calendar,
+  ClockIcon, 
+  CalendarDays
+} from 'lucide-react';
 
 type TimeFrame = 'day' | 'week' | 'month';
 
@@ -17,29 +22,41 @@ const TimeFrameSelector = ({
   className,
 }: TimeFrameSelectorProps) => {
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div className={cn("flex items-center space-x-1.5", className)}>
       <Button
         variant={activeTimeFrame === 'day' ? 'default' : 'outline'}
         size="sm"
         onClick={() => onChange('day')}
-        className="text-xs px-3"
+        className={cn(
+          "text-xs h-8 px-2.5",
+          activeTimeFrame === 'day' ? 'bg-primary text-primary-foreground' : ''
+        )}
       >
+        <ClockIcon className="h-3 w-3 mr-1" />
         Day
       </Button>
       <Button
         variant={activeTimeFrame === 'week' ? 'default' : 'outline'}
         size="sm"
         onClick={() => onChange('week')}
-        className="text-xs px-3"
+        className={cn(
+          "text-xs h-8 px-2.5",
+          activeTimeFrame === 'week' ? 'bg-primary text-primary-foreground' : ''
+        )}
       >
+        <Calendar className="h-3 w-3 mr-1" />
         Week
       </Button>
       <Button
         variant={activeTimeFrame === 'month' ? 'default' : 'outline'}
         size="sm"
         onClick={() => onChange('month')}
-        className="text-xs px-3"
+        className={cn(
+          "text-xs h-8 px-2.5",
+          activeTimeFrame === 'month' ? 'bg-primary text-primary-foreground' : ''
+        )}
       >
+        <CalendarDays className="h-3 w-3 mr-1" />
         Month
       </Button>
     </div>

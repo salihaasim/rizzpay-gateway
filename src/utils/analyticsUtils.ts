@@ -69,6 +69,18 @@ export const calculateTotalRevenue = (transactions: Transaction[]) => {
   }, 0);
 };
 
+// Calculate average transaction value
+export const calculateAvgTransactionValue = (transactions: Transaction[]) => {
+  const successfulTxns = transactions.filter(
+    t => t.status === 'successful' || t.status === 'settled'
+  );
+  
+  if (successfulTxns.length === 0) return 0;
+  
+  const totalRevenue = calculateTotalRevenue(successfulTxns);
+  return totalRevenue / successfulTxns.length;
+};
+
 // Calculate success rate
 export const calculateSuccessRate = (transactions: Transaction[]) => {
   if (transactions.length === 0) return 0;
@@ -92,10 +104,56 @@ export const getPaymentMethodDistribution = (transactions: Transaction[]) => {
   return distribution;
 };
 
+// Get transactions by status
+export const getTransactionsByStatus = (transactions: Transaction[], status: TransactionStatus) => {
+  return transactions.filter(t => t.status === status);
+};
+
 // Calculate growth compared to previous period
 export const calculateGrowthRate = (current: number, previous: number) => {
   if (previous === 0) return current > 0 ? 100 : 0;
   return ((current - previous) / previous) * 100;
+};
+
+// Get hourly distribution of transactions
+export const getHourlyDistribution = (transactions: Transaction[]) => {
+  const hourlyDistribution: number[] = Array(24).fill(0);
+  
+  transactions.forEach(transaction => {
+    const txDate = new Date(transaction.date);
+    if (isValid(txDate)) {
+      const hour = txDate.getHours();
+      hourlyDistribution[hour]++;
+    }
+  });
+  
+  return hourlyDistribution;
+};
+
+// Get peak transaction time
+export const getPeakTransactionHour = (transactions: Transaction[]) => {
+  const hourly = getHourlyDistribution(transactions);
+  let peakHour = 0;
+  let peakCount = 0;
+  
+  hourly.forEach((count, hour) => {
+    if (count > peakCount) {
+      peakCount = count;
+      peakHour = hour;
+    }
+  });
+  
+  return { hour: peakHour, count: peakCount };
+};
+
+// Get customer statistics
+export const getCustomerStatistics = (transactions: Transaction[]) => {
+  const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
+  const transactionsPerCustomer = uniqueCustomers > 0 
+    ? transactions.length / uniqueCustomers 
+    : 0;
+    
+  return { uniqueCustomers, transactionsPerCustomer };
 };
 
 // Generate analytics summary for dashboard
@@ -117,19 +175,18 @@ export const generateAnalyticsSummary = (transactions: Transaction[]) => {
   // Calculate payment method distribution
   const paymentMethods = getPaymentMethodDistribution(lastMonthTxns);
   
-  // Get unique customers
-  const uniqueCustomers = new Set(
-    lastMonthTxns.map(t => t.customer)
-  ).size;
+  // Get customer stats
+  const customerStats = getCustomerStatistics(lastMonthTxns);
   
   // Success rates
   const dailySuccessRate = calculateSuccessRate(todayTxns);
   const monthlySuccessRate = calculateSuccessRate(lastMonthTxns);
   
   // Average transaction value
-  const avgTransactionValue = lastMonthTxns.length > 0 
-    ? monthlyRevenue / lastMonthTxns.length 
-    : 0;
+  const avgTransactionValue = calculateAvgTransactionValue(lastMonthTxns);
+  
+  // Get peak transaction hour
+  const peakHour = getPeakTransactionHour(lastMonthTxns);
   
   return {
     revenue: {
@@ -147,12 +204,14 @@ export const generateAnalyticsSummary = (transactions: Transaction[]) => {
       dailyGrowth: calculateGrowthRate(todayTxns.length, yesterdayTxns.length),
     },
     customers: {
-      unique: uniqueCustomers,
+      unique: customerStats.uniqueCustomers,
+      averageTransactions: customerStats.transactionsPerCustomer,
     },
     performance: {
       dailySuccessRate,
       monthlySuccessRate,
       avgTransactionValue,
+      peakHour,
     },
     paymentMethods,
   };
