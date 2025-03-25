@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { Session } from '@supabase/supabase-js';
+import { createClient, Session } from '@supabase/supabase-js';
+import { useAuth } from '@/stores/authStore';
 
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -17,11 +18,11 @@ import WebhookPayment from './pages/WebhookPayment';
 import DeveloperIntegration from './pages/DeveloperIntegration';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFound from './pages/NotFound';
+import { supabase } from './integrations/supabase/client';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const { checkAuth, isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -31,7 +32,7 @@ function App() {
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-  }, [user, supabase]);
+  }, []);
 
   const SupabaseStatus = () => (
     <div className="absolute top-0 left-0 w-full flex justify-center">

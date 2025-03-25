@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -107,7 +106,7 @@ const DeveloperIntegration: React.FC = () => {
                 <p className="text-xs text-muted-foreground mt-1">Use for testing in development environment.</p>
               </div>
               
-              <Alert variant="warning" className="mt-4">
+              <Alert variant="destructive" className="mt-4">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Security Notice</AlertTitle>
                 <AlertDescription>
