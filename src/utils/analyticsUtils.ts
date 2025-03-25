@@ -1,6 +1,6 @@
 
 import { Transaction, TransactionStatus } from '@/stores/transactionStore';
-import { subDays, isWithinInterval, startOfDay, endOfDay, format } from 'date-fns';
+import { subDays, isWithinInterval, startOfDay, endOfDay, format, isValid } from 'date-fns';
 
 // Get transactions by date range
 export const getTransactionsByDateRange = (
@@ -8,8 +8,15 @@ export const getTransactionsByDateRange = (
   startDate: Date,
   endDate: Date
 ) => {
+  if (!isValid(startDate) || !isValid(endDate)) {
+    console.error('Invalid date range provided', { startDate, endDate });
+    return [];
+  }
+  
   return transactions.filter((transaction) => {
     const txDate = new Date(transaction.date);
+    if (!isValid(txDate)) return false;
+    
     return isWithinInterval(txDate, { start: startDate, end: endDate });
   });
 };

@@ -13,7 +13,7 @@ import {
   Legend,
   Bar
 } from 'recharts';
-import { format, subDays, subWeeks, subMonths, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval } from 'date-fns';
+import { format, subDays, isValid, startOfDay } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Transaction } from '@/stores/transactionStore';
 import TimeFrameSelector from './TimeFrameSelector';
@@ -48,7 +48,7 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
   
   // Initialize data with zero values
   const data = interval.map(date => ({
-    name: format(date, dateFormat),
+    name: isValid(date) ? format(date, dateFormat) : `Invalid Date`,
     revenue: 0,
     transactions: 0,
     timestamp: date.getTime(),
@@ -57,6 +57,12 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
   // Populate with transaction data
   transactions.forEach(transaction => {
     const txDate = new Date(transaction.date);
+    
+    // Skip invalid dates
+    if (!isValid(txDate)) {
+      return;
+    }
+    
     const txTimestamp = txDate.getTime();
     
     // Skip failed transactions
@@ -66,13 +72,20 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
     
     // Find matching data entry based on time frame
     const dataEntry = data.find(entry => {
+      if (!entry.timestamp) return false;
+      
+      const entryDate = new Date(entry.timestamp);
+      if (!isValid(entryDate)) return false;
+      
       if (timeFrame === 'day') {
         // Match by hour
-        return txDate.getHours() === new Date(entry.timestamp).getHours() &&
-               txDate.getDate() === new Date(entry.timestamp).getDate();
+        return txDate.getHours() === entryDate.getHours() &&
+               txDate.getDate() === entryDate.getDate();
       } else {
-        // Match by day for week and month
-        return format(txDate, 'yyyy-MM-dd') === format(new Date(entry.timestamp), 'yyyy-MM-dd');
+        // Match by day for week and month - normalize to start of day to avoid time comparison issues
+        const txStartOfDay = startOfDay(txDate).getTime();
+        const entryStartOfDay = startOfDay(entryDate).getTime();
+        return txStartOfDay === entryStartOfDay;
       }
     });
     
