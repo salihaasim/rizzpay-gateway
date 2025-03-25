@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from 'react';
 import { 
   LineChart, 
@@ -23,7 +22,7 @@ import {
   TrendingUp, 
   BarChart3,
   ArrowUpRight,
-  InfoCircle
+  Info
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
@@ -33,13 +32,11 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 
 type TimeFrame = 'day' | 'week' | 'month';
 
-// Chart data generation
 const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame) => {
   const today = new Date();
   let interval: Date[] = [];
   let dateFormat = '';
   
-  // Define intervals and formats based on time frame
   switch (timeFrame) {
     case 'day':
       interval = Array.from({ length: 24 }, (_, i) => {
@@ -59,7 +56,6 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
       break;
   }
   
-  // Initialize data with zero values
   const data = interval.map(date => ({
     name: isValid(date) ? format(date, dateFormat) : `Invalid Date`,
     revenue: 0,
@@ -67,23 +63,19 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
     timestamp: date.getTime(),
   }));
   
-  // Populate with transaction data
   transactions.forEach(transaction => {
     const txDate = new Date(transaction.date);
     
-    // Skip invalid dates
     if (!isValid(txDate)) {
       return;
     }
     
     const txTimestamp = txDate.getTime();
     
-    // Skip failed transactions
     if (transaction.status === 'failed' || transaction.status === 'declined') {
       return;
     }
     
-    // Find matching data entry based on time frame
     const dataEntry = data.find(entry => {
       if (!entry.timestamp) return false;
       
@@ -91,11 +83,9 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
       if (!isValid(entryDate)) return false;
       
       if (timeFrame === 'day') {
-        // Match by hour
         return txDate.getHours() === entryDate.getHours() &&
                txDate.getDate() === entryDate.getDate();
       } else {
-        // Match by day for week and month - normalize to start of day to avoid time comparison issues
         const txStartOfDay = startOfDay(txDate).getTime();
         const entryStartOfDay = startOfDay(entryDate).getTime();
         return txStartOfDay === entryStartOfDay;
@@ -103,7 +93,6 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
     });
     
     if (dataEntry) {
-      // Extract amount (remove currency symbol and convert to number)
       const amountStr = transaction.amount.replace(/[^0-9.-]+/g, '');
       const amount = parseFloat(amountStr);
       
@@ -117,14 +106,12 @@ const generateTimeFrameData = (transactions: Transaction[], timeFrame: TimeFrame
   return data;
 };
 
-// Calculate average revenue per period
 const calculateAverageRevenue = (data: any[]) => {
   if (data.length === 0) return 0;
   const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
   return totalRevenue / data.length;
 };
 
-// Find peak transaction period
 const findPeakTransactionPeriod = (data: any[]) => {
   if (data.length === 0) return null;
   return data.reduce((max, item) => 
@@ -156,13 +143,11 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
   );
   
   const handleDownloadCSV = () => {
-    // Convert data to CSV
     const headers = 'Period,Revenue,Transactions\n';
     const csvContent = chartData.reduce((content, row) => {
       return content + `${row.name},${row.revenue},${row.transactions}\n`;
     }, headers);
     
-    // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -372,7 +357,7 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
         
         <div className="flex justify-between items-center px-6 py-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <InfoCircle className="h-3 w-3" />
+            <Info className="h-3 w-3" />
             <span>Based on {transactions.length} transactions</span>
           </div>
           <div>
