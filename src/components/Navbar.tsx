@@ -118,13 +118,13 @@ const Navbar = () => {
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden py-4 border-t">
-          <div className="container">
+          <div className="container flex flex-col space-y-3">
             <NavLink to="/" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
               Home
             </NavLink>
             
             {isAuthenticated ? (
-              <div className="flex flex-col space-y-3">
+              <>
                 <NavLink to="/dashboard" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
                 </NavLink>
@@ -143,16 +143,16 @@ const Navbar = () => {
                 <NavLink to="/payment" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
                   Make Payment
                 </NavLink>
-              </div>
+              </>
             ) : (
-              <div className="flex flex-col space-y-3">
+              <>
                 <NavLink to="/payment" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
                   Make Payment
                 </NavLink>
                 <NavLink to="/developers" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
                   Developers
                 </NavLink>
-              </div>
+              </>
             )}
           </div>
         </div>
