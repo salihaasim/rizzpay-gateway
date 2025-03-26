@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/stores/authStore';
@@ -61,6 +60,9 @@ const Navbar = () => {
                 </NavLink>
                 <NavLink to="/payment" className={navLinkClasses}>
                   Make Payment
+                </NavLink>
+                <NavLink to="/quick-payment" className={navLinkClasses}>
+                  Quick Payment
                 </NavLink>
                 <NavLink to="/developers" className={navLinkClasses}>
                   Developers

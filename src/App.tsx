@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/dashboard/*" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
         <Route path="/webhook-payment" element={<WebhookPayment />} />
         <Route path="/quick-payment" element={<QuickPaymentPage />} />
       </Routes>
