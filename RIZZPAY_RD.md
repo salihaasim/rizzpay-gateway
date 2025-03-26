@@ -1,3 +1,4 @@
+
 # Rizzpay Research & Development Documentation
 
 ## Project Overview
@@ -61,6 +62,18 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
    # or
    yarn preview
    ```
+
+## Quick Start Guide
+
+For developers new to the project, here's a quick way to get started:
+
+1. **Setup your environment** as described above
+2. **Login as a test merchant**:
+   - Email: `test@rizzpay.com`
+   - Password: `testpass123`
+3. **Explore the dashboard** to understand the merchant view
+4. **Test a payment flow** by creating a new payment
+5. **Check the webhook setup** to understand integration capabilities
 
 ## Project Timeline
 
@@ -132,6 +145,10 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
 2. **Component Props Errors**
    - **Issue**: `Property 'apiKey' is missing in type '{}'`
    - **Resolution**: Added proper state management for API key in WebhookPage component
+
+3. **Zustand Store Errors**
+   - **Issue**: TypeScript errors with object literals in state updates
+   - **Resolution**: Fixed by properly typing the `set` function in store slices and ensuring all updates use a function that returns partial state
 
 #### Supabase Integration
 
@@ -319,6 +336,23 @@ npx supabase functions deploy
 # Deploy a specific function
 npx supabase functions deploy webhook
 ```
+
+## Troubleshooting Common Issues
+
+### Authentication Problems
+
+- **Issue**: Unable to login after registration
+  **Solution**: Check Supabase policies and roles configuration
+
+### Payment Processing Failures
+
+- **Issue**: Payment initiated but stuck in processing
+  **Solution**: Check webhook configuration and ensure proper callback URL
+
+### Development Environment Issues
+
+- **Issue**: Hot-reloading not working properly
+  **Solution**: Restart the development server and clear browser cache
 
 ## Future Development Roadmap
 
