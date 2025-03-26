@@ -1,11 +1,9 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import StatCard from '@/components/StatCard';
 import TransactionCard from '@/components/TransactionCard';
 import PaymentFlow from '@/components/PaymentFlow';
-import Navbar from '@/components/Navbar';
 import { Separator } from '@/components/ui/separator';
 import AnalyticsChart from '@/components/AnalyticsChart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -56,8 +54,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="content-wrapper">
         <div className="page-header">
           <div>

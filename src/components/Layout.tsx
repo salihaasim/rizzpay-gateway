@@ -1,6 +1,5 @@
 
 import React, { memo } from 'react';
-import Navbar from './Navbar';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Navigate } from 'react-router-dom';
 
@@ -30,7 +29,6 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1">
         {children}
       </main>
