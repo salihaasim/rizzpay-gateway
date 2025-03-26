@@ -5,7 +5,6 @@ import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import PaymentPage from './pages/PaymentPage';
 import WebhookPayment from './pages/WebhookPayment';
-import QuickPaymentPage from './pages/QuickPaymentPage';
 import Layout from './components/Layout';
 import { Toaster } from 'sonner';
 
@@ -18,7 +17,6 @@ function App() {
         <Route path="/dashboard/*" element={<Layout><Dashboard /></Layout>} />
         <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
         <Route path="/webhook-payment" element={<WebhookPayment />} />
-        <Route path="/quick-payment" element={<QuickPaymentPage />} />
       </Routes>
     </Router>
   );
