@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useState, useCallback, memo } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/stores/authStore';
 import { useProfileStore } from '@/stores/profileStore';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -12,10 +12,23 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) => {
   return `text-sm font-medium transition-colors hover:text-primary ${isActive ? 'text-primary' : 'text-muted-foreground'}`;
 };
 
-const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+const Navbar = memo(() => {
+  const { isAuthenticated, logout, loading } = useAuth();
   const { profile } = useProfileStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen(prevState => !prevState);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+  }, [logout]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -32,7 +45,7 @@ const Navbar = () => {
               Home
             </NavLink>
             
-            {isAuthenticated ? (
+            {isAuthenticated && !loading ? (
               <>
                 <NavLink to="/dashboard" className={navLinkClasses}>
                   Dashboard
@@ -58,12 +71,12 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleMobileMenu}>
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle menu</span>
           </Button>
           
-          {isAuthenticated ? (
+          {isAuthenticated && !loading ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -76,7 +89,7 @@ const Navbar = () => {
               <DropdownMenuContent align="end" className="bg-background border border-border">
                 <DropdownMenuLabel>{profile?.full_name || "User"}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   Logout
                   <LogOut className="ml-auto h-4 w-4" />
                 </DropdownMenuItem>
@@ -101,28 +114,28 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden py-4 border-t">
           <div className="container flex flex-col space-y-3">
-            <NavLink to="/" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+            <NavLink to="/" className={navLinkClasses} onClick={closeMobileMenu}>
               Home
             </NavLink>
             
-            {isAuthenticated ? (
+            {isAuthenticated && !loading ? (
               <>
-                <NavLink to="/dashboard" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                <NavLink to="/dashboard" className={navLinkClasses} onClick={closeMobileMenu}>
                   Dashboard
                 </NavLink>
-                <NavLink to="/transactions" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                <NavLink to="/transactions" className={navLinkClasses} onClick={closeMobileMenu}>
                   Transactions
                 </NavLink>
-                <NavLink to="/wallet" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                <NavLink to="/wallet" className={navLinkClasses} onClick={closeMobileMenu}>
                   Wallet
                 </NavLink>
-                <NavLink to="/webhook" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                <NavLink to="/webhook" className={navLinkClasses} onClick={closeMobileMenu}>
                   Webhooks
                 </NavLink>
-                <NavLink to="/developers" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                <NavLink to="/developers" className={navLinkClasses} onClick={closeMobileMenu}>
                   Developers
                 </NavLink>
-                <NavLink to="/payment" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                <NavLink to="/payment" className={navLinkClasses} onClick={closeMobileMenu}>
                   Make Payment
                 </NavLink>
               </>
@@ -132,6 +145,8 @@ const Navbar = () => {
       )}
     </header>
   );
-};
+});
 
-export default React.memo(Navbar);
+Navbar.displayName = 'Navbar';
+
+export default Navbar;

@@ -1,5 +1,5 @@
 
-import React, { useEffect, memo, Suspense } from 'react';
+import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import { Toaster } from 'sonner';
@@ -44,12 +44,22 @@ const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
 ProtectedRoute.displayName = 'ProtectedRoute';
 
 function App() {
-  const { checkAuth } = useAuth();
+  const { checkAuth, loading } = useAuth();
+  const [appReady, setAppReady] = useState(false);
   
   // Check authentication status on app load
   useEffect(() => {
-    checkAuth();
+    const initAuth = async () => {
+      await checkAuth();
+      setAppReady(true);
+    };
+    
+    initAuth();
   }, [checkAuth]);
+
+  if (!appReady && loading) {
+    return <PageLoading />;
+  }
 
   return (
     <Router>
