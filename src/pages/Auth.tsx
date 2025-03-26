@@ -1,112 +1,52 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { useProfileStore } from '@/stores/profileStore';
-import { useToast } from '@/components/ui/use-toast';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { LogIn, Store, Loader2, CreditCard, ArrowLeft } from 'lucide-react';
-import MerchantRegistration from '@/components/auth/MerchantRegistration';
-import { supabase } from '@/utils/supabaseClient';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, LogIn, Store, Loader2 } from 'lucide-react';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
-// Validation schema
-const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-const Auth: React.FC = () => {
-  const [authMode, setAuthMode] = useState<'login' | 'merchant'>('login');
+const Auth = () => {
+  const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setUserRole, initializeWallet } = useTransactionStore();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  // Check if already logged in
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase().auth.getSession();
-      if (data.session) {
-        const { data: userData } = await supabase().auth.getUser();
-        if (userData.user) {
-          // Check if admin
-          if (userData.user.email === 'admin@rizzpay.com') {
-            setUserRole('admin', userData.user.email);
-          } else {
-            setUserRole('merchant', userData.user.email);
-            initializeWallet(userData.user.email);
-          }
-          navigate('/dashboard');
-        }
-      }
-    };
-    
-    checkSession();
-  }, [navigate, setUserRole, initializeWallet]);
-
-  // Login form
-  const loginForm = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    fullName: ''
   });
+  
+  const { login, addMerchant } = useMerchantAuth();
+  const navigate = useNavigate();
 
-  const handleLoginSubmit = async (data: LoginFormValues) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    try {
-      const { data: authData, error } = await supabase().auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+
+    if (isRegister) {
+      addMerchant({
+        username: formData.username,
+        password: formData.password,
+        fullName: formData.fullName
       });
-
-      if (error) {
-        toast({
-          title: "Login failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      if (authData.user) {
-        // Check if admin
-        if (authData.user.email === 'admin@rizzpay.com') {
-          setUserRole('admin', authData.user.email);
-          toast({
-            title: "Admin login successful",
-            description: "Welcome back, admin!",
-          });
-        } else {
-          setUserRole('merchant', authData.user.email);
-          initializeWallet(authData.user.email);
-          toast({
-            title: "Merchant login successful",
-            description: `Welcome back!`,
-          });
-        }
+      setIsRegister(false);
+      setFormData({ username: '', password: '', fullName: '' });
+    } else {
+      const success = login(formData.username, formData.password);
+      if (success) {
         navigate('/dashboard');
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      toast({
-        title: "Login failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
     }
+
     setLoading(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   return (
@@ -120,7 +60,7 @@ const Auth: React.FC = () => {
             </Button>
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
-                <CreditCard className="h-5 w-5 text-primary" />
+                <Store className="h-5 w-5 text-primary" />
               </div>
               <span className="font-bold text-xl bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent">
                 RizzPay
@@ -129,123 +69,90 @@ const Auth: React.FC = () => {
           </div>
         </div>
       </header>
-      
+
       <div className="flex-1 flex items-center justify-center bg-secondary/10 py-10">
         <div className="w-full max-w-md px-4">
-          <Card className="border-0 shadow-lg overflow-hidden">
-            <CardHeader className="text-center pb-4">
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="text-center">
               <CardTitle className="text-2xl">
-                {authMode === 'merchant' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <Store className="h-6 w-6 text-primary" />
-                    Merchant Registration
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                      <LogIn className="h-6 w-6 text-primary" />
-                    </div>
-                    Welcome Back
-                  </div>
-                )}
+                {isRegister ? 'Register as Merchant' : 'Merchant Login'}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {authMode === 'merchant' ? (
-                // Merchant registration form
-                <MerchantRegistration />
-              ) : (
-                // Login form
-                <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
-                    <FormField
-                      control={loginForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="your@email.com" 
-                              {...field} 
-                              className="bg-secondary/30 border-secondary"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="••••••" 
-                              {...field} 
-                              className="bg-secondary/30 border-secondary"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Logging in...
-                        </>
-                      ) : (
-                        <>
-                          <LogIn className="mr-2 h-4 w-4" />
-                          Login
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              )}
-            </CardContent>
-            <CardFooter className="flex flex-col pt-0">
-              <Separator className="my-4" />
-              {authMode === 'merchant' ? (
-                <Button 
-                  variant="outline" 
-                  onClick={() => setAuthMode('login')}
-                  className="w-full"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Login
-                </Button>
-              ) : (
-                <div className="w-full">
-                  <p className="text-center text-sm text-muted-foreground mb-3">
-                    Don't have an account yet?
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setAuthMode('merchant')}
-                    className="w-full"
-                  >
-                    <Store className="mr-2 h-4 w-4" />
-                    Register as Merchant
-                  </Button>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    placeholder="Enter your username"
+                    required
+                  />
                 </div>
-              )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+
+                {isRegister && (
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  </div>
+                )}
+
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isRegister ? 'Registering...' : 'Logging in...'}
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      {isRegister ? 'Register' : 'Login'}
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <Button
+                variant="link"
+                onClick={() => {
+                  setIsRegister(!isRegister);
+                  setFormData({ username: '', password: '', fullName: '' });
+                }}
+              >
+                {isRegister
+                  ? 'Already have an account? Login'
+                  : 'Need an account? Register'}
+              </Button>
             </CardFooter>
           </Card>
-          
-          <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              By continuing, you agree to RizzPay's{' '}
-              <a href="#" className="text-primary hover:underline">Terms of Service</a>{' '}
-              and{' '}
-              <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
-            </p>
+
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            <p>Demo credentials:</p>
+            <p>Username: merchant</p>
+            <p>Password: password</p>
           </div>
         </div>
       </div>

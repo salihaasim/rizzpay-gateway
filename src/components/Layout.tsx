@@ -1,14 +1,15 @@
 
 import React, { memo } from 'react';
 import Navbar from './Navbar';
-import { useAuth } from '@/stores/authStore';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { Navigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = memo(({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useMerchantAuth();
 
   // Show loading indicator if authentication is still being checked
   if (loading) {
@@ -22,9 +23,9 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     );
   }
 
-  // If not authenticated, we let App's ProtectedRoute handle the redirect
+  // If not authenticated, redirect to auth page
   if (!isAuthenticated) {
-    return null;
+    return <Navigate to="/auth" replace />;
   }
 
   return (

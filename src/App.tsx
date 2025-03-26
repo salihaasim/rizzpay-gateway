@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -16,6 +15,7 @@ const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Layout = React.lazy(() => import('./components/Layout'));
 const Auth = React.lazy(() => import('./pages/Auth'));
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 // Loading component
 const PageLoading = () => (
@@ -27,41 +27,13 @@ const PageLoading = () => (
   </div>
 );
 
-// Optimized Protected route component
-const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-  
-  if (loading) {
-    return <PageLoading />;
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-});
-
-ProtectedRoute.displayName = 'ProtectedRoute';
-
-function App() {
-  const { checkAuth, loading } = useAuth();
+const App = () => {
+  const { isAuthenticated, loading } = useMerchantAuth();
   const [appReady, setAppReady] = useState(false);
   
-  // Check authentication status on app load
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        await checkAuth();
-      } catch (error) {
-        console.error("Authentication check failed:", error);
-      } finally {
-        setAppReady(true);
-      }
-    };
-    
-    initAuth();
-  }, [checkAuth]);
+    setAppReady(true);
+  }, []);
 
   if (!appReady && loading) {
     return <PageLoading />;
@@ -72,8 +44,9 @@ function App() {
       <Toaster position="top-right" />
       <Suspense fallback={<PageLoading />}>
         <Routes>
-          {/* Index page without Layout to avoid duplicate navbar */}
+          {/* Public routes */}
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           
           {/* Protected routes with Layout */}
           <Route path="/dashboard/*" element={
@@ -110,15 +83,29 @@ function App() {
           {/* Special pages */}
           <Route path="/webhook-payment" element={<WebhookPayment />} />
           
-          {/* Auth page */}
-          <Route path="/auth" element={<Auth />} />
-          
           {/* 404 Page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </Router>
   );
-}
+};
+
+// Update ProtectedRoute to use merchant auth
+const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useMerchantAuth();
+  
+  if (loading) {
+    return <PageLoading />;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+});
+
+ProtectedRoute.displayName = 'ProtectedRoute';
 
 export default App;
