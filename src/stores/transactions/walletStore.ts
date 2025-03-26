@@ -1,5 +1,5 @@
 
-import { Transaction, Wallet, WalletTransactionType } from './types';
+import { Transaction, Wallet, WalletTransactionType, TransactionState } from './types';
 import { generateTransactionId } from './utils';
 
 export interface WalletSlice {
@@ -12,8 +12,8 @@ export interface WalletSlice {
 }
 
 export const createWalletSlice = (
-  set: (fn: (state: any) => any) => void,
-  get: () => any
+  set: (fn: (state: TransactionState) => Partial<TransactionState>) => void,
+  get: () => TransactionState
 ): WalletSlice => ({
   wallets: {},
   

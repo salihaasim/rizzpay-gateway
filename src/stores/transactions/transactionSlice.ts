@@ -9,8 +9,8 @@ export interface TransactionSlice {
 }
 
 export const createTransactionSlice = (
-  set: (fn: (state: any) => any) => void,
-  get: () => any
+  set: (fn: (state: TransactionState) => Partial<TransactionState>) => void,
+  get: () => TransactionState
 ): TransactionSlice => ({
   transactions: [],
   
@@ -28,5 +28,5 @@ export const createTransactionSlice = (
       )
     })),
     
-  clearTransactions: () => set({ transactions: [] })
+  clearTransactions: () => set((state) => ({ transactions: [] }))
 });

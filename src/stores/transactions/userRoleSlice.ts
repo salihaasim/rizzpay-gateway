@@ -1,5 +1,5 @@
 
-import { UserRole } from './types';
+import { UserRole, TransactionState } from './types';
 
 export interface UserRoleSlice {
   userRole: UserRole;
@@ -10,17 +10,26 @@ export interface UserRoleSlice {
 }
 
 export const createUserRoleSlice = (
-  set: (fn: (state: any) => any) => void,
-  get: () => any
+  set: (fn: (state: TransactionState) => Partial<TransactionState>) => void,
+  get: () => TransactionState
 ): UserRoleSlice => ({
   userRole: null,
   userEmail: null,
   
-  setUserRole: (role, email) => set({ userRole: role, userEmail: email }),
+  setUserRole: (role, email) => set((state) => ({ 
+    userRole: role, 
+    userEmail: email 
+  })),
   
-  clearUserData: () => set({ userRole: null, userEmail: null }),
+  clearUserData: () => set((state) => ({ 
+    userRole: null, 
+    userEmail: null 
+  })),
   
   resetUserRole: () => {
-    set({ userRole: null, userEmail: null });
+    set((state) => ({ 
+      userRole: null, 
+      userEmail: null 
+    }));
   }
 });
