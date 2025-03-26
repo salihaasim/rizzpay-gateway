@@ -1,28 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle2 } from 'lucide-react';
+import { useTransactionStore } from '@/stores/transactionStore';
+import { simulateWalletProcessing } from '@/utils/walletUtils';
 import { toast } from 'sonner';
-import { loadRazorpayScript } from '@/utils/razorpay/razorpayLoader';
-import { 
-  processRazorpayCardPayment, 
-  processRazorpayNeftPayment 
-} from '@/utils/paymentBackendUtils';
+import { generateTransactionId } from '@/utils/formatUtils';
 
 interface RazorpayPaymentHandlerProps {
-  paymentData: {
-    amount: string;
-    currency: string;
-    paymentMethod: string;
-    name: string;
-    customerEmail: string;
-    cardNumber?: string;
-    cardExpiry?: string;
-    cardName?: string;
-    bankAccount?: string;
-    bankIfsc?: string;
-    bankName?: string;
-  };
+  paymentData: any;
   onSuccess: (transactionId: string) => void;
   onError: () => void;
 }
@@ -32,87 +18,91 @@ const RazorpayPaymentHandler: React.FC<RazorpayPaymentHandlerProps> = ({
   onSuccess,
   onError
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const { depositToWallet, userEmail } = useTransactionStore();
 
-  const initiatePayment = async () => {
-    setLoading(true);
+  const handleRazorpayPayment = async () => {
+    setProcessing(true);
     
     try {
-      // Show processing notification
-      toast.info(
-        'Processing Payment',
-        {
-          description: `Processing ${paymentData.paymentMethod.toUpperCase()} payment of ${getCurrencySymbol(paymentData.currency)}${paymentData.amount}...`
+      // If payment method is wallet, handle it directly
+      if (paymentData.paymentMethod === 'wallet' && userEmail) {
+        const walletBalance = useTransactionStore.getState().getWalletBalance(userEmail);
+        const amount = parseFloat(paymentData.amount);
+        
+        // Check if wallet has sufficient balance
+        if (amount > walletBalance) {
+          toast.error("Insufficient wallet balance", {
+            description: "Please add funds to your wallet or choose a different payment method."
+          });
+          setProcessing(false);
+          return;
         }
-      );
-      
-      // Process the payment using Razorpay based on payment method
-      let result = null;
-      
-      if (paymentData.paymentMethod === 'card') {
-        result = await processRazorpayCardPayment(
-          parseFloat(paymentData.amount),
-          paymentData.name,
-          paymentData.customerEmail,
-          {
-            cardNumber: paymentData.cardNumber || '4242424242424242',
-            cardExpiry: paymentData.cardExpiry || '12/25',
-            cardHolderName: paymentData.cardName || paymentData.name
-          }
+        
+        // Create a transaction ID
+        const transactionId = generateTransactionId();
+        
+        // Process the payment from wallet
+        await simulateWalletProcessing(
+          userEmail, 
+          amount, 
+          'withdrawal', 
+          `Payment for ${paymentData.transactionId || 'order'}`
         );
-      } else if (paymentData.paymentMethod === 'neft') {
-        result = await processRazorpayNeftPayment(
-          parseFloat(paymentData.amount),
-          paymentData.name,
-          paymentData.customerEmail,
-          {
-            accountNumber: paymentData.bankAccount || '1234567890',
-            ifscCode: paymentData.bankIfsc || 'SBIN0001234',
-            bankName: paymentData.bankName || 'HDFC Bank'
-          }
-        );
+        
+        // Notify success
+        toast.success("Payment successful", {
+          description: `₹${amount.toFixed(2)} has been paid from your wallet.`
+        });
+        
+        // Call success callback
+        onSuccess(transactionId);
+        return;
       }
       
-      if (result) {
-        // Payment was successful
-        toast.success('Payment successful!');
-        onSuccess(result.id || 'transaction-id');
-      } else {
-        // Payment failed or was cancelled
-        toast.error('Payment was not completed');
-        onError();
-      }
-      
-      setLoading(false);
+      // For other payment methods, simulate Razorpay payment
+      // In a real implementation, this would call the Razorpay SDK
+      setTimeout(() => {
+        const transactionId = generateTransactionId();
+        
+        // For 90% of cases, simulate success
+        if (Math.random() < 0.9) {
+          onSuccess(transactionId);
+        } else {
+          toast.error("Payment failed", {
+            description: "Please try again or use a different payment method."
+          });
+          onError();
+        }
+        
+        setProcessing(false);
+      }, 2000);
     } catch (error) {
-      console.error("Payment processing error:", error);
-      toast.error("An error occurred during payment processing");
-      setLoading(false);
+      console.error('Payment error:', error);
+      toast.error("Payment processing error", {
+        description: error instanceof Error ? error.message : "An unexpected error occurred."
+      });
       onError();
-    }
-  };
-
-  const getCurrencySymbol = (currency: string) => {
-    switch (currency) {
-      case 'INR': return '₹';
-      case 'USD': return '$';
-      case 'EUR': return '€';
-      default: return '₹';
+      setProcessing(false);
     }
   };
 
   return (
-    <Button 
-      onClick={initiatePayment} 
-      disabled={loading} 
-      className="rounded-full px-6 w-full"
+    <Button
+      onClick={handleRazorpayPayment}
+      disabled={processing}
+      className="w-full"
     >
-      {loading ? (
+      {processing ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Processing Payment...
         </>
       ) : (
-        <>Pay Now</>
+        <>
+          <CheckCircle2 className="mr-2 h-4 w-4" />
+          Pay Now
+        </>
       )}
     </Button>
   );
