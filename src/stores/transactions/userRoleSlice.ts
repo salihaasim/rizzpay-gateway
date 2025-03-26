@@ -7,6 +7,7 @@ export interface UserRoleSlice {
   setUserRole: (role: UserRole, email: string | null) => void;
   clearUserData: () => void;
   resetUserRole: () => void;
+  isAuthenticated: () => boolean;
 }
 
 export const createUserRoleSlice = (
@@ -31,5 +32,10 @@ export const createUserRoleSlice = (
       userRole: null, 
       userEmail: null 
     }));
+  },
+  
+  isAuthenticated: () => {
+    const state = get();
+    return state.userEmail !== null;
   }
 });

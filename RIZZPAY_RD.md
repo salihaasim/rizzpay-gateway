@@ -74,6 +74,7 @@ For developers new to the project, here's a quick way to get started:
 3. **Explore the dashboard** to understand the merchant view
 4. **Test a payment flow** by creating a new payment
 5. **Check the webhook setup** to understand integration capabilities
+6. **Try the quick payment feature** by visiting `/quick-payment` route directly
 
 ## Project Timeline
 
@@ -116,6 +117,12 @@ For developers new to the project, here's a quick way to get started:
    - Created payment storage and verification capabilities
    - Implemented secure payment data handling
    - Added transaction status management
+
+7. **Quick Payment Feature**
+   - Implemented direct payment page for customers
+   - Added user-friendly payment form for fast checkout
+   - Created seamless process for guests to make payments
+   - Connected to existing payment processors
 
 ### UI Improvements
 
@@ -375,6 +382,11 @@ npx supabase functions deploy webhook
 5. **Internationalization**
    - Add multi-currency support
    - Implement language localization
+
+6. **Quick Payment System Improvements**
+   - Add saved payment methods for returning users
+   - Implement QR code generation for quick payments
+   - Add more payment options specific to quick payment flow
 
 ---
 

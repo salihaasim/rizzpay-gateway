@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -36,8 +35,13 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               
-              <Button variant="outline" size="lg" className="rounded-full px-8">
-                Learn More
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="rounded-full px-8"
+                onClick={() => navigate('/quick-payment')}
+              >
+                Make a Payment
               </Button>
             </div>
           </div>
@@ -190,6 +194,29 @@ const Index = () => {
           </div>
           
           <RoleSelector />
+        </div>
+      </section>
+      
+      {/* Quick Payment Section */}
+      <section className="py-16 md:py-20 bg-secondary/20">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4">Need to Make a Quick Payment?</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              No account needed. Make secure payments instantly using our payment gateway.
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/quick-payment')} 
+              className="rounded-full px-8 shadow-md"
+            >
+              Quick Payment
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </section>
       
