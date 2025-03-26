@@ -15,67 +15,6 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
 - **Form Handling**: React Hook Form, Zod
 - **Notifications**: Sonner
 
-## Running the Application Locally
-
-### Development Environment Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/rizzpay.git
-   cd rizzpay
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. **Environment Variables**
-   Create a `.env` file in the root directory with:
-   ```
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
-   ```
-
-4. **Start development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-   
-   The application will be available at `http://localhost:8080`
-
-5. **Build for production**
-   ```bash
-   npm run build
-   # or
-   yarn build
-   ```
-
-6. **Preview production build**
-   ```bash
-   npm run preview
-   # or
-   yarn preview
-   ```
-
-## Quick Start Guide
-
-For developers new to the project, here's a quick way to get started:
-
-1. **Setup your environment** as described above
-2. **Login as a test merchant**:
-   - Email: `test@rizzpay.com`
-   - Password: `testpass123`
-3. **Explore the dashboard** to understand the merchant view
-4. **Test a payment flow** by creating a new payment
-5. **Check the webhook setup** to understand integration capabilities
-6. **Try the quick payment feature** by visiting `/quick-payment` route directly
-
 ## Project Timeline
 
 ### Initial Setup
@@ -118,12 +57,6 @@ For developers new to the project, here's a quick way to get started:
    - Implemented secure payment data handling
    - Added transaction status management
 
-7. **Quick Payment Feature**
-   - Implemented direct payment page for customers
-   - Added user-friendly payment form for fast checkout
-   - Created seamless process for guests to make payments
-   - Connected to existing payment processors
-
 ### UI Improvements
 
 1. **Navigation**
@@ -153,10 +86,6 @@ For developers new to the project, here's a quick way to get started:
    - **Issue**: `Property 'apiKey' is missing in type '{}'`
    - **Resolution**: Added proper state management for API key in WebhookPage component
 
-3. **Zustand Store Errors**
-   - **Issue**: TypeScript errors with object literals in state updates
-   - **Resolution**: Fixed by properly typing the `set` function in store slices and ensuring all updates use a function that returns partial state
-
 #### Supabase Integration
 
 1. **Client Configuration**
@@ -180,49 +109,6 @@ For developers new to the project, here's a quick way to get started:
 3. **API Integration**
    - Created utility functions for API calls
    - Implemented proper error handling for all API interactions
-
-## Store Architecture
-
-The application uses Zustand for state management with a modular approach:
-
-### Transaction Store Structure
-
-```
-src/stores/transactions/
-├── index.ts                # Main store export
-├── types.ts                # TypeScript interfaces and types
-├── utils.ts                # Helper functions
-├── transactionSlice.ts     # Transaction management
-├── userRoleSlice.ts        # User roles and permissions
-└── walletStore.ts          # Wallet functionality
-```
-
-### Key Design Principles
-
-1. **Slice Pattern**: State is divided into focused slices with specific responsibilities
-2. **Type Safety**: Comprehensive TypeScript typing for all store operations
-3. **Immutability**: State updates follow immutable patterns
-4. **Separation of Concerns**: Business logic is separated from UI components
-
-### Usage Example
-
-```typescript
-// Importing the store
-import { useTransactionStore } from '@/stores/transactions';
-
-// Using the store in a component
-const Component = () => {
-  const { transactions, addTransaction } = useTransactionStore();
-  
-  // Access state
-  console.log(transactions);
-  
-  // Update state
-  addTransaction(newTransaction);
-  
-  return (/* component JSX */);
-};
-```
 
 ## Commands & Development Notes
 
@@ -296,71 +182,6 @@ npm install date-fns uuid lucide-react recharts sonner
 npm install @supabase/supabase-js
 ```
 
-## Testing
-
-For testing the application during development:
-
-```bash
-# Run unit tests
-npm run test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run integration tests
-npm run test:integration
-```
-
-## Code Style and Linting
-
-We use ESLint and Prettier for code formatting and linting:
-
-```bash
-# Check code formatting
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
-# Format code with Prettier
-npm run format
-```
-
-## Deployment
-
-### Production Deployment
-
-1. Build the application: `npm run build`
-2. Deploy the `dist` folder to your hosting service
-3. Ensure environment variables are properly set in the production environment
-
-### Supabase Functions Deployment
-
-```bash
-# Deploy all functions
-npx supabase functions deploy
-
-# Deploy a specific function
-npx supabase functions deploy webhook
-```
-
-## Troubleshooting Common Issues
-
-### Authentication Problems
-
-- **Issue**: Unable to login after registration
-  **Solution**: Check Supabase policies and roles configuration
-
-### Payment Processing Failures
-
-- **Issue**: Payment initiated but stuck in processing
-  **Solution**: Check webhook configuration and ensure proper callback URL
-
-### Development Environment Issues
-
-- **Issue**: Hot-reloading not working properly
-  **Solution**: Restart the development server and clear browser cache
-
 ## Future Development Roadmap
 
 1. **Analytics Dashboard**
@@ -382,11 +203,6 @@ npx supabase functions deploy webhook
 5. **Internationalization**
    - Add multi-currency support
    - Implement language localization
-
-6. **Quick Payment System Improvements**
-   - Add saved payment methods for returning users
-   - Implement QR code generation for quick payments
-   - Add more payment options specific to quick payment flow
 
 ---
 

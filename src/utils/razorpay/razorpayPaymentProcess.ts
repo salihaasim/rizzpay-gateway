@@ -29,15 +29,12 @@ export const processRazorpayPayment = async (
     // Convert amount to paise (Razorpay requires amount in smallest currency unit)
     const amountInPaise = Math.round(orderData.amount * 100);
     
-    // Force currency to INR
-    const currency = 'INR';
-    
     // Return a promise that resolves when payment completes
     return new Promise((resolve, reject) => {
       const options = {
         key: "rzp_test_JXIkZl2p0iUbRw", // Using the Razorpay Key ID
         amount: amountInPaise,
-        currency: currency,
+        currency: orderData.currency,
         name: "Rizzpay",
         description: orderData.description || "Payment Processing",
         order_id: orderData.orderId,
@@ -77,7 +74,7 @@ export const processRazorpayPayment = async (
                   {
                     stage: 'initiated',
                     timestamp: new Date().toISOString(),
-                    message: `Payment of ${orderData.amount} INR initiated via Razorpay`
+                    message: `Payment of ${orderData.amount} ${orderData.currency} initiated via Razorpay`
                   },
                   {
                     stage: 'completed',
@@ -112,7 +109,7 @@ export const processRazorpayPayment = async (
             const transaction: Transaction = {
               id: data.id,
               date: new Date(data.date).toISOString(),
-              amount: `₹ ${data.amount}`,
+              amount: `${data.currency === 'INR' ? '₹' : data.currency} ${data.amount}`,
               rawAmount: parseFloat(data.amount.toString()),
               paymentMethod: data.payment_method,
               status: 'successful',

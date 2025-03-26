@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { loadRazorpayScript } from '@/utils/razorpay/razorpayLoader';
-import { Loader2, IndianRupee } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface PaymentAmountFormProps {
   paymentData: any;
@@ -36,13 +37,6 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
     
     preloadScript();
   }, []);
-
-  // Force set currency to INR
-  React.useEffect(() => {
-    if (paymentData.currency !== 'INR') {
-      handleSelectChange('currency', 'INR');
-    }
-  }, [paymentData.currency, handleSelectChange]);
 
   // Direct Razorpay payment handling
   const handleDirectRazorpayPayment = async () => {
@@ -83,7 +77,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
       const options = {
         key: "rzp_test_JXIkZl2p0iUbRw", // Using the Razorpay Key ID
         amount: amountInPaise,
-        currency: 'INR',
+        currency: paymentData.currency,
         name: "Rizzpay",
         description: paymentData.purpose || "Payment Processing",
         prefill: {
@@ -155,10 +149,10 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="amount">Payment Amount (₹)</Label>
+        <Label htmlFor="amount">Payment Amount</Label>
         <div className="relative">
           <span className="absolute left-3 top-2.5 text-gray-500">
-            <IndianRupee className="h-4 w-4" />
+            {getCurrencySymbol(paymentData.currency)}
           </span>
           <Input
             id="amount"
@@ -175,17 +169,37 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="paymentMethod">Payment Method</Label>
-        <select
-          id="paymentMethod"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          value={paymentData.paymentMethod}
-          onChange={(e) => handleSelectChange('paymentMethod', e.target.value)}
+        <Label htmlFor="currency">Currency</Label>
+        <Select
+          value={paymentData.currency}
+          onValueChange={(value) => handleSelectChange('currency', value)}
         >
-          <option value="card">Credit/Debit Card</option>
-          <option value="neft">NEFT/Bank Transfer</option>
-          <option value="upi">UPI</option>
-        </select>
+          <SelectTrigger>
+            <SelectValue placeholder="Select Currency" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
+            <SelectItem value="USD">US Dollar ($)</SelectItem>
+            <SelectItem value="EUR">Euro (€)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="paymentMethod">Payment Method</Label>
+        <Select
+          value={paymentData.paymentMethod}
+          onValueChange={(value) => handleSelectChange('paymentMethod', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Payment Method" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="card">Credit/Debit Card</SelectItem>
+            <SelectItem value="neft">NEFT/Bank Transfer</SelectItem>
+            <SelectItem value="upi">UPI</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="space-y-2">

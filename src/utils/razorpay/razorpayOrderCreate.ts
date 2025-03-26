@@ -5,16 +5,13 @@ import { toast } from 'sonner';
 // Create a Razorpay order in the backend
 export const createRazorpayOrder = async (
   amount: number,
-  currency: string = 'INR', // Default to INR, but currency parameter is ignored
+  currency: string = 'INR',
   paymentMethod: string,
   customerName: string,
   customerEmail?: string,
   description?: string
 ): Promise<{ orderId: string, transactionId: string } | null> => {
   try {
-    // Force currency to INR
-    currency = 'INR';
-    
     // Create a transaction record first
     const transactionId = `RZRP_${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     

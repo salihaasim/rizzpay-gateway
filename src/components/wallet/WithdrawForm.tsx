@@ -5,37 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { validateIfscCode } from '@/utils/hdfcBankApi';
 
 interface WithdrawFormProps {
-  onWithdraw: (amount: number, description?: string, bankDetails?: {
-    accountNumber: string;
-    ifscCode: string;
-    beneficiaryName: string;
-    method: string;
-  }) => void;
+  onWithdraw: (amount: number, description?: string) => void;
   isProcessing?: boolean;
 }
 
 const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = false }) => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
-  const [withdrawMethod, setWithdrawMethod] = useState('wallet');
-  
-  // Bank details for NEFT withdrawals
-  const [accountNumber, setAccountNumber] = useState('');
-  const [ifscCode, setIfscCode] = useState('');
-  const [beneficiaryName, setBeneficiaryName] = useState('');
-  
-  // Validation states
-  const [ifscError, setIfscError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,29 +23,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
       return;
     }
     
-    // For NEFT withdrawals, validate bank details
-    if (withdrawMethod === 'neft') {
-      if (!accountNumber || !ifscCode || !beneficiaryName) {
-        return;
-      }
-      
-      if (!validateIfscCode(ifscCode)) {
-        setIfscError('Invalid IFSC code format');
-        return;
-      }
-      
-      setIfscError('');
-      
-      onWithdraw(parsedAmount, description, {
-        accountNumber,
-        ifscCode,
-        beneficiaryName,
-        method: 'neft'
-      });
-    } else {
-      // Regular wallet withdrawal
-      onWithdraw(parsedAmount, description);
-    }
+    onWithdraw(parsedAmount, description);
   };
 
   return (
@@ -91,69 +47,6 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="withdrawMethod">Withdrawal Method</Label>
-        <Select 
-          value={withdrawMethod} 
-          onValueChange={setWithdrawMethod}
-          disabled={isProcessing}
-        >
-          <SelectTrigger id="withdrawMethod" className="w-full">
-            <SelectValue placeholder="Select withdrawal method" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="wallet">Wallet (Internal)</SelectItem>
-            <SelectItem value="neft">NEFT Bank Transfer</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      {withdrawMethod === 'neft' && (
-        <div className="space-y-4 p-4 border rounded-md bg-secondary/20">
-          <div className="space-y-2">
-            <Label htmlFor="beneficiaryName">Beneficiary Name</Label>
-            <Input 
-              id="beneficiaryName"
-              value={beneficiaryName} 
-              onChange={(e) => setBeneficiaryName(e.target.value)}
-              placeholder="Account holder's name"
-              disabled={isProcessing}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="accountNumber">Account Number</Label>
-            <Input 
-              id="accountNumber"
-              value={accountNumber} 
-              onChange={(e) => setAccountNumber(e.target.value)}
-              placeholder="Bank account number"
-              disabled={isProcessing}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="ifscCode">IFSC Code</Label>
-            <Input 
-              id="ifscCode"
-              value={ifscCode} 
-              onChange={(e) => {
-                setIfscCode(e.target.value.toUpperCase());
-                setIfscError('');
-              }}
-              placeholder="HDFC0000123"
-              disabled={isProcessing}
-            />
-            {ifscError && (
-              <p className="text-xs text-destructive">{ifscError}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Format: 4 letter bank code + 0 + 6 character branch code (e.g., HDFC0001234)
-            </p>
-          </div>
-        </div>
-      )}
-      
-      <div className="space-y-2">
         <Label htmlFor="description">Description (Optional)</Label>
         <Textarea 
           id="description"
@@ -168,10 +61,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
       
       <Button 
         type="submit" 
-        disabled={isProcessing || 
-          !amount || 
-          parseFloat(amount) <= 0 || 
-          (withdrawMethod === 'neft' && (!accountNumber || !ifscCode || !beneficiaryName))}
+        disabled={isProcessing || !amount || parseFloat(amount) <= 0}
         className="w-full"
       >
         {isProcessing ? (
@@ -179,7 +69,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
           </>
         ) : (
-          `Withdraw Funds${withdrawMethod === 'neft' ? ' via NEFT' : ''}`
+          'Withdraw Funds'
         )}
       </Button>
     </form>
