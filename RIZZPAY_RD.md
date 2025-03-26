@@ -1,4 +1,3 @@
-
 # Rizzpay Research & Development Documentation
 
 ## Project Overview
@@ -14,6 +13,54 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
 - **Routing**: React Router DOM
 - **Form Handling**: React Hook Form, Zod
 - **Notifications**: Sonner
+
+## Running the Application Locally
+
+### Development Environment Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/rizzpay.git
+   cd rizzpay
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Environment Variables**
+   Create a `.env` file in the root directory with:
+   ```
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+   ```
+
+4. **Start development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+   
+   The application will be available at `http://localhost:8080`
+
+5. **Build for production**
+   ```bash
+   npm run build
+   # or
+   yarn build
+   ```
+
+6. **Preview production build**
+   ```bash
+   npm run preview
+   # or
+   yarn preview
+   ```
 
 ## Project Timeline
 
@@ -110,6 +157,49 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
    - Created utility functions for API calls
    - Implemented proper error handling for all API interactions
 
+## Store Architecture
+
+The application uses Zustand for state management with a modular approach:
+
+### Transaction Store Structure
+
+```
+src/stores/transactions/
+├── index.ts                # Main store export
+├── types.ts                # TypeScript interfaces and types
+├── utils.ts                # Helper functions
+├── transactionSlice.ts     # Transaction management
+├── userRoleSlice.ts        # User roles and permissions
+└── walletStore.ts          # Wallet functionality
+```
+
+### Key Design Principles
+
+1. **Slice Pattern**: State is divided into focused slices with specific responsibilities
+2. **Type Safety**: Comprehensive TypeScript typing for all store operations
+3. **Immutability**: State updates follow immutable patterns
+4. **Separation of Concerns**: Business logic is separated from UI components
+
+### Usage Example
+
+```typescript
+// Importing the store
+import { useTransactionStore } from '@/stores/transactions';
+
+// Using the store in a component
+const Component = () => {
+  const { transactions, addTransaction } = useTransactionStore();
+  
+  // Access state
+  console.log(transactions);
+  
+  // Update state
+  addTransaction(newTransaction);
+  
+  return (/* component JSX */);
+};
+```
+
 ## Commands & Development Notes
 
 ### Setting Up Supabase Edge Functions
@@ -180,6 +270,54 @@ npm install date-fns uuid lucide-react recharts sonner
 
 # Supabase Integration
 npm install @supabase/supabase-js
+```
+
+## Testing
+
+For testing the application during development:
+
+```bash
+# Run unit tests
+npm run test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run integration tests
+npm run test:integration
+```
+
+## Code Style and Linting
+
+We use ESLint and Prettier for code formatting and linting:
+
+```bash
+# Check code formatting
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+```
+
+## Deployment
+
+### Production Deployment
+
+1. Build the application: `npm run build`
+2. Deploy the `dist` folder to your hosting service
+3. Ensure environment variables are properly set in the production environment
+
+### Supabase Functions Deployment
+
+```bash
+# Deploy all functions
+npx supabase functions deploy
+
+# Deploy a specific function
+npx supabase functions deploy webhook
 ```
 
 ## Future Development Roadmap
