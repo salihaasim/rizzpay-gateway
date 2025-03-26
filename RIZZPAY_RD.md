@@ -138,6 +138,22 @@ The payment processing flow is implemented using several key components:
 
 This architecture ensures secure, reliable payment processing with clear status tracking and comprehensive record-keeping.
 
+## Application Structure
+
+The application is structured to avoid redundancy and ensure a clean user experience:
+
+1. **Landing Page (Index.tsx)**:
+   - Contains its own Navbar for non-authenticated users
+   - Showcases features and provides access to payment functionality
+
+2. **Dashboard & Protected Routes**:
+   - Wrapped in Layout component with consistent Navbar
+   - Accessible only to authenticated users
+
+3. **Payment Flow**:
+   - Simplified to a single "Make Payment" option
+   - Accessible from both authenticated and non-authenticated views
+
 ## Quick Start Guide
 
 For developers new to the project, here's a quick way to get started:

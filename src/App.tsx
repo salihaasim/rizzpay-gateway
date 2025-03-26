@@ -13,6 +13,7 @@ function App() {
     <Router>
       <Toaster position="top-right" />
       <Routes>
+        {/* Index page without Layout to avoid duplicate navbar */}
         <Route path="/" element={<Index />} />
         <Route path="/dashboard/*" element={<Layout><Dashboard /></Layout>} />
         <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
