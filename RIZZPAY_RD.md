@@ -15,172 +15,187 @@ Rizzpay is a payment gateway platform that allows merchants to process payments 
 - **Form Handling**: React Hook Form, Zod
 - **Notifications**: Sonner
 
-## Project Timeline
+## Running the Application Locally
 
-### Initial Setup
+### Development Environment Setup
 
-- Created React + TypeScript project with Vite
-- Added Tailwind CSS and Shadcn UI for component library
-- Set up project routing structure
-- Established Supabase connection for backend services
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/rizzpay.git
+   cd rizzpay
+   ```
 
-### Core Features Development
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-1. **Authentication System**
-   - Implemented merchant registration and login
-   - Created role-based authentication (admin/merchant)
+3. **Environment Variables**
+   Create a `.env` file in the root directory with:
+   ```
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+   ```
 
-2. **Transaction Management**
-   - Built transaction store with Zustand
-   - Created transaction listing and filtering capabilities
-   - Implemented transaction details view
+4. **Start development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+   
+   The application will be available at `http://localhost:8080`
 
-3. **Payment Processing**
-   - Developed payment flow for various payment methods
-   - Added card payments, UPI, and net banking options
-   - Implemented payment status tracking and notifications
+5. **Build for production**
+   ```bash
+   npm run build
+   # or
+   yarn build
+   ```
 
-4. **Wallet System**
-   - Created merchant wallet functionality
-   - Implemented deposit, withdraw, and transfer features
-   - Added transaction history for wallet operations
+## Payment Flow Architecture
 
-5. **Webhook Integration**
-   - Developed webhook system for third-party integrations
-   - Created API key management for merchants
-   - Implemented webhook payment processing flow
-   - Added callback handling for payment confirmations
+### How Payments Work in RizzPay
 
-6. **Backend Payment Processing**
-   - Added backend support for NEFT and card payments
-   - Created payment storage and verification capabilities
-   - Implemented secure payment data handling
-   - Added transaction status management
+RizzPay processes payments through a sequence of well-defined steps, from initiation to settlement. The diagram below illustrates the flow:
 
-### UI Improvements
-
-1. **Navigation**
-   - Improved navigation bar UI for cleaner experience
-   - Implemented role-based navigation (admin/merchant)
-   - Removed client option from navigation tabs
-   - Added visual indicators for current user role
-
-2. **Dashboard**
-   - Enhanced dashboard UI with role-specific views
-   - Updated tab system to show only relevant options based on user role
-   - Improved mobile navigation drawer with better role information
-
-3. **Brand Elements**
-   - Changed favicon from default to credit card symbol
-   - Updated visual identity to reflect payment focus
-
-### Technical Issues & Resolutions
-
-#### TypeScript Errors
-
-1. **Missing Type Definitions**
-   - **Issue**: `Property 'callbackUrl' does not exist on type 'Json'`
-   - **Resolution**: Created proper interface for PaymentDetails and used type assertion
-
-2. **Component Props Errors**
-   - **Issue**: `Property 'apiKey' is missing in type '{}'`
-   - **Resolution**: Added proper state management for API key in WebhookPage component
-
-#### Supabase Integration
-
-1. **Client Configuration**
-   - **Issue**: Type errors with Supabase client configuration
-   - **Resolution**: Updated type definitions and correctly configured createClient with Database types
-
-2. **Edge Functions**
-   - **Issue**: Configuration challenges with webhook processing
-   - **Resolution**: Implemented proper Edge Functions for webhook processing and callbacks
-
-### Code Optimization
-
-1. **Component Refactoring**
-   - Split large components into smaller, focused components
-   - Created reusable hooks for common functionality
-
-2. **State Management**
-   - Optimized Zustand stores for better performance
-   - Implemented proper state persistence
-
-3. **API Integration**
-   - Created utility functions for API calls
-   - Implemented proper error handling for all API interactions
-
-## Commands & Development Notes
-
-### Setting Up Supabase Edge Functions
-
-```bash
-# Initialize Supabase project
-npx supabase init
-
-# Create webhook function
-npx supabase functions new webhook
-
-# Create webhook callback function
-npx supabase functions new webhook_callback
-
-# Deploy functions
-npx supabase functions deploy webhook
-npx supabase functions deploy webhook_callback
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │     │                 │
+│  User initiates │     │  Payment method │     │  Payment        │     │  Transaction    │
+│  payment on     │──►  │  selection and  │──►  │  processing via │──►  │  recording and  │
+│  Payment Page   │     │  data input     │     │  gateway/provider│     │  confirmation   │
+│                 │     │                 │     │                 │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │                       │
+        │                       │                       │                       │
+        ▼                       ▼                       ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │     │                 │
+│  Amount and     │     │  UPI, Credit    │     │  Razorpay,      │     │  Transaction    │
+│  merchant info  │     │  Card, NEFT     │     │  Bank networks, │     │  stored in      │
+│  validation     │     │  Bank Transfer  │     │  UPI gateways   │     │  Supabase DB    │
+│                 │     │                 │     │                 │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-### Database Schema Updates
+### Detailed Transaction Flow:
 
-```sql
--- Create merchants table
-CREATE TABLE merchants (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  email TEXT UNIQUE NOT NULL,
-  name TEXT NOT NULL,
-  business_name TEXT,
-  business_type TEXT,
-  phone TEXT,
-  api_key TEXT,
-  status TEXT DEFAULT 'active',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+1. **Payment Initiation**:
+   - User enters payment amount and basic information
+   - System generates a unique transaction ID
+   - Initial transaction record created with "pending" status
 
--- Create transactions table
-CREATE TABLE transactions (
-  id TEXT PRIMARY KEY,
-  amount DECIMAL NOT NULL,
-  currency TEXT DEFAULT 'INR',
-  status TEXT NOT NULL,
-  payment_method TEXT NOT NULL,
-  customer_name TEXT,
-  customer_email TEXT,
-  merchant_id UUID REFERENCES merchants(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  payment_details JSONB
-);
+2. **Payment Method Selection**:
+   - User selects from available payment methods:
+     - Credit/Debit Card (via Razorpay)
+     - UPI (with QR code generation)
+     - NEFT/Bank Transfer
+
+3. **Payment Processing**:
+   - For Card payments: Razorpay SDK handles payment securely
+   - For UPI: QR code is generated for scanning with UPI apps
+   - For NEFT: Bank details are provided for manual transfer
+
+4. **Transaction States**:
+   - The transaction goes through various processing states:
+     - `initiated` → `gateway_processing` → `processor_routing` → `authorization_decision`
+     - Final states: `completed` (success) or `declined` (failure)
+
+5. **Confirmation and Recording**:
+   - Transaction is stored in Supabase database
+   - Receipt/confirmation is shown to user
+   - Webhooks can notify external systems
+
+6. **Settlement Process** (background):
+   - Funds are settled to merchant account
+   - Transaction status is updated to "settled"
+
+### Technical Implementation:
+
+The payment processing flow is implemented using several key components:
+
+1. **Payment Form (`PaymentFlow.tsx`)**:
+   - Manages the user interface for payment entry
+   - Handles validation and payment method selection
+
+2. **Transaction Store (`transactionStore.ts`)**:
+   - Zustand store for managing transaction state
+   - Handles transaction creation, updates, and queries
+
+3. **Payment Processors**:
+   - Razorpay integration for card payments
+   - UPI payment handlers
+   - NEFT processing utilities
+
+4. **Backend Integration**:
+   - Supabase database for transaction storage
+   - Authentication for merchants
+   - Webhook processing for notifications
+
+This architecture ensures secure, reliable payment processing with clear status tracking and comprehensive record-keeping.
+
+## Application Structure
+
+The application is structured to avoid redundancy and ensure a clean user experience:
+
+1. **Landing Page (Index.tsx)**:
+   - Contains its own Navbar for non-authenticated users
+   - Showcases features and provides access to payment functionality
+
+2. **Dashboard & Protected Routes**:
+   - Wrapped in Layout component with consistent Navbar
+   - Accessible only to authenticated users
+
+3. **Payment Flow**:
+   - Simplified to a single "Make Payment" option
+   - Accessible from both authenticated and non-authenticated views
+
+## Quick Start Guide
+
+For developers new to the project, here's a quick way to get started:
+
+1. **Setup your environment** as described above
+2. **Login as a test merchant**:
+   - Email: `test@rizzpay.com`
+   - Password: `testpass123`
+3. **Explore the dashboard** to understand the merchant view
+4. **Test a payment flow** by creating a new payment
+5. **Check the webhook setup** to understand integration capabilities
+
+## Code Architecture
+
+### Store Structure
+
+The application uses Zustand for state management with a modular approach:
+
+```
+src/stores/transactions/
+├── index.ts                # Main store export
+├── types.ts                # TypeScript interfaces and types
+├── utils.ts                # Helper functions
+├── transactionSlice.ts     # Transaction management
+├── userRoleSlice.ts        # User roles and permissions
+└── walletStore.ts          # Wallet functionality
 ```
 
-### Package Installation History
+### Key Design Principles
 
-```bash
-# UI Components and Styling
-npm install @radix-ui/react-* class-variance-authority clsx tailwind-merge tailwindcss-animate
+1. **Slice Pattern**: State is divided into focused slices with specific responsibilities
+2. **Type Safety**: Comprehensive TypeScript typing for all store operations
+3. **Immutability**: State updates follow immutable patterns
+4. **Separation of Concerns**: Business logic is separated from UI components
 
-# State Management and Data Fetching
-npm install zustand @tanstack/react-query
+## Deployment
 
-# Form Handling
-npm install react-hook-form zod @hookform/resolvers
+### Production Deployment
 
-# Routing
-npm install react-router-dom
-
-# Utilities
-npm install date-fns uuid lucide-react recharts sonner
-
-# Supabase Integration
-npm install @supabase/supabase-js
-```
+1. Build the application: `npm run build`
+2. Deploy the `dist` folder to your hosting service
+3. Ensure environment variables are properly set in the production environment
 
 ## Future Development Roadmap
 
@@ -203,7 +218,3 @@ npm install @supabase/supabase-js
 5. **Internationalization**
    - Add multi-currency support
    - Implement language localization
-
----
-
-*This documentation will be continuously updated as the project evolves. For each major change, please add details about what was changed, why it was changed, and the outcome of those changes.*

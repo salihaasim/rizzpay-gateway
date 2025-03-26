@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { simulateWalletProcessing } from '@/utils/walletUtils';
 import { toast } from 'sonner';
+import { handleWalletToBankTransfer } from '@/utils/hdfcBankApi';
 
 export const useWalletActions = (userEmail: string | null) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -45,7 +46,16 @@ export const useWalletActions = (userEmail: string | null) => {
     }
   };
   
-  const handleWithdraw = async (amount: number, description?: string) => {
+  const handleWithdraw = async (
+    amount: number, 
+    description?: string, 
+    bankDetails?: {
+      accountNumber: string;
+      ifscCode: string;
+      beneficiaryName: string;
+      method: string;
+    }
+  ) => {
     if (isProcessing) return;
     
     if (amount > walletBalance) {
@@ -58,14 +68,43 @@ export const useWalletActions = (userEmail: string | null) => {
     setIsProcessing(true);
     
     try {
-      toast.info("Processing withdrawal...");
-      
-      // Use the utility function to simulate processing
-      await simulateWalletProcessing(userEmail, amount, 'withdrawal', description);
-      
-      toast.success("Withdrawal successful", {
-        description: `₹${amount.toFixed(2)} has been withdrawn from your wallet.`
-      });
+      // Special handling for NEFT withdrawals
+      if (bankDetails && bankDetails.method === 'neft') {
+        toast.info("Processing NEFT transfer...");
+        
+        // Call HDFC Bank API integration
+        const transactionId = await handleWalletToBankTransfer(
+          bankDetails.accountNumber,
+          bankDetails.ifscCode,
+          bankDetails.beneficiaryName,
+          amount,
+          userEmail
+        );
+        
+        if (!transactionId) {
+          throw new Error("Bank transfer failed");
+        }
+        
+        // Update description with bank details
+        const enhancedDescription = `${description || 'NEFT Transfer'} | To: ${bankDetails.beneficiaryName} | A/C: ${bankDetails.accountNumber.substring(0, 4)}XXXX${bankDetails.accountNumber.substring(bankDetails.accountNumber.length - 4)} | IFSC: ${bankDetails.ifscCode}`;
+        
+        // Process the wallet withdrawal
+        await simulateWalletProcessing(userEmail, amount, 'withdrawal', enhancedDescription);
+        
+        toast.success("NEFT transfer initiated", {
+          description: `₹${amount.toFixed(2)} is being transferred to your bank account.`
+        });
+      } else {
+        // Regular wallet withdrawal
+        toast.info("Processing withdrawal...");
+        
+        // Use the utility function to simulate processing
+        await simulateWalletProcessing(userEmail, amount, 'withdrawal', description);
+        
+        toast.success("Withdrawal successful", {
+          description: `₹${amount.toFixed(2)} has been withdrawn from your wallet.`
+        });
+      }
     } catch (error) {
       console.error('Withdrawal error:', error);
       toast.error("Withdrawal failed", {

@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import Navbar from '@/components/Navbar';
 import RoleSelector from '@/components/RoleSelector';
 import { ArrowRight, CreditCard, ShieldCheck, Zap, CheckCircle2, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +11,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
       {/* Hero Section */}
       <section className="relative w-full py-20 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/3 to-background z-[-1]" />
@@ -36,8 +38,13 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               
-              <Button variant="outline" size="lg" className="rounded-full px-8">
-                Learn More
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="rounded-full px-8"
+                onClick={() => navigate('/quick-payment')}
+              >
+                Make a Payment
               </Button>
             </div>
           </div>
@@ -190,6 +197,29 @@ const Index = () => {
           </div>
           
           <RoleSelector />
+        </div>
+      </section>
+      
+      {/* Quick Payment Section */}
+      <section className="py-16 md:py-20 bg-secondary/20">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4">Need to Make a Quick Payment?</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              No account needed. Make secure payments instantly using our payment gateway.
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/payment')} 
+              className="rounded-full px-8 shadow-md"
+            >
+              Make Payment
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </section>
       

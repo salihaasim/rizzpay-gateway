@@ -31,7 +31,7 @@ export const usePaymentForm = () => {
   
   const [paymentData, setPaymentData] = useState<PaymentFormData>({
     amount: '',
-    currency: 'INR',
+    currency: 'INR', // Only INR is allowed
     paymentMethod: 'card' as PaymentMethod,
     upiId: 'yourname@okaxis', // Default UPI ID template
     name: '',
@@ -54,6 +54,11 @@ export const usePaymentForm = () => {
   }, []);
 
   const handleSelectChange = useCallback((name: string, value: string) => {
+    // Always enforce INR for currency
+    if (name === 'currency' && value !== 'INR') {
+      value = 'INR';
+    }
+    
     setPaymentData(prev => ({ ...prev, [name]: value }));
     
     // Clear QR code when changing payment method
@@ -77,7 +82,7 @@ export const usePaymentForm = () => {
     
     try {
       // Format the UPI payment URL (upi://pay format)
-      const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}&tr=${paymentData.transactionId}`;
+      const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=INR&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId}`)}&tr=${paymentData.transactionId}`;
       
       // Generate QR code URL using a third-party service
       const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
@@ -87,7 +92,7 @@ export const usePaymentForm = () => {
       console.error("QR code generation error:", error);
       setQrCodeError(true);
     }
-  }, [paymentData.upiId, paymentData.amount, paymentData.name, paymentData.currency, paymentData.transactionId, validateUpiId]);
+  }, [paymentData.upiId, paymentData.amount, paymentData.name, paymentData.transactionId, validateUpiId]);
 
   const handleQrCodeError = useCallback(() => {
     setQrCodeError(false);
@@ -110,12 +115,8 @@ export const usePaymentForm = () => {
   }, []);
 
   const getCurrencySymbol = useCallback((currency: string) => {
-    switch (currency) {
-      case 'INR': return '₹';
-      case 'USD': return '$';
-      case 'EUR': return '€';
-      default: return '₹';
-    }
+    // Always return Indian Rupee symbol regardless of input
+    return '₹';
   }, []);
 
   return {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Loader2, AlertCircle } from 'lucide-react';
@@ -43,6 +44,13 @@ const PaymentFlow = () => {
     resetForm,
     getCurrencySymbol
   } = usePaymentForm();
+
+  // Force currency to INR
+  useEffect(() => {
+    if (paymentData.currency !== 'INR') {
+      handleSelectChange('currency', 'INR');
+    }
+  }, [paymentData.currency, handleSelectChange]);
 
   // Generate QR code when UPI ID changes and is valid
   useEffect(() => {
@@ -94,11 +102,18 @@ const PaymentFlow = () => {
     }
   }, [currentTransactionId, navigate]);
 
+  const goToDeveloperPage = useCallback(() => {
+    navigate('/developers');
+  }, [navigate]);
+
   return (
     <Card className="w-full max-w-md mx-auto border-0 shadow-lg overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b pb-8">
         <CardTitle className="text-xl font-semibold">Make a Payment</CardTitle>
-        <CardDescription>Complete your transaction securely with Razorpay</CardDescription>
+        <CardDescription className="flex justify-between items-center">
+          <span>Complete your transaction securely with Razorpay</span>
+          <Button variant="link" size="sm" onClick={goToDeveloperPage}>Developer API</Button>
+        </CardDescription>
       </CardHeader>
       
       <CardContent className="pt-6">
@@ -126,7 +141,7 @@ const PaymentFlow = () => {
               <div className="bg-secondary rounded-lg p-4 mb-4">
                 <div className="text-sm text-muted-foreground mb-1">Amount</div>
                 <div className="text-2xl font-semibold">
-                  {getCurrencySymbol(paymentData.currency)} {paymentData.amount}
+                  ₹ {paymentData.amount}
                 </div>
                 <div className="text-xs text-muted-foreground mt-2">
                   Transaction ID: {paymentData.transactionId}

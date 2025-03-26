@@ -4,6 +4,9 @@ import CardPayment from './CardPayment';
 import NetBankingPayment from './NetBankingPayment';
 import UpiPayment from './UpiPayment';
 import { AlertCircle } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 interface PaymentMethodProps {
   paymentMethod: string;
@@ -18,6 +21,14 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   handleInputChange,
   loading
 }) => {
+  const userEmail = useTransactionStore(state => state.userEmail);
+  const walletBalance = useTransactionStore(state => {
+    if (state.userEmail) {
+      return state.getWalletBalance(state.userEmail);
+    }
+    return 0;
+  });
+  
   // Simple UPI ID validation function
   const validateUpiId = (upiId: string): boolean => {
     // Basic UPI ID validation (alphanumeric@provider format)
@@ -67,6 +78,30 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
           Transaction ID: {paymentData.transactionId}
         </div>
       </div>
+      
+      {paymentMethod === 'wallet' && userEmail && (
+        <div className="space-y-4">
+          <div className="border p-4 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium">RizzPay Wallet</span>
+              <span className="text-sm bg-primary/10 text-primary rounded-full px-2 py-0.5">
+                ₹{walletBalance.toFixed(2)}
+              </span>
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              {parseFloat(paymentData.amount) > walletBalance ? (
+                <div className="flex items-center text-destructive">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  Insufficient balance
+                </div>
+              ) : (
+                <div>Pay directly from your RizzPay wallet balance</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="space-y-4">
         {paymentMethod === 'card' && (
