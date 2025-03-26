@@ -8,6 +8,10 @@ RizzPay is a comprehensive payment gateway platform that enables merchants to pr
 - [Overview](#overview)
 - [Features](#features)
 - [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running Locally](#running-locally)
+  - [Environment Setup](#environment-setup)
 - [Architecture](#architecture)
 - [Payment Methods](#payment-methods)
 - [Wallet System](#wallet-system)
@@ -37,6 +41,7 @@ RizzPay is a modern payment platform built with React, TypeScript, and Supabase,
 
 - Node.js (v16 or higher)
 - npm or yarn package manager
+- Git
 
 ### Installation
 
@@ -53,14 +58,41 @@ RizzPay is a modern payment platform built with React, TypeScript, and Supabase,
    yarn install
    ```
 
-3. Start the development server:
+### Running Locally
+
+1. Start the development server:
    ```bash
    npm run dev
    # or
    yarn dev
    ```
 
-4. Open your browser and navigate to `http://localhost:5173` to see the application running.
+2. Open your browser and navigate to `http://localhost:8080` to see the application running.
+
+3. To build for production:
+   ```bash
+   npm run build
+   # or
+   yarn build
+   ```
+
+4. To preview the production build:
+   ```bash
+   npm run preview
+   # or
+   yarn preview
+   ```
+
+### Environment Setup
+
+1. Create a `.env` file in the root directory with the following variables:
+   ```
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+   ```
+
+2. Replace the placeholder values with your actual API keys and endpoints.
 
 ## Architecture
 
