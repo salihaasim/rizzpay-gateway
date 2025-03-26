@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 // Define the store state type
 interface AuthState {
@@ -115,8 +115,11 @@ export const useAuth = create<AuthState>()(
     }),
     {
       name: 'auth-storage', // name for the storage
-      partialize: (state) => ({ isAuthenticated: state.isAuthenticated, user: state.user }),
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      partialize: (state) => ({ 
+        isAuthenticated: state.isAuthenticated, 
+        user: state.user 
+      }),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

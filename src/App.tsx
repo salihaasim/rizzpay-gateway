@@ -15,6 +15,7 @@ const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
 const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Layout = React.lazy(() => import('./components/Layout'));
+const Auth = React.lazy(() => import('./pages/Auth'));
 
 // Loading component
 const PageLoading = () => (
@@ -110,9 +111,7 @@ function App() {
           <Route path="/webhook-payment" element={<WebhookPayment />} />
           
           {/* Auth page */}
-          <Route path="/auth" element={
-            React.lazy(() => import('./pages/Auth'))
-          } />
+          <Route path="/auth" element={<Auth />} />
           
           {/* 404 Page */}
           <Route path="*" element={<NotFound />} />
