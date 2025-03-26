@@ -77,6 +77,7 @@ The codebase follows a modular architecture with:
 - `/components`: Reusable UI components
 - `/pages`: Main application views
 - `/stores`: Global state management
+  - `/stores/transactions`: Refactored transaction store with clear separation of concerns
 - `/utils`: Helper functions and utilities
 - `/hooks`: Custom React hooks
 - `/integrations`: External service integrations
@@ -137,11 +138,12 @@ The application has been optimized to prevent unnecessary refreshes and improve 
 - Use the provided folder structure for different types of components
 - Create small, focused components (<100 lines of code where possible)
 - Use TypeScript interfaces for all props and state
+- Store logic is separated into slices for better maintainability
 
 ### State Management
 - Use Zustand stores for global state
 - Use React Query for server state management
-- Follow the store patterns established in `/stores` directory
+- Follow the store patterns established in `/stores/transactions` directory
 
 ### Styling
 - Use Tailwind CSS for styling components
