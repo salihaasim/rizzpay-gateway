@@ -23,6 +23,7 @@ export const useAuth = create<AuthState>((set) => ({
   // Check authentication status
   checkAuth: async () => {
     try {
+      set({ loading: true });
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         const { data: userData } = await supabase.auth.getUser();
@@ -101,9 +102,12 @@ export const useAuth = create<AuthState>((set) => ({
   },
 }));
 
-// Initialize auth check
+// Initialize auth check with proper error handling
 if (typeof window !== 'undefined') {
+  // Delay to ensure DOM is fully loaded
   setTimeout(() => {
-    useAuth.getState().checkAuth();
-  }, 100);
+    useAuth.getState().checkAuth().catch(error => {
+      console.error('Failed to check authentication status:', error);
+    });
+  }, 200);
 }
