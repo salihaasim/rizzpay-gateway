@@ -1,6 +1,6 @@
 
-import React, { useState, useCallback, memo } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useCallback, memo, useEffect } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/stores/authStore';
 import { useProfileStore } from '@/stores/profileStore';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -13,10 +13,11 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) => {
 };
 
 const Navbar = memo(() => {
-  const { isAuthenticated, logout, loading } = useAuth();
+  const { isAuthenticated, logout, loading, user } = useAuth();
   const { profile } = useProfileStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleMobileMenu = useCallback(() => {
     setMobileMenuOpen(prevState => !prevState);
@@ -28,7 +29,8 @@ const Navbar = memo(() => {
 
   const handleLogout = useCallback(async () => {
     await logout();
-  }, [logout]);
+    navigate('/');
+  }, [logout, navigate]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -82,12 +84,12 @@ const Navbar = memo(() => {
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || "Avatar"} />
-                    <AvatarFallback>{profile?.full_name?.slice(0, 2).toUpperCase() || "US"}</AvatarFallback>
+                    <AvatarFallback>{profile?.full_name?.slice(0, 2).toUpperCase() || user?.email?.slice(0, 2).toUpperCase() || "US"}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-background border border-border">
-                <DropdownMenuLabel>{profile?.full_name || "User"}</DropdownMenuLabel>
+                <DropdownMenuLabel>{profile?.full_name || user?.email || "User"}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   Logout

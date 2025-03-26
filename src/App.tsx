@@ -50,8 +50,13 @@ function App() {
   // Check authentication status on app load
   useEffect(() => {
     const initAuth = async () => {
-      await checkAuth();
-      setAppReady(true);
+      try {
+        await checkAuth();
+      } catch (error) {
+        console.error("Authentication check failed:", error);
+      } finally {
+        setAppReady(true);
+      }
     };
     
     initAuth();
@@ -103,6 +108,11 @@ function App() {
           
           {/* Special pages */}
           <Route path="/webhook-payment" element={<WebhookPayment />} />
+          
+          {/* Auth page */}
+          <Route path="/auth" element={
+            React.lazy(() => import('./pages/Auth'))
+          } />
           
           {/* 404 Page */}
           <Route path="*" element={<NotFound />} />

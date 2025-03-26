@@ -18,7 +18,7 @@ interface AuthState {
 // Create the store with persistence to prevent losing auth state on page refresh
 export const useAuth = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       isAuthenticated: false,
       user: null,
       loading: true,
@@ -116,6 +116,7 @@ export const useAuth = create<AuthState>()(
     {
       name: 'auth-storage', // name for the storage
       partialize: (state) => ({ isAuthenticated: state.isAuthenticated, user: state.user }),
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     }
   )
 );
