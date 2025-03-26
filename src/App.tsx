@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import PaymentPage from './pages/PaymentPage';
@@ -12,8 +12,33 @@ import WalletPage from './pages/WalletPage';
 import WebhookPage from './pages/WebhookPage';
 import DeveloperIntegration from './pages/DeveloperIntegration';
 import NotFound from './pages/NotFound';
+import { useAuth } from './stores/authStore';
+
+// Protected route wrapper component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Check if the authentication is still loading
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+  
+  // Redirect to home if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 function App() {
+  const { checkAuth } = useAuth();
+  
+  // Check authentication status on app load
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
   return (
     <Router>
       <Toaster position="top-right" />
@@ -21,13 +46,37 @@ function App() {
         {/* Index page without Layout to avoid duplicate navbar */}
         <Route path="/" element={<Index />} />
         
-        {/* Pages with Layout */}
-        <Route path="/dashboard/*" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
-        <Route path="/transactions" element={<Layout><Transactions /></Layout>} />
-        <Route path="/wallet" element={<Layout><WalletPage /></Layout>} />
-        <Route path="/webhook" element={<Layout><WebhookPage /></Layout>} />
-        <Route path="/developers" element={<Layout><DeveloperIntegration /></Layout>} />
+        {/* Protected routes with Layout */}
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <Layout><Dashboard /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/transactions" element={
+          <ProtectedRoute>
+            <Layout><Transactions /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/wallet" element={
+          <ProtectedRoute>
+            <Layout><WalletPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/webhook" element={
+          <ProtectedRoute>
+            <Layout><WebhookPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/developers" element={
+          <ProtectedRoute>
+            <Layout><DeveloperIntegration /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/payment" element={
+          <ProtectedRoute>
+            <Layout><PaymentPage /></Layout>
+          </ProtectedRoute>
+        } />
         
         {/* Special pages */}
         <Route path="/webhook-payment" element={<WebhookPayment />} />

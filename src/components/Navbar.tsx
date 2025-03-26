@@ -62,16 +62,7 @@ const Navbar = () => {
                   Make Payment
                 </NavLink>
               </>
-            ) : (
-              <>
-                <NavLink to="/payment" className={navLinkClasses}>
-                  Make Payment
-                </NavLink>
-                <NavLink to="/developers" className={navLinkClasses}>
-                  Developers
-                </NavLink>
-              </>
-            )}
+            ) : null}
           </nav>
         </div>
 
@@ -144,16 +135,7 @@ const Navbar = () => {
                   Make Payment
                 </NavLink>
               </>
-            ) : (
-              <>
-                <NavLink to="/payment" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
-                  Make Payment
-                </NavLink>
-                <NavLink to="/developers" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
-                  Developers
-                </NavLink>
-              </>
-            )}
+            ) : null}
           </div>
         </div>
       )}
