@@ -37,6 +37,10 @@ const Navbar = () => {
             </div>
           </Link>
           <nav className="hidden md:flex gap-6">
+            <NavLink to="/" className={navLinkClasses}>
+              Home
+            </NavLink>
+            
             {isAuthenticated ? (
               <>
                 <NavLink to="/dashboard" className={navLinkClasses}>
@@ -54,6 +58,9 @@ const Navbar = () => {
                 <NavLink to="/developers" className={navLinkClasses}>
                   Developers
                 </NavLink>
+                <NavLink to="/payment" className={navLinkClasses}>
+                  Make Payment
+                </NavLink>
               </>
             ) : (
               <>
@@ -69,6 +76,11 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+          
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -107,6 +119,10 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden py-4 border-t">
           <div className="container">
+            <NavLink to="/" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+              Home
+            </NavLink>
+            
             {isAuthenticated ? (
               <div className="flex flex-col space-y-3">
                 <NavLink to="/dashboard" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
@@ -123,6 +139,9 @@ const Navbar = () => {
                 </NavLink>
                 <NavLink to="/developers" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
                   Developers
+                </NavLink>
+                <NavLink to="/payment" className={navLinkClasses} onClick={() => setMobileMenuOpen(false)}>
+                  Make Payment
                 </NavLink>
               </div>
             ) : (
