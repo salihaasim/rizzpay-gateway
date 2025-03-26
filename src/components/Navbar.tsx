@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/stores/authStore';
 import { useProfileStore } from '@/stores/profileStore';
@@ -15,16 +15,7 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) => {
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   const { profile } = useProfileStore();
-  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -82,7 +73,7 @@ const Navbar = () => {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="bg-background border border-border">
                 <DropdownMenuLabel>{profile?.full_name || "User"}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
@@ -106,7 +97,7 @@ const Navbar = () => {
         </div>
       </div>
       
-      {/* Mobile menu overlay */}
+      {/* Mobile menu overlay - optimized to prevent unnecessary renders */}
       {mobileMenuOpen && (
         <div className="md:hidden py-4 border-t">
           <div className="container flex flex-col space-y-3">
@@ -143,4 +134,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

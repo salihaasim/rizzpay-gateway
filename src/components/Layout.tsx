@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import Navbar from './Navbar';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -15,6 +15,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
     </div>
   );
-};
+});
+
+Layout.displayName = 'Layout';
 
 export default Layout;

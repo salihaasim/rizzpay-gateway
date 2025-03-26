@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
@@ -14,22 +14,34 @@ import DeveloperIntegration from './pages/DeveloperIntegration';
 import NotFound from './pages/NotFound';
 import { useAuth } from './stores/authStore';
 
-// Protected route wrapper component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+// Optimized Protected route component
+const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
   
-  // Check if the authentication is still loading
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-pulse flex space-x-4">
+          <div className="rounded-full bg-primary/10 h-12 w-12"></div>
+          <div className="flex-1 space-y-4 py-1">
+            <div className="h-4 bg-primary/10 rounded w-3/4"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-primary/10 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   
-  // Redirect to home if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
-};
+});
+
+ProtectedRoute.displayName = 'ProtectedRoute';
 
 function App() {
   const { checkAuth } = useAuth();
