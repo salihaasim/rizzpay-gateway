@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define the store state type
@@ -26,8 +27,10 @@ export const useAuth = create<AuthState>((set) => ({
       if (data.session) {
         const { data: userData } = await supabase.auth.getUser();
         set({ isAuthenticated: true, user: userData.user, loading: false });
+        console.log('User authenticated:', userData.user.email);
       } else {
         set({ isAuthenticated: false, user: null, loading: false });
+        console.log('No active session found');
       }
     } catch (error) {
       console.error('Auth check error:', error);
@@ -44,13 +47,16 @@ export const useAuth = create<AuthState>((set) => ({
       });
       
       if (error) {
+        toast.error(error.message);
         return { error };
       }
       
       set({ isAuthenticated: true, user: data.user });
+      toast.success(`Welcome back, ${data.user?.email}`);
       return { error: null };
     } catch (error) {
       console.error('Login error:', error);
+      toast.error('Login failed. Please try again.');
       return { error };
     }
   },
@@ -69,13 +75,15 @@ export const useAuth = create<AuthState>((set) => ({
       });
       
       if (error) {
+        toast.error(error.message);
         return { error };
       }
       
-      // Note: User may need to verify email depending on Supabase settings
+      toast.success('Registration successful! Please check your email to verify your account.');
       return { error: null };
     } catch (error) {
       console.error('Registration error:', error);
+      toast.error('Registration failed. Please try again.');
       return { error };
     }
   },
@@ -85,13 +93,17 @@ export const useAuth = create<AuthState>((set) => ({
     try {
       await supabase.auth.signOut();
       set({ isAuthenticated: false, user: null });
+      toast.success('You have been logged out');
     } catch (error) {
       console.error('Logout error:', error);
+      toast.error('Logout failed. Please try again.');
     }
   },
 }));
 
 // Initialize auth check
 if (typeof window !== 'undefined') {
-  useAuth.getState().checkAuth();
+  setTimeout(() => {
+    useAuth.getState().checkAuth();
+  }, 100);
 }
