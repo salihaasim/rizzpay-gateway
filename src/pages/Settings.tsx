@@ -1,32 +1,55 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, User, Bell, Globe, CreditCard, Building } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Globe, CreditCard, Building, ShieldCheck } from 'lucide-react';
+import { useProfileStore } from '@/stores/profileStore';
 
 const Settings = () => {
+  const { firstName, lastName, email, phone, company } = useProfileStore();
+  
   return (
     <div className="container py-6 space-y-6">
       <div className="flex items-center justify-between">
-          <div>
+        <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground">Manage your account and preferences</p>
         </div>
-        </div>
+      </div>
+      
+      {/* Personal Profile Card */}
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Personal Profile
+          </CardTitle>
+          <CardDescription>Your personal information</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Full Name</p>
+              <p className="text-base font-medium">{firstName} {lastName}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Email Address</p>
+              <p className="text-base font-medium">{email}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Phone Number</p>
+              <p className="text-base font-medium">{phone}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Company</p>
+              <p className="text-base font-medium">{company}</p>
+            </div>
+          </div>
+          <Button variant="outline">Edit Profile</Button>
+        </CardContent>
+      </Card>
         
       <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profile
-            </CardTitle>
-            <CardDescription>Update your personal information</CardDescription>
-            </CardHeader>
-          <CardContent>
-            <Button variant="outline">Edit Profile</Button>
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -37,47 +60,60 @@ const Settings = () => {
           </CardHeader>
           <CardContent>
             <Button variant="outline">Update Business Info</Button>
-            </CardContent>
-          </Card>
+          </CardContent>
+        </Card>
           
         <Card>
-                  <CardHeader>
+          <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
               Notifications
             </CardTitle>
             <CardDescription>Configure your notification preferences</CardDescription>
-                  </CardHeader>
+          </CardHeader>
           <CardContent>
             <Button variant="outline">Notification Settings</Button>
-                  </CardContent>
-                </Card>
+          </CardContent>
+        </Card>
               
         <Card>
-                  <CardHeader>
+          <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
               Language & Region
             </CardTitle>
             <CardDescription>Set your preferred language and region</CardDescription>
-                  </CardHeader>
+          </CardHeader>
           <CardContent>
             <Button variant="outline">Change Language</Button>
-                  </CardContent>
-                </Card>
+          </CardContent>
+        </Card>
               
         <Card>
-                  <CardHeader>
+          <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
               Billing & Subscription
             </CardTitle>
             <CardDescription>Manage your billing information and subscription</CardDescription>
-                  </CardHeader>
+          </CardHeader>
           <CardContent>
             <Button variant="outline">Billing Settings</Button>
-                  </CardContent>
-                </Card>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5" />
+              Security
+            </CardTitle>
+            <CardDescription>Manage your account security settings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" onClick={() => window.location.href = '/security'}>Security Settings</Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
