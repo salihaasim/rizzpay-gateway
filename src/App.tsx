@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -14,17 +13,24 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
 const DeveloperIntegration = React.lazy(() => import('./pages/DeveloperIntegration'));
-const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
+const Security = React.lazy(() => import('./pages/Security'));
+const Settings = React.lazy(() => import('./pages/Settings'));
 const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Auth = React.lazy(() => import('./pages/Auth'));
 
 // Loading component
 const PageLoading = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="flex flex-col items-center space-y-4">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      <p className="text-muted-foreground">Loading...</p>
+  <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center space-y-6">
+      <div className="relative">
+        <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
+        <div className="w-16 h-16 border-4 border-primary rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+      </div>
+      <div className="flex flex-col items-center space-y-1">
+        <p className="text-lg font-medium text-foreground">Loading...</p>
+        <p className="text-sm text-muted-foreground">Please wait while we prepare your dashboard</p>
+      </div>
     </div>
   </div>
 );
@@ -77,9 +83,14 @@ const App = () => {
               <Layout><DeveloperIntegration /></Layout>
             </ProtectedRoute>
           } />
-          <Route path="/payment" element={
+          <Route path="/security" element={
             <ProtectedRoute>
-              <Layout><PaymentPage /></Layout>
+              <Layout><Security /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Layout><Settings /></Layout>
             </ProtectedRoute>
           } />
           
