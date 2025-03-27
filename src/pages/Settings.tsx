@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, User, Bell, Globe, Building, ShieldCheck } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Building, ShieldCheck } from 'lucide-react';
 import { useProfileStore } from '@/stores/profileStore';
 import { useNavigate } from 'react-router-dom';
 
@@ -75,19 +75,6 @@ const Settings = () => {
           </CardHeader>
           <CardContent>
             <Button variant="outline" onClick={() => navigate('/notifications')}>Notification Settings</Button>
-          </CardContent>
-        </Card>
-              
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              Language & Region
-            </CardTitle>
-            <CardDescription>Set your preferred language and region</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" onClick={() => navigate('/language-settings')}>Change Language</Button>
           </CardContent>
         </Card>
 
