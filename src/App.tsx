@@ -3,20 +3,21 @@ import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import { Toaster } from 'sonner';
-import { useAuth } from './stores/authStore';
+import { useMerchantAuth } from './stores/merchantAuthStore';
+import Layout from './components/Layout';
 
-// Lazy load components to improve initial load time
+// Directly import WalletPage to avoid lazy loading issue
+import WalletPage from './pages/WalletPage';
+
+// Lazy load other components to improve initial load time
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/Transactions'));
-const WalletPage = React.lazy(() => import('./pages/WalletPage'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
 const DeveloperIntegration = React.lazy(() => import('./pages/DeveloperIntegration'));
 const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
 const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
-const Layout = React.lazy(() => import('./components/Layout'));
 const Auth = React.lazy(() => import('./pages/Auth'));
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 // Loading component
 const PageLoading = () => (
@@ -60,6 +61,7 @@ const App = () => {
               <Layout><Transactions /></Layout>
             </ProtectedRoute>
           } />
+          {/* Directly use WalletPage instead of lazy loading it */}
           <Route path="/wallet" element={
             <ProtectedRoute>
               <Layout><WalletPage /></Layout>

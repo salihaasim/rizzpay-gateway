@@ -124,10 +124,9 @@ For more detailed information on API integration, please refer to the [Developer
 For technical support or questions about the payment system, please contact:
 - Email: support@rizzpay.com
 - Phone: +91-755024887
-WhatsApp: +91-7550248887
-
+- WhatsApp: +91-7550248887
 - Live Chat: Available on the dashboard (business hours)
 
 ---
 
-**Note**: This documentation is for internal use and for merchants integrating with the RizzPay platform. The payment processing system is continually evolving, and features may be updated or changed.
+**Note**: This documentation is continuously updated as the RizzPay platform evolves. For the most current information, always refer to the latest version.

@@ -1,7 +1,5 @@
 
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Wallet from '@/components/Wallet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Filter, Info } from 'lucide-react';
@@ -26,6 +24,7 @@ import TransactionList from '@/components/wallet/TransactionList';
 import { useFilteredTransactions } from '@/hooks/useFilteredTransactions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Wallet from '@/components/Wallet';
 
 const WalletPage = () => {
   const { transactions, userEmail } = useTransactionStore();
@@ -54,8 +53,6 @@ const WalletPage = () => {
   
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="content-wrapper">
         <div className="page-header">
           <div>
