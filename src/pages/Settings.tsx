@@ -7,12 +7,12 @@ const Settings = () => {
   return (
     <div className="container py-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
+          <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground">Manage your account and preferences</p>
         </div>
-      </div>
-
+        </div>
+        
       <div className="grid gap-6">
         <Card>
           <CardHeader>
@@ -21,7 +21,7 @@ const Settings = () => {
               Profile
             </CardTitle>
             <CardDescription>Update your personal information</CardDescription>
-          </CardHeader>
+            </CardHeader>
           <CardContent>
             <Button variant="outline">Edit Profile</Button>
           </CardContent>
@@ -37,47 +37,47 @@ const Settings = () => {
           </CardHeader>
           <CardContent>
             <Button variant="outline">Update Business Info</Button>
-          </CardContent>
-        </Card>
-
+            </CardContent>
+          </Card>
+          
         <Card>
-          <CardHeader>
+                  <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
               Notifications
             </CardTitle>
             <CardDescription>Configure your notification preferences</CardDescription>
-          </CardHeader>
+                  </CardHeader>
           <CardContent>
             <Button variant="outline">Notification Settings</Button>
-          </CardContent>
-        </Card>
-
+                  </CardContent>
+                </Card>
+              
         <Card>
-          <CardHeader>
+                  <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
               Language & Region
             </CardTitle>
             <CardDescription>Set your preferred language and region</CardDescription>
-          </CardHeader>
+                  </CardHeader>
           <CardContent>
             <Button variant="outline">Change Language</Button>
-          </CardContent>
-        </Card>
-
+                  </CardContent>
+                </Card>
+              
         <Card>
-          <CardHeader>
+                  <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
               Billing & Subscription
             </CardTitle>
             <CardDescription>Manage your billing information and subscription</CardDescription>
-          </CardHeader>
+                  </CardHeader>
           <CardContent>
             <Button variant="outline">Billing Settings</Button>
-          </CardContent>
-        </Card>
+                  </CardContent>
+                </Card>
       </div>
     </div>
   );
