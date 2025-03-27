@@ -2,11 +2,13 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, User, Bell, Globe, CreditCard, Building, ShieldCheck } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Globe, Building, ShieldCheck } from 'lucide-react';
 import { useProfileStore } from '@/stores/profileStore';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const { firstName, lastName, email, phone, company } = useProfileStore();
+  const navigate = useNavigate();
   
   return (
     <div className="container py-6 space-y-6">
@@ -45,7 +47,7 @@ const Settings = () => {
               <p className="text-base font-medium">{company}</p>
             </div>
           </div>
-          <Button variant="outline">Edit Profile</Button>
+          <Button variant="outline" onClick={() => navigate('/profile-edit')}>Edit Profile</Button>
         </CardContent>
       </Card>
         
@@ -59,7 +61,7 @@ const Settings = () => {
             <CardDescription>Manage your business details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline">Update Business Info</Button>
+            <Button variant="outline" onClick={() => navigate('/business-info')}>Update Business Info</Button>
           </CardContent>
         </Card>
           
@@ -72,7 +74,7 @@ const Settings = () => {
             <CardDescription>Configure your notification preferences</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline">Notification Settings</Button>
+            <Button variant="outline" onClick={() => navigate('/notifications')}>Notification Settings</Button>
           </CardContent>
         </Card>
               
@@ -85,20 +87,7 @@ const Settings = () => {
             <CardDescription>Set your preferred language and region</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline">Change Language</Button>
-          </CardContent>
-        </Card>
-              
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              Billing & Subscription
-            </CardTitle>
-            <CardDescription>Manage your billing information and subscription</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline">Billing Settings</Button>
+            <Button variant="outline" onClick={() => navigate('/language-settings')}>Change Language</Button>
           </CardContent>
         </Card>
 
@@ -111,7 +100,7 @@ const Settings = () => {
             <CardDescription>Manage your account security settings</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" onClick={() => window.location.href = '/security'}>Security Settings</Button>
+            <Button variant="outline" onClick={() => navigate('/security')}>Security Settings</Button>
           </CardContent>
         </Card>
       </div>
