@@ -1,11 +1,10 @@
 
-import React, { useState, useCallback, memo, useEffect } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/stores/authStore';
-import { useProfileStore } from '@/stores/profileStore';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import React, { useState, useCallback, memo } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { LogOut, Menu } from 'lucide-react';
 
 const navLinkClasses = ({ isActive }: { isActive: boolean }) => {
@@ -13,10 +12,8 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) => {
 };
 
 const Navbar = memo(() => {
-  const { isAuthenticated, logout, loading, user } = useAuth();
-  const { profile } = useProfileStore();
+  const { isAuthenticated, logout, currentMerchant } = useMerchantAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
 
   const toggleMobileMenu = useCallback(() => {
@@ -28,8 +25,8 @@ const Navbar = memo(() => {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    await logout();
-    navigate('/');
+    logout();
+    navigate('/auth');
   }, [logout, navigate]);
 
   return (
@@ -47,7 +44,7 @@ const Navbar = memo(() => {
               Home
             </NavLink>
             
-            {isAuthenticated && !loading ? (
+            {isAuthenticated ? (
               <>
                 <NavLink to="/dashboard" className={navLinkClasses}>
                   Dashboard
@@ -78,18 +75,17 @@ const Navbar = memo(() => {
             <span className="sr-only">Toggle menu</span>
           </Button>
           
-          {isAuthenticated && !loading ? (
+          {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || "Avatar"} />
-                    <AvatarFallback>{profile?.full_name?.slice(0, 2).toUpperCase() || user?.email?.slice(0, 2).toUpperCase() || "US"}</AvatarFallback>
+                    <AvatarFallback>{currentMerchant?.fullName?.slice(0, 2).toUpperCase() || currentMerchant?.username?.slice(0, 2).toUpperCase() || "MP"}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-background border border-border">
-                <DropdownMenuLabel>{profile?.full_name || user?.email || "User"}</DropdownMenuLabel>
+                <DropdownMenuLabel>{currentMerchant?.fullName || currentMerchant?.username || "Merchant"}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   Logout
@@ -112,7 +108,7 @@ const Navbar = memo(() => {
         </div>
       </div>
       
-      {/* Mobile menu overlay - optimized to prevent unnecessary renders */}
+      {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden py-4 border-t">
           <div className="container flex flex-col space-y-3">
@@ -120,7 +116,7 @@ const Navbar = memo(() => {
               Home
             </NavLink>
             
-            {isAuthenticated && !loading ? (
+            {isAuthenticated ? (
               <>
                 <NavLink to="/dashboard" className={navLinkClasses} onClick={closeMobileMenu}>
                   Dashboard
