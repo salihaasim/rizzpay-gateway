@@ -14,6 +14,7 @@ RizzPay is a modern payment processing platform designed for merchants to easily
 - **Webhook Integration**: Set up and manage webhook endpoints for real-time notifications
 - **Developer Tools**: API keys, documentation, and integration examples for developers
 - **Payment Processing**: Support for multiple payment methods (cards, UPI, bank transfers)
+- **Mobile App**: Android application for on-the-go payment management
 
 ## Implementation Details
 
@@ -23,6 +24,7 @@ RizzPay is a modern payment processing platform designed for merchants to easily
 - Implements React Router for navigation
 - State management with Zustand for predictable state updates
 - Integrates with various payment gateways for processing transactions
+- Mobile app built with Capacitor
 
 ## Code Structure
 
@@ -48,6 +50,35 @@ The application uses a JWT-based authentication system:
 - Merchants can register and log in securely
 - Authentication state is maintained across sessions
 - Protected routes require authentication
+
+## Building Android APK
+
+To build an Android APK:
+
+1. Export the project to your GitHub repository
+2. Clone the repository to your local machine
+3. Install the dependencies:
+   ```
+   npm install
+   ```
+4. Build the web application:
+   ```
+   npm run build
+   ```
+5. Add the Android platform:
+   ```
+   npx cap add android
+   ```
+6. Sync the web code to the Android project:
+   ```
+   npx cap sync
+   ```
+7. Open the project in Android Studio:
+   ```
+   npx cap open android
+   ```
+8. In Android Studio, go to Build > Build Bundle(s) / APK(s) > Build APK(s)
+9. The APK will be generated in the android/app/build/outputs/apk/debug folder
 
 ## Payment Processing
 
