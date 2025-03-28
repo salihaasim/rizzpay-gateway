@@ -1,198 +1,120 @@
-import React, { useState, useCallback, memo } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu, X, Home, LayoutDashboard, Receipt, Wallet, Webhook, Code, CreditCard, Shield, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Menu } from "lucide-react";
+import { cn } from "@/lib/utils";
+import UserSwitcher from './UserSwitcher';
 
-const navLinkClasses = ({ isActive }: { isActive: boolean }) => {
-  return cn(
-    "text-sm font-medium transition-all duration-200 hover:text-primary flex items-center gap-2",
-    isActive ? "text-primary" : "text-muted-foreground"
-  );
-};
+const Navbar = () => {
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-const Navbar = memo(() => {
-  const { isAuthenticated, logout, currentMerchant } = useMerchantAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
-  const toggleMobileMenu = useCallback(() => {
-    setMobileMenuOpen(prevState => !prevState);
-  }, []);
-
-  const closeMobileMenu = useCallback(() => {
-    setMobileMenuOpen(false);
-  }, []);
-
-  const handleLogout = useCallback(async () => {
-    logout();
-    navigate('/auth');
-  }, [logout, navigate]);
+  const navItems = [
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Transactions', path: '/transactions' },
+    { name: 'Wallet', path: '/wallet' },
+    { name: 'Webhooks', path: '/webhooks' },
+    { name: 'Settings', path: '/settings' },
+  ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex gap-10 items-center">
-          <Link to="/" className="flex items-center group">
-            <div className="text-2xl font-bold tracking-tight transition-colors duration-200">
-              <span className="text-primary group-hover:text-primary/90">Rizz</span>
-              <span className="group-hover:text-foreground/90">Pay</span>
-            </div>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-14 max-w-screen-2xl items-center justify-between px-4 md:px-6">
+        <div className="flex items-center gap-2">
+          <Link 
+            to="/" 
+            className="font-semibold text-xl text-primary flex items-center gap-1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+            >
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span className="font-bold">RizzPay</span>
           </Link>
-          <nav className="hidden md:flex gap-6">
-            {!isAuthenticated ? (
-              <NavLink to="/" className={navLinkClasses}>
-                <Home className="h-4 w-4" />
-                Home
-              </NavLink>
-            ) : null}
-            
-            {isAuthenticated ? (
-              <>
-                <NavLink to="/dashboard" className={navLinkClasses}>
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </NavLink>
-                <NavLink to="/transactions" className={navLinkClasses}>
-                  <Receipt className="h-4 w-4" />
-                  Transactions
-                </NavLink>
-                <NavLink to="/wallet" className={navLinkClasses}>
-                  <Wallet className="h-4 w-4" />
-                  Wallet
-                </NavLink>
-                <NavLink to="/webhook" className={navLinkClasses}>
-                  <Webhook className="h-4 w-4" />
-                  Webhooks
-                </NavLink>
-                <NavLink to="/developers" className={navLinkClasses}>
-                  <Code className="h-4 w-4" />
-                  Developers
-                </NavLink>
-                <NavLink to="/security" className={navLinkClasses}>
-                  <Shield className="h-4 w-4" />
-                  Security
-                </NavLink>
-                <NavLink to="/settings" className={navLinkClasses}>
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </NavLink>
-              </>
-            ) : null}
+          
+          <nav className="hidden md:flex gap-6 ml-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  isActive(item.path)
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
+                {item.name}
+              </Link>
+            ))}
           </nav>
         </div>
-
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden hover:bg-primary/10" 
-            onClick={toggleMobileMenu}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-            <span className="sr-only">Toggle menu</span>
-          </Button>
+        
+        <div className="flex items-center gap-2">
+          <UserSwitcher />
           
-          {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-primary/10">
-                  <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-                    <AvatarFallback className="bg-primary/10">
-                      {currentMerchant?.fullName?.slice(0, 2).toUpperCase() || currentMerchant?.username?.slice(0, 2).toUpperCase() || "MP"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <DropdownMenuLabel className="font-semibold">
-                  {currentMerchant?.fullName || currentMerchant?.username || "Merchant"}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={handleLogout} 
-                  className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button
+                variant="ghost"
+                className="px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+              >
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="pr-0">
+              <Link to="/" className="flex items-center gap-1 mb-8">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
                 >
-                  Logout
-                  <LogOut className="ml-auto h-4 w-4" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Link to="/auth">
-                <Button variant="outline" size="sm" className="hover:bg-primary/10">
-                  Log In
-                </Button>
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+                <span className="font-bold text-xl">RizzPay</span>
               </Link>
-              <Link to="/auth">
-                <Button size="sm" className="bg-primary hover:bg-primary/90">
-                  Sign Up
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-      
-      {/* Mobile menu overlay */}
-      <div className={cn(
-        "md:hidden border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200 ease-in-out",
-        mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
-      )}>
-        <div className="container py-4 flex flex-col space-y-3">
-          {!isAuthenticated ? (
-            <NavLink to="/" className={navLinkClasses} onClick={closeMobileMenu}>
-              <Home className="h-4 w-4" />
-              Home
-            </NavLink>
-          ) : null}
-          
-          {isAuthenticated ? (
-            <>
-              <NavLink to="/dashboard" className={navLinkClasses} onClick={closeMobileMenu}>
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </NavLink>
-              <NavLink to="/transactions" className={navLinkClasses} onClick={closeMobileMenu}>
-                <Receipt className="h-4 w-4" />
-                Transactions
-              </NavLink>
-              <NavLink to="/wallet" className={navLinkClasses} onClick={closeMobileMenu}>
-                <Wallet className="h-4 w-4" />
-                Wallet
-              </NavLink>
-              <NavLink to="/webhook" className={navLinkClasses} onClick={closeMobileMenu}>
-                <Webhook className="h-4 w-4" />
-                Webhooks
-              </NavLink>
-              <NavLink to="/developers" className={navLinkClasses} onClick={closeMobileMenu}>
-                <Code className="h-4 w-4" />
-                Developers
-              </NavLink>
-              <NavLink to="/security" className={navLinkClasses} onClick={closeMobileMenu}>
-                <Shield className="h-4 w-4" />
-                Security
-              </NavLink>
-              <NavLink to="/settings" className={navLinkClasses} onClick={closeMobileMenu}>
-                <Settings className="h-4 w-4" />
-                Settings
-              </NavLink>
-            </>
-          ) : null}
+              <div className="grid gap-2 py-6">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex w-full items-center py-2 text-lg font-semibold",
+                      isActive(item.path)
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    )}
+                    onClick={() => setOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
   );
-});
-
-Navbar.displayName = 'Navbar';
+};
 
 export default Navbar;

@@ -43,6 +43,7 @@ const Wallet = () => {
               onDeposit={handleDeposit}
               onWithdraw={handleWithdraw}
               onTransfer={handleTransfer}
+              userEmail={userEmail}
             />
           </div>
           
