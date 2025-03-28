@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -100,9 +101,9 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   
   useEffect(() => {
     if (paymentData.amount && upiId && isValid) {
-      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}&tr=${paymentData.transactionId || ''}`;
+      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=${paymentData.transactionId || ''}`;
       
-      const webLink = `https://upi.link/pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}`;
+      const webLink = `https://upi.link/pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}`;
       
       setPaymentLink(webLink);
     } else {
@@ -142,7 +143,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
       return;
     }
     
-    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Transaction ${paymentData.transactionId || 'UPI Payment'}`)}&tr=${paymentData.transactionId || ''}`;
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=${paymentData.transactionId || ''}`;
     
     try {
       window.location.href = upiUrl;
@@ -164,14 +165,14 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   
   return (
     <>
-      <div className="text-sm font-medium mb-2">UPI Payment</div>
+      <div className="text-sm font-medium mb-2">UPI Payment via RizzPay</div>
       <div className="rounded-lg border p-4">
         <div className="flex items-center mb-4">
           <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
             <QrCode className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <div className="font-medium">UPI Transfer</div>
+            <div className="font-medium">RizzPay UPI Transfer</div>
             <div className="text-sm text-muted-foreground">
               Pay using your UPI app
             </div>
@@ -238,13 +239,18 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                     <p className="text-xs text-center">Failed to load QR code</p>
                   </div>
                 ) : (
-                  <img 
-                    src={qrCodeUrl} 
-                    alt="UPI QR Code"
-                    className="h-full w-full object-contain"
-                    onLoad={handleQrCodeLoad}
-                    onError={handleQrCodeLoadError}
-                  />
+                  <>
+                    <img 
+                      src={qrCodeUrl} 
+                      alt="UPI QR Code"
+                      className="h-full w-full object-contain"
+                      onLoad={handleQrCodeLoad}
+                      onError={handleQrCodeLoadError}
+                    />
+                    <p className="text-xs text-center text-primary mt-1">
+                      Powered by RizzPay
+                    </p>
+                  </>
                 )}
               </div>
             ) : (
@@ -285,12 +291,12 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                 <PopoverTrigger asChild>
                   <Button variant="link" size="sm" className="text-xs">
                     <Link className="h-3 w-3 mr-1" />
-                    Get payment link
+                    Get RizzPay payment link
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Payment Link</h4>
+                    <h4 className="text-sm font-medium">RizzPay Payment Link</h4>
                     <div className="flex items-center space-x-2">
                       <Input 
                         value={paymentLink || "Enter valid UPI ID first"}
@@ -337,7 +343,7 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
           {isLoading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</>
           ) : (
-            <><Send className="mr-2 h-4 w-4" /> Pay Now</>
+            <><Send className="mr-2 h-4 w-4" /> Pay Now via RizzPay</>
           )}
         </Button>
       </div>

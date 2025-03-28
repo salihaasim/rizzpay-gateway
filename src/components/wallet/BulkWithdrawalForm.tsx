@@ -153,7 +153,7 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Bulk Withdrawals');
     
     // Write to file and download
-    XLSX.writeFile(workbook, 'bulk_withdrawal_template.xlsx');
+    XLSX.writeFile(workbook, 'rizzpay_bulk_withdrawal_template.xlsx');
   };
   
   const processWithdrawals = async () => {
@@ -227,7 +227,7 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
               variant="outline"
               size="icon"
               onClick={downloadTemplate}
-              title="Download Template"
+              title="Download RizzPay Template"
             >
               <Download className="h-4 w-4" />
             </Button>
@@ -269,7 +269,7 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
             {isProcessing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                Processing Withdrawals...
+                Processing RizzPay Withdrawals...
               </>
             ) : (
               'Process All Withdrawals'

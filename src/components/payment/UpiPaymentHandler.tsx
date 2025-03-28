@@ -76,7 +76,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     setQrCodeError(false);
     try {
       // Format the UPI payment URL (upi://pay format)
-      const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}&tr=${generateTransactionId()}`;
+      const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=${generateTransactionId()}`;
       
       // Generate QR code URL using a third-party service
       const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
@@ -85,7 +85,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       
       // Generate direct UPI payment link instead of using upi.link (which redirects to GoDaddy)
       // This uses the intent format which is more widely supported
-      const webLink = `https://upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}`;
+      const webLink = `https://upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}`;
       setPaymentLink(webLink);
     } catch (error) {
       console.error("QR code generation error:", error);
@@ -95,7 +95,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
 
   // Generate a simple transaction ID
   const generateTransactionId = () => {
-    return 'UPITX' + Math.floor(Math.random() * 1000000);
+    return 'RZPY' + Math.floor(Math.random() * 1000000);
   };
 
   const handleUpiPayment = async () => {
@@ -128,7 +128,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       
       // Simulate UPI payment processing
       console.log(`Simulating UPI payment to ${paymentData.upiId} for ${paymentData.amount}`);
-      toast.success(`Payment request sent to UPI ID: ${paymentData.upiId}`, {
+      toast.success(`Payment request sent via RizzPay to UPI ID: ${paymentData.upiId}`, {
         description: "Check your UPI app for payment confirmation"
       });
       
@@ -151,7 +151,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     }
     
     // Format the UPI payment URL (upi://pay format)
-    const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`UPI Payment`)}&tr=${generateTransactionId()}`;
+    const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=${generateTransactionId()}`;
     
     // Try to open the UPI app
     try {
@@ -196,7 +196,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
             </>
           ) : (
             <>
-              <Smartphone className="mr-2 h-4 w-4" /> Pay with UPI
+              <Smartphone className="mr-2 h-4 w-4" /> Pay with UPI via RizzPay
             </>
           )}
         </Button>
@@ -226,7 +226,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Scan QR Code</DialogTitle>
+            <DialogTitle>RizzPay QR Code Payment</DialogTitle>
             <DialogDescription>
               Scan this QR code with any UPI app to make the payment of ₹{paymentData.amount}
             </DialogDescription>
@@ -245,6 +245,9 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
                   alt="UPI QR Code"
                   className="h-48 w-48 object-contain"
                 />
+                <p className="text-xs text-center text-muted-foreground mt-2">
+                  Powered by RizzPay
+                </p>
               </div>
             ) : (
               <div className="h-48 w-48 flex items-center justify-center">
@@ -283,7 +286,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
           <DialogHeader>
             <DialogTitle>Choose UPI App</DialogTitle>
             <DialogDescription>
-              Select a UPI app to make your payment
+              Select a UPI app to make your payment via RizzPay
             </DialogDescription>
           </DialogHeader>
           
@@ -305,7 +308,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
           </div>
           
           <div className="p-4 border-t">
-            <p className="text-sm mb-2">Payment Link:</p>
+            <p className="text-sm mb-2">RizzPay Payment Link:</p>
             <div className="flex gap-2 relative">
               <Input
                 type="text"
