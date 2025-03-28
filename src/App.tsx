@@ -76,7 +76,7 @@ const App = () => {
             </ProtectedRoute>
           } />
           
-          {/* Webhook routes - consolidated to prevent duplicate navbars */}
+          {/* Webhook routes - ensuring Layout component is used */}
           <Route path="/webhook" element={
             <ProtectedRoute>
               <Layout><WebhookSetup /></Layout>
