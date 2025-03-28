@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -18,7 +19,8 @@ const Navbar = () => {
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Transactions', path: '/transactions' },
     { name: 'Wallet', path: '/wallet' },
-    { name: 'Webhooks', path: '/webhooks' },
+    { name: 'Webhook', path: '/webhook' },
+    { name: 'Security', path: '/security' },
     { name: 'Settings', path: '/settings' },
   ];
 

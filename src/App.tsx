@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -12,6 +13,7 @@ import WalletPage from './pages/WalletPage';
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
+const WebhookSetup = React.lazy(() => import('./pages/WebhookSetup'));
 const DeveloperIntegration = React.lazy(() => import('./pages/DeveloperIntegration'));
 const Security = React.lazy(() => import('./pages/Security'));
 const Settings = React.lazy(() => import('./pages/Settings'));
@@ -75,7 +77,12 @@ const App = () => {
           } />
           <Route path="/webhook" element={
             <ProtectedRoute>
-              <Layout><WebhookPage /></Layout>
+              <Layout><WebhookSetup /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/webhooks" element={
+            <ProtectedRoute>
+              <Layout><WebhookSetup /></Layout>
             </ProtectedRoute>
           } />
           <Route path="/developers" element={

@@ -1,4 +1,3 @@
-
 // RizzPay UI Design System
 // This file contains shared design tokens and UI configurations
 
@@ -18,6 +17,13 @@ export const colors = {
     dark: 'hsl(var(--secondary) / 120%)',
     contrast: 'hsl(var(--secondary-foreground))'
   },
+  // Aqua blue colors
+  aqua: {
+    main: '#0EA5E9',
+    light: '#33C3F0',
+    dark: '#0C8BBF',
+    contrast: '#FFFFFF'
+  },
   // Admin-specific colors
   admin: {
     primary: 'hsl(240 5.9% 10%)',
@@ -31,16 +37,16 @@ export const colors = {
   },
   // Merchant-specific colors
   merchant: {
-    primary: 'hsl(224 64% 33%)',
-    secondary: 'hsl(214 32% 91%)',
-    accent: 'hsl(215 100% 50%)',
+    primary: 'hsl(195 64% 33%)',
+    secondary: 'hsl(195 32% 91%)',
+    accent: 'hsl(195 100% 50%)',
     background: 'hsl(0 0% 100%)'
   },
   status: {
     success: 'hsl(142 71% 45%)',
     warning: 'hsl(38 92% 50%)',
     error: 'hsl(0 84% 60%)',
-    info: 'hsl(214 100% 60%)'
+    info: 'hsl(195 100% 60%)'
   }
 };
 
@@ -120,19 +126,19 @@ export const adminUI = {
   },
   content: {
     background: colors.admin.background,
-    padding: spacing.xl
+    padding: 'var(--spacing-xl)'
   },
   card: {
     background: 'hsl(0 0% 100%)',
     border: '1px solid hsl(var(--border) / 50%)',
-    shadow: shadows.sm,
-    radius: radii.lg
+    shadow: 'var(--shadows-sm)',
+    radius: 'var(--radii-lg)'
   },
   button: {
     primary: {
-      background: colors.admin.accent,
-      hover: 'hsl(280 70% 50%)',
-      text: 'hsl(0 0% 100%)'
+      background: colors.aqua.main,
+      hover: colors.aqua.dark,
+      text: colors.aqua.contrast
     },
     secondary: {
       background: colors.admin.secondary,
@@ -144,9 +150,9 @@ export const adminUI = {
     card: {
       background: 'hsl(0 0% 100%)',
       border: '1px solid hsl(var(--border) / 50%)',
-      shadow: shadows.sm,
-      radius: radii.lg,
-      padding: spacing.lg
+      shadow: 'var(--shadows-sm)',
+      radius: 'var(--radii-lg)',
+      padding: 'var(--spacing-lg)'
     },
     iconBg: {
       primary: 'hsl(280 70% 60% / 10%)',
@@ -183,23 +189,23 @@ export const merchantUI = {
   },
   content: {
     background: 'hsl(0 0% 100%)',
-    padding: spacing.lg
+    padding: 'var(--spacing-lg)'
   },
   card: {
     background: 'hsl(0 0% 100%)',
     border: '1px solid hsl(var(--border) / 50%)',
-    shadow: shadows.sm,
-    radius: radii.md
+    shadow: 'var(--shadows-sm)',
+    radius: 'var(--radii-md)'
   },
   button: {
     primary: {
-      background: 'hsl(214 100% 50%)',
-      hover: 'hsl(214 100% 45%)',
-      text: 'hsl(0 0% 100%)'
+      background: colors.aqua.main,
+      hover: colors.aqua.dark,
+      text: colors.aqua.contrast
     },
     secondary: {
-      background: 'hsl(224 64% 33%)',
-      hover: 'hsl(224 64% 28%)',
+      background: 'hsl(195 64% 33%)',
+      hover: 'hsl(195 64% 28%)',
       text: 'hsl(0 0% 100%)'
     }
   },
@@ -207,9 +213,9 @@ export const merchantUI = {
     card: {
       background: 'hsl(0 0% 100%)',
       border: '1px solid hsl(var(--border) / 50%)',
-      shadow: shadows.sm,
-      radius: radii.md,
-      padding: spacing.md
+      shadow: 'var(--shadows-sm)',
+      radius: 'var(--radii-md)',
+      padding: 'var(--spacing-md)'
     },
     iconBg: {
       primary: 'hsl(214 100% 50% / 10%)',
@@ -248,7 +254,7 @@ export const zIndices = {
 export const layout = {
   maxWidth: '1440px',
   contentMaxWidth: '1280px',
-  containerPadding: spacing.lg,
+  containerPadding: 'var(--spacing-xl)',
   sidebarWidth: '280px',
   sidebarCollapsedWidth: '80px',
   topNavHeight: '64px'
@@ -276,7 +282,8 @@ export const animations = {
 // Gradients
 export const gradients = {
   primary: 'linear-gradient(135deg, hsl(280 70% 60%), hsl(320 70% 50%))',
-  secondary: 'linear-gradient(135deg, hsl(214 100% 50%), hsl(224 64% 33%))',
+  secondary: 'linear-gradient(135deg, #0EA5E9, #0C8BBF)',
+  aqua: 'linear-gradient(135deg, #33C3F0, #0EA5E9)',
   success: 'linear-gradient(135deg, hsl(142 71% 45%), hsl(160 71% 40%))',
   warning: 'linear-gradient(135deg, hsl(38 92% 50%), hsl(25 95% 50%))',
   error: 'linear-gradient(135deg, hsl(0 84% 60%), hsl(0 70% 50%))',
