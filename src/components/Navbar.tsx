@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
 
@@ -32,18 +32,10 @@ const Navbar = () => {
             to="/" 
             className="font-semibold text-xl text-primary flex items-center gap-1"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <CreditCard
               className="h-6 w-6"
-            >
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-            </svg>
+              strokeWidth={1.5}
+            />
             <span className="font-bold">RizzPay</span>
           </Link>
           
@@ -80,18 +72,7 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
               <Link to="/" className="flex items-center gap-1 mb-8">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-6 w-6"
-                >
-                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                </svg>
+                <CreditCard className="h-6 w-6" strokeWidth={1.5} />
                 <span className="font-bold text-xl">RizzPay</span>
               </Link>
               <div className="grid gap-2 py-6">

@@ -9,10 +9,10 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
-              <CreditCard className="h-5 w-5 text-primary" />
+              <CreditCard className="h-5 w-5 text-primary" strokeWidth={1.5} />
             </div>
             <span className="font-bold text-xl bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent">
-              Rizzpay
+              RizzPay
             </span>
           </div>
           
@@ -29,7 +29,7 @@ const Footer = () => {
           </div>
           
           <div className="text-sm text-muted-foreground mt-4 md:mt-0">
-            © {new Date().getFullYear()} Rizzpay. All rights reserved.
+            © {new Date().getFullYear()} RizzPay. All rights reserved.
           </div>
         </div>
       </div>

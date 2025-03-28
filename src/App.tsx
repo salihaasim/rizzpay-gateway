@@ -75,6 +75,8 @@ const App = () => {
               <Layout><WalletPage /></Layout>
             </ProtectedRoute>
           } />
+          
+          {/* Webhook routes - consolidated to prevent duplicate navbars */}
           <Route path="/webhook" element={
             <ProtectedRoute>
               <Layout><WebhookSetup /></Layout>
@@ -85,6 +87,7 @@ const App = () => {
               <Layout><WebhookSetup /></Layout>
             </ProtectedRoute>
           } />
+          
           <Route path="/developers" element={
             <ProtectedRoute>
               <Layout><DeveloperIntegration /></Layout>
@@ -93,6 +96,13 @@ const App = () => {
           <Route path="/security" element={
             <ProtectedRoute>
               <Layout><Security /></Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Settings routes */}
+          <Route path="/settings/*" element={
+            <ProtectedRoute>
+              <Layout><Settings /></Layout>
             </ProtectedRoute>
           } />
           <Route path="/settings" element={
