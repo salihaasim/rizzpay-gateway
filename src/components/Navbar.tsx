@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, CreditCard } from "lucide-react";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
+import logoSvg from '../assets/logo.svg';
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -32,10 +33,7 @@ const Navbar = () => {
             to="/" 
             className="font-semibold text-xl text-primary flex items-center gap-1"
           >
-            <CreditCard
-              className="h-6 w-6"
-              strokeWidth={1.5}
-            />
+            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
             <span className="font-bold">RizzPay</span>
           </Link>
           
@@ -72,7 +70,7 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
               <Link to="/" className="flex items-center gap-1 mb-8">
-                <CreditCard className="h-6 w-6" strokeWidth={1.5} />
+                <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
                 <span className="font-bold text-xl">RizzPay</span>
               </Link>
               <div className="grid gap-2 py-6">

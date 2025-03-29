@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Navbar from '@/components/Navbar';
+import LandingNavbar from '@/components/landing/LandingNavbar';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
@@ -11,10 +11,14 @@ import Footer from '@/components/landing/Footer';
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <LandingNavbar />
       <HeroSection />
-      <FeaturesSection />
-      <HowItWorksSection />
+      <div id="features">
+        <FeaturesSection />
+      </div>
+      <div id="how-it-works">
+        <HowItWorksSection />
+      </div>
       <RoleSectionWrapper />
       <QuickPaymentSection />
       <Footer />
