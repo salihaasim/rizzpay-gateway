@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Bell, Settings, Monitor, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Bell, Settings, Monitor, LogOut, Users } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SupabaseStatus from '@/components/SupabaseStatus';
 import { Link } from 'react-router-dom';
 import { 
@@ -37,6 +37,13 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
         <div className="flex items-center space-x-3">
           <SupabaseStatus />
           
+          <Link to="/admin/merchants">
+            <Button variant="outline" size="sm" className="flex items-center mr-2">
+              <Users className="h-4 w-4 mr-1" />
+              Manage Merchants
+            </Button>
+          </Link>
+          
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 flex items-center justify-center text-[10px] text-white">3</span>
@@ -46,7 +53,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#9970e2] text-white text-xs">
+                  <AvatarFallback className="bg-coinbase text-white text-xs">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
@@ -62,6 +69,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/admin/merchants" className="cursor-pointer flex items-center">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Manage Merchants</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/admin/settings" className="cursor-pointer flex items-center">
                   <Settings className="mr-2 h-4 w-4" />

@@ -12,7 +12,7 @@ const LandingNavbar = () => {
         <div className="flex items-center gap-2">
           <Link 
             to="/" 
-            className="font-semibold text-xl text-primary flex items-center gap-1"
+            className="font-semibold text-xl text-coinbase flex items-center gap-1"
           >
             <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
             <span className="font-bold">RizzPay</span>
@@ -21,13 +21,13 @@ const LandingNavbar = () => {
         
         <div className="flex items-center gap-4">
           <nav className="hidden md:flex gap-6">
-            <Link to="#features" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            <Link to="#features" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
               Features
             </Link>
-            <Link to="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            <Link to="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
               How it Works
             </Link>
-            <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
               Terms & Conditions
             </Link>
           </nav>
@@ -39,7 +39,7 @@ const LandingNavbar = () => {
           </Link>
           
           <Link to="/auth">
-            <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
+            <Button size="sm" className="bg-coinbase text-white hover:bg-coinbase/90">
               Sign Up
             </Button>
           </Link>

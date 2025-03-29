@@ -4,6 +4,7 @@ import Index from './pages/Index';
 import { Toaster } from 'sonner';
 import { useMerchantAuth } from './stores/merchantAuthStore';
 import Layout from './components/Layout';
+import PaymentPageLoading from './components/payment/PaymentPageLoading';
 
 // Directly import WalletPage to avoid lazy loading issue
 import WalletPage from './pages/WalletPage';
@@ -21,21 +22,8 @@ const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Auth = React.lazy(() => import('./pages/Auth'));
 
-// Loading component
-const PageLoading = () => (
-  <div className="flex items-center justify-center min-h-screen bg-background">
-    <div className="flex flex-col items-center space-y-6">
-      <div className="relative">
-        <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
-        <div className="w-16 h-16 border-4 border-primary rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
-      </div>
-      <div className="flex flex-col items-center space-y-1">
-        <p className="text-lg font-medium text-foreground">Loading...</p>
-        <p className="text-sm text-muted-foreground">Please wait while we prepare your dashboard</p>
-      </div>
-    </div>
-  </div>
-);
+// Loading component - now using our enhanced payment loading animation
+const PageLoading = () => <PaymentPageLoading />;
 
 const App = () => {
   const { isAuthenticated, loading } = useMerchantAuth();
