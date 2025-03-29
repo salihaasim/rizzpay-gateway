@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -66,10 +65,10 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				aqua: {
-					DEFAULT: '#0EA5E9',
-					light: '#33C3F0',
-					dark: '#0C8BBF'
+				coinbase: {
+					DEFAULT: '#0052FF',
+					light: '#0052FF90',
+					dark: '#0045DB'
 				}
 			},
 			borderRadius: {

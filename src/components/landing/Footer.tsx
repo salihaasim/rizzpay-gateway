@@ -10,19 +10,19 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
             <img src={logoSvg} alt="RizzPay Logo" className="h-8 w-8 mr-2" />
-            <span className="font-bold text-xl bg-gradient-to-br from-primary to-[#33C3F0] bg-clip-text text-transparent">
+            <span className="font-bold text-xl bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent">
               RizzPay
             </span>
           </div>
           
           <div className="flex gap-8">
-            <a href="#" className="text-sm text-muted-foreground hover:text-[#33C3F0] transition-colors">
+            <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Terms & Conditions
+            </Link>
+            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Privacy Policy
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-[#33C3F0] transition-colors">
-              Terms of Service
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-[#33C3F0] transition-colors">
+            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Contact Us
             </a>
           </div>

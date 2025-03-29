@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -8,6 +7,7 @@ import Layout from './components/Layout';
 
 // Directly import WalletPage to avoid lazy loading issue
 import WalletPage from './pages/WalletPage';
+import TermsAndConditions from './pages/TermsAndConditions';
 
 // Lazy load other components to improve initial load time
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
@@ -57,6 +57,7 @@ const App = () => {
           {/* Public routes */}
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
           
           {/* Protected routes with Layout */}
           <Route path="/dashboard/*" element={
@@ -69,7 +70,6 @@ const App = () => {
               <Layout><Transactions /></Layout>
             </ProtectedRoute>
           } />
-          {/* Directly use WalletPage instead of lazy loading it */}
           <Route path="/wallet" element={
             <ProtectedRoute>
               <Layout><WalletPage /></Layout>

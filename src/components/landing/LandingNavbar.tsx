@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { CreditCard } from "lucide-react";
+import logoSvg from '../../assets/logo.svg';
 
 const LandingNavbar = () => {
   return (
@@ -13,10 +14,7 @@ const LandingNavbar = () => {
             to="/" 
             className="font-semibold text-xl text-primary flex items-center gap-1"
           >
-            <CreditCard
-              className="h-6 w-6"
-              strokeWidth={1.5}
-            />
+            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
             <span className="font-bold">RizzPay</span>
           </Link>
         </div>
@@ -29,8 +27,8 @@ const LandingNavbar = () => {
             <Link to="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               How it Works
             </Link>
-            <Link to="#pricing" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              Pricing
+            <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              Terms & Conditions
             </Link>
           </nav>
           
@@ -41,7 +39,7 @@ const LandingNavbar = () => {
           </Link>
           
           <Link to="/auth">
-            <Button size="sm">
+            <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
               Sign Up
             </Button>
           </Link>
