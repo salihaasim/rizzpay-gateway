@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { usePaymentForm } from './payment/usePaymentForm';
 
-// Lazy load components for better initial loading performance
-const PaymentAmountForm = lazy(() => import('./payment/PaymentAmountForm'));
-const PaymentMethodComponent = lazy(() => import('./payment/PaymentMethod'));
-const PaymentSuccess = lazy(() => import('./payment/PaymentSuccess'));
-const RazorpayPaymentHandler = lazy(() => import('./payment/RazorpayPaymentHandler'));
-const UpiPaymentHandler = lazy(() => import('./payment/UpiPaymentHandler'));
-const PaymentSuccessActions = lazy(() => import('./payment/PaymentSuccessActions'));
+// Import components directly instead of using lazy loading
+import PaymentAmountForm from './payment/PaymentAmountForm';
+import PaymentMethodComponent from './payment/PaymentMethod';
+import PaymentSuccess from './payment/PaymentSuccess';
+import RazorpayPaymentHandler from './payment/RazorpayPaymentHandler';
+import UpiPaymentHandler from './payment/UpiPaymentHandler';
+import PaymentSuccessActions from './payment/PaymentSuccessActions';
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -117,64 +117,62 @@ const PaymentFlow = () => {
       </CardHeader>
       
       <CardContent className="pt-6">
-        <Suspense fallback={<LoadingFallback />}>
-          {step === 1 && (
-            <PaymentAmountForm 
-              paymentData={paymentData}
-              handleInputChange={handleInputChange}
-              handleSelectChange={handleSelectChange}
-              getCurrencySymbol={getCurrencySymbol}
-            />
-          )}
-          
-          {step === 2 && paymentData.paymentMethod !== 'upi' && (
-            <PaymentMethodComponent
-              paymentMethod={paymentData.paymentMethod}
-              paymentData={paymentData}
-              handleInputChange={handleInputChange}
-              loading={loading}
-            />
-          )}
-          
-          {step === 2 && paymentData.paymentMethod === 'upi' && (
-            <>
-              <div className="bg-secondary rounded-lg p-4 mb-4">
-                <div className="text-sm text-muted-foreground mb-1">Amount</div>
-                <div className="text-2xl font-semibold">
-                  ₹ {paymentData.amount}
-                </div>
-                <div className="text-xs text-muted-foreground mt-2">
-                  Transaction ID: {paymentData.transactionId}
-                </div>
+        {step === 1 && (
+          <PaymentAmountForm 
+            paymentData={paymentData}
+            handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
+            getCurrencySymbol={getCurrencySymbol}
+          />
+        )}
+        
+        {step === 2 && paymentData.paymentMethod !== 'upi' && (
+          <PaymentMethodComponent
+            paymentMethod={paymentData.paymentMethod}
+            paymentData={paymentData}
+            handleInputChange={handleInputChange}
+            loading={loading}
+          />
+        )}
+        
+        {step === 2 && paymentData.paymentMethod === 'upi' && (
+          <>
+            <div className="bg-secondary rounded-lg p-4 mb-4">
+              <div className="text-sm text-muted-foreground mb-1">Amount</div>
+              <div className="text-2xl font-semibold">
+                ₹ {paymentData.amount}
               </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">UPI ID</label>
-                <input 
-                  className="w-full px-3 py-2 border rounded-md"
-                  placeholder="your-name@upi" 
-                  value={paymentData.upiId}
-                  onChange={(e) => handleInputChange({
-                    target: { name: 'upiId', value: e.target.value }
-                  } as React.ChangeEvent<HTMLInputElement>)}
-                />
-                {paymentData.upiId && !validateUpiId(paymentData.upiId) && (
-                  <p className="text-xs text-destructive mt-1 flex items-center">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    Please enter a valid UPI ID (e.g. name@bank)
-                  </p>
-                )}
+              <div className="text-xs text-muted-foreground mt-2">
+                Transaction ID: {paymentData.transactionId}
               </div>
-            </>
-          )}
-          
-          {step === 3 && (
-            <PaymentSuccess
-              paymentData={paymentData}
-              getCurrencySymbol={getCurrencySymbol}
-            />
-          )}
-        </Suspense>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">UPI ID</label>
+              <input 
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="your-name@upi" 
+                value={paymentData.upiId}
+                onChange={(e) => handleInputChange({
+                  target: { name: 'upiId', value: e.target.value }
+                } as React.ChangeEvent<HTMLInputElement>)}
+              />
+              {paymentData.upiId && !validateUpiId(paymentData.upiId) && (
+                <p className="text-xs text-destructive mt-1 flex items-center">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Please enter a valid UPI ID (e.g. name@bank)
+                </p>
+              )}
+            </div>
+          </>
+        )}
+        
+        {step === 3 && (
+          <PaymentSuccess
+            paymentData={paymentData}
+            getCurrencySymbol={getCurrencySymbol}
+          />
+        )}
       </CardContent>
       
       <CardFooter className={`flex ${step === 3 ? 'justify-center flex-col space-y-2' : 'justify-end'} pt-2 pb-6`}>
@@ -185,32 +183,26 @@ const PaymentFlow = () => {
         )}
         
         {step === 2 && paymentData.paymentMethod !== 'upi' && (
-          <Suspense fallback={<LoadingFallback />}>
-            <RazorpayPaymentHandler
-              paymentData={paymentData}
-              onSuccess={handlePaymentSuccess}
-              onError={handlePaymentError}
-            />
-          </Suspense>
+          <RazorpayPaymentHandler
+            paymentData={paymentData}
+            onSuccess={handlePaymentSuccess}
+            onError={handlePaymentError}
+          />
         )}
         
         {step === 2 && paymentData.paymentMethod === 'upi' && (
-          <Suspense fallback={<LoadingFallback />}>
-            <UpiPaymentHandler
-              paymentData={paymentData}
-              validateUpiId={validateUpiId}
-              onSuccess={handlePaymentSuccess}
-            />
-          </Suspense>
+          <UpiPaymentHandler
+            paymentData={paymentData}
+            validateUpiId={validateUpiId}
+            onSuccess={handlePaymentSuccess}
+          />
         )}
         
         {step === 3 && (
-          <Suspense fallback={<LoadingFallback />}>
-            <PaymentSuccessActions
-              onViewTransaction={handleViewTransaction}
-              onMakeAnotherPayment={resetForm}
-            />
-          </Suspense>
+          <PaymentSuccessActions
+            onViewTransaction={handleViewTransaction}
+            onMakeAnotherPayment={resetForm}
+          />
         )}
       </CardFooter>
     </Card>

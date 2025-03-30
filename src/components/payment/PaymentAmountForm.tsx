@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   // Preload Razorpay script to improve user experience
-  React.useEffect(() => {
+  useEffect(() => {
     const preloadScript = async () => {
       try {
         const isLoaded = await loadRazorpayScript();
@@ -38,7 +38,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   }, []);
 
   // Force set currency to INR
-  React.useEffect(() => {
+  useEffect(() => {
     if (paymentData.currency !== 'INR') {
       handleSelectChange('currency', 'INR');
     }
