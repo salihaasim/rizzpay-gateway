@@ -7,6 +7,11 @@ interface MerchantCredentials {
   username: string;
   password: string;
   fullName: string;
+  pricing?: {
+    transactionFee: number; // percentage
+    fixedFee: number; // in rupees
+    monthlyFee: number; // in rupees
+  };
 }
 
 interface MerchantAuthState {
@@ -15,6 +20,7 @@ interface MerchantAuthState {
   merchants: MerchantCredentials[];
   loading: boolean;
   addMerchant: (merchant: MerchantCredentials) => void;
+  updateMerchantPricing: (username: string, pricing: MerchantCredentials['pricing']) => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
 }
@@ -29,7 +35,12 @@ export const useMerchantAuth = create<MerchantAuthState>()(
         {
           username: 'merchant',
           password: 'password',
-          fullName: 'Demo Merchant'
+          fullName: 'Demo Merchant',
+          pricing: {
+            transactionFee: 2.5,
+            fixedFee: 5,
+            monthlyFee: 499
+          }
         }
       ],
       loading: false,
@@ -39,6 +50,15 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           merchants: [...state.merchants, merchant]
         }));
         toast.success('Merchant registered successfully');
+      },
+
+      updateMerchantPricing: (username, pricing) => {
+        set((state) => ({
+          merchants: state.merchants.map(m => 
+            m.username === username ? { ...m, pricing } : m
+          )
+        }));
+        toast.success('Merchant pricing updated successfully');
       },
 
       login: (username, password) => {

@@ -21,6 +21,7 @@ const Settings = React.lazy(() => import('./pages/Settings'));
 const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Auth = React.lazy(() => import('./pages/Auth'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 
 // Loading component - now using our enhanced payment loading animation
 const PageLoading = () => <PaymentPageLoading />;
@@ -47,12 +48,22 @@ const App = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/merchants" element={<AdminDashboard />} />
+          <Route path="/admin/escrow" element={<AdminDashboard />} />
+          <Route path="/admin/pricing" element={<AdminDashboard />} />
+          <Route path="/admin/settings" element={<AdminDashboard />} />
+          <Route path="/admin/analytics" element={<AdminDashboard />} />
+          <Route path="/admin/transactions" element={<AdminDashboard />} />
+          
           {/* Protected routes with Layout */}
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
               <Layout><Dashboard /></Layout>
             </ProtectedRoute>
           } />
+          
           <Route path="/transactions" element={
             <ProtectedRoute>
               <Layout><Transactions /></Layout>

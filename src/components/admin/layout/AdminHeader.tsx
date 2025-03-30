@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, Settings, Monitor, LogOut, Users } from 'lucide-react';
+import { Bell, Settings, Monitor, LogOut, Users, Wallet, FileText } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SupabaseStatus from '@/components/SupabaseStatus';
@@ -44,6 +44,13 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
             </Button>
           </Link>
           
+          <Link to="/admin/escrow">
+            <Button variant="outline" size="sm" className="flex items-center mr-2">
+              <Wallet className="h-4 w-4 mr-1" />
+              Escrow
+            </Button>
+          </Link>
+          
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 flex items-center justify-center text-[10px] text-white">3</span>
@@ -73,6 +80,18 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
                 <Link to="/admin/merchants" className="cursor-pointer flex items-center">
                   <Users className="mr-2 h-4 w-4" />
                   <span>Manage Merchants</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/admin/escrow" className="cursor-pointer flex items-center">
+                  <Wallet className="mr-2 h-4 w-4" />
+                  <span>Escrow Account</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/admin/pricing" className="cursor-pointer flex items-center">
+                  <FileText className="mr-2 h-4 w-4" />
+                  <span>Merchant Pricing</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
