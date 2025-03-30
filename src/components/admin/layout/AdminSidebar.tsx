@@ -1,232 +1,121 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { 
-  Home, 
-  ShieldCheck, 
   Users, 
-  Settings, 
-  CreditCard, 
-  BarChart3,
-  LogOut, 
-  ChevronLeft, 
-  Menu,
-  Globe,
-  Monitor,
-  HelpCircle
+  Wallet, 
+  BarChart3, 
+  Settings,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  ShieldCheck
 } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { adminUI } from '@/styles/rizzpay-ui';
+import logoSvg from '../../../assets/logo.svg';
 
-interface AdminSidebarProps {
+interface SidebarProps {
   userEmail: string | null;
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   handleLogout: () => void;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ 
+const AdminSidebar: React.FC<SidebarProps> = ({ 
   userEmail, 
   collapsed, 
-  setCollapsed, 
-  handleLogout 
+  setCollapsed,
+  handleLogout
 }) => {
   const location = useLocation();
-  
-  // Navigation items for admin
+
   const navItems = [
-    {
-      name: 'Dashboard',
-      href: '/admin',
-      icon: <Home className="h-5 w-5" />,
-    },
-    {
-      name: 'Merchants',
-      href: '/admin/merchants',
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      name: 'Transactions',
-      href: '/admin/transactions',
-      icon: <CreditCard className="h-5 w-5" />,
-    },
-    {
-      name: 'Analytics',
-      href: '/admin/analytics',
-      icon: <BarChart3 className="h-5 w-5" />,
-    },
-    {
-      name: 'Settings',
-      href: '/admin/settings',
-      icon: <Settings className="h-5 w-5" />,
-    },
+    { name: 'Dashboard', path: '/admin', icon: BarChart3 },
+    { name: 'Merchants', path: '/admin/merchants', icon: Users },
+    { name: 'Escrow Account', path: '/admin/escrow', icon: Wallet },
+    { name: 'Pricing', path: '/admin/pricing', icon: FileText },
+    { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
   const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (!userEmail) return 'A';
-    return userEmail.substring(0, 2).toUpperCase();
+    if (path === '/admin' && location.pathname === '/admin') {
+      return true;
+    }
+    return location.pathname.startsWith(path) && path !== '/admin';
   };
 
   return (
-    <aside 
-      className={cn(
-        "fixed h-full z-20 transition-all duration-300 hidden lg:block",
-        collapsed ? "w-20" : "w-[280px]"
-      )}
-      style={{ 
-        width: collapsed ? adminUI.sidebar.collapsedWidth : adminUI.sidebar.width, 
-        background: adminUI.sidebar.background 
-      }}
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 transition-all duration-300 flex-shrink-0 overflow-hidden border-r border-gray-100 bg-white ${
+        collapsed ? 'w-20' : 'w-[280px]'
+      }`}
     >
-      <div className="h-16 border-b border-white/10 flex items-center px-4">
-        <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between")} style={{ width: '100%' }}>
-          {!collapsed && (
-            <Link to="/admin" className="font-bold text-xl flex items-center">
-              <div className="h-8 w-8 rounded-lg bg-[#9970e2]/10 flex items-center justify-center mr-2">
-                <ShieldCheck className="h-5 w-5 text-[#9970e2]" />
+      <div className="flex h-full flex-col">
+        {/* Sidebar header */}
+        <div className={`flex h-14 items-center border-b px-4`}>
+          <Link to="/admin" className="flex items-center">
+            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
+            {!collapsed && (
+              <span className="ml-2 font-bold text-xl">
+                RizzPay <span className="text-coinbase">Admin</span>
+              </span>
+            )}
+          </Link>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="ml-auto h-8 w-8 rounded-md hover:bg-gray-100 flex items-center justify-center"
+          >
+            {collapsed ? (
+              <ChevronRight className="h-5 w-5 text-gray-500" />
+            ) : (
+              <ChevronLeft className="h-5 w-5 text-gray-500" />
+            )}
+          </button>
+        </div>
+
+        {/* Sidebar content */}
+        <div className="flex-1 overflow-auto py-2">
+          <nav className="flex flex-col space-y-1 px-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center space-x-3 rounded-md px-3 py-2 transition-colors ${
+                  isActive(item.path)
+                    ? 'bg-[#9970e2]/10 text-[#9970e2]'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <item.icon className={`h-5 w-5 flex-shrink-0 ${
+                  isActive(item.path) ? 'text-[#9970e2]' : 'text-gray-500'
+                }`} />
+                {!collapsed && <span>{item.name}</span>}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* Sidebar footer */}
+        <div className="mt-auto border-t px-3 py-3">
+          <div className={`flex items-center px-2 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+            {!collapsed && (
+              <div className="flex flex-col">
+                <span className="text-xs font-medium text-gray-600">Logged in as</span>
+                <span className="text-sm truncate">{userEmail || 'Admin'}</span>
               </div>
-              <span className="text-white">RizzAdmin</span>
-            </Link>
-          )}
-          {collapsed && (
-            <div className="h-8 w-8 rounded-lg bg-[#9970e2]/10 flex items-center justify-center">
-              <ShieldCheck className="h-5 w-5 text-[#9970e2]" />
-            </div>
-          )}
-          {!collapsed && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setCollapsed(true)}
-              className="text-white/70 hover:text-white hover:bg-white/10"
+            )}
+            <button
+              onClick={handleLogout}
+              className={`flex items-center space-x-2 rounded-md p-2 text-rose-500 hover:bg-rose-50 ${
+                collapsed ? 'w-10 h-10 justify-center' : ''
+              }`}
             >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          )}
+              <LogOut className="h-5 w-5" />
+              {!collapsed && <span>Logout</span>}
+            </button>
+          </div>
         </div>
       </div>
-      
-      <ScrollArea className="h-[calc(100vh-4rem)] py-4">
-        <div className="space-y-2 px-3">
-          {navItems.map((item) => (
-            <TooltipProvider key={item.href} delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={item.href}
-                    className={cn(
-                      "flex items-center py-3 px-3 rounded-md transition-colors",
-                      collapsed ? "justify-center" : "justify-start",
-                      isActive(item.href)
-                        ? "bg-white/10 text-white"
-                        : "text-white/70 hover:text-white hover:bg-white/10"
-                    )}
-                  >
-                    <div className="flex items-center">
-                      <span className={cn("", collapsed ? "" : "mr-3")}>{item.icon}</span>
-                      {!collapsed && <span>{item.name}</span>}
-                    </div>
-                  </Link>
-                </TooltipTrigger>
-                {collapsed && (
-                  <TooltipContent side="right">
-                    {item.name}
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          ))}
-        </div>
-        
-        {/* Quick links section for common tasks */}
-        {!collapsed && (
-          <div className="mt-6 px-3">
-            <h3 className="text-white/50 text-xs uppercase font-semibold px-3 mb-2">Quick Actions</h3>
-            <div className="space-y-1">
-              <Link
-                to="/dashboard"
-                className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
-              >
-                <Monitor className="h-4 w-4 mr-3" />
-                <span className="text-sm">Merchant View</span>
-              </Link>
-              <Link
-                to="/"
-                className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
-              >
-                <Globe className="h-4 w-4 mr-3" />
-                <span className="text-sm">Main Website</span>
-              </Link>
-              <Link
-                to="#"
-                className="flex items-center py-2 px-3 rounded-md transition-colors text-white/70 hover:text-white hover:bg-white/10"
-              >
-                <HelpCircle className="h-4 w-4 mr-3" />
-                <span className="text-sm">Admin Guide</span>
-              </Link>
-            </div>
-          </div>
-        )}
-        
-        {!collapsed && (
-          <div className="mt-8 px-6">
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-white/90 text-sm font-medium mb-3">Admin Control Panel</p>
-              <p className="text-white/70 text-xs mb-4">You have full access to manage the platform and users.</p>
-              <p className="text-white/90 text-xs flex items-center">
-                <ShieldCheck className="h-3 w-3 mr-1" />
-                Admin privileges
-              </p>
-            </div>
-          </div>
-        )}
-      </ScrollArea>
-      
-      {!collapsed && (
-        <div className="absolute bottom-0 w-full p-4 border-t border-white/10">
-          <div className="flex items-center">
-            <Avatar className="h-10 w-10 mr-3">
-              <AvatarFallback className="bg-[#9970e2] text-white">
-                {getUserInitials()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <p className="text-white text-sm font-medium">{userEmail}</p>
-              <p className="text-white/70 text-xs">Administrator</p>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleLogout}
-              className="text-white/70 hover:text-white hover:bg-white/10"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      {collapsed && (
-        <div className="absolute bottom-4 left-0 w-full flex justify-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setCollapsed(false)}
-            className="text-white/70 hover:text-white hover:bg-white/10 h-10 w-10 rounded-full"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </div>
-      )}
     </aside>
   );
 };

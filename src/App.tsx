@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -48,7 +49,7 @@ const App = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           
-          {/* Admin routes */}
+          {/* Admin routes - No Layout component since AdminLayout handles this */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/merchants" element={<AdminDashboard />} />
           <Route path="/admin/escrow" element={<AdminDashboard />} />
@@ -57,7 +58,7 @@ const App = () => {
           <Route path="/admin/analytics" element={<AdminDashboard />} />
           <Route path="/admin/transactions" element={<AdminDashboard />} />
           
-          {/* Protected routes with Layout */}
+          {/* Protected merchant routes with Layout */}
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
               <Layout><Dashboard /></Layout>
