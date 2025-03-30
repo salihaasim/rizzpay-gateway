@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Sheet } from '@/components/ui/sheet';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 // Import refactored components
 import AdminSidebar from './layout/AdminSidebar';
@@ -22,12 +23,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userRole, userEmail, resetUserRole } = useTransactionStore();
+  const { logout: merchantLogout } = useMerchantAuth();
   
   // Redirect if not admin
-  if (userRole !== 'admin') {
-    navigate('/dashboard');
-    return null;
-  }
+  useEffect(() => {
+    if (userRole !== 'admin') {
+      navigate('/dashboard');
+    }
+  }, [userRole, navigate]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -35,9 +38,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const handleLogout = () => {
     resetUserRole();
+    merchantLogout(); // Ensure we also log out from merchant auth
     toast.success('Logged out successfully');
-    navigate('/auth');
+    navigate('/', { replace: true }); // Redirect to home page
   };
+
+  if (userRole !== 'admin') {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex">

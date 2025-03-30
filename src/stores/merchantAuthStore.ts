@@ -84,6 +84,9 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           currentMerchant: null 
         });
         toast.success('Logged out successfully');
+        
+        // Note: The actual navigation to home page is handled in the components
+        // that call this method (Layout.tsx and AdminLayout.tsx)
       }
     }),
     {
