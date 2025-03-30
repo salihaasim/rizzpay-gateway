@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -6,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, LogIn, Store, Loader2 } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -16,13 +18,14 @@ const Auth = () => {
     fullName: ''
   });
   
-  const { login, addMerchant, isAuthenticated, user, userRole } = useMerchantAuth();
+  const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
+  const { userRole } = useTransactionStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Check if the user is an admin
-      if (user?.role === 'admin' || userRole === 'admin') {
+      // Check if the user is an admin from transactionStore
+      if (userRole === 'admin') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
@@ -45,7 +48,7 @@ const Auth = () => {
     } else {
       const success = login(formData.username, formData.password);
       if (success) {
-        navigate('/dashboard');
+        // Redirect is handled by the useEffect
       }
     }
 
