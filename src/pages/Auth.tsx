@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,8 +16,19 @@ const Auth = () => {
     fullName: ''
   });
   
-  const { login, addMerchant } = useMerchantAuth();
+  const { login, addMerchant, isAuthenticated, user, userRole } = useMerchantAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Check if the user is an admin
+      if (user?.role === 'admin' || userRole === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

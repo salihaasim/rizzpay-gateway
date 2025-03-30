@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Index from './pages/Index';
 import { Toaster } from 'sonner';
 import { useMerchantAuth } from './stores/merchantAuthStore';
+import { useTransactionStore } from './stores/transactionStore';
 import Layout from './components/Layout';
 import PaymentPageLoading from './components/payment/PaymentPageLoading';
 
@@ -29,6 +30,7 @@ const PageLoading = () => <PaymentPageLoading />;
 
 const App = () => {
   const { isAuthenticated, loading } = useMerchantAuth();
+  const { userRole } = useTransactionStore();
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
@@ -38,6 +40,9 @@ const App = () => {
   if (!appReady && loading) {
     return <PageLoading />;
   }
+
+  // Check if user is an admin
+  const isAdmin = userRole === 'admin';
 
   return (
     <Router>
@@ -58,56 +63,56 @@ const App = () => {
           <Route path="/admin/analytics" element={<AdminDashboard />} />
           <Route path="/admin/transactions" element={<AdminDashboard />} />
           
-          {/* Protected merchant routes with Layout */}
+          {/* Protected merchant routes with Layout - Redirect admin to admin dashboard */}
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
-              <Layout><Dashboard /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Dashboard /></Layout>}
             </ProtectedRoute>
           } />
           
           <Route path="/transactions" element={
             <ProtectedRoute>
-              <Layout><Transactions /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Transactions /></Layout>}
             </ProtectedRoute>
           } />
           <Route path="/wallet" element={
             <ProtectedRoute>
-              <Layout><WalletPage /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WalletPage /></Layout>}
             </ProtectedRoute>
           } />
           
           {/* Webhook routes - ensuring Layout component is used */}
           <Route path="/webhook" element={
             <ProtectedRoute>
-              <Layout><WebhookSetup /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
             </ProtectedRoute>
           } />
           <Route path="/webhooks" element={
             <ProtectedRoute>
-              <Layout><WebhookSetup /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
             </ProtectedRoute>
           } />
           
           <Route path="/developers" element={
             <ProtectedRoute>
-              <Layout><DeveloperIntegration /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><DeveloperIntegration /></Layout>}
             </ProtectedRoute>
           } />
           <Route path="/security" element={
             <ProtectedRoute>
-              <Layout><Security /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Security /></Layout>}
             </ProtectedRoute>
           } />
           
           {/* Settings routes */}
           <Route path="/settings/*" element={
             <ProtectedRoute>
-              <Layout><Settings /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
             </ProtectedRoute>
           } />
           <Route path="/settings" element={
             <ProtectedRoute>
-              <Layout><Settings /></Layout>
+              {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
             </ProtectedRoute>
           } />
           

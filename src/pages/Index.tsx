@@ -5,7 +5,6 @@ import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
 import RoleSectionWrapper from '@/components/landing/RoleSectionWrapper';
-import QuickPaymentSection from '@/components/landing/QuickPaymentSection';
 import Footer from '@/components/landing/Footer';
 
 const Index = () => {
@@ -20,7 +19,6 @@ const Index = () => {
         <HowItWorksSection />
       </div>
       <RoleSectionWrapper />
-      <QuickPaymentSection />
       <Footer />
     </div>
   );
