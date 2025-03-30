@@ -1,7 +1,7 @@
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 
 interface LayoutProps {
@@ -10,6 +10,16 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const { isAuthenticated, loading } = useMerchantAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Monitor authentication status for changes
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+      // User logged out, redirect to home page
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   // Show loading indicator if authentication is still being checked
   if (loading) {
@@ -23,9 +33,9 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     );
   }
 
-  // If not authenticated, redirect to auth page
+  // If not authenticated, redirect to auth page with current location for back navigation
   if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   return (

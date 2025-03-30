@@ -78,7 +78,11 @@ export const useMerchantAuth = create<MerchantAuthState>()(
       },
 
       logout: () => {
-        set({ isAuthenticated: false, currentMerchant: null });
+        // Optimized logout - clear only necessary state
+        set({ 
+          isAuthenticated: false, 
+          currentMerchant: null 
+        });
         toast.success('Logged out successfully');
       }
     }),

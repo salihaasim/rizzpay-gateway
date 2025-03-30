@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,10 @@ const Auth = () => {
   const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
   const { userRole } = useTransactionStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the previous location from state or default to home
+  const { from } = location.state || { from: { pathname: '/' } };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -62,14 +66,19 @@ const Auth = () => {
     }));
   };
 
+  const handleBack = () => {
+    // Navigate back to where the user came from or to the home page
+    navigate(-1);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="w-full py-6 border-b bg-background">
         <div className="container px-4 mx-auto">
           <div className="flex justify-between items-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="sm" onClick={handleBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              Back
             </Button>
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">

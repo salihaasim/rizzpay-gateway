@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useProfileStore } from '@/stores/profileStore';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -16,10 +15,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import UserRegistrationForm from './UserRegistrationForm';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const UserSwitcher = () => {
   const { userEmail, setUserRole } = useTransactionStore();
   const { merchants, addMerchant } = useProfileStore();
+  const { logout: merchantLogout } = useMerchantAuth();
   const [open, setOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const navigate = useNavigate();
@@ -43,9 +44,16 @@ const UserSwitcher = () => {
   };
   
   const handleLogout = () => {
+    // Call both logout methods to ensure complete logout
     setUserRole(null, null);
+    merchantLogout(); // Add this to ensure proper merchant logout
+    
     setOpen(false);
-    navigate('/');
+    
+    // Redirect to home page
+    navigate('/', { replace: true });
+    
+    toast.success('Logged out successfully');
   };
   
   const handleRegisterUser = (userData: { name: string; email: string; phone: string; company: string }) => {

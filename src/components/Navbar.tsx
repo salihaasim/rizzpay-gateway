@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
 import logoSvg from '../assets/logo.svg';
@@ -11,9 +11,14 @@ import logoSvg from '../assets/logo.svg';
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleBack = () => {
+    navigate(-1); // Go back to previous page
   };
 
   const navItems = [
@@ -29,6 +34,18 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 max-w-screen-2xl items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-2">
+          {location.pathname !== '/' && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleBack} 
+              className="mr-2"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
+          
           <Link 
             to="/" 
             className="font-semibold text-xl text-primary flex items-center gap-1"
