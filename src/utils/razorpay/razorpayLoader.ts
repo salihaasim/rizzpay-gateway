@@ -25,6 +25,32 @@ export const loadRazorpayScript = (): Promise<boolean> => {
       
       // Additional validation to ensure Razorpay is properly loaded
       if (window.Razorpay) {
+        // Configure Razorpay for mobile responsiveness
+        if (window.Razorpay.constructor && window.Razorpay.constructor.prototype) {
+          const originalOpen = window.Razorpay.constructor.prototype.open;
+          window.Razorpay.constructor.prototype.open = function(...args) {
+            // Update theme and prefill options for better mobile UX
+            if (this.options) {
+              // Ensure theme has appropriate colors for mobile
+              if (!this.options.theme) {
+                this.options.theme = { color: "#2563eb" };
+              }
+              
+              // Set correct modal options for mobile
+              if (!this.options.modal) {
+                this.options.modal = {
+                  backdropclose: false,
+                  escape: false,
+                  animation: true
+                };
+              }
+            }
+            
+            // Call original open with updated options
+            return originalOpen.apply(this, args);
+          };
+        }
+        
         resolve(true);
       } else {
         console.error('Razorpay object not found after script load');

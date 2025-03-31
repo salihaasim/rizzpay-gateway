@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { loadRazorpayScript } from '@/utils/razorpay/razorpayLoader';
 import { Loader2, IndianRupee } from 'lucide-react';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 interface PaymentAmountFormProps {
   paymentData: any;
@@ -22,6 +23,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 640px)');
 
   // Preload Razorpay script to improve user experience
   useEffect(() => {
@@ -105,7 +107,11 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
             console.log('Razorpay payment dismissed by user');
             toast.info('Payment cancelled');
             setIsProcessing(false);
-          }
+          },
+          // Mobile-specific options
+          animation: true,
+          backdropclose: false,
+          escape: false
         }
       };
       
@@ -136,6 +142,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           value={paymentData.name}
           onChange={handleInputChange}
           required
+          className="h-11 md:h-10" // Taller input for mobile touch
         />
       </div>
       
@@ -148,6 +155,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           placeholder="your@email.com"
           value={paymentData.customerEmail}
           onChange={handleInputChange}
+          className="h-11 md:h-10" // Taller input for mobile touch
         />
         <p className="text-xs text-muted-foreground">
           Required for receipt (will be sent to Razorpay)
@@ -165,11 +173,12 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
             name="amount"
             type="number"
             placeholder="0.00"
-            className="pl-7"
+            className="pl-7 h-11 md:h-10 text-lg" // Larger text for better readability on mobile
             value={paymentData.amount}
             onChange={handleInputChange}
             min="1"
             required
+            inputMode="decimal" // Better keyboard for number input on mobile
           />
         </div>
       </div>
@@ -178,7 +187,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
         <Label htmlFor="paymentMethod">Payment Method</Label>
         <select
           id="paymentMethod"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="flex h-11 md:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           value={paymentData.paymentMethod}
           onChange={(e) => handleSelectChange('paymentMethod', e.target.value)}
         >
@@ -196,13 +205,14 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           placeholder="Payment purpose (optional)"
           value={paymentData.purpose}
           onChange={handleInputChange}
+          className="h-11 md:h-10" // Taller input for mobile touch
         />
       </div>
 
       {(paymentData.paymentMethod === 'card' || paymentData.paymentMethod === 'neft') && (
         <Button 
           onClick={handleDirectRazorpayPayment}
-          className="w-full mt-4"
+          className={`w-full mt-4 ${isMobile ? 'h-12 text-base' : 'h-10'}`} // Taller button with larger text on mobile
           disabled={isProcessing}
         >
           {isProcessing ? (
