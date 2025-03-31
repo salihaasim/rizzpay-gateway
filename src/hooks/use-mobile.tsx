@@ -1,19 +1,19 @@
-import * as React from "react"
 
-const MOBILE_BREAKPOINT = 768
+import { useMediaQuery, mediaQueries } from './use-media-query';
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+/**
+ * Re-export useMediaQuery for backwards compatibility
+ * This ensures any existing imports using useMediaQuery from use-mobile
+ * will continue to work while we transition to use-media-query
+ */
+export { useMediaQuery, mediaQueries };
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
-
-  return !!isMobile
+/**
+ * Custom hook to detect if the current device is a mobile device
+ * @returns Boolean indicating if the device is mobile
+ */
+export function useMobile(): boolean {
+  return useMediaQuery(mediaQueries.isMobile);
 }
+
+export default useMobile;
