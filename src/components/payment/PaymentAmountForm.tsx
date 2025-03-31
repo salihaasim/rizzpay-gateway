@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { loadRazorpayScript } from '@/utils/razorpay/razorpayLoader';
 import { Loader2, IndianRupee } from 'lucide-react';
-import { useMediaQuery } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface PaymentAmountFormProps {
   paymentData: any;
@@ -25,7 +24,6 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const isMobile = useMediaQuery('(max-width: 640px)');
 
-  // Preload Razorpay script to improve user experience
   useEffect(() => {
     const preloadScript = async () => {
       try {
@@ -39,16 +37,13 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
     preloadScript();
   }, []);
 
-  // Force set currency to INR
   useEffect(() => {
     if (paymentData.currency !== 'INR') {
       handleSelectChange('currency', 'INR');
     }
   }, [paymentData.currency, handleSelectChange]);
 
-  // Direct Razorpay payment handling
   const handleDirectRazorpayPayment = async () => {
-    // Validate form
     if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
       toast.error('Please enter a valid amount');
       return;
@@ -67,7 +62,6 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
     try {
       setIsProcessing(true);
       
-      // Load Razorpay script if not already loaded
       if (!scriptLoaded) {
         const isLoaded = await loadRazorpayScript();
         if (!isLoaded) {
@@ -78,12 +72,10 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
         setScriptLoaded(true);
       }
       
-      // Convert amount to paise (Razorpay requires amount in smallest currency unit)
       const amountInPaise = Math.round(parseFloat(paymentData.amount) * 100);
       
-      // Create Razorpay options
       const options = {
-        key: "rzp_test_JXIkZl2p0iUbRw", // Using the Razorpay Key ID
+        key: "rzp_test_JXIkZl2p0iUbRw",
         amount: amountInPaise,
         currency: 'INR',
         name: "Rizzpay",
@@ -93,7 +85,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           email: paymentData.customerEmail || '',
         },
         theme: {
-          color: "#2563eb", // Primary color
+          color: "#2563eb",
         },
         handler: function(response: any) {
           console.log('Razorpay payment successful:', response);
@@ -108,14 +100,12 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
             toast.info('Payment cancelled');
             setIsProcessing(false);
           },
-          // Mobile-specific options
           animation: true,
           backdropclose: false,
           escape: false
         }
       };
       
-      // Open Razorpay checkout
       const razorpay = new window.Razorpay(options);
       razorpay.on('payment.failed', function (response: any) {
         console.error('Razorpay payment failed:', response.error);
@@ -142,7 +132,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           value={paymentData.name}
           onChange={handleInputChange}
           required
-          className="h-11 md:h-10" // Taller input for mobile touch
+          className="h-11 md:h-10"
         />
       </div>
       
@@ -155,7 +145,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           placeholder="your@email.com"
           value={paymentData.customerEmail}
           onChange={handleInputChange}
-          className="h-11 md:h-10" // Taller input for mobile touch
+          className="h-11 md:h-10"
         />
         <p className="text-xs text-muted-foreground">
           Required for receipt (will be sent to Razorpay)
@@ -173,12 +163,12 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
             name="amount"
             type="number"
             placeholder="0.00"
-            className="pl-7 h-11 md:h-10 text-lg" // Larger text for better readability on mobile
+            className="pl-7 h-11 md:h-10 text-lg"
             value={paymentData.amount}
             onChange={handleInputChange}
             min="1"
             required
-            inputMode="decimal" // Better keyboard for number input on mobile
+            inputMode="decimal"
           />
         </div>
       </div>
@@ -205,14 +195,14 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           placeholder="Payment purpose (optional)"
           value={paymentData.purpose}
           onChange={handleInputChange}
-          className="h-11 md:h-10" // Taller input for mobile touch
+          className="h-11 md:h-10"
         />
       </div>
 
       {(paymentData.paymentMethod === 'card' || paymentData.paymentMethod === 'neft') && (
         <Button 
           onClick={handleDirectRazorpayPayment}
-          className={`w-full mt-4 ${isMobile ? 'h-12 text-base' : 'h-10'}`} // Taller button with larger text on mobile
+          className={`w-full mt-4 ${isMobile ? 'h-12 text-base' : 'h-10'}`}
           disabled={isProcessing}
         >
           {isProcessing ? (
