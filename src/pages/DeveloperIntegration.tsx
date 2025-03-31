@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -15,13 +14,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Check, Copy, Code, Server, Globe, Key, AlertCircle, Webhook, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useMobile } from '@/hooks/use-mobile';
 import { motion } from '@/components/ui/motion';
 
 const DeveloperIntegration: React.FC = () => {
   const [copied, setCopied] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("api-keys");
-  const isMobile = useIsMobile();
+  const isMobile = useMobile();
   
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
