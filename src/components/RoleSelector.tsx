@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { supabase } from '@/utils/supabaseClient';
+import { useMerchantAuth } from '@/stores/merchantAuthStore'; // Add this import
 
 const roles = [
   {
@@ -27,10 +28,10 @@ const roles = [
   }
 ];
 
-// Demo credentials - simplified for easier login
+// Demo credentials - updated for easier login
 const demoCredentials = {
   admin: { username: 'rizzpay', password: 'rizzpay123' },
-  merchant: { username: 'merchant', password: 'merchant' },
+  merchant: { username: 'merchant', password: 'password' },
 };
 
 const RoleSelector = () => {
@@ -39,6 +40,7 @@ const RoleSelector = () => {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
   const { setUserRole, userRole, userEmail } = useTransactionStore();
+  const { login: merchantLogin } = useMerchantAuth(); // Add this line
 
   // Check if user is already logged in
   useEffect(() => {
@@ -70,19 +72,27 @@ const RoleSelector = () => {
     }
 
     try {
-      // Try to sign in with Supabase
+      // First try merchant auth login (which handles both merchant and admin logins)
+      const loginSuccess = merchantLogin(credentials.email, credentials.password);
+      
+      if (loginSuccess) {
+        // Authentication is successful, redirection will happen via useEffect in Auth.tsx
+        return;
+      }
+      
+      // If merchant auth login fails, try Supabase auth as fallback
       const { data, error } = await supabase().auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password
       });
 
       if (error) {
-        // Fallback to demo credentials for testing
+        // Check for demo credentials
         const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
         
         if ((credentials.email === demoUser.username || 
             credentials.email.toLowerCase() === selectedRole.toLowerCase()) && 
-            (credentials.password === demoUser.password || credentials.password === 'password')) {
+            (credentials.password === demoUser.password)) {
           
           // Store role in Zustand store
           setUserRole(selectedRole as 'admin' | 'merchant', credentials.email);

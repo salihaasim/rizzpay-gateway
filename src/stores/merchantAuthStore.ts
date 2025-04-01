@@ -91,16 +91,22 @@ export const useMerchantAuth = create<MerchantAuthState>()(
 
       login: (username, password) => {
         const { merchants } = get();
+        
+        console.log("Attempting login with:", username, password);
+        console.log("Available merchants:", merchants);
+        
         const merchant = merchants.find(
           m => m.username === username && m.password === password
         );
 
         if (merchant) {
+          console.log("Login successful for:", merchant);
           set({ isAuthenticated: true, currentMerchant: merchant });
           toast.success(`Welcome back, ${merchant.fullName}`);
           return true;
         }
 
+        console.log("Login failed: No matching credentials found");
         toast.error('Invalid credentials');
         return false;
       },

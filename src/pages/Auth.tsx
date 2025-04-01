@@ -32,9 +32,11 @@ const Auth = () => {
     if (isAuthenticated && currentMerchant) {
       // Check if the user is an admin
       if (currentMerchant.role === 'admin') {
+        console.log("Admin user authenticated, redirecting to admin dashboard");
         setUserRole('admin', currentMerchant.username);
         navigate('/admin');
       } else {
+        console.log("Merchant user authenticated, redirecting to merchant dashboard");
         setUserRole('merchant', currentMerchant.username || null);
         navigate('/dashboard');
       }
@@ -44,6 +46,9 @@ const Auth = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    console.log("Form submitted:", formData);
+    console.log("Active role:", activeRole);
 
     if (isRegister) {
       addMerchant({
