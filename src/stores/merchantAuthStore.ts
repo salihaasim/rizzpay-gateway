@@ -39,7 +39,7 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           fullName: 'Demo Merchant',
           role: 'merchant',
           pricing: {
-            transactionFee: 2.5,
+            transactionFee: 3.5, // Updated to 3.5%
             fixedFee: 5,
             monthlyFee: 499
           }
@@ -65,7 +65,13 @@ export const useMerchantAuth = create<MerchantAuthState>()(
         // Set default role to merchant if not specified
         const merchantWithRole = {
           ...merchant,
-          role: merchant.role || 'merchant'
+          role: merchant.role || 'merchant',
+          // Set default pricing for new merchants if not specified
+          pricing: merchant.pricing || {
+            transactionFee: 3.5, // Default 3.5% transaction fee
+            fixedFee: 5,
+            monthlyFee: 499
+          }
         };
         
         set((state) => ({

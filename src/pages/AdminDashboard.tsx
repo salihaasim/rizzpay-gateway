@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import AdminMerchantsList from '@/components/admin/AdminMerchantsList';
 import EscrowAccount from '@/components/admin/EscrowAccount';
+import MerchantPricingControl from '@/components/admin/MerchantPricingControl';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -37,6 +39,7 @@ const AdminDashboard = () => {
     const path = location.pathname;
     if (path.includes('/admin/merchants')) return 'merchants';
     if (path.includes('/admin/escrow')) return 'escrow';
+    if (path.includes('/admin/pricing')) return 'pricing';
     if (path.includes('/admin/transactions')) return 'transactions';
     if (path.includes('/admin/analytics')) return 'analytics';
     if (path.includes('/admin/settings')) return 'settings';
@@ -81,6 +84,8 @@ const AdminDashboard = () => {
         return <AdminMerchantsList />;
       case 'escrow':
         return <EscrowAccount />;
+      case 'pricing':
+        return <MerchantPricingControl />;
       case 'transactions':
         return (
           <Card className="border border-border/50 shadow-sm">
@@ -271,6 +276,7 @@ const AdminDashboard = () => {
     switch (section) {
       case 'merchants': return 'Merchant Management';
       case 'escrow': return 'Escrow Account';
+      case 'pricing': return 'Merchant Pricing Control';
       case 'transactions': return 'Transaction Management';
       case 'analytics': return 'Analytics Dashboard';
       case 'settings': return 'Admin Settings';
@@ -283,6 +289,7 @@ const AdminDashboard = () => {
     switch (section) {
       case 'merchants': return 'Manage merchant accounts and permissions';
       case 'escrow': return 'Monitor and manage the platform escrow account';
+      case 'pricing': return 'Control transaction fees and pricing for merchants';
       case 'transactions': return 'Monitor and manage payment transactions';
       case 'analytics': return 'Platform performance metrics and insights';
       case 'settings': return 'Configure platform settings and permissions';
@@ -295,6 +302,7 @@ const AdminDashboard = () => {
     switch (section) {
       case 'merchants': return <Users className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
       case 'escrow': return <Wallet className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
+      case 'pricing': return <Percent className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
       case 'transactions': return <CreditCard className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
       case 'analytics': return <BarChart3 className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
       case 'settings': return <Settings className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;

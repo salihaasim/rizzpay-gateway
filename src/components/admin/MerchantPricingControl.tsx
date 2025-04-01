@@ -16,9 +16,9 @@ const MerchantPricingControl = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedMerchant, setSelectedMerchant] = useState<string | null>(null);
   const [pricingForm, setPricingForm] = useState({
-    transactionFee: 0,
-    fixedFee: 0,
-    monthlyFee: 0
+    transactionFee: 3.5, // Default to 3.5%
+    fixedFee: 5,
+    monthlyFee: 499
   });
 
   // Only get merchants with role 'merchant'
@@ -37,7 +37,7 @@ const MerchantPricingControl = () => {
     } else {
       // Default pricing if none exists
       setPricingForm({
-        transactionFee: 2.5,
+        transactionFee: 3.5, // Updated default to 3.5%
         fixedFee: 5,
         monthlyFee: 499
       });
@@ -68,7 +68,7 @@ const MerchantPricingControl = () => {
         <CardHeader>
           <CardTitle>Merchant Pricing Control</CardTitle>
           <CardDescription>
-            Manage pricing plans for your merchants
+            Manage pricing plans for your merchants. Default payment in: 3.5%, payment out: 1%
           </CardDescription>
         </CardHeader>
         <CardContent>
