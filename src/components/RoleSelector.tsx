@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { supabase } from '@/utils/supabaseClient';
-import { useMerchantAuth } from '@/stores/merchantAuthStore'; // Add this import
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const roles = [
   {
@@ -28,7 +27,6 @@ const roles = [
   }
 ];
 
-// Demo credentials - updated for easier login
 const demoCredentials = {
   admin: { username: 'rizzpay', password: 'rizzpay123' },
   merchant: { username: 'merchant', password: 'password' },
@@ -40,9 +38,8 @@ const RoleSelector = () => {
   const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
   const { setUserRole, userRole, userEmail } = useTransactionStore();
-  const { login: merchantLogin } = useMerchantAuth(); // Add this line
+  const { login: merchantLogin } = useMerchantAuth();
 
-  // Check if user is already logged in
   useEffect(() => {
     if (userRole) {
       navigate('/dashboard');
@@ -57,7 +54,6 @@ const RoleSelector = () => {
   const handleContinue = async () => {
     if (!showLogin) {
       setShowLogin(true);
-      // Pre-fill with demo credentials for better UX
       setCredentials({
         email: demoCredentials[selectedRole as keyof typeof demoCredentials].username,
         password: demoCredentials[selectedRole as keyof typeof demoCredentials].password,
@@ -65,42 +61,43 @@ const RoleSelector = () => {
       return;
     }
 
-    // Simple validation
     if (!credentials.email || !credentials.password) {
       toast.error("Please enter both email and password");
       return;
     }
 
     try {
-      // First try merchant auth login (which handles both merchant and admin logins)
+      console.log("Testing credentials:", credentials.email, credentials.password);
+      
       const loginSuccess = merchantLogin(credentials.email, credentials.password);
       
       if (loginSuccess) {
-        // Authentication is successful, redirection will happen via useEffect in Auth.tsx
+        console.log("Merchant auth login successful");
         return;
       }
       
-      // If merchant auth login fails, try Supabase auth as fallback
+      console.log("Merchant auth login failed, trying Supabase auth");
+      
       const { data, error } = await supabase().auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password
       });
 
       if (error) {
-        // Check for demo credentials
         const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
+        
+        console.log("Checking demo credentials:", demoUser);
         
         if ((credentials.email === demoUser.username || 
             credentials.email.toLowerCase() === selectedRole.toLowerCase()) && 
             (credentials.password === demoUser.password)) {
           
-          // Store role in Zustand store
+          console.log("Demo credentials match, logging in as:", selectedRole);
+          
           setUserRole(selectedRole as 'admin' | 'merchant', credentials.email);
           
-          // Successful login
           toast.success(`Logged in as ${selectedRole}`);
           
-          // Redirect based on role
           if (selectedRole === 'admin') {
             navigate('/admin');
           } else {
@@ -114,7 +111,6 @@ const RoleSelector = () => {
       }
 
       if (data.user) {
-        // Check role and redirect
         if (data.user.email === 'admin@rizzpay.com' && selectedRole === 'admin') {
           setUserRole('admin', data.user.email);
           navigate('/admin');
@@ -135,7 +131,6 @@ const RoleSelector = () => {
     navigate('/auth');
   };
 
-  // Handle enter key in login form
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleContinue();

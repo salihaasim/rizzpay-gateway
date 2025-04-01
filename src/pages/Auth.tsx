@@ -9,6 +9,7 @@ import { ArrowLeft, LogIn, Store, Loader2, Building2 } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -61,11 +62,17 @@ const Auth = () => {
       setFormData({ username: '', password: '', fullName: '' });
       setLoading(false);
     } else {
+      // For debugging
+      if (formData.username === 'rizzpay' && formData.password === 'rizzpay123') {
+        console.log("Found matching admin credentials, attempting login...");
+      }
+      
       const success = login(formData.username, formData.password);
       
       // Redirection is handled by the useEffect, but we still need to handle failures
       if (!success) {
         setLoading(false);
+        toast.error('Invalid credentials. Please check your username and password.');
       }
     }
   };

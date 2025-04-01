@@ -123,6 +123,16 @@ export const useMerchantAuth = create<MerchantAuthState>()(
     {
       name: 'merchant-auth-storage',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        ...state,
+        // We need to clear the localStorage completely to ensure fresh data
+        // This is a workaround for persistent storage issues
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          console.log("Store rehydrated successfully");
+        }
+      }
     }
   )
 );
