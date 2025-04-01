@@ -50,6 +50,13 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           password: 'admin',
           fullName: 'Admin User',
           role: 'admin'
+        },
+        // New admin account with requested credentials
+        {
+          username: 'rizzpay',
+          password: 'rizzpay123',
+          fullName: 'RizzPay Admin',
+          role: 'admin'
         }
       ],
       loading: false,

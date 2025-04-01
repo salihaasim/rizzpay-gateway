@@ -29,13 +29,13 @@ const Auth = () => {
   const { from } = location.state || { from: { pathname: '/' } };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentMerchant) {
       // Check if the user is an admin
-      if (currentMerchant?.role === 'admin') {
+      if (currentMerchant.role === 'admin') {
         setUserRole('admin', currentMerchant.username);
         navigate('/admin');
       } else {
-        setUserRole('merchant', currentMerchant?.username || null);
+        setUserRole('merchant', currentMerchant.username || null);
         navigate('/dashboard');
       }
     }
@@ -54,12 +54,15 @@ const Auth = () => {
       });
       setIsRegister(false);
       setFormData({ username: '', password: '', fullName: '' });
+      setLoading(false);
     } else {
-      login(formData.username, formData.password);
-      // Redirection is handled by the useEffect
+      const success = login(formData.username, formData.password);
+      
+      // Redirection is handled by the useEffect, but we still need to handle failures
+      if (!success) {
+        setLoading(false);
+      }
     }
-
-    setLoading(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +75,23 @@ const Auth = () => {
   const handleBack = () => {
     // Navigate back to where the user came from or to the home page
     navigate(-1);
+  };
+
+  // Auto-fill demo credentials based on selected role
+  const fillDemoCredentials = () => {
+    if (activeRole === 'admin') {
+      setFormData({
+        username: 'rizzpay',
+        password: 'rizzpay123',
+        fullName: ''
+      });
+    } else {
+      setFormData({
+        username: 'merchant',
+        password: 'password',
+        fullName: ''
+      });
+    }
   };
 
   return (
@@ -100,7 +120,7 @@ const Auth = () => {
           <Card className="border-0 shadow-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
-                {isRegister ? 'Register Account' : 'Account Login'}
+                {isRegister ? 'Register Account' : `${activeRole === 'admin' ? 'Admin' : 'Merchant'} Login`}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -108,7 +128,11 @@ const Auth = () => {
                 <Tabs
                   defaultValue="merchant"
                   value={activeRole}
-                  onValueChange={setActiveRole}
+                  onValueChange={(value) => {
+                    setActiveRole(value);
+                    // Clear form data when switching roles
+                    setFormData({ username: '', password: '', fullName: '' });
+                  }}
                   className="mb-6"
                 >
                   <TabsList className="grid grid-cols-2 w-full">
@@ -132,7 +156,7 @@ const Auth = () => {
                     name="username"
                     value={formData.username}
                     onChange={handleInputChange}
-                    placeholder="Enter your username"
+                    placeholder={`Enter your ${activeRole} username`}
                     required
                   />
                 </div>
@@ -177,6 +201,17 @@ const Auth = () => {
                     </>
                   )}
                 </Button>
+
+                {!isRegister && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full mt-2"
+                    onClick={fillDemoCredentials}
+                  >
+                    Use Demo Credentials
+                  </Button>
+                )}
               </form>
             </CardContent>
             <CardFooter className="flex justify-center">
@@ -196,15 +231,15 @@ const Auth = () => {
 
           <div className="mt-4 text-center text-sm text-muted-foreground">
             <p>Demo credentials:</p>
-            {activeRole === 'merchant' ? (
+            {activeRole === 'admin' ? (
               <>
-                <p>Username: merchant</p>
-                <p>Password: password</p>
+                <p>Username: rizzpay</p>
+                <p>Password: rizzpay123</p>
               </>
             ) : (
               <>
-                <p>Username: admin</p>
-                <p>Password: admin</p>
+                <p>Username: merchant</p>
+                <p>Password: password</p>
               </>
             )}
           </div>

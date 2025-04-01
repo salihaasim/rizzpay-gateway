@@ -29,8 +29,8 @@ const roles = [
 
 // Demo credentials - simplified for easier login
 const demoCredentials = {
-  admin: { username: 'admin@rizzpay.com', password: 'admin' },
-  merchant: { username: 'merchant@rizzpay.com', password: 'merchant' },
+  admin: { username: 'rizzpay', password: 'rizzpay123' },
+  merchant: { username: 'merchant', password: 'merchant' },
 };
 
 const RoleSelector = () => {
@@ -89,7 +89,13 @@ const RoleSelector = () => {
           
           // Successful login
           toast.success(`Logged in as ${selectedRole}`);
-          navigate('/dashboard');
+          
+          // Redirect based on role
+          if (selectedRole === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard');
+          }
           return;
         }
         
@@ -101,12 +107,13 @@ const RoleSelector = () => {
         // Check role and redirect
         if (data.user.email === 'admin@rizzpay.com' && selectedRole === 'admin') {
           setUserRole('admin', data.user.email);
+          navigate('/admin');
         } else {
           setUserRole('merchant', data.user.email);
+          navigate('/dashboard');
         }
         
         toast.success(`Logged in as ${selectedRole}`);
-        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -191,14 +198,13 @@ const RoleSelector = () => {
           ) : (
             <div className="space-y-4 py-4 animate-fade-in">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-medium">Username</label>
                 <Input
                   name="email"
                   value={credentials.email}
                   onChange={handleInputChange}
-                  placeholder="Enter your email"
+                  placeholder="Enter your username"
                   onKeyDown={handleKeyDown}
-                  type="email"
                 />
                 <p className="text-xs text-muted-foreground">
                   Demo: {demoCredentials[selectedRole as keyof typeof demoCredentials].username}
