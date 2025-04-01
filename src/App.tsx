@@ -29,7 +29,7 @@ const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const PageLoading = () => <PaymentPageLoading />;
 
 const App = () => {
-  const { isAuthenticated, loading } = useMerchantAuth();
+  const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
   const { userRole } = useTransactionStore();
   const [appReady, setAppReady] = useState(false);
   
@@ -41,8 +41,8 @@ const App = () => {
     return <PageLoading />;
   }
 
-  // Check if user is an admin
-  const isAdmin = userRole === 'admin';
+  // Check if user is an admin directly from merchant auth
+  const isAdmin = currentMerchant?.role === 'admin' || userRole === 'admin';
 
   return (
     <Router>
@@ -55,13 +55,13 @@ const App = () => {
           <Route path="/terms" element={<TermsAndConditions />} />
           
           {/* Admin routes - No Layout component since AdminLayout handles this */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/merchants" element={<AdminDashboard />} />
-          <Route path="/admin/escrow" element={<AdminDashboard />} />
-          <Route path="/admin/pricing" element={<AdminDashboard />} />
-          <Route path="/admin/settings" element={<AdminDashboard />} />
-          <Route path="/admin/analytics" element={<AdminDashboard />} />
-          <Route path="/admin/transactions" element={<AdminDashboard />} />
+          <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/escrow" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/pricing" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/settings" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/transactions" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
           
           {/* Protected merchant routes with Layout - Redirect admin to admin dashboard */}
           <Route path="/dashboard/*" element={

@@ -5,13 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, LogIn, Store, Loader2 } from 'lucide-react';
+import { ArrowLeft, LogIn, Store, Loader2, Building2 } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useTransactionStore } from '@/stores/transactionStore';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeRole, setActiveRole] = useState('merchant');
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -19,7 +21,7 @@ const Auth = () => {
   });
   
   const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
-  const { userRole } = useTransactionStore();
+  const { setUserRole } = useTransactionStore();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -28,14 +30,16 @@ const Auth = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Check if the user is an admin from transactionStore
-      if (userRole === 'admin') {
+      // Check if the user is an admin
+      if (currentMerchant?.role === 'admin') {
+        setUserRole('admin', currentMerchant.username);
         navigate('/admin');
       } else {
+        setUserRole('merchant', currentMerchant?.username || null);
         navigate('/dashboard');
       }
     }
-  }, [isAuthenticated, userRole, navigate]);
+  }, [isAuthenticated, currentMerchant, navigate, setUserRole]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,15 +49,14 @@ const Auth = () => {
       addMerchant({
         username: formData.username,
         password: formData.password,
-        fullName: formData.fullName
+        fullName: formData.fullName,
+        role: (activeRole === 'admin' ? 'admin' : 'merchant') as 'admin' | 'merchant'
       });
       setIsRegister(false);
       setFormData({ username: '', password: '', fullName: '' });
     } else {
-      const success = login(formData.username, formData.password);
-      if (success) {
-        // Redirect is handled by the useEffect
-      }
+      login(formData.username, formData.password);
+      // Redirection is handled by the useEffect
     }
 
     setLoading(false);
@@ -97,10 +100,30 @@ const Auth = () => {
           <Card className="border-0 shadow-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
-                {isRegister ? 'Register as Merchant' : 'Merchant Login'}
+                {isRegister ? 'Register Account' : 'Account Login'}
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {!isRegister && (
+                <Tabs
+                  defaultValue="merchant"
+                  value={activeRole}
+                  onValueChange={setActiveRole}
+                  className="mb-6"
+                >
+                  <TabsList className="grid grid-cols-2 w-full">
+                    <TabsTrigger value="merchant" className="flex items-center gap-2">
+                      <Store className="h-4 w-4" />
+                      Merchant
+                    </TabsTrigger>
+                    <TabsTrigger value="admin" className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      Admin
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
+              
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
@@ -173,8 +196,17 @@ const Auth = () => {
 
           <div className="mt-4 text-center text-sm text-muted-foreground">
             <p>Demo credentials:</p>
-            <p>Username: merchant</p>
-            <p>Password: password</p>
+            {activeRole === 'merchant' ? (
+              <>
+                <p>Username: merchant</p>
+                <p>Password: password</p>
+              </>
+            ) : (
+              <>
+                <p>Username: admin</p>
+                <p>Password: admin</p>
+              </>
+            )}
           </div>
         </div>
       </div>

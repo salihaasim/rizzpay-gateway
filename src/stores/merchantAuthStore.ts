@@ -12,6 +12,7 @@ interface MerchantCredentials {
     fixedFee: number; // in rupees
     monthlyFee: number; // in rupees
   };
+  role?: 'admin' | 'merchant'; // Added role field
 }
 
 interface MerchantAuthState {
@@ -36,18 +37,32 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           username: 'merchant',
           password: 'password',
           fullName: 'Demo Merchant',
+          role: 'merchant',
           pricing: {
             transactionFee: 2.5,
             fixedFee: 5,
             monthlyFee: 499
           }
+        },
+        // Default admin account
+        {
+          username: 'admin',
+          password: 'admin',
+          fullName: 'Admin User',
+          role: 'admin'
         }
       ],
       loading: false,
 
       addMerchant: (merchant) => {
+        // Set default role to merchant if not specified
+        const merchantWithRole = {
+          ...merchant,
+          role: merchant.role || 'merchant'
+        };
+        
         set((state) => ({
-          merchants: [...state.merchants, merchant]
+          merchants: [...state.merchants, merchantWithRole]
         }));
         toast.success('Merchant registered successfully');
       },
@@ -84,9 +99,6 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           currentMerchant: null 
         });
         toast.success('Logged out successfully');
-        
-        // Note: The actual navigation to home page is handled in the components
-        // that call this method (Layout.tsx and AdminLayout.tsx)
       }
     }),
     {
