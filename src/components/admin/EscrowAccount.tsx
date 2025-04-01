@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { handleWalletToBankTransfer, validateIfscCode } from '@/utils/hdfcBankApi';
-import { Coins, ArrowUpRight, Bank, FileText, Clock, AlertCircle, BadgeCheck, Wallet } from 'lucide-react';
+import { Coins, ArrowUpRight, Building, FileText, Clock, AlertCircle, BadgeCheck, Wallet } from 'lucide-react';
 
 const EscrowAccount = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -203,7 +203,7 @@ const EscrowAccount = () => {
             Overview
           </TabsTrigger>
           <TabsTrigger value="bank" className="flex items-center gap-2">
-            <Bank className="h-4 w-4" />
+            <Building className="h-4 w-4" />
             Bank Connection
           </TabsTrigger>
           <TabsTrigger value="transactions" className="flex items-center gap-2">
@@ -244,7 +244,7 @@ const EscrowAccount = () => {
                       className="flex-1"
                       onClick={() => setActiveTab('bank')}
                     >
-                      <Bank className="h-4 w-4 mr-2" />
+                      <Building className="h-4 w-4 mr-2" />
                       Connect Bank
                     </Button>
                     <Button 
@@ -274,7 +274,7 @@ const EscrowAccount = () => {
                           {transaction.type === 'deposit' ? (
                             <ArrowUpRight className={`h-5 w-5 text-green-500`} />
                           ) : (
-                            <Bank className={`h-5 w-5 text-blue-500`} />
+                            <Building className={`h-5 w-5 text-blue-500`} />
                           )}
                         </div>
                         <div>
@@ -417,7 +417,7 @@ const EscrowAccount = () => {
                     </>
                   ) : (
                     <>
-                      <Bank className="mr-2 h-4 w-4" />
+                      <Building className="mr-2 h-4 w-4" />
                       Connect Bank Account
                     </>
                   )}
@@ -466,7 +466,7 @@ const EscrowAccount = () => {
                         {transaction.type === 'deposit' ? (
                           <ArrowUpRight className={`h-6 w-6 text-green-500`} />
                         ) : (
-                          <Bank className={`h-6 w-6 text-blue-500`} />
+                          <Building className={`h-6 w-6 text-blue-500`} />
                         )}
                       </div>
                       <div>
