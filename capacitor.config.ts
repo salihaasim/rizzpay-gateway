@@ -6,8 +6,9 @@ const config: CapacitorConfig = {
   appName: 'RizzPay Gateway',
   webDir: 'dist',
   server: {
-    url: 'https://6a072580-7034-4551-b22a-73b317db9627.lovableproject.com?forceHideBadge=true',
-    cleartext: true
+    url: 'https://rizzpay.co.in?forceHideBadge=true',
+    cleartext: true,
+    allowNavigation: ['rizzpay.co.in', '*.rizzpay.co.in']
   },
   android: {
     buildOptions: {

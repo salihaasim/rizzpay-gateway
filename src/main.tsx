@@ -4,6 +4,11 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
+// Log domain information for debugging
+console.log("Domain:", window.location.hostname);
+console.log("Path:", window.location.pathname);
+console.log("Full URL:", window.location.href);
+
 // Create root with proper error handling
 const rootElement = document.getElementById("root");
 

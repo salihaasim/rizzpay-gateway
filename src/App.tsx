@@ -34,6 +34,13 @@ const App = () => {
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
+    // Add domain check for proper initialization
+    const hostname = window.location.hostname;
+    console.log("Current hostname:", hostname);
+    
+    // Add any domain-specific initialization here
+    document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
+    
     setAppReady(true);
   }, []);
 

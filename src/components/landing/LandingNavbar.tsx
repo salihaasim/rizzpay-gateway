@@ -21,12 +21,12 @@ const LandingNavbar = () => {
         
         <div className="flex items-center gap-4">
           <nav className="hidden md:flex gap-6">
-            <Link to="#features" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
+            <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
               Features
-            </Link>
-            <Link to="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
+            </a>
+            <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors">
               How it Works
-            </Link>
+            </a>
             <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:text-coinbase transition-colors flex items-center">
               <FileText className="h-4 w-4 mr-1" />
               Terms & Conditions
@@ -50,4 +50,4 @@ const LandingNavbar = () => {
   );
 };
 
-export default LandingNavbar;
+export default React.memo(LandingNavbar);
