@@ -3,6 +3,54 @@
 
 ## Infrastructure Requirements
 
+### Physical Server Requirements
+- **Primary Server Hardware**: Enterprise-grade servers with redundancy
+  - **CPU**: Minimum 16 cores, 32 threads (Intel Xeon or AMD EPYC)
+  - **RAM**: 64GB ECC memory (128GB recommended for high volume)
+  - **Storage**: RAID 10 configuration with enterprise SSDs
+  - **Network Interface**: 10Gbps redundant network interfaces
+  - **Power**: Redundant power supplies with UPS backup
+- **Backup Servers**: Identical configuration for failover
+- **Transaction Storage**: Dedicated storage servers for transaction logs
+  - **Capacity**: Minimum 100TB expandable storage for 7-year retention
+  - **Backup**: Daily incremental, weekly full backups to offsite location
+  - **Archival System**: Cold storage for transactions older than 2 years
+
+### High Volume Transaction Processing
+- **Daily Transaction Capacity**: 125 crore rupees (1.25 billion INR)
+- **Transaction Per Second (TPS)**: Minimum 1000 TPS capability
+- **Peak Load Handling**: 3x normal capacity for festival/sale periods
+- **Queue Management**: Advanced message queue system for peak handling
+- **Database Sharding**: Transaction data sharded by date and merchant
+
+### Cloud Deployment (AWS)
+- **Compute**: 
+  - AWS EC2 m5.4xlarge or c5.4xlarge instances in multi-AZ configuration
+  - Auto-scaling groups with minimum 3 instances
+  - Spot instances for non-critical background processing
+- **Database**: 
+  - Amazon RDS for PostgreSQL in Multi-AZ deployment
+  - Read replicas across multiple availability zones
+  - Database instance class: db.r5.2xlarge or higher
+- **Storage**: 
+  - EBS volumes with Provisioned IOPS (io2) for transaction data
+  - S3 with lifecycle policies for long-term transaction storage
+  - S3 Glacier Deep Archive for 7-year transaction log retention
+- **Networking**:
+  - AWS Application Load Balancer in multiple AZs
+  - AWS Global Accelerator for improved global routing
+  - VPC with public and private subnets across multiple AZs
+  - AWS Direct Connect for secure connection to on-premises systems
+- **Security**:
+  - AWS WAF for application firewall protection
+  - AWS Shield for DDoS protection
+  - KMS for encryption key management
+  - AWS Secrets Manager for credential management
+- **Monitoring and Scaling**:
+  - CloudWatch with custom metrics for transaction monitoring
+  - Auto-scaling based on transaction volume and queue depth
+  - Lambda functions for event-driven scaling decisions
+
 ### Server Requirements
 - **Web Server**: Node.js-compatible server environment (minimum v16.x)
 - **RAM**: Minimum 4GB (8GB recommended for production)
@@ -49,13 +97,20 @@
    - Processing timeline stored for audit purposes
    - Payment details encrypted when necessary
 
-2. **Security Measures**:
+2. **Long-Term Transaction Storage**:
+   - 7-year retention of all transaction logs as per regulatory requirements
+   - Data partitioning by year/month for efficient retrieval
+   - Automatic archiving system for transactions older than 1 year
+   - Tamper-proof storage with blockchain verification for regulatory compliance
+   - Regular integrity checks and audit trails of archived data
+
+3. **Security Measures**:
    - PCI-DSS compliance considerations for card data
    - Tokenization of sensitive payment information
    - Row-level security policies in database
    - Data encryption for sensitive fields
 
-3. **Reconciliation System**:
+4. **Reconciliation System**:
    - Daily transaction reconciliation with payment gateways
    - Automated detection of discrepancies
    - Settlement verification process
@@ -195,3 +250,4 @@
    - Performance degradation alerts
    - Security breach notifications
    - Gateway integration failures
+
