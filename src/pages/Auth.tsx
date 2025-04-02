@@ -29,22 +29,27 @@ const Auth = () => {
   // Get the previous location from state or default to home
   const { from } = location.state || { from: { pathname: '/' } };
 
+  // Check authentication status on mount and when it changes
   useEffect(() => {
+    console.log("Auth effect running, authenticated:", isAuthenticated, "merchant:", currentMerchant);
+    
     if (isAuthenticated && currentMerchant) {
+      setLoading(false); // Ensure loading is turned off
+      
       // Check if the user is an admin
       if (currentMerchant.role === 'admin') {
         console.log("Admin user authenticated, redirecting to admin dashboard");
         setUserRole('admin', currentMerchant.username);
-        navigate('/admin');
+        navigate('/admin', { replace: true });
       } else {
         console.log("Merchant user authenticated, redirecting to merchant dashboard");
-        setUserRole('merchant', currentMerchant.username || null);
-        navigate('/dashboard');
+        setUserRole('merchant', currentMerchant.username || '');
+        navigate('/dashboard', { replace: true });
       }
     }
   }, [isAuthenticated, currentMerchant, navigate, setUserRole]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -52,27 +57,37 @@ const Auth = () => {
     console.log("Active role:", activeRole);
 
     if (isRegister) {
+      // Handle registration
       addMerchant({
         username: formData.username,
         password: formData.password,
         fullName: formData.fullName,
         role: (activeRole === 'admin' ? 'admin' : 'merchant') as 'admin' | 'merchant'
       });
+      
       setIsRegister(false);
       setFormData({ username: '', password: '', fullName: '' });
       setLoading(false);
+      toast.success('Registration successful! Please login with your credentials.');
     } else {
-      // For debugging
-      if (formData.username === 'rizzpay' && formData.password === 'rizzpay123') {
-        console.log("Found matching admin credentials, attempting login...");
-      }
-      
-      const success = login(formData.username, formData.password);
-      
-      // Redirection is handled by the useEffect, but we still need to handle failures
-      if (!success) {
+      try {
+        // For debugging
+        if (formData.username === 'rizzpay' && formData.password === 'rizzpay123') {
+          console.log("Found matching admin credentials, attempting login...");
+        }
+        
+        // Attempt login
+        const success = login(formData.username, formData.password);
+        
+        if (!success) {
+          setLoading(false);
+          toast.error('Invalid credentials. Please check your username and password.');
+        }
+        // If successful, the useEffect will handle redirection
+      } catch (error) {
+        console.error("Login error:", error);
         setLoading(false);
-        toast.error('Invalid credentials. Please check your username and password.');
+        toast.error('An unexpected error occurred. Please try again.');
       }
     }
   };

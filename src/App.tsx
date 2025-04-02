@@ -30,9 +30,10 @@ const PageLoading = () => <PaymentPageLoading />;
 
 const App = () => {
   const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
-  const { userRole } = useTransactionStore();
+  const { userRole, setUserRole } = useTransactionStore();
   const [appReady, setAppReady] = useState(false);
   
+  // Initialize app and check domain information
   useEffect(() => {
     // Add domain check for proper initialization
     const hostname = window.location.hostname;
@@ -41,10 +42,28 @@ const App = () => {
     // Add any domain-specific initialization here
     document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
     
+    // Sync merchant role with transaction store on app initialization
+    if (isAuthenticated && currentMerchant) {
+      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
+      setUserRole(role, currentMerchant.username);
+      console.log(`User role set to ${role} on app initialization`);
+    }
+    
     setAppReady(true);
-  }, []);
+  }, [isAuthenticated, currentMerchant, setUserRole]);
 
-  if (!appReady && loading) {
+  // Ensure roles are in sync whenever authentication state changes
+  useEffect(() => {
+    if (isAuthenticated && currentMerchant) {
+      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
+      if (userRole !== role) {
+        setUserRole(role, currentMerchant.username);
+        console.log(`User role updated to ${role} after authentication change`);
+      }
+    }
+  }, [isAuthenticated, currentMerchant, userRole, setUserRole]);
+
+  if (!appReady || loading) {
     return <PageLoading />;
   }
 
@@ -58,7 +77,11 @@ const App = () => {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth" element={
+            isAuthenticated ? 
+              (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />) : 
+              <Auth />
+          } />
           <Route path="/terms" element={<TermsAndConditions />} />
           
           {/* Admin routes - No Layout component since AdminLayout handles this */}

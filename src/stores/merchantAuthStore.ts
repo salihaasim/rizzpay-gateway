@@ -101,7 +101,12 @@ export const useMerchantAuth = create<MerchantAuthState>()(
 
         if (merchant) {
           console.log("Login successful for:", merchant);
-          set({ isAuthenticated: true, currentMerchant: merchant });
+          // Update state immediately on successful login
+          set({ 
+            isAuthenticated: true, 
+            currentMerchant: merchant,
+            loading: false
+          });
           toast.success(`Welcome back, ${merchant.fullName}`);
           return true;
         }
@@ -124,9 +129,9 @@ export const useMerchantAuth = create<MerchantAuthState>()(
       name: 'merchant-auth-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        ...state,
-        // We need to clear the localStorage completely to ensure fresh data
-        // This is a workaround for persistent storage issues
+        isAuthenticated: state.isAuthenticated,
+        currentMerchant: state.currentMerchant,
+        merchants: state.merchants
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
