@@ -39,7 +39,7 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           fullName: 'Demo Merchant',
           role: 'merchant',
           pricing: {
-            transactionFee: 1.0, // Updated to 1.0% for payment in
+            transactionFee: 1.0, // 1.0% for payment in
             fixedFee: 5,
             monthlyFee: 499
           }

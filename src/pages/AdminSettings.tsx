@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { 
-  Users, Shield, Database, Bank, FileSpreadsheet, 
+  Users, Shield, Database, Building, FileSpreadsheet, 
   ListFilter, KeyRound, Check, X, Download 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
