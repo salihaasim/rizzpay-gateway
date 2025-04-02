@@ -36,6 +36,27 @@ Demo credentials:
 - Admin: username: `rizzpay`, password: `rizzpay123`
 - Merchant: username: `merchant`, password: `password`
 
+## Admin Features
+
+The admin dashboard includes:
+
+- **Merchant Management**: Add, edit, and manage merchants
+- **Role Management**: Create and manage user roles with custom permissions
+- **Transaction Logs**: View and export transaction history to Excel
+- **Merchant Whitelist**: Manage trusted merchants with special access
+- **Bank API Integration**: Connect with banking APIs for seamless transactions
+- **Pricing Control**: Set default pricing (payment in: 1%, payment out: 1%)
+
+## Merchant Features
+
+Merchants have access to:
+
+- **Dashboard**: Overview of transaction metrics and performance
+- **Transactions**: Track and manage payment transactions
+- **Wallet**: Manage funds and perform transactions
+- **Webhooks**: Set up integrations with external systems
+- **Settings**: Configure account settings and preferences
+
 ## Server Requirements
 
 See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.
@@ -47,4 +68,3 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
-

@@ -24,6 +24,9 @@ const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Auth = React.lazy(() => import('./pages/Auth'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
+const AdminSettings = React.lazy(() => import('./pages/AdminSettings'));
+const AdminTransactionLog = React.lazy(() => import('./pages/AdminTransactionLog'));
+const MerchantWhitelist = React.lazy(() => import('./pages/MerchantWhitelist'));
 
 // Loading component - now using our enhanced payment loading animation
 const PageLoading = () => <PaymentPageLoading />;
@@ -49,6 +52,7 @@ const App = () => {
       console.log(`User role set to ${role} on app initialization`);
     }
     
+    // App is ready
     setAppReady(true);
   }, [isAuthenticated, currentMerchant, setUserRole]);
 
@@ -72,7 +76,7 @@ const App = () => {
 
   return (
     <Router>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" richColors />
       <Suspense fallback={<PageLoading />}>
         <Routes>
           {/* Public routes */}
@@ -89,9 +93,10 @@ const App = () => {
           <Route path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/escrow" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/pricing" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
-          <Route path="/admin/settings" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/settings" element={isAdmin ? <AdminSettings /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
-          <Route path="/admin/transactions" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />
           
           {/* Protected merchant routes with Layout - Redirect admin to admin dashboard */}
           <Route path="/dashboard/*" element={
