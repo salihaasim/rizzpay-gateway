@@ -10,7 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
-  ShieldCheck
+  ShieldCheck,
+  FileSpreadsheet
 } from 'lucide-react';
 import logoSvg from '../../../assets/logo.svg';
 
@@ -34,6 +35,8 @@ const AdminSidebar: React.FC<SidebarProps> = ({
     { name: 'Merchants', path: '/admin/merchants', icon: Users },
     { name: 'Escrow Account', path: '/admin/escrow', icon: Wallet },
     { name: 'Pricing', path: '/admin/pricing', icon: FileText },
+    { name: 'Whitelist', path: '/admin/whitelist', icon: ShieldCheck },
+    { name: 'Transaction Log', path: '/admin/transaction-log', icon: FileSpreadsheet },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 

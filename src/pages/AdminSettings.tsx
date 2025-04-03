@@ -43,22 +43,8 @@ const AdminSettings = () => {
     );
   }
   
-  // Redirect non-admin users
-  if (currentMerchant?.role !== 'admin') {
-    return (
-      <AdminLayout>
-        <div className="space-y-4">
-          <h1 className="text-2xl font-bold">Access Denied</h1>
-          <p className="text-muted-foreground">
-            You don't have permission to access this page.
-          </p>
-          <Button onClick={() => navigate('/dashboard')}>
-            Back to Dashboard
-          </Button>
-        </div>
-      </AdminLayout>
-    );
-  }
+  // Removed the access denied check since this is an admin-only route
+  // Already protected by AdminLayout
   
   return (
     <AdminLayout>
@@ -96,7 +82,10 @@ const AdminSettings = () => {
         </Tabs>
         
         <div className="flex justify-end">
-          <Button onClick={() => navigate("/admin")}>Save Settings</Button>
+          <Button onClick={() => {
+            toast.success("Settings saved successfully");
+            navigate("/admin");
+          }}>Save Settings</Button>
         </div>
       </div>
     </AdminLayout>

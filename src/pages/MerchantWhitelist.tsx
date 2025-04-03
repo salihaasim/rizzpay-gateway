@@ -41,7 +41,7 @@ const MerchantWhitelist = () => {
   };
   
   // Approve merchant
-  const handleApprove = (id: number) => {
+  const handleApprove = (id) => {
     setWhitelist(whitelist.map(item => 
       item.id === id ? { ...item, status: 'approved' } : item
     ));
@@ -49,7 +49,7 @@ const MerchantWhitelist = () => {
   };
   
   // Reject merchant
-  const handleReject = (id: number) => {
+  const handleReject = (id) => {
     setWhitelist(whitelist.filter(item => item.id !== id));
     toast.success('Merchant removed from whitelist');
   };

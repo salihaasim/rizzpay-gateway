@@ -12,6 +12,8 @@ import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
 import AdminMobileMenu from './layout/AdminMobileMenu';
 import AdminMobileMenuTrigger from './layout/AdminMobileMenuTrigger';
+import MerchantWhitelist from '@/pages/MerchantWhitelist';
+import AdminTransactionLog from '@/pages/AdminTransactionLog';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -42,6 +44,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     toast.success('Logged out successfully');
     navigate('/', { replace: true }); // Redirect to home page
   };
+
+  // If whitelist path is accessed directly, render the whitelist page
+  if (location.pathname === '/admin/whitelist') {
+    return <MerchantWhitelist />;
+  }
+
+  // If transaction log path is accessed directly, render the transaction log page
+  if (location.pathname === '/admin/transaction-log') {
+    return <AdminTransactionLog />;
+  }
 
   if (userRole !== 'admin') {
     return null;

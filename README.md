@@ -54,6 +54,10 @@ A modern, user-friendly payment gateway platform with admin and merchant interfa
 - Optimized loading times and application speed
 - Reduced page refreshes for improved user experience
 
+## Project Goals
+- Processing 100 crore INR in daily transactions
+- See `rizzpay_project_progress.txt` for current progress tracking
+
 ## Technologies Used
 - React with TypeScript
 - Tailwind CSS for styling
