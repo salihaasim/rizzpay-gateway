@@ -24,6 +24,7 @@ interface MerchantAuthState {
   updateMerchantPricing: (username: string, pricing: MerchantCredentials['pricing']) => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
+  changePassword: (username: string, currentPassword: string, newPassword: string) => boolean;
 }
 
 export const useMerchantAuth = create<MerchantAuthState>()(
@@ -39,7 +40,7 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           fullName: 'Demo Merchant',
           role: 'merchant',
           pricing: {
-            transactionFee: 1.0, // 1.0% for payment in
+            transactionFee: 1.0, // Updated to 1.0% as requested
             fixedFee: 5,
             monthlyFee: 499
           }
@@ -123,6 +124,27 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           currentMerchant: null 
         });
         toast.success('Logged out successfully');
+      },
+      
+      changePassword: (username, currentPassword, newPassword) => {
+        const { merchants } = get();
+        const merchantIndex = merchants.findIndex(
+          m => m.username === username && m.password === currentPassword
+        );
+        
+        if (merchantIndex === -1) {
+          toast.error('Current password is incorrect');
+          return false;
+        }
+        
+        set((state) => ({
+          merchants: state.merchants.map((m, index) => 
+            index === merchantIndex ? { ...m, password: newPassword } : m
+          )
+        }));
+        
+        toast.success('Password changed successfully');
+        return true;
       }
     }),
     {

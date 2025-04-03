@@ -1,70 +1,75 @@
 
 # RizzPay Payment Gateway
 
-RizzPay is a secure, fast, and reliable payment gateway solution for businesses and consumers.
+A modern, user-friendly payment gateway platform with admin and merchant interfaces.
 
-## Mobile App Support
+## Features
 
-This application is optimized for both Android and iOS mobile platforms via Capacitor. The app provides a seamless payment experience across all devices.
+### Admin Features
+- **Dashboard:** Monitor platform performance, transactions, and merchant activity
+- **Merchant Management:** Approve, suspend and manage merchant accounts
+- **Escrow Account:** Control platform funds and perform settlements
+- **Pricing Controls:** Set and adjust transaction fee rates for merchants
+- **Role Management:** Create and manage user roles with different permissions
+- **Bank API Integration:** Connect to banking systems for automated transfers
+- **Transaction Logs:** View and export detailed transaction history
+- **Merchant Whitelist:** Manage trusted merchants with privileged access
 
-### Mobile Features
+### Merchant Features
+- **Dashboard:** Track sales, transactions, and account balance
+- **Payment Processing:** Accept payments via UPI, cards, and net banking
+- **Settlement History:** View incoming and outgoing fund movements
+- **API Integration:** Get API keys and integration code for websites
+- **Security Settings:** Manage account security and password changes
+- **Pricing Information:** View current transaction fee rates
 
-- **Responsive UI**: Fully responsive design that works on all screen sizes
-- **Native Capabilities**: Uses device capabilities like camera for QR scanning
-- **Offline Support**: Basic functionality works even with intermittent connectivity
-- **Push Notifications**: Get real-time updates on transaction status
-- **Biometric Authentication**: Secure login with fingerprint or face recognition
+## Demo Credentials
 
-### Building Mobile Apps
+### Admin Login
+- Username: `rizzpay`
+- Password: `rizzpay123`
 
-To build the mobile applications:
+### Merchant Login
+- Username: `merchant`
+- Password: `password`
 
-1. Install dependencies: `npm install`
-2. Build the web application: `npm run build`
-3. Sync with Capacitor: `npx cap sync`
-4. Build for Android: `npx cap open android`
-5. Build for iOS: `npx cap open ios` (requires macOS with Xcode)
+## Development
 
-## Authentication
+### Authentication
+- The application uses a custom authentication system
+- Users can register as merchants or log in as admins
+- Different user roles have different permissions and access levels
 
-The application supports multiple user roles:
+### Mobile App
+- The application is optimized for Android and iOS
+- Native app features are provided via Capacitor
 
-- **Admin**: Full access to all features and management capabilities
-- **Merchant**: Access to merchant-specific features
+### Security Features
+- Password management with secure storage
+- API key management for merchants
+- Bank API integration for secure transactions
 
-Demo credentials:
-- Admin: username: `rizzpay`, password: `rizzpay123`
-- Merchant: username: `merchant`, password: `password`
+### Performance Optimizations
+- Responsive design for all device sizes
+- Optimized loading times and application speed
 
-## Admin Features
+## Technologies Used
+- React with TypeScript
+- Tailwind CSS for styling
+- Shadcn UI component library
+- Zustand for state management
+- Capacitor for native mobile features
+- Supabase for backend services
 
-The admin dashboard includes:
+## Installation and Setup
+1. Clone the repository
+2. Run `npm install` to install dependencies
+3. Run `npm run dev` to start the development server
+4. Access the application at `http://localhost:5173`
 
-- **Merchant Management**: Add, edit, and manage merchants
-- **Role Management**: Create and manage user roles with custom permissions
-- **Transaction Logs**: View and export transaction history to Excel
-- **Merchant Whitelist**: Manage trusted merchants with special access
-- **Bank API Integration**: Connect with banking APIs for seamless transactions
-- **Pricing Control**: Set default pricing (payment in: 1%, payment out: 1%)
+## Deployment
+- The application can be deployed to any static hosting service
+- Follow Capacitor documentation for deploying to mobile app stores
 
-## Merchant Features
-
-Merchants have access to:
-
-- **Dashboard**: Overview of transaction metrics and performance
-- **Transactions**: Track and manage payment transactions
-- **Wallet**: Manage funds and perform transactions
-- **Webhooks**: Set up integrations with external systems
-- **Settings**: Configure account settings and preferences
-
-## Server Requirements
-
-See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.
-
-## Documentation
-
-For complete documentation on RizzPay Gateway features and APIs, please refer to the documentation files:
-
-- [Payment Processing](PAYMENT_README.md)
-- [Webhook Integration](WEBHOOK_README.md)
-- [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+## License
+This project is licensed under the MIT License.
