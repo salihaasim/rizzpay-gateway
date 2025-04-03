@@ -52,6 +52,7 @@ A modern, user-friendly payment gateway platform with admin and merchant interfa
 ### Performance Optimizations
 - Responsive design for all device sizes
 - Optimized loading times and application speed
+- Reduced page refreshes for improved user experience
 
 ## Technologies Used
 - React with TypeScript
