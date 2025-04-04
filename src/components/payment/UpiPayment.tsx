@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
@@ -87,6 +86,8 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
   const [paymentLink, setPaymentLink] = useState('');
   const [linkCopied, setLinkCopied] = useState(false);
   const [selectedApp, setSelectedApp] = useState<UpiApp | null>(null);
+  const [linkGenerated, setLinkGenerated] = useState(false);
+  const [paymentLinks, setPaymentLinks] = useState<string[]>([]);
   
   const handleUpiIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -119,6 +120,19 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
     setQrLoading(false);
     handleQrCodeError();
   };
+
+  const generatePaymentLink = useCallback(() => {
+    if (paymentLink) {
+      const shortenedLink = `rizzpay.pay/${Math.random().toString(36).substring(2, 8)}`;
+      
+      setPaymentLinks(prev => [shortenedLink, ...prev.slice(0, 4)]);
+      setLinkGenerated(true);
+      
+      toast.success('Payment collection link generated', {
+        description: 'You can now share this link to collect payments'
+      });
+    }
+  }, [paymentLink]);
 
   const copyPaymentLink = () => {
     if (paymentLink) {
@@ -174,16 +188,17 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
           <div>
             <div className="font-medium">RizzPay UPI Transfer</div>
             <div className="text-sm text-muted-foreground">
-              Pay using your UPI app
+              Pay using your UPI app or create payment links
             </div>
           </div>
         </div>
         
         <Tabs defaultValue="upi-id" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upi-id">UPI ID</TabsTrigger>
             <TabsTrigger value="qr-code">QR Code</TabsTrigger>
             <TabsTrigger value="apps">UPI Apps</TabsTrigger>
+            <TabsTrigger value="links">Payment Links</TabsTrigger>
           </TabsList>
           
           <TabsContent value="upi-id" className="space-y-4">
@@ -322,6 +337,75 @@ const UpiPayment: React.FC<UpiPaymentProps> = ({
                   </div>
                 </PopoverContent>
               </Popover>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="links" className="space-y-4">
+            <div className="space-y-4">
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h3 className="text-sm font-medium mb-2">Generate Payment Collection Link</h3>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Create a shareable payment link that you can send to customers via email, SMS, or any messaging app.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    onClick={generatePaymentLink}
+                    disabled={!isValid || !paymentData.amount}
+                    className="text-xs h-8"
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Link className="h-3 w-3 mr-1" /> Generate Link
+                  </Button>
+                  {linkGenerated && (
+                    <Button
+                      onClick={copyPaymentLink}
+                      className="text-xs h-8"
+                      variant="secondary"
+                      size="sm"
+                    >
+                      {linkCopied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                      Copy Link
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {paymentLinks.length > 0 && (
+                <div className="border rounded-md p-3">
+                  <h4 className="text-xs font-medium mb-2">Recent Payment Links</h4>
+                  <ul className="space-y-2">
+                    {paymentLinks.map((link, i) => (
+                      <li key={i} className="flex items-center justify-between border-b border-dashed last:border-b-0 pb-1 last:pb-0">
+                        <span className="text-xs">{link}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => {
+                            navigator.clipboard.writeText(paymentLink);
+                            toast.success('Link copied');
+                          }}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              <div className="border-t pt-3 mt-3">
+                <p className="text-xs text-muted-foreground mb-1">
+                  How it works:
+                </p>
+                <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
+                  <li>Generate a payment link</li>
+                  <li>Share the link with your customer</li>
+                  <li>Customer opens the link and completes the payment</li>
+                  <li>You'll receive a notification once payment is complete</li>
+                </ol>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
