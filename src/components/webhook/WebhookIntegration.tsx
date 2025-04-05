@@ -1,12 +1,26 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useState, useRef } from 'react';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { CopyIcon, CheckIcon, CodeIcon, RefreshCwIcon, ExternalLinkIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Code, 
+  Copy, 
+  Check, 
+  CreditCard, 
+  ArrowRight, 
+  Link,
+  Loader2 
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { useTransactionStore } from '@/stores/transactionStore';
 import { supabase } from '@/utils/supabaseClient';
 
 interface WebhookIntegrationProps {
@@ -15,330 +29,491 @@ interface WebhookIntegrationProps {
 
 const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
   const [copied, setCopied] = useState<string | null>(null);
-  const [regenerating, setRegenerating] = useState(false);
-  const { userEmail } = useTransactionStore();
-
-  const handleRegenerate = async () => {
-    if (!userEmail) return;
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [paymentLink, setPaymentLink] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
+  
+  // Form state for payment link generation
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [paymentDescription, setPaymentDescription] = useState('');
+  
+  const paymentLinkRef = useRef<HTMLInputElement>(null);
+  
+  const handleCopy = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(field);
     
-    setRegenerating(true);
+    setTimeout(() => {
+      setCopied(null);
+    }, 2000);
+    
+    toast.success('Copied to clipboard!');
+  };
+  
+  const generatePaymentLink = async () => {
+    if (!apiKey) {
+      toast.error('No API key available. Please check your merchant settings.');
+      return;
+    }
+    
+    if (!paymentAmount || isNaN(parseFloat(paymentAmount)) || parseFloat(paymentAmount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    
+    if (!customerName) {
+      toast.error('Customer name is required');
+      return;
+    }
+    
+    setIsGeneratingLink(true);
+    
     try {
-      // Generate a new API key
-      const newApiKey = `wh_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+      const webhookUrl = `${window.location.origin}/api/webhook`;
       
-      // Update in Supabase
-      const { error } = await supabase()
-        .from('merchants')
-        .update({ api_key: newApiKey })
-        .eq('email', userEmail);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          token: apiKey,
+          amount: parseFloat(paymentAmount),
+          customer_name: customerName,
+          customer_email: customerEmail || undefined,
+          description: paymentDescription || 'Payment via link',
+          callback_url: `${window.location.origin}/payment/success`
+        })
+      });
       
-      if (error) {
-        console.error('Error regenerating API key:', error);
-        toast.error('Failed to regenerate API key');
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        setPaymentLink(result.paymentUrl);
+        setTransactionId(result.transactionId);
+        toast.success('Payment link generated successfully!');
       } else {
-        // Update local state with new API key
-        apiKey = newApiKey;
-        toast.success('Webhook token regenerated successfully');
+        toast.error(`Failed to generate payment link: ${result.message}`);
       }
-    } catch (err) {
-      console.error('Unexpected error regenerating API key:', err);
-      toast.error('An unexpected error occurred');
+    } catch (error) {
+      console.error('Error generating payment link:', error);
+      toast.error('Failed to generate payment link. Please try again.');
     } finally {
-      setRegenerating(false);
+      setIsGeneratingLink(false);
+    }
+  };
+  
+  const handleCopyPaymentLink = () => {
+    if (paymentLink && paymentLinkRef.current) {
+      paymentLinkRef.current.select();
+      handleCopy(paymentLink, 'payment-link');
     }
   };
 
-  const copyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(type);
-      toast.success(`${type} copied to clipboard!`);
-      
-      setTimeout(() => {
-        setCopied(null);
-      }, 2000);
-    }).catch(() => {
-      toast.error('Failed to copy. Please try again.');
-    });
-  };
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="webhook" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="webhook" className="text-xs md:text-sm">Webhook Integration</TabsTrigger>
+          <TabsTrigger value="code-examples" className="text-xs md:text-sm">Code Examples</TabsTrigger>
+          <TabsTrigger value="payment-links" className="text-xs md:text-sm">Payment Links</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="webhook">
+          <Card>
+            <CardHeader>
+              <CardTitle>Webhook Integration</CardTitle>
+              <CardDescription>
+                Use Rizzpay's webhook to receive payments on your website or application
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Your API Key</Label>
+                <div className="flex">
+                  <Input
+                    type="text"
+                    value={apiKey || ''}
+                    readOnly
+                    className="font-mono text-sm flex-1"
+                    placeholder="No API key found"
+                  />
+                  {apiKey && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleCopy(apiKey, 'api-key')}
+                      className="ml-2"
+                    >
+                      {copied === 'api-key' ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                </div>
+                {!apiKey && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    No API key found. Please contact support to get your API key.
+                  </p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Webhook URL</Label>
+                <div className="flex">
+                  <Input
+                    type="text"
+                    value={`${window.location.origin}/api/webhook`}
+                    readOnly
+                    className="font-mono text-sm flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleCopy(`${window.location.origin}/api/webhook`, 'webhook-url')}
+                    className="ml-2"
+                  >
+                    {copied === 'webhook-url' ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="bg-muted p-4 rounded-md">
+                <h3 className="text-sm font-medium mb-2">How to Use</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Send a POST request to the webhook URL with the following parameters:
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                  <li><code className="text-xs bg-muted-foreground/20 px-1 rounded">token</code>: Your API key</li>
+                  <li><code className="text-xs bg-muted-foreground/20 px-1 rounded">amount</code>: Payment amount (e.g. 100.00)</li>
+                  <li><code className="text-xs bg-muted-foreground/20 px-1 rounded">customer_name</code>: Name of customer</li>
+                  <li><code className="text-xs bg-muted-foreground/20 px-1 rounded">customer_email</code>: Email of customer (optional)</li>
+                  <li><code className="text-xs bg-muted-foreground/20 px-1 rounded">description</code>: Payment description (optional)</li>
+                  <li><code className="text-xs bg-muted-foreground/20 px-1 rounded">callback_url</code>: URL to redirect after payment (optional)</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="code-examples">
+          <Card>
+            <CardHeader>
+              <CardTitle>Code Examples</CardTitle>
+              <CardDescription>
+                Example code snippets to integrate with our payment API
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label className="text-base">JavaScript/Node.js</Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleCopy(jsExample, 'js-example')}
+                  >
+                    {copied === 'js-example' ? (
+                      <Check className="h-4 w-4 mr-1" />
+                    ) : (
+                      <Copy className="h-4 w-4 mr-1" />
+                    )}
+                    Copy
+                  </Button>
+                </div>
+                <pre className="bg-muted p-4 rounded-md overflow-x-auto text-xs">
+                  <code>{jsExample}</code>
+                </pre>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label className="text-base">Python</Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleCopy(pythonExample, 'python-example')}
+                  >
+                    {copied === 'python-example' ? (
+                      <Check className="h-4 w-4 mr-1" />
+                    ) : (
+                      <Copy className="h-4 w-4 mr-1" />
+                    )}
+                    Copy
+                  </Button>
+                </div>
+                <pre className="bg-muted p-4 rounded-md overflow-x-auto text-xs">
+                  <code>{pythonExample}</code>
+                </pre>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label className="text-base">PHP</Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleCopy(phpExample, 'php-example')}
+                  >
+                    {copied === 'php-example' ? (
+                      <Check className="h-4 w-4 mr-1" />
+                    ) : (
+                      <Copy className="h-4 w-4 mr-1" />
+                    )}
+                    Copy
+                  </Button>
+                </div>
+                <pre className="bg-muted p-4 rounded-md overflow-x-auto text-xs">
+                  <code>{phpExample}</code>
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="payment-links">
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Links</CardTitle>
+              <CardDescription>
+                Create payment links to share with your customers
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {paymentLink ? (
+                <div className="space-y-4 bg-secondary/30 p-4 rounded-lg">
+                  <div className="space-y-2">
+                    <Label className="text-base">Payment Link Generated</Label>
+                    <div className="flex">
+                      <Input
+                        ref={paymentLinkRef}
+                        type="text"
+                        value={paymentLink}
+                        readOnly
+                        className="font-mono text-sm flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleCopyPaymentLink}
+                        className="ml-2"
+                      >
+                        {copied === 'payment-link' ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-sm">Transaction ID</Label>
+                    <p className="text-sm font-mono bg-muted p-2 rounded">{transactionId}</p>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row justify-between gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setPaymentLink(null);
+                        setTransactionId(null);
+                      }}
+                    >
+                      Create Another Link
+                    </Button>
+                    
+                    <Button
+                      onClick={() => {
+                        if (paymentLink) {
+                          window.open(paymentLink, '_blank');
+                        }
+                      }}
+                    >
+                      <ArrowRight className="h-4 w-4 mr-2" />
+                      Open Payment Page
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="amount">Amount (INR)</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      placeholder="Enter amount"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="customer-name">Customer Name</Label>
+                    <Input
+                      id="customer-name"
+                      placeholder="Enter customer name"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="customer-email">Customer Email (Optional)</Label>
+                    <Input
+                      id="customer-email"
+                      type="email"
+                      placeholder="Enter customer email"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Input
+                      id="description"
+                      placeholder="Enter payment description"
+                      value={paymentDescription}
+                      onChange={(e) => setPaymentDescription(e.target.value)}
+                    />
+                  </div>
+                  
+                  <Button
+                    className="w-full"
+                    onClick={generatePaymentLink}
+                    disabled={isGeneratingLink || !apiKey}
+                  >
+                    {isGeneratingLink ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating Link...
+                      </>
+                    ) : (
+                      <>
+                        <Link className="h-4 w-4 mr-2" />
+                        Generate Payment Link
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
 
-  // Get webhook URL from current origin
-  const webhookEndpoint = `${window.location.origin}/api/webhook`;
-  
-  const htmlCode = `<form action="${webhookEndpoint}" method="POST">
-  <input type="hidden" name="token" value="${apiKey || 'YOUR_WEBHOOK_TOKEN'}" />
-  <input type="hidden" name="amount" value="100.00" />
-  <input type="hidden" name="currency" value="INR" />
-  <input type="hidden" name="description" value="Payment for Product X" />
-  <input type="hidden" name="customer_name" value="John Doe" />
-  <input type="hidden" name="customer_email" value="john@example.com" />
-  <input type="hidden" name="callback_url" value="https://yourwebsite.com/payment-callback" />
-  <button type="submit">Pay Now</button>
-</form>`;
+// Example code snippets
+const jsExample = `// JavaScript/Node.js Example
+const fetch = require('node-fetch');
 
-  const jsCode = `// Function to initiate payment
-async function initiateRizzpayPayment(paymentDetails) {
+async function createPayment() {
   try {
-    const response = await fetch("${webhookEndpoint}", {
-      method: "POST",
+    const response = await fetch('https://yourdomain.com/api/webhook', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        token: "${apiKey || 'YOUR_WEBHOOK_TOKEN'}",
-        amount: paymentDetails.amount,
-        currency: paymentDetails.currency || "INR",
-        description: paymentDetails.description,
-        customer_name: paymentDetails.customerName,
-        customer_email: paymentDetails.customerEmail,
-        callback_url: paymentDetails.callbackUrl
-      }),
+        token: 'YOUR_API_KEY',
+        amount: 100.00,
+        customer_name: 'John Doe',
+        customer_email: 'john@example.com',
+        description: 'Payment for Product X',
+        callback_url: 'https://yourdomain.com/payment-callback'
+      })
     });
-
-    const result = await response.json();
     
-    if (result.status === "success") {
-      // Redirect to the payment page
-      window.location.href = result.paymentUrl;
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      console.log('Payment URL:', data.paymentUrl);
+      console.log('Transaction ID:', data.transactionId);
     } else {
-      console.error("Payment initiation failed:", result.message);
+      console.error('Error:', data.message);
     }
   } catch (error) {
-    console.error("Error:", error);
+    console.error('Error:', error);
   }
 }
 
-// Example usage
-document.getElementById("payment-button").addEventListener("click", () => {
-  initiateRizzpayPayment({
-    amount: "100.00",
-    currency: "INR",
-    description: "Payment for Product X",
-    customerName: "John Doe",
-    customerEmail: "john@example.com",
-    callbackUrl: "https://yourwebsite.com/payment-callback"
-  });
-});`;
+createPayment();`;
 
-  const exampleRequestUrl = `${webhookEndpoint}?token=${apiKey || 'YOUR_WEBHOOK_TOKEN'}&amount=100.00&currency=INR&description=Product+Purchase&customer_name=John+Doe&customer_email=john@example.com&callback_url=https://yourwebsite.com/payment-callback`;
+const pythonExample = `# Python Example
+import requests
+import json
 
-  const apiDocumentation = [
-    { param: 'token', required: true, description: 'Your unique webhook token (merchant API key)' },
-    { param: 'amount', required: true, description: 'Payment amount (e.g., 100.00)' },
-    { param: 'currency', required: false, description: 'Currency code (default: INR)' },
-    { param: 'description', required: false, description: 'Payment description or purpose' },
-    { param: 'customer_name', required: true, description: 'Name of the customer making payment' },
-    { param: 'customer_email', required: false, description: 'Email of the customer (recommended)' },
-    { param: 'callback_url', required: false, description: 'URL to redirect after payment completion' },
-  ];
+def create_payment():
+    try:
+        payload = {
+            'token': 'YOUR_API_KEY',
+            'amount': 100.00,
+            'customer_name': 'John Doe',
+            'customer_email': 'john@example.com',
+            'description': 'Payment for Product X',
+            'callback_url': 'https://yourdomain.com/payment-callback'
+        }
+        
+        response = requests.post(
+            'https://yourdomain.com/api/webhook',
+            headers={'Content-Type': 'application/json'},
+            data=json.dumps(payload)
+        )
+        
+        data = response.json()
+        
+        if data['status'] == 'success':
+            print('Payment URL:', data['paymentUrl'])
+            print('Transaction ID:', data['transactionId'])
+        else:
+            print('Error:', data['message'])
+    except Exception as e:
+        print('Error:', str(e))
 
-  return (
-    <Card className="border shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-xl flex items-center">
-          <CodeIcon className="h-5 w-5 mr-2" />
-          Webhook Integration
-        </CardTitle>
-        <CardDescription>
-          Integrate Rizzpay with your website or application
-        </CardDescription>
-      </CardHeader>
+create_payment()`;
 
-      <CardContent className="space-y-6">
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium">Your Webhook Token</h3>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleRegenerate}
-              disabled={regenerating || !userEmail}
-            >
-              {regenerating ? (
-                <>
-                  <RefreshCwIcon className="h-3.5 w-3.5 mr-2 animate-spin" />
-                  Regenerating...
-                </>
-              ) : (
-                <>
-                  <RefreshCwIcon className="h-3.5 w-3.5 mr-2" />
-                  Regenerate
-                </>
-              )}
-            </Button>
-          </div>
-          
-          <div className="flex">
-            <Input
-              value={apiKey || 'Please login to see your token'}
-              readOnly
-              className="font-mono text-sm"
-              disabled={!apiKey}
-            />
-            <Button
-              onClick={() => apiKey && copyToClipboard(apiKey, 'Token')}
-              variant="outline"
-              size="icon"
-              className="ml-2"
-              disabled={!apiKey}
-            >
-              {copied === 'Token' ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            This token is your merchant API key. Keep it secure and use it for webhook integrations.
-          </p>
-        </div>
+const phpExample = `<?php
+// PHP Example
+function createPayment() {
+    $payload = array(
+        'token' => 'YOUR_API_KEY',
+        'amount' => 100.00,
+        'customer_name' => 'John Doe',
+        'customer_email' => 'john@example.com',
+        'description' => 'Payment for Product X',
+        'callback_url' => 'https://yourdomain.com/payment-callback'
+    );
+    
+    $ch = curl_init('https://yourdomain.com/api/webhook');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
+    $data = json_decode($response, true);
+    
+    if ($data['status'] === 'success') {
+        echo 'Payment URL: ' . $data['paymentUrl'] . "\n";
+        echo 'Transaction ID: ' . $data['transactionId'] . "\n";
+    } else {
+        echo 'Error: ' . $data['message'] . "\n";
+    }
+}
 
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium">Webhook Endpoint</h3>
-          <div className="flex">
-            <Input
-              value={webhookEndpoint}
-              readOnly
-              className="font-mono text-sm"
-            />
-            <Button
-              onClick={() => copyToClipboard(webhookEndpoint, 'Endpoint')}
-              variant="outline"
-              size="icon"
-              className="ml-2"
-            >
-              {copied === 'Endpoint' ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            This is the endpoint where your website should send payment requests.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium">Integration Examples</h3>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h4 className="text-xs font-medium">HTML Form Example</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(htmlCode, 'HTML')}
-                className="h-6 text-xs"
-              >
-                {copied === 'HTML' ? (
-                  <>
-                    <CheckIcon className="h-3.5 w-3.5 mr-1.5" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <CopyIcon className="h-3.5 w-3.5 mr-1.5" /> Copy
-                  </>
-                )}
-              </Button>
-            </div>
-            <Textarea
-              value={htmlCode}
-              readOnly
-              className="font-mono text-xs h-32 resize-none bg-muted"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h4 className="text-xs font-medium">JavaScript Example</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(jsCode, 'JS')}
-                className="h-6 text-xs"
-              >
-                {copied === 'JS' ? (
-                  <>
-                    <CheckIcon className="h-3.5 w-3.5 mr-1.5" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <CopyIcon className="h-3.5 w-3.5 mr-1.5" /> Copy
-                  </>
-                )}
-              </Button>
-            </div>
-            <Textarea
-              value={jsCode}
-              readOnly
-              className="font-mono text-xs h-40 resize-none bg-muted"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h4 className="text-xs font-medium">Example Request URL</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(exampleRequestUrl, 'URL')}
-                className="h-6 text-xs"
-              >
-                {copied === 'URL' ? (
-                  <>
-                    <CheckIcon className="h-3.5 w-3.5 mr-1.5" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <CopyIcon className="h-3.5 w-3.5 mr-1.5" /> Copy
-                  </>
-                )}
-              </Button>
-            </div>
-            <Textarea
-              value={exampleRequestUrl}
-              readOnly
-              className="font-mono text-xs h-16 resize-none bg-muted overflow-auto whitespace-pre-wrap"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium">API Parameters</h3>
-          <div className="border rounded-md">
-            <table className="min-w-full divide-y divide-border">
-              <thead>
-                <tr className="bg-muted/50">
-                  <th className="px-4 py-2 text-left text-xs font-medium">Parameter</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium">Required</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium">Description</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {apiDocumentation.map((param, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}>
-                    <td className="px-4 py-2 text-xs font-mono">{param.param}</td>
-                    <td className="px-4 py-2 text-xs">
-                      {param.required ? (
-                        <span className="text-red-500">Yes</span>
-                      ) : (
-                        <span className="text-muted-foreground">No</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-xs">{param.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter className="flex flex-col items-start space-y-2">
-        <p className="text-xs text-muted-foreground">
-          Need more details? Check our 
-          <Button variant="link" className="h-auto p-0 px-1 text-xs" asChild>
-            <a href="/WEBHOOK_README.md" target="_blank" rel="noopener noreferrer">
-              complete webhook documentation <ExternalLinkIcon className="h-3 w-3 inline" />
-            </a>
-          </Button>
-        </p>
-      </CardFooter>
-    </Card>
-  );
-};
+createPayment();
+?>`;
 
 export default WebhookIntegration;

@@ -1,80 +1,52 @@
 
 # RizzPay Payment Gateway
 
-A modern, user-friendly payment gateway platform with admin and merchant interfaces.
+RizzPay is a comprehensive payment gateway platform designed for Indian businesses, offering a wide range of payment collection methods, transaction management, and merchant services.
 
 ## Features
 
-### Admin Features
-- **Dashboard:** Monitor platform performance, transactions, and merchant activity
-- **Merchant Management:** Approve, suspend and manage merchant accounts
-- **Escrow Account:** Control platform funds and perform settlements
-- **Pricing Controls:** Set and adjust transaction fee rates for merchants
-- **Role Management:** Create and manage user roles with different permissions
-- **Bank API Integration:** Connect to banking systems for automated transfers
-- **Transaction Logs:** View and export detailed transaction history
-- **Merchant Whitelist:** Manage trusted merchants with privileged access
+- **Multiple Payment Methods**: Accept payments via UPI, cards, net banking, and more
+- **Payment Links**: Generate shareable payment links to collect payments without a website
+- **Escrow Services**: Secure payment holding system to protect both buyers and sellers
+- **Merchant Dashboard**: Comprehensive analytics and transaction management
+- **Webhook Integration**: Easily integrate payments with your website or application
+- **Transaction Logs**: Detailed transaction history and reporting
+- **Real-time Notifications**: Stay updated on payment status changes
+- **Admin Controls**: Manage merchants, escrow accounts, and platform settings
 
-### Merchant Features
-- **Dashboard:** Track sales, transactions, and account balance
-- **Payment Processing:** Accept payments via UPI, cards, and net banking
-- **Settlement History:** View incoming and outgoing fund movements
-- **API Integration:** Get API keys and integration code for websites
-- **Security Settings:** Manage account security and password changes
-- **Pricing Information:** View current transaction fee rates
+## Documentation
 
-## Demo Credentials
+For detailed information about the platform, please refer to the following documentation:
 
-### Admin Login
-- Username: `rizzpay`
-- Password: `rizzpay123`
+- [RizzPay Documentation](RIZZPAY_DOCUMENTATION.md): Complete platform overview
+- [Payment Processing Guide](PAYMENT_README.md): Payment processing workflows
+- [Merchant Onboarding Guide](MERCHANT_ONBOARDING.md): How to onboard merchants to the platform
+- [Escrow System Explained](RIZZPAY_ESCROW_EXPLAINED.md): Understanding the escrow system
+- [Webhook Integration Guide](WEBHOOK_README.md): Integrating with our webhook API
 
-### Merchant Login
-- Username: `merchant`
-- Password: `password`
+## Developer Integration
 
-## Development
+RizzPay provides several methods for integrating payments into your application:
 
-### Authentication
-- The application uses a custom authentication system
-- Users can register as merchants or log in as admins
-- Different user roles have different permissions and access levels
+1. **Direct API Integration**: Use our REST APIs for complete control
+2. **Payment Links**: Generate payment links to share with customers
+3. **Hosted Payment Page**: Redirect customers to our secure payment page
+4. **Webhook Integration**: Receive payment notifications directly to your server
 
-### Mobile App
-- The application is optimized for Android and iOS
-- Native app features are provided via Capacitor
+## Recent Updates
 
-### Security Features
-- Password management with secure storage
-- API key management for merchants
-- Bank API integration for secure transactions
+- Added payment link generation feature for easy payment collection
+- Implemented comprehensive escrow system with bank API integration
+- Enhanced webhook integration with multiple programming language examples
+- Improved transaction log filtering and export capabilities
 
-### Performance Optimizations
-- Responsive design for all device sizes
-- Optimized loading times and application speed
-- Reduced page refreshes for improved user experience
+## Getting Started
 
-## Project Goals
-- Processing 100 crore INR in daily transactions
-- See `rizzpay_project_progress.txt` for current progress tracking
+To start accepting payments with RizzPay:
 
-## Technologies Used
-- React with TypeScript
-- Tailwind CSS for styling
-- Shadcn UI component library
-- Zustand for state management
-- Capacitor for native mobile features
-- Supabase for backend services
+1. Register for a merchant account
+2. Complete the verification process
+3. Integrate one of our payment solutions
+4. Start accepting payments
 
-## Installation and Setup
-1. Clone the repository
-2. Run `npm install` to install dependencies
-3. Run `npm run dev` to start the development server
-4. Access the application at `http://localhost:5173`
-
-## Deployment
-- The application can be deployed to any static hosting service
-- Follow Capacitor documentation for deploying to mobile app stores
-
-## License
-This project is licensed under the MIT License.
+For more information, visit our developer portal or contact our support team.
