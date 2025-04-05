@@ -33,9 +33,21 @@ RizzPay provides several methods for integrating payments into your application:
 3. **Hosted Payment Page**: Redirect customers to our secure payment page
 4. **Webhook Integration**: Receive payment notifications directly to your server
 
+## UPI Payment Links
+
+RizzPay now supports UPI payment link generation for merchants:
+
+1. Go to the Admin Dashboard > Payment Links tab
+2. Click "Generate New UPI Link"
+3. Fill in the payment details including amount, customer information, and UPI ID
+4. Share the generated link with your customer
+5. Track payment status in real-time from your dashboard
+
+These payment links work seamlessly on all devices and payment apps, ensuring a smooth transaction experience for your customers.
+
 ## Recent Updates
 
-- Added payment link generation feature for easy payment collection
+- Added UPI payment link generation feature for direct payment collection
 - Implemented comprehensive escrow system with bank API integration
 - Enhanced webhook integration with multiple programming language examples
 - Improved transaction log filtering and export capabilities
