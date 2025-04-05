@@ -34,9 +34,10 @@ const AdminTransactionLog = () => {
     const matchesSearch = 
       !searchTerm || 
       transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.customerEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.merchantId?.toLowerCase().includes(searchTerm.toLowerCase());
+      transaction.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (transaction.paymentDetails?.buyerEmail && transaction.paymentDetails.buyerEmail.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (transaction.paymentDetails?.buyerName && transaction.paymentDetails.buyerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (transaction.createdBy && transaction.createdBy.toLowerCase().includes(searchTerm.toLowerCase()));
     
     return inDateRange && matchesSearch;
   });
@@ -47,12 +48,12 @@ const AdminTransactionLog = () => {
     const data = filteredTransactions.map(t => ({
       'Transaction ID': t.id,
       'Date': format(new Date(t.date), 'dd/MM/yyyy HH:mm'),
-      'Amount': `${t.currency} ${t.amount}`,
+      'Amount': `₹${t.amount}`,
       'Status': t.status,
       'Payment Method': t.paymentMethod,
-      'Customer': t.customerName || 'N/A',
-      'Email': t.customerEmail || 'N/A',
-      'Merchant ID': t.merchantId || 'N/A',
+      'Customer': t.customer || 'N/A',
+      'Email': t.paymentDetails?.buyerEmail || 'N/A',
+      'Merchant ID': t.createdBy || 'N/A',
       'Description': t.description || 'N/A'
     }));
     
@@ -202,12 +203,12 @@ const AdminTransactionLog = () => {
                             {format(new Date(transaction.date), 'HH:mm:ss')}
                           </div>
                         </TableCell>
-                        <TableCell>{transaction.currency} {transaction.amount}</TableCell>
+                        <TableCell>{transaction.amount}</TableCell>
                         <TableCell>
                           <Badge
                             variant="outline"
                             className={
-                              transaction.status === 'completed'
+                              transaction.status === 'successful'
                                 ? 'bg-green-50 text-green-700 border-green-200'
                                 : transaction.status === 'pending'
                                 ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
@@ -218,8 +219,8 @@ const AdminTransactionLog = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="capitalize">{transaction.paymentMethod}</TableCell>
-                        <TableCell>{transaction.customerName || 'N/A'}</TableCell>
-                        <TableCell>{transaction.merchantId || 'N/A'}</TableCell>
+                        <TableCell>{transaction.customer || 'N/A'}</TableCell>
+                        <TableCell>{transaction.createdBy || 'N/A'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
