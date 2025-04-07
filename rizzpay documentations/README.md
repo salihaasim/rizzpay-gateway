@@ -60,6 +60,16 @@ Merchants have access to:
 - **Webhooks**: Set up integrations with external systems
 - **Settings**: Configure account settings and preferences
 
+## UPI Payment Features
+
+RizzPay provides comprehensive UPI payment capabilities:
+
+- **Static QR Generation**: Create branded QR codes for UPI payments
+- **Payment Links**: Generate and share payment links with customers
+- **Direct UPI Integration**: Connect directly with popular UPI apps
+- **Real-time Notifications**: Get instant payment confirmations
+- **Customizable Payment Pages**: Branded payment experience for customers
+
 ## Server Requirements
 
 See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.
@@ -71,4 +81,5 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+
 
