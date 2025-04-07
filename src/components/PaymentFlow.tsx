@@ -194,7 +194,7 @@ const PaymentFlow = () => {
           <UpiPaymentHandler
             paymentData={{
               ...paymentData,
-              email: paymentData.email || ''
+              email: paymentData.email // Now this property exists in the type
             }}
             validateUpiId={validateUpiId}
             onSuccess={handlePaymentSuccess}

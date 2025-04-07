@@ -20,6 +20,7 @@ interface PaymentFormData {
   bankName: string;
   purpose: string;
   customerEmail: string;
+  email: string; // Added email field to fix the TypeScript error
 }
 
 export const usePaymentForm = () => {
@@ -45,7 +46,8 @@ export const usePaymentForm = () => {
     bankIfsc: '',
     bankName: '',
     purpose: 'Payment',
-    customerEmail: ''
+    customerEmail: '',
+    email: '' // Initialize the email field with an empty string
   });
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
