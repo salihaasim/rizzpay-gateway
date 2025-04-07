@@ -28,6 +28,7 @@ RizzPay supports multiple payment methods to provide flexibility to users:
 ### 2. UPI Payments
 - Direct UPI ID payments
 - QR code generation for easy payments
+- Static merchant QR codes with RizzPay branding
 - Instant notification system
 
 ### 3. NEFT/RTGS Bank Transfers
@@ -40,6 +41,24 @@ RizzPay supports multiple payment methods to provide flexibility to users:
 - Instant transfers between users
 - Low-fee transactions
 - Deposit and withdrawal functionality
+
+## Static UPI QR Codes for Merchants
+
+RizzPay provides merchants with the ability to create customized static QR codes:
+
+### Features:
+- **Branded QR Codes**: QR codes include RizzPay branding for trust and recognition
+- **UPI ID Integration**: Link directly to merchant's UPI ID
+- **Easy Generation**: Simple interface to create QR codes in seconds
+- **Download Option**: Save QR codes as images for printing or sharing
+- **No Transaction Fees**: Static QR codes have no additional transaction fees
+
+### Usage:
+1. Navigate to the Wallet section
+2. Select the "Static QR" tab
+3. Enter your UPI ID
+4. Generate and download your branded QR code
+5. Display the QR code at your point of sale
 
 ## RizzPay Wallet System
 

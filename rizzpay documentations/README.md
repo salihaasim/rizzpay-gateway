@@ -54,6 +54,9 @@ Merchants have access to:
 - **Dashboard**: Overview of transaction metrics and performance
 - **Transactions**: Track and manage payment transactions
 - **Wallet**: Manage funds and perform transactions
+  - **Static UPI QR Codes**: Generate branded QR codes for UPI payments
+  - **Deposits & Withdrawals**: Manage wallet funds
+  - **Transfers**: Send money to other merchants
 - **Webhooks**: Set up integrations with external systems
 - **Settings**: Configure account settings and preferences
 
@@ -68,3 +71,4 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+

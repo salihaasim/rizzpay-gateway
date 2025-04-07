@@ -6,6 +6,7 @@ import DepositForm from './DepositForm';
 import WithdrawForm from './WithdrawForm';
 import TransferForm from './TransferForm';
 import BulkWithdrawalForm from './BulkWithdrawalForm';
+import StaticQrGenerator from './StaticQrGenerator';
 
 interface WalletActionTabsProps {
   merchants: Merchant[];
@@ -31,11 +32,12 @@ const WalletActionTabs: React.FC<WalletActionTabsProps> = ({
 }) => {
   return (
     <Tabs defaultValue="deposit" className="mt-6">
-      <TabsList className="grid grid-cols-4 mb-4">
+      <TabsList className="grid grid-cols-5 mb-4">
         <TabsTrigger value="deposit">Deposit</TabsTrigger>
         <TabsTrigger value="withdraw">Withdraw</TabsTrigger>
         <TabsTrigger value="bulk-withdraw">Bulk Withdraw</TabsTrigger>
         <TabsTrigger value="transfer">Transfer</TabsTrigger>
+        <TabsTrigger value="static-qr">Static QR</TabsTrigger>
       </TabsList>
       
       <TabsContent value="deposit">
@@ -56,6 +58,10 @@ const WalletActionTabs: React.FC<WalletActionTabsProps> = ({
           isProcessing={isProcessing} 
           merchants={merchants}
         />
+      </TabsContent>
+      
+      <TabsContent value="static-qr">
+        <StaticQrGenerator userEmail={userEmail} />
       </TabsContent>
     </Tabs>
   );
