@@ -43,7 +43,11 @@ const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
       </div>
       
       <div className="space-y-4 mt-4">
-        <UpiQrCodeDisplay qrCodeUrl={qrCodeUrl} upiId={upiId} />
+        <UpiQrCodeDisplay 
+          qrCodeUrl={qrCodeUrl} 
+          upiId={upiId} 
+          isLoading={!qrCodeUrl && loading}
+        />
         
         <div className="space-y-2">
           <Label>UPI ID</Label>

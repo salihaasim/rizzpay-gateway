@@ -7,9 +7,14 @@ import { toast } from 'sonner';
 interface UpiQrCodeDisplayProps {
   qrCodeUrl: string;
   upiId: string;
+  isLoading?: boolean;
 }
 
-const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({ qrCodeUrl, upiId }) => {
+const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({ 
+  qrCodeUrl, 
+  upiId,
+  isLoading = false
+}) => {
   const [linkCopied, setLinkCopied] = useState(false);
   
   const copyToClipboard = (text: string) => {
@@ -26,7 +31,11 @@ const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({ qrCodeUrl, upiId })
     <div className="text-center">
       <h3 className="text-sm font-medium">Scan QR Code to Pay</h3>
       <div className="flex justify-center my-4">
-        {qrCodeUrl ? (
+        {isLoading ? (
+          <div className="h-48 w-48 flex items-center justify-center border rounded-lg">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : qrCodeUrl ? (
           <div className="p-2 bg-white border rounded-lg">
             <img 
               src={qrCodeUrl} 
@@ -36,7 +45,7 @@ const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({ qrCodeUrl, upiId })
           </div>
         ) : (
           <div className="h-48 w-48 flex items-center justify-center border rounded-lg">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <QrCode className="h-8 w-8 text-muted-foreground" />
           </div>
         )}
       </div>

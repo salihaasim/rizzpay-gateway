@@ -1,12 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { QrCode, Download, Copy, Check } from 'lucide-react';
+import { QrCode, Download, Copy, Check, FileDown, Link, FileText } from 'lucide-react';
 import { getUpiQrCodeUrl } from '@/utils/upiQrUtils';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import html2pdf from 'html2pdf.js';
 
 interface StaticQrGeneratorProps {
   userEmail?: string | null;
@@ -16,6 +20,11 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
   const [upiId, setUpiId] = useState<string>('');
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [websiteUrl, setWebsiteUrl] = useState<string>('');
+  const [websiteDescription, setWebsiteDescription] = useState<string>('');
+  const [includeDescription, setIncludeDescription] = useState<boolean>(true);
+  const qrCodeRef = useRef<HTMLDivElement>(null);
   
   const generateQrCode = () => {
     if (!upiId || !upiId.includes('@')) {
@@ -23,13 +32,22 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
       return;
     }
     
-    const qrCodeUrl = getUpiQrCodeUrl(upiId);
-    setQrUrl(qrCodeUrl);
-    toast.success('QR Code generated successfully');
+    setIsLoading(true);
+    
+    // Simulate network delay to prevent random loading
+    setTimeout(() => {
+      const qrCodeUrl = getUpiQrCodeUrl(upiId);
+      setQrUrl(qrCodeUrl);
+      toast.success('QR Code generated successfully');
+      setIsLoading(false);
+    }, 800);
   };
   
   const downloadQrCode = () => {
-    if (!qrUrl) return;
+    if (!qrUrl) {
+      toast.error('Please generate a QR code first');
+      return;
+    }
     
     // Create a temporary anchor element to download the image
     const link = document.createElement('a');
@@ -42,6 +60,30 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
     toast.success('QR Code downloaded!');
   };
   
+  const exportToPdf = () => {
+    if (!qrCodeRef.current) {
+      toast.error('QR code not available');
+      return;
+    }
+    
+    toast.info('Generating PDF...');
+    
+    const element = qrCodeRef.current;
+    const opt = {
+      margin: 1,
+      filename: `rizzpay-upi-qr-${upiId.replace('@', '-')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().from(element).set(opt).save().then(() => {
+      toast.success('PDF downloaded successfully!');
+    }).catch(() => {
+      toast.error('Failed to generate PDF');
+    });
+  };
+  
   const copyUpiId = () => {
     navigator.clipboard.writeText(upiId);
     setCopied(true);
@@ -50,6 +92,26 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
     setTimeout(() => {
       setCopied(false);
     }, 2000);
+  };
+  
+  const getWebsiteEmbedCode = () => {
+    if (!upiId) return '';
+    
+    return `<div class="rizzpay-upi-payment">
+  <img src="${qrUrl}" alt="Pay with UPI" style="max-width: 200px; display: block; margin: 0 auto;">
+  <p style="text-align: center; margin-top: 10px; font-family: sans-serif; font-size: 14px;">
+    <strong>UPI ID:</strong> ${upiId}
+  </p>
+  <p style="text-align: center; margin-top: 5px; font-family: sans-serif; font-size: 12px; color: #666;">
+    Powered by RizzPay
+  </p>
+</div>`;
+  };
+  
+  const copyEmbedCode = () => {
+    const code = getWebsiteEmbedCode();
+    navigator.clipboard.writeText(code);
+    toast.success('Embed code copied to clipboard!');
   };
   
   return (
@@ -75,18 +137,87 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
         </div>
       </div>
       
-      <Button 
-        onClick={generateQrCode} 
-        className="w-full"
-        disabled={!upiId || !upiId.includes('@')}
-      >
-        <QrCode className="mr-2 h-4 w-4" />
-        Generate Static QR Code
-      </Button>
+      <Tabs defaultValue="basic" className="w-full">
+        <TabsList className="grid grid-cols-2 mb-4">
+          <TabsTrigger value="basic">Basic</TabsTrigger>
+          <TabsTrigger value="website">Website Integration</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="basic" className="space-y-4">
+          <Button 
+            onClick={generateQrCode} 
+            className="w-full"
+            disabled={!upiId || !upiId.includes('@') || isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <QrCode className="mr-2 h-4 w-4" />
+                Generate Static QR Code
+              </>
+            )}
+          </Button>
+        </TabsContent>
+        
+        <TabsContent value="website" className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="websiteUrl">Your Website URL (Optional)</Label>
+            <Input
+              id="websiteUrl"
+              value={websiteUrl}
+              onChange={(e) => setWebsiteUrl(e.target.value)}
+              placeholder="https://yourwebsite.com"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label htmlFor="description">Payment Description (Optional)</Label>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="include-desc" className="text-sm">Include in QR</Label>
+                <Switch
+                  id="include-desc"
+                  checked={includeDescription}
+                  onCheckedChange={setIncludeDescription}
+                />
+              </div>
+            </div>
+            <Textarea
+              id="description"
+              value={websiteDescription}
+              onChange={(e) => setWebsiteDescription(e.target.value)}
+              placeholder="Payment for products/services"
+              rows={2}
+            />
+          </div>
+          
+          <Button 
+            onClick={generateQrCode} 
+            className="w-full"
+            disabled={!upiId || !upiId.includes('@') || isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <QrCode className="mr-2 h-4 w-4" />
+                Generate Static QR Code
+              </>
+            )}
+          </Button>
+        </TabsContent>
+      </Tabs>
       
       {qrUrl && (
         <Card className="border-dashed mt-4">
-          <CardContent className="p-4 flex flex-col items-center">
+          <CardContent className="p-4 flex flex-col items-center" ref={qrCodeRef}>
             <div className="relative">
               <img 
                 src={qrUrl} 
@@ -100,15 +231,41 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
             <div className="text-center mt-2">
               <p className="font-medium">{upiId}</p>
               <p className="text-xs text-muted-foreground">Scan to pay via UPI</p>
+              {websiteDescription && includeDescription && (
+                <p className="text-sm mt-2 font-medium">{websiteDescription}</p>
+              )}
             </div>
           </CardContent>
-          <CardFooter className="p-4 pt-0 flex justify-center">
-            <Button onClick={downloadQrCode} variant="outline">
+          <CardFooter className="p-4 pt-0 flex flex-wrap gap-2 justify-center">
+            <Button onClick={downloadQrCode} variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
-              Download QR Code
+              Download QR
             </Button>
+            <Button onClick={exportToPdf} variant="outline" size="sm">
+              <FileText className="mr-2 h-4 w-4" />
+              Export as PDF
+            </Button>
+            {getWebsiteEmbedCode() && (
+              <Button onClick={copyEmbedCode} variant="outline" size="sm">
+                <Link className="mr-2 h-4 w-4" />
+                Copy Embed Code
+              </Button>
+            )}
           </CardFooter>
         </Card>
+      )}
+      
+      {qrUrl && websiteUrl && (
+        <div className="mt-4 space-y-2">
+          <Label>Embed Code for Your Website</Label>
+          <div className="bg-muted p-3 rounded-md">
+            <code className="text-xs whitespace-pre-wrap break-all">{getWebsiteEmbedCode()}</code>
+          </div>
+          <Button onClick={copyEmbedCode} variant="secondary" size="sm" className="w-full">
+            <Copy className="mr-2 h-4 w-4" />
+            Copy Embed Code
+          </Button>
+        </div>
       )}
     </div>
   );
