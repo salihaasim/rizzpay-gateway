@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink, Copy, Check } from 'lucide-react';
@@ -12,6 +11,7 @@ import {
   DialogDescription
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useNavigate } from 'react-router-dom';
 
 interface UpiPaymentHandlerProps {
   paymentData: {
@@ -19,6 +19,7 @@ interface UpiPaymentHandlerProps {
     currency: string;
     upiId: string;
     name: string;
+    email?: string;
   };
   validateUpiId: (upiId: string) => boolean;
   onSuccess: (transactionId: string) => void;
@@ -57,6 +58,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
   validateUpiId,
   onSuccess
 }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrCodeError, setQrCodeError] = useState(false);
@@ -98,7 +100,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     return 'RZPY' + Math.floor(Math.random() * 1000000);
   };
 
-  const handleUpiPayment = async () => {
+  const handleUpiPayment = () => {
     if (!validateUpiId(paymentData.upiId)) {
       toast.error('Please enter a valid UPI ID');
       return;
@@ -112,31 +114,18 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     setLoading(true);
     
     try {
-      // Create a transaction entry with UPI payment details
-      const transaction = addTransaction(
-        paymentData.amount,
-        'upi',
-        'pending',
-        paymentData.name,
-        {
-          upiId: paymentData.upiId,
-          // Make sure we only use properties that are defined in PaymentDetails type
-          // The payment method is already passed as a separate parameter to addTransaction
-          gateway: 'upi_direct'
-        }
-      );
-      
-      // Simulate UPI payment processing
-      console.log(`Simulating UPI payment to ${paymentData.upiId} for ${paymentData.amount}`);
-      toast.success(`Payment request sent via RizzPay to UPI ID: ${paymentData.upiId}`, {
-        description: "Check your UPI app for payment confirmation"
+      // Instead of processing the payment here, navigate to the UPI payment page
+      const params = new URLSearchParams({
+        amount: paymentData.amount,
+        name: paymentData.name,
+        email: paymentData.email || '',
+        desc: `Payment via RizzPay`,
+        upi: paymentData.upiId,
+        id: generateTransactionId()
       });
       
-      // Simulate delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setLoading(false);
-      onSuccess(transaction.id);
+      // Navigate to UPI payment page with query parameters
+      navigate(`/upi-payment?${params.toString()}`);
     } catch (error) {
       console.error("UPI payment error:", error);
       toast.error("An error occurred during UPI payment processing");

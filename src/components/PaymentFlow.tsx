@@ -192,7 +192,10 @@ const PaymentFlow = () => {
         
         {step === 2 && paymentData.paymentMethod === 'upi' && (
           <UpiPaymentHandler
-            paymentData={paymentData}
+            paymentData={{
+              ...paymentData,
+              email: paymentData.email || ''
+            }}
             validateUpiId={validateUpiId}
             onSuccess={handlePaymentSuccess}
           />
