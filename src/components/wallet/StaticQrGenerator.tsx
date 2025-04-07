@@ -76,46 +76,78 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
     pdfContainer.appendChild(header);
     
     const qrImage = new Image();
+    qrImage.crossOrigin = 'anonymous';
     qrImage.src = qrUrl;
-    qrImage.style.display = 'block';
-    qrImage.style.margin = '0 auto';
     qrImage.style.width = '200px';
     qrImage.style.height = '200px';
+    qrImage.style.display = 'block';
+    qrImage.style.margin = '0 auto';
     
     qrImage.onload = () => {
-      pdfContainer.appendChild(qrImage);
+      const canvas = document.createElement('canvas');
+      canvas.width = qrImage.width;
+      canvas.height = qrImage.height;
+      const ctx = canvas.getContext('2d');
       
-      const details = document.createElement('div');
-      details.style.textAlign = 'center';
-      details.style.marginTop = '15px';
-      
-      details.innerHTML = `
-        <p style="font-weight: bold; font-size: 16px;">UPI ID: ${upiId}</p>
-        <p style="color: #555; margin-top: 10px;">Scan with any UPI app to pay</p>
-        ${websiteDescription && includeDescription ? 
-          `<p style="font-style: italic; margin-top: 10px;">${websiteDescription}</p>` : ''}
-        <p style="color: #888; font-size: 12px; margin-top: 20px;">Powered by RizzPay Payment Gateway</p>
-      `;
-      
-      pdfContainer.appendChild(details);
-      
-      const opt = {
-        margin: 0.5,
-        filename: `rizzpay-upi-qr-${upiId.replace('@', '-')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      
-      html2pdf().from(pdfContainer).set(opt).save().then(() => {
-        toast.success('PDF downloaded successfully!');
-      }).catch((err) => {
-        console.error('PDF generation error:', err);
-        toast.error('Failed to generate PDF');
-      });
+      if (ctx) {
+        ctx.drawImage(qrImage, 0, 0, qrImage.width, qrImage.height);
+        
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          
+          const qrImgElement = document.createElement('img');
+          qrImgElement.src = dataUrl;
+          qrImgElement.style.width = '200px';
+          qrImgElement.style.height = '200px';
+          qrImgElement.style.display = 'block';
+          qrImgElement.style.margin = '0 auto';
+          
+          pdfContainer.appendChild(qrImgElement);
+          
+          const details = document.createElement('div');
+          details.style.textAlign = 'center';
+          details.style.marginTop = '15px';
+          
+          details.innerHTML = `
+            <p style="font-weight: bold; font-size: 16px;">UPI ID: ${upiId}</p>
+            <p style="color: #555; margin-top: 10px;">Scan with any UPI app to pay</p>
+            ${websiteDescription && includeDescription ? 
+              `<p style="font-style: italic; margin-top: 10px;">${websiteDescription}</p>` : ''}
+            <p style="color: #888; font-size: 12px; margin-top: 20px;">Powered by RizzPay Payment Gateway</p>
+          `;
+          
+          pdfContainer.appendChild(details);
+          
+          const opt = {
+            margin: 1,
+            filename: `rizzpay-upi-qr-${upiId.replace('@', '-')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+          };
+          
+          html2pdf()
+            .from(pdfContainer)
+            .set(opt)
+            .save()
+            .then(() => {
+              toast.success('PDF downloaded successfully!');
+            })
+            .catch((err) => {
+              console.error('PDF generation error:', err);
+              toast.error('Failed to generate PDF');
+            });
+        } catch (err) {
+          console.error('Canvas data URL error:', err);
+          toast.error('Failed to process QR code image');
+        }
+      } else {
+        toast.error('Could not create canvas context');
+      }
     };
     
     qrImage.onerror = () => {
+      console.error('Failed to load QR image');
       toast.error('Failed to load QR code image for PDF');
     };
   };
