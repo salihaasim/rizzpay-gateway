@@ -72,6 +72,7 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Direct UPI Integration**: Connect directly with popular UPI apps
 - **Real-time Notifications**: Get instant payment confirmations
 - **Customizable Payment Pages**: Branded payment experience for customers
+- **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
 
 ## Server Requirements
 

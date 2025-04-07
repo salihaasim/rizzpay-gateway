@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink, Copy, Check } from 'lucide-react';
@@ -114,7 +115,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
     setLoading(true);
     
     try {
-      // Instead of processing the payment here, navigate to the UPI payment page
+      // Construct the payment parameters
       const params = new URLSearchParams({
         amount: paymentData.amount,
         name: paymentData.name,
@@ -125,6 +126,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       });
       
       // Navigate to UPI payment page with query parameters
+      // Using "/upi-payment" instead of "/payment/upi" to match route definition
       navigate(`/upi-payment?${params.toString()}`);
     } catch (error) {
       console.error("UPI payment error:", error);

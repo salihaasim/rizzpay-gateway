@@ -137,6 +137,7 @@ const App = () => {
           
           <Route path="/webhook-payment" element={<WebhookPayment />} />
           
+          <Route path="/upi-payment" element={<UpiPaymentPage />} />
           <Route path="/payment/upi" element={<UpiPaymentPage />} />
           
           <Route path="*" element={<NotFound />} />
