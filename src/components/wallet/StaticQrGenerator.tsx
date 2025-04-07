@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { QrCode, Download, Copy, Check, FileDown, Link, FileText } from 'lucide-react';
+import { QrCode, Download, Copy, Check, FileDown, Link, FileText, Loader2 } from 'lucide-react';
 import { getUpiQrCodeUrl } from '@/utils/upiQrUtils';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
