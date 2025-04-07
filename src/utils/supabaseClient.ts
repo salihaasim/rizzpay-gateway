@@ -93,6 +93,12 @@ export const syncTransactionToSupabase = async (transaction: any) => {
   }
 };
 
+// Add a safe method to handle custom tables that might not exist in the typed schema
+export const safeSupabaseTable = (tableName: string) => {
+  // @ts-ignore - This is necessary for accessing dynamic tables
+  return supabase().from(tableName);
+};
+
 // Improved caching for transactions with longer cache time
 let cachedTransactions: any[] = [];
 let lastFetchTime = 0;

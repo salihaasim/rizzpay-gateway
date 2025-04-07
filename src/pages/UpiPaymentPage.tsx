@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle, IndianRupee, QrCode, Copy, Check, ArrowRight, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
-import { supabase } from '@/utils/supabaseClient';
+import { supabase, safeSupabaseTable } from '@/utils/supabaseClient';
 
 const UpiPaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -78,10 +78,9 @@ const UpiPaymentPage = () => {
         description,
       });
       
-      // Try to update the payment link status in Supabase
+      // Try to update the payment link status in Supabase using the safe method
       try {
-        await supabase()
-          .from('payment_links')
+        await safeSupabaseTable('payment_links')
           .update({ status: 'paid', paid_at: new Date().toISOString() })
           .eq('id', linkId);
       } catch (error) {
