@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,7 +33,6 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
     
     setIsLoading(true);
     
-    // Simulate network delay to prevent random loading
     setTimeout(() => {
       const qrCodeUrl = getUpiQrCodeUrl(upiId);
       setQrUrl(qrCodeUrl);
@@ -49,7 +47,6 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
       return;
     }
     
-    // Create a temporary anchor element to download the image
     const link = document.createElement('a');
     link.href = qrUrl;
     link.download = `rizzpay-upi-qr-${upiId.replace('@', '-')}.png`;
@@ -61,27 +58,66 @@ const StaticQrGenerator: React.FC<StaticQrGeneratorProps> = ({ userEmail }) => {
   };
   
   const exportToPdf = () => {
-    if (!qrCodeRef.current) {
+    if (!qrCodeRef.current || !qrUrl) {
       toast.error('QR code not available');
       return;
     }
     
     toast.info('Generating PDF...');
     
-    const element = qrCodeRef.current;
-    const opt = {
-      margin: 1,
-      filename: `rizzpay-upi-qr-${upiId.replace('@', '-')}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    const pdfContainer = document.createElement('div');
+    pdfContainer.style.padding = '20px';
+    pdfContainer.style.fontFamily = 'Arial, sans-serif';
+    
+    const header = document.createElement('div');
+    header.style.textAlign = 'center';
+    header.style.marginBottom = '15px';
+    header.innerHTML = '<h2 style="color: #333;">RizzPay UPI Payment</h2>';
+    pdfContainer.appendChild(header);
+    
+    const qrImage = new Image();
+    qrImage.src = qrUrl;
+    qrImage.style.display = 'block';
+    qrImage.style.margin = '0 auto';
+    qrImage.style.width = '200px';
+    qrImage.style.height = '200px';
+    
+    qrImage.onload = () => {
+      pdfContainer.appendChild(qrImage);
+      
+      const details = document.createElement('div');
+      details.style.textAlign = 'center';
+      details.style.marginTop = '15px';
+      
+      details.innerHTML = `
+        <p style="font-weight: bold; font-size: 16px;">UPI ID: ${upiId}</p>
+        <p style="color: #555; margin-top: 10px;">Scan with any UPI app to pay</p>
+        ${websiteDescription && includeDescription ? 
+          `<p style="font-style: italic; margin-top: 10px;">${websiteDescription}</p>` : ''}
+        <p style="color: #888; font-size: 12px; margin-top: 20px;">Powered by RizzPay Payment Gateway</p>
+      `;
+      
+      pdfContainer.appendChild(details);
+      
+      const opt = {
+        margin: 0.5,
+        filename: `rizzpay-upi-qr-${upiId.replace('@', '-')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      
+      html2pdf().from(pdfContainer).set(opt).save().then(() => {
+        toast.success('PDF downloaded successfully!');
+      }).catch((err) => {
+        console.error('PDF generation error:', err);
+        toast.error('Failed to generate PDF');
+      });
     };
     
-    html2pdf().from(element).set(opt).save().then(() => {
-      toast.success('PDF downloaded successfully!');
-    }).catch(() => {
-      toast.error('Failed to generate PDF');
-    });
+    qrImage.onerror = () => {
+      toast.error('Failed to load QR code image for PDF');
+    };
   };
   
   const copyUpiId = () => {
