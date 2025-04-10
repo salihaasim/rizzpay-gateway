@@ -74,13 +74,6 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Customizable Payment Pages**: Branded payment experience for customers
 - **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
 
-## UI Features
-
-- **Responsive Dashboard**: Optimized layout for all screen sizes
-- **Interactive Analytics**: Visual representation of transaction data
-- **Compact Design**: Efficient use of screen space with optimized component sizing
-- **Smooth Navigation**: Streamlined navigation between different sections
-
 ## Server Requirements
 
 See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.

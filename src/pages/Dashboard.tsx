@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
@@ -26,13 +25,13 @@ const paymentMethodData = [
 ];
 
 const RecentTransactionsList = React.memo(({ transactions }: { transactions: Transaction[] }) => (
-  <div className="space-y-3">
+  <div className="space-y-4">
     {transactions.length > 0 ? (
       transactions.map((transaction) => (
         <TransactionCard key={transaction.id} {...transaction} />
       ))
     ) : (
-      <div className="text-center py-8 border rounded-lg bg-secondary/30">
+      <div className="text-center py-12 border rounded-lg bg-secondary/30">
         <p className="text-muted-foreground">No transactions yet</p>
       </div>
     )}
@@ -56,10 +55,10 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="content-wrapper">
-        <div className="page-header mb-4">
+        <div className="page-header">
           <div>
-            <h1 className="page-title text-xl font-semibold">Dashboard</h1>
-            <p className="page-description text-sm text-muted-foreground">
+            <h1 className="page-title">Dashboard</h1>
+            <p className="page-description">
               {userRole === 'admin' ? 'Admin Control Panel' : 'Merchant Dashboard'}
             </p>
           </div>
@@ -79,7 +78,7 @@ const Dashboard = () => {
           )}
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <StatCard
             title="Total Revenue"
             value={`₹${analytics.revenue.monthly.toLocaleString('en-IN')}`}
@@ -115,10 +114,10 @@ const Dashboard = () => {
           />
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <AnalyticsChart 
             transactions={transactions} 
-            className="lg:col-span-2 dashboard-card h-[350px]"
+            className="lg:col-span-2 dashboard-card"
           />
           
           <Card className="dashboard-card backdrop-blur-sm shadow-lg border-0">
@@ -126,42 +125,42 @@ const Dashboard = () => {
               <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
               <CardDescription>24 hours performance</CardDescription>
             </CardHeader>
-            <CardContent className="pt-3">
-              <div className="space-y-3">
+            <CardContent className="pt-4">
+              <div className="space-y-4">
                 <div className="flex items-center p-3 bg-emerald-500/5 rounded-lg shadow-sm">
-                  <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center mr-3">
-                    <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mr-3">
+                    <ArrowUpRight className="h-5 w-5 text-emerald-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">Incoming</p>
+                    <p className="font-medium">Incoming</p>
                     <p className="text-xs text-muted-foreground">Today</p>
                   </div>
-                  <p className="text-emerald-500 font-semibold text-sm">+₹{analytics.revenue.today.toLocaleString('en-IN')}</p>
+                  <p className="text-emerald-500 font-semibold">+₹{analytics.revenue.today.toLocaleString('en-IN')}</p>
                 </div>
                 
                 <div className="flex items-center p-3 bg-amber-500/5 rounded-lg shadow-sm">
-                  <div className="w-9 h-9 rounded-full bg-amber-500/10 flex items-center justify-center mr-3">
-                    <Clock className="h-4 w-4 text-amber-500" />
+                  <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mr-3">
+                    <Clock className="h-5 w-5 text-amber-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">Avg. Processing</p>
+                    <p className="font-medium">Avg. Processing</p>
                     <p className="text-xs text-muted-foreground">Time</p>
                   </div>
-                  <p className="font-semibold text-sm">2.3s</p>
+                  <p className="font-semibold">2.3s</p>
                 </div>
                 
-                <Separator className="my-3" />
+                <Separator className="my-4" />
                 
-                <div className="px-2">
+                <div className="px-3">
                   <div className="grid gap-2">
                     <div className="flex justify-between items-center">
                       <div className="text-sm text-muted-foreground">Total Balance</div>
-                      <div className="text-lg font-semibold">₹{analytics.revenue.monthly.toLocaleString('en-IN')}</div>
+                      <div className="text-xl font-semibold">₹{analytics.revenue.monthly.toLocaleString('en-IN')}</div>
                     </div>
                     
                     <div className="flex justify-between items-center">
                       <div className="text-sm text-muted-foreground">Avg. Transaction</div>
-                      <div className="font-medium text-sm">₹{analytics.performance.avgTransactionValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                      <div className="font-medium">₹{analytics.performance.avgTransactionValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
                     </div>
                   </div>
                 </div>
@@ -170,14 +169,14 @@ const Dashboard = () => {
           </Card>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <div className="lg:col-span-3 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3 space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-medium">Recent Transactions</h2>
+              <h2 className="section-heading">Recent Transactions</h2>
               <Link to="/transactions">
                 <Button variant="outline" size="sm" className="gap-1 hover:bg-primary/10 hover:text-primary">
                   View All 
-                  <ArrowRight className="h-3 w-3" />
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -185,7 +184,7 @@ const Dashboard = () => {
           </div>
           
           <div className="lg:col-span-2">
-            <h2 className="text-lg font-medium mb-3">Quick Payment</h2>
+            <h2 className="section-heading">Quick Payment</h2>
             <Card className="dashboard-card backdrop-blur-sm shadow-lg border-0">
               <CardContent className="p-4">
                 <PaymentFlow />
