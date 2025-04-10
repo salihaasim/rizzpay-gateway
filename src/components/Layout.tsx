@@ -43,12 +43,12 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-6">
+      <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-3">
         <div className="h-full">
           {children}
         </div>
       </main>
-      <div className="py-4 text-center text-xs text-muted-foreground border-t">
+      <div className="py-3 text-center text-xs text-muted-foreground border-t">
         <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
         <p className="mt-1">Version 1.0.0</p>
       </div>

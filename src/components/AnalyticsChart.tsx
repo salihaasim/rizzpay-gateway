@@ -54,16 +54,16 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
   };
   
   return (
-    <Card className={cn("overflow-hidden backdrop-blur-sm shadow-lg border-0", className)}>
-      <CardHeader className="pb-2 bg-gradient-to-r from-background to-secondary/20">
+    <Card className={cn("overflow-hidden backdrop-blur-sm shadow-lg border-0 flex flex-col h-full", className)}>
+      <CardHeader className="pb-1 bg-gradient-to-r from-background to-secondary/20 py-2 px-4">
         <ChartHeader 
           timeFrame={timeFrame}
           onTimeFrameChange={setTimeFrame}
           onDownloadCSV={handleDownloadCSV}
         />
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="px-6 py-2">
+      <CardContent className="p-0 flex-1 flex flex-col">
+        <div className="px-4 py-1">
           <ChartStats 
             avgRevenue={avgRevenue}
             peakPeriod={peakPeriod}
@@ -71,10 +71,12 @@ const AnalyticsChart = ({ transactions, className }: AnalyticsChartProps) => {
           />
         </div>
         
-        <RevenueChart 
-          chartData={chartData}
-          avgRevenue={avgRevenue}
-        />
+        <div className="flex-1 h-[210px] min-h-0">
+          <RevenueChart 
+            chartData={chartData}
+            avgRevenue={avgRevenue}
+          />
+        </div>
         
         <ChartFooter transactionCount={transactions.length} />
       </CardContent>

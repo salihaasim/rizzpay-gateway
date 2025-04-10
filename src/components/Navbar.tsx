@@ -32,7 +32,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 max-w-screen-2xl items-center justify-between px-4 md:px-6">
+      <div className="flex h-12 max-w-screen-2xl mx-auto items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-2">
           {location.pathname !== '/' && (
             <Button 
@@ -50,17 +50,17 @@ const Navbar = () => {
             to="/" 
             className="font-semibold text-xl text-primary flex items-center gap-1"
           >
-            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
+            <img src={logoSvg} alt="RizzPay Logo" className="h-5 w-5" />
             <span className="font-bold">RizzPay</span>
           </Link>
           
-          <nav className="hidden md:flex gap-6 ml-6">
+          <nav className="hidden md:flex gap-4 ml-4">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-primary py-1",
                   isActive(item.path)
                     ? "text-foreground"
                     : "text-muted-foreground"
@@ -86,11 +86,11 @@ const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
-              <Link to="/" className="flex items-center gap-1 mb-8">
+              <Link to="/" className="flex items-center gap-1 mb-6">
                 <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
                 <span className="font-bold text-xl">RizzPay</span>
               </Link>
-              <div className="grid gap-2 py-6">
+              <div className="grid gap-1 py-4">
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
