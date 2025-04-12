@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Filter, Info } from 'lucide-react';
@@ -52,103 +52,99 @@ const WalletPage = () => {
   };
   
   return (
-    <div className="min-h-screen bg-background">
-      <div className="content-wrapper">
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">Wallet</h1>
-            <p className="page-description">Manage your funds securely</p>
+    <div className="bg-background">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Wallet</h1>
+        <p className="text-muted-foreground">Manage your funds securely</p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card className="dashboard-card overflow-hidden">
+            <Wallet />
+          </Card>
+          
+          <div className="mt-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+              <div className="flex items-center justify-between">
+                <TabsList>
+                  <TabsTrigger value="transactions">Transactions</TabsTrigger>
+                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                </TabsList>
+                
+                <div className="flex items-center">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground mr-2" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Filter your transactions by type
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <Select 
+                    value={transactionFilter} 
+                    onValueChange={setTransactionFilter}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Filter transactions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Transactions</SelectItem>
+                      <SelectItem value="deposit">Deposits</SelectItem>
+                      <SelectItem value="withdrawal">Withdrawals</SelectItem>
+                      <SelectItem value="transfer">Transfers</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <TabsContent value="transactions" className="mt-4">
+                <Card className="dashboard-card border border-border/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-medium">Transaction History</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TransactionList 
+                      transactions={filteredTransactions}
+                      userEmail={userEmail || ''}
+                      onViewDetails={handleViewTransaction}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="analytics" className="mt-4">
+                <Card className="dashboard-card border border-border/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-medium">Wallet Analytics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="py-8 text-center text-muted-foreground">
+                      Analytics feature coming soon
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Card className="dashboard-card overflow-hidden">
-              <Wallet />
-            </Card>
-            
-            <div className="mt-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                <div className="flex items-center justify-between">
-                  <TabsList>
-                    <TabsTrigger value="transactions">Transactions</TabsTrigger>
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                  </TabsList>
-                  
-                  <div className="flex items-center">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-muted-foreground mr-2" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Filter your transactions by type
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    
-                    <Select 
-                      value={transactionFilter} 
-                      onValueChange={setTransactionFilter}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <Filter className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder="Filter transactions" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Transactions</SelectItem>
-                        <SelectItem value="deposit">Deposits</SelectItem>
-                        <SelectItem value="withdrawal">Withdrawals</SelectItem>
-                        <SelectItem value="transfer">Transfers</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <TabsContent value="transactions" className="mt-4">
-                  <Card className="dashboard-card border border-border/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg font-medium">Transaction History</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <TransactionList 
-                        transactions={filteredTransactions}
-                        userEmail={userEmail || ''}
-                        onViewDetails={handleViewTransaction}
-                      />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="analytics" className="mt-4">
-                  <Card className="dashboard-card border border-border/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg font-medium">Wallet Analytics</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="py-8 text-center text-muted-foreground">
-                        Analytics feature coming soon
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
+        <div className="space-y-6">
+          <Card className="dashboard-card border border-border/50">
+            {userEmail && <WalletSummary walletTransactions={walletTransactions} userEmail={userEmail} />}
+          </Card>
           
-          <div className="space-y-6">
-            <Card className="dashboard-card border border-border/50">
-              {userEmail && <WalletSummary walletTransactions={walletTransactions} userEmail={userEmail} />}
-            </Card>
-            
-            <Card className="dashboard-card border border-border/50">
-              <WalletFees />
-            </Card>
-            
-            <Card className="dashboard-card border border-border/50">
-              <WalletHowItWorks />
-            </Card>
-          </div>
+          <Card className="dashboard-card border border-border/50">
+            <WalletFees />
+          </Card>
+          
+          <Card className="dashboard-card border border-border/50">
+            <WalletHowItWorks />
+          </Card>
         </div>
       </div>
       

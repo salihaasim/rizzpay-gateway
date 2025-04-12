@@ -51,7 +51,7 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ chartData, avgRevenue }) =>
   };
   
   return (
-    <div className="h-[300px] p-2">
+    <div className="h-[250px] p-2">
       <ChartContainer 
         config={chartConfig}
         className="w-full [&_.recharts-cartesian-grid-horizontal_line]:stroke-border/30 [&_.recharts-cartesian-grid-vertical_line]:stroke-border/30"
