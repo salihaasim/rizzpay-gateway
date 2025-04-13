@@ -48,7 +48,7 @@ const Navbar = () => {
           
           <Link 
             to="/" 
-            className="font-semibold text-xl text-primary flex items-center gap-1"
+            className="font-semibold text-xl text-[#0052FF] flex items-center gap-1"
           >
             <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
             <span className="font-bold">RizzPay</span>
@@ -60,7 +60,7 @@ const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-[#0052FF]",
                   isActive(item.path)
                     ? "text-foreground"
                     : "text-muted-foreground"

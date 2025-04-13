@@ -91,7 +91,7 @@ const RazorpayPaymentHandler: React.FC<RazorpayPaymentHandlerProps> = ({
     <Button
       onClick={handleRazorpayPayment}
       disabled={processing}
-      className="w-full"
+      className="w-full bg-[#0052FF] hover:bg-[#0045DB]"
     >
       {processing ? (
         <>

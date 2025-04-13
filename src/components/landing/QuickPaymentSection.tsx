@@ -8,7 +8,7 @@ const QuickPaymentSection = () => {
   const navigate = useNavigate();
   
   return (
-    <section className="py-16 md:py-20 bg-primary/10">
+    <section className="py-16 md:py-20 bg-[#0052FF]/10">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold mb-4">Need to Make a Quick Payment?</h2>
@@ -21,7 +21,7 @@ const QuickPaymentSection = () => {
           <Button 
             size="lg" 
             onClick={() => navigate('/payment')} 
-            className="rounded-full px-8 shadow-md"
+            className="rounded-full px-8 shadow-md bg-[#0052FF] hover:bg-[#0045DB]"
           >
             Make Payment
             <ArrowRight className="ml-2 h-4 w-4" />

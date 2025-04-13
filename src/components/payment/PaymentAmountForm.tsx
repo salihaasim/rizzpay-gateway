@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,6 +39,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
   }, []);
 
   useEffect(() => {
+    // Always ensure INR is selected as currency since we're domestic only
     if (paymentData.currency !== 'INR') {
       handleSelectChange('currency', 'INR');
     }
@@ -54,8 +56,8 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
       return;
     }
 
-    if (paymentData.paymentMethod !== 'card' && paymentData.paymentMethod !== 'neft') {
-      toast.error('Please select either Card or NEFT payment method');
+    if (paymentData.paymentMethod !== 'card' && paymentData.paymentMethod !== 'neft' && paymentData.paymentMethod !== 'upi') {
+      toast.error('Please select a valid payment method');
       return;
     }
 
@@ -78,17 +80,17 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
         key: "rzp_test_JXIkZl2p0iUbRw",
         amount: amountInPaise,
         currency: 'INR',
-        name: "Rizzpay",
-        description: paymentData.purpose || "Payment Processing",
+        name: "RizzPay",
+        description: paymentData.purpose || "Domestic Payment Processing",
         prefill: {
           name: paymentData.name,
           email: paymentData.customerEmail || '',
         },
         theme: {
-          color: "#2563eb",
+          color: "#0052FF",
         },
         handler: function(response: any) {
-          console.log('Razorpay payment successful:', response);
+          console.log('Payment successful:', response);
           toast.success('Payment successful!', {
             description: `Payment ID: ${response.razorpay_payment_id}`
           });
@@ -96,7 +98,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
         },
         modal: {
           ondismiss: function() {
-            console.log('Razorpay payment dismissed by user');
+            console.log('Payment dismissed by user');
             toast.info('Payment cancelled');
             setIsProcessing(false);
           },
@@ -108,14 +110,14 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
       
       const razorpay = new window.Razorpay(options);
       razorpay.on('payment.failed', function (response: any) {
-        console.error('Razorpay payment failed:', response.error);
+        console.error('Payment failed:', response.error);
         toast.error(`Payment failed: ${response.error.description}`);
         setIsProcessing(false);
       });
       
       razorpay.open();
     } catch (error) {
-      console.error('Error processing direct Razorpay payment:', error);
+      console.error('Error processing payment:', error);
       toast.error('Payment processing failed');
       setIsProcessing(false);
     }
@@ -148,7 +150,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
           className="h-11 md:h-10"
         />
         <p className="text-xs text-muted-foreground">
-          Required for receipt (will be sent to Razorpay)
+          Required for receipt
         </p>
       </div>
       
