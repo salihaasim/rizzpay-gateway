@@ -211,7 +211,7 @@ const PaymentAmountForm: React.FC<PaymentAmountFormProps> = ({
               Processing...
             </>
           ) : (
-            <>Pay with Razorpay</>
+            <>Pay with RizzPay</>
           )}
         </Button>
       )}
