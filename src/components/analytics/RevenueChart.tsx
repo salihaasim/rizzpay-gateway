@@ -51,14 +51,14 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ chartData, avgRevenue }) =>
   };
   
   return (
-    <div className="h-[250px] p-2">
+    <div className="h-[220px] p-2">
       <ChartContainer 
         config={chartConfig}
         className="w-full [&_.recharts-cartesian-grid-horizontal_line]:stroke-border/30 [&_.recharts-cartesian-grid-vertical_line]:stroke-border/30"
       >
         <ComposedChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
         >
           <defs>
             <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -69,14 +69,14 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ chartData, avgRevenue }) =>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="name" 
-            fontSize={12} 
+            fontSize={11} 
             tick={{ fill: 'hsl(var(--muted-foreground))' }}
             tickLine={{ stroke: 'hsl(var(--border))' }}
             axisLine={{ stroke: 'hsl(var(--border))' }}
           />
           <YAxis 
             yAxisId="left"
-            fontSize={12} 
+            fontSize={11} 
             tickFormatter={(value) => `₹${value}`}
             tick={{ fill: 'hsl(var(--muted-foreground))' }}
             tickLine={{ stroke: 'hsl(var(--border))' }}
@@ -85,7 +85,7 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ chartData, avgRevenue }) =>
           <YAxis 
             yAxisId="right" 
             orientation="right" 
-            fontSize={12}
+            fontSize={11}
             tick={{ fill: 'hsl(var(--muted-foreground))' }}
             tickLine={{ stroke: 'hsl(var(--border))' }}
             axisLine={{ stroke: 'hsl(var(--border))' }}
@@ -124,13 +124,13 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ chartData, avgRevenue }) =>
           />
           <Legend 
             verticalAlign="top" 
-            height={36}
+            height={30}
             formatter={(value) => value === 'revenue' ? 'Revenue' : 'Transactions'}
           />
           <ReferenceLine 
             y={avgRevenue} 
             yAxisId="left" 
-            label="Avg" 
+            label={{ value: 'Avg', position: 'right', fill: 'hsl(var(--destructive))' }}
             stroke="hsl(var(--destructive))"
             strokeDasharray="3 3"
           />
@@ -149,7 +149,7 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ chartData, avgRevenue }) =>
             name="transactions"
             fill="hsl(var(--secondary))"
             radius={[4, 4, 0, 0]}
-            maxBarSize={40}
+            maxBarSize={30}
           />
         </ComposedChart>
       </ChartContainer>

@@ -1,6 +1,6 @@
 
 import { Transaction } from '@/stores/transactionStore';
-import { format, isValid } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { TimeFrame } from './ChartHeader';
 
 // Generate chart data based on timeframe
@@ -44,9 +44,16 @@ export const generateTimeFrameData = (transactions: Transaction[], timeFrame: Ti
   }));
   
   transactions.forEach(transaction => {
-    const txDate = new Date(transaction.date);
+    // Ensure we're working with valid date objects
+    let txDate = new Date(transaction.date);
+    
+    // If the date string couldn't be parsed, try using parseISO
+    if (!isValid(txDate) && typeof transaction.date === 'string') {
+      txDate = parseISO(transaction.date);
+    }
     
     if (!isValid(txDate)) {
+      console.warn('Invalid transaction date:', transaction.date);
       return;
     }
     
@@ -72,8 +79,15 @@ export const generateTimeFrameData = (transactions: Transaction[], timeFrame: Ti
     });
     
     if (dataEntry) {
-      const amountStr = transaction.amount.replace(/[^0-9.-]+/g, '');
-      const amount = parseFloat(amountStr);
+      // Handle both string and number amount formats
+      let amount = 0;
+      if (typeof transaction.amount === 'string') {
+        // Remove currency symbols and commas
+        const amountStr = transaction.amount.replace(/[^0-9.-]+/g, '');
+        amount = parseFloat(amountStr);
+      } else if (typeof transaction.amount === 'number') {
+        amount = transaction.amount;
+      }
       
       if (!isNaN(amount)) {
         dataEntry.revenue += amount;
@@ -88,8 +102,13 @@ export const generateTimeFrameData = (transactions: Transaction[], timeFrame: Ti
 // Calculate average revenue from chart data
 export const calculateAverageRevenue = (data: any[]) => {
   if (data.length === 0) return 0;
-  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
-  return totalRevenue / data.length;
+  
+  // Only consider entries with transactions
+  const entriesWithRevenue = data.filter(item => item.transactions > 0);
+  if (entriesWithRevenue.length === 0) return 0;
+  
+  const totalRevenue = entriesWithRevenue.reduce((sum, item) => sum + item.revenue, 0);
+  return totalRevenue / entriesWithRevenue.length;
 };
 
 // Find the peak transaction period from chart data

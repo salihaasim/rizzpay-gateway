@@ -60,8 +60,8 @@ const RazorpayPaymentHandler: React.FC<RazorpayPaymentHandlerProps> = ({
         return;
       }
       
-      // For other payment methods, simulate Razorpay payment
-      // In a real implementation, this would call the Razorpay SDK
+      // For other payment methods, simulate payment processing
+      // In a real implementation, this would call the payment processor SDK
       setTimeout(() => {
         const transactionId = generateTransactionId();
         

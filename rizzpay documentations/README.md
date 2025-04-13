@@ -81,6 +81,8 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Chart Size Adjustment**: Reduced analytics chart height for better display
 - **Layout Spacing**: Optimized content spacing and container widths
 - **Responsive Fixes**: Improved mobile experience with better spacing
+- **Graph Improvements**: Enhanced revenue graph to show actual transaction data
+- **Payment Button Updates**: Updated payment buttons to use consistent branding
 
 ## Server Requirements
 
