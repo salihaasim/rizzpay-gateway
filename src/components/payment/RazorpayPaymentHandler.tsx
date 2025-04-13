@@ -101,7 +101,7 @@ const RazorpayPaymentHandler: React.FC<RazorpayPaymentHandlerProps> = ({
       ) : (
         <>
           <CheckCircle2 className="mr-2 h-4 w-4" />
-          Pay Now
+          Pay with RizzPay
         </>
       )}
     </Button>
