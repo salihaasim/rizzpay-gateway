@@ -111,7 +111,7 @@ const PaymentFlow = () => {
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b pb-8">
         <CardTitle className="text-xl font-semibold">Make a Payment</CardTitle>
         <CardDescription className="flex justify-between items-center">
-          <span>Complete your transaction securely with Razorpay</span>
+          <span>Complete your transaction securely</span>
           <Button variant="link" size="sm" onClick={goToDeveloperPage}>Developer API</Button>
         </CardDescription>
       </CardHeader>
