@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { 
-  CreditCard, 
   QrCode, 
-  BanknotesIcon, 
+  CreditCard, 
+  BanknoteIcon, 
   CheckCircle2 
 } from 'lucide-react';
 
@@ -40,7 +39,7 @@ const HowItWorksSection = () => {
       description: "Accept payments via UPI, net banking, and Indian bank cards."
     },
     {
-      icon: <BanknotesIcon className="h-6 w-6 text-primary" />,
+      icon: <BanknoteIcon className="h-6 w-6 text-primary" />,
       title: "Instant Settlements",
       description: "Receive funds instantly in your Indian bank account."
     }
