@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -12,6 +11,11 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import AasimoAI from './components/aasimo/AasimoAI';
 import AdminMonitoring from './pages/AdminMonitoring';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminSettings from './pages/AdminSettings';
+import AdminTransactionLog from './pages/AdminTransactionLog';
+import MerchantWhitelist from './pages/MerchantWhitelist';
+import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/Transactions'));
@@ -23,11 +27,6 @@ const Settings = React.lazy(() => import('./pages/Settings'));
 const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 const Auth = React.lazy(() => import('./pages/Auth'));
-const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
-const AdminSettings = React.lazy(() => import('./pages/AdminSettings'));
-const AdminTransactionLog = React.lazy(() => import('./pages/AdminTransactionLog'));
-const MerchantWhitelist = React.lazy(() => import('./pages/MerchantWhitelist'));
-const MonitoringDashboard = React.lazy(() => import('./components/admin/monitoring/MonitoringDashboard'));
 
 const PageLoading = () => <PaymentPageLoading />;
 
@@ -81,7 +80,6 @@ const App = () => {
           } />
           <Route path="/terms" element={<TermsAndConditions />} />
           
-          {/* Special Aasimo AI route - not linked from admin or merchant interfaces */}
           <Route path="/aasimo-ai" element={<AasimoAI />} />
           
           <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
@@ -94,7 +92,6 @@ const App = () => {
           <Route path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />
           
-          {/* Individual monitoring dashboard routes */}
           <Route path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />
           
           <Route path="/dashboard/*" element={

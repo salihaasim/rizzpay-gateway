@@ -46,6 +46,7 @@ The admin dashboard includes:
 - **Merchant Whitelist**: Manage trusted merchants with special access
 - **Bank API Integration**: Connect with banking APIs for seamless transactions
 - **Pricing Control**: Set default pricing (payment in: 1%, payment out: 1%)
+- **System Monitoring**: Comprehensive monitoring dashboards for all aspects of the system
 
 ## Merchant Features
 
@@ -74,6 +75,22 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Customizable Payment Pages**: Branded payment experience for customers
 - **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
 
+## System Monitoring
+
+RizzPay includes comprehensive monitoring dashboards for all aspects of the system:
+
+- **Server Performance**: Real-time CPU, memory, and system resource monitoring
+- **API Gateway**: Monitor API performance and request rates
+- **Database Health**: Track database performance and query analytics
+- **Payment Gateway**: Monitor payment processor status and transaction metrics
+- **Security**: Track security events and compliance status
+- **Transactions**: Real-time tracking of payment flow
+- **Error Tracking**: Monitor application errors and exceptions
+- **Business Analytics**: Analyze user behavior and business performance
+- **System Status**: Comprehensive overview of all system components
+- **Performance Analytics**: Track detailed performance metrics
+- **Incident Management**: Track and resolve system incidents
+
 ## Special Features
 
 ### Aasimo AI Assistant
@@ -95,6 +112,7 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 - **Graph Improvements**: Enhanced revenue graph to show actual transaction data
 - **Payment Button Updates**: Updated payment buttons to use consistent RizzPay branding
 - **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
+- **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
 
 ## Server Requirements
 

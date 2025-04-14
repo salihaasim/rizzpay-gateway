@@ -69,12 +69,16 @@ const MonitoringDashboard = () => {
   const { dashboardType } = useParams<{ dashboardType: string }>();
   const navigate = useNavigate();
   
-  // Default to server dashboard if no type is specified
-  const dashboard = dashboards[dashboardType as keyof typeof dashboards] || dashboards.server;
+  // Default to server dashboard if no type is specified or if the type doesn't exist
+  const dashboard = dashboardType && dashboards[dashboardType as keyof typeof dashboards] 
+    ? dashboards[dashboardType as keyof typeof dashboards] 
+    : dashboards.server;
   
   const handleBack = () => {
     navigate('/admin/monitoring');
   };
+  
+  console.log("Rendering monitoring dashboard for type:", dashboardType);
   
   return (
     <AdminLayout>
