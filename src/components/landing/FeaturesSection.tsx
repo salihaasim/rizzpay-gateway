@@ -37,21 +37,21 @@ const FeaturesSection = () => {
   const features = [
     {
       icon: <Zap className="h-6 w-6 text-primary" />,
-      title: "Lightning Fast",
-      description: "Process transactions in milliseconds with our optimized payment infrastructure.",
-      benefits: ["Instant confirmations", "Low latency processing"]
+      title: "Lightning Fast Domestic Payments",
+      description: "Process Indian rupee transactions instantly with our optimized payment infrastructure.",
+      benefits: ["Instant UPI confirmations", "Low-cost domestic transfers"]
     },
     {
       icon: <ShieldCheck className="h-6 w-6 text-primary" />,
       title: "Bank-Grade Security",
-      description: "End-to-end encryption and compliance with global security standards.",
-      benefits: ["Data encryption", "Fraud protection"]
+      description: "End-to-end encryption and compliance with Indian financial regulations.",
+      benefits: ["RBI compliant", "Fraud protection"]
     },
     {
       icon: <CreditCard className="h-6 w-6 text-primary" />,
-      title: "Multiple Payment Options",
-      description: "Support for UPI, credit cards, debit cards, and more payment methods.",
-      benefits: ["All UPI apps supported", "International payments"]
+      title: "Multiple Domestic Payment Options",
+      description: "Support for UPI, credit cards, debit cards, and Indian bank transfers.",
+      benefits: ["All major UPI apps", "Instant bank transfers"]
     }
   ];
 
@@ -59,10 +59,10 @@ const FeaturesSection = () => {
     <section className="py-16 md:py-24 bg-secondary/50">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Why Choose Rizzpay?</h2>
+          <h2 className="text-3xl font-bold mb-4">Why Choose Rizzpay for Domestic Payments?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Our powerful platform is designed to meet the needs of merchants, 
-            customers, and administrators with an intuitive interface.
+            Our powerful platform is designed to meet the needs of Indian merchants, 
+            customers, and businesses with an intuitive domestic payment solution.
           </p>
         </div>
         
