@@ -74,6 +74,16 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Customizable Payment Pages**: Branded payment experience for customers
 - **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
 
+## Special Features
+
+### Aasimo AI Assistant
+
+RizzPay includes a specialized AI assistant named Aasimo AI that provides strategic insights and feature suggestions. This tool is accessible via a special URL and is designed to help the development team optimize the payment platform.
+
+- **Access**: Visit `/aasimo-ai` to interact with the AI assistant
+- **Purpose**: Get ideas for new features and improvements to the payment gateway
+- **Availability**: This feature is not linked from admin or merchant dashboards
+
 ## Recent Updates
 
 - **Brand Updates**: Updated branding to RizzPay throughout the application
@@ -84,6 +94,7 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Responsive Fixes**: Improved mobile experience with better spacing
 - **Graph Improvements**: Enhanced revenue graph to show actual transaction data
 - **Payment Button Updates**: Updated payment buttons to use consistent RizzPay branding
+- **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
 
 ## Server Requirements
 

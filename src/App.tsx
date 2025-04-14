@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -9,6 +10,7 @@ import PaymentPageLoading from './components/payment/PaymentPageLoading';
 import WalletPage from './pages/WalletPage';
 import TermsAndConditions from './pages/TermsAndConditions';
 import UpiPaymentPage from './pages/UpiPaymentPage';
+import AasimoAI from './components/aasimo/AasimoAI';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/Transactions'));
@@ -75,6 +77,9 @@ const App = () => {
               <Auth />
           } />
           <Route path="/terms" element={<TermsAndConditions />} />
+          
+          {/* Special Aasimo AI route - not linked from admin or merchant interfaces */}
+          <Route path="/aasimo-ai" element={<AasimoAI />} />
           
           <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
