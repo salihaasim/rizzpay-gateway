@@ -33,6 +33,12 @@ const AdminSectionContent: React.FC<AdminSectionContentProps> = ({ section }) =>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Please visit the dedicated monitoring page for full system monitoring capabilities.</p>
+            <a 
+              href="/admin/monitoring" 
+              className="inline-block mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Go to Monitoring Dashboard
+            </a>
           </CardContent>
         </Card>
       );

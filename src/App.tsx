@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -31,7 +32,8 @@ const PageLoading = () => <PaymentPageLoading />;
 
 const App = () => {
   const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
-  const { userRole, setUserRole } = useTransactionStore();
+  const transactionStore = useTransactionStore();
+  const { setUserRole } = transactionStore || {}; 
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
@@ -40,7 +42,7 @@ const App = () => {
     
     document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
     
-    if (isAuthenticated && currentMerchant) {
+    if (isAuthenticated && currentMerchant && setUserRole) {
       const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
       setUserRole(role, currentMerchant.username);
       console.log(`User role set to ${role} on app initialization`);
@@ -50,20 +52,20 @@ const App = () => {
   }, [isAuthenticated, currentMerchant, setUserRole]);
 
   useEffect(() => {
-    if (isAuthenticated && currentMerchant) {
+    if (isAuthenticated && currentMerchant && setUserRole && transactionStore) {
       const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
-      if (userRole !== role) {
+      if (transactionStore.userRole !== role) {
         setUserRole(role, currentMerchant.username);
         console.log(`User role updated to ${role} after authentication change`);
       }
     }
-  }, [isAuthenticated, currentMerchant, userRole, setUserRole]);
+  }, [isAuthenticated, currentMerchant, transactionStore, setUserRole]);
 
   if (!appReady || loading) {
     return <PageLoading />;
   }
 
-  const isAdmin = currentMerchant?.role === 'admin' || userRole === 'admin';
+  const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
 
   return (
     <Router>
