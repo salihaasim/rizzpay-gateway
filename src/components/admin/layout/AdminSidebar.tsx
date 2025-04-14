@@ -1,126 +1,197 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Users, 
-  Wallet, 
-  BarChart3, 
-  Settings,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
+import { cn } from '@/lib/utils';
+import {
+  BarChart3,
+  CreditCard,
+  DollarSign,
   FileText,
-  ShieldCheck,
-  FileSpreadsheet
+  Home,
+  LogOut,
+  Settings,
+  Users,
+  Shield,
+  MonitorSmartphone,
+  Sparkles
 } from 'lucide-react';
-import logoSvg from '../../../assets/logo.svg';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface SidebarProps {
-  userEmail: string | null;
+  userEmail: string;
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   handleLogout: () => void;
 }
 
-const AdminSidebar: React.FC<SidebarProps> = ({ 
-  userEmail, 
-  collapsed, 
+const AdminSidebar: React.FC<SidebarProps> = ({
+  userEmail,
+  collapsed,
   setCollapsed,
-  handleLogout
+  handleLogout,
 }) => {
   const location = useLocation();
 
-  const navItems = [
-    { name: 'Dashboard', path: '/admin', icon: BarChart3 },
-    { name: 'Merchants', path: '/admin/merchants', icon: Users },
-    { name: 'Escrow Account', path: '/admin/escrow', icon: Wallet },
-    { name: 'Pricing', path: '/admin/pricing', icon: FileText },
-    { name: 'Whitelist', path: '/admin/whitelist', icon: ShieldCheck },
-    { name: 'Transaction Log', path: '/admin/transaction-log', icon: FileSpreadsheet },
-    { name: 'Settings', path: '/admin/settings', icon: Settings },
-  ];
-
   const isActive = (path: string) => {
-    if (path === '/admin' && location.pathname === '/admin') {
-      return true;
-    }
-    return location.pathname.startsWith(path) && path !== '/admin';
+    return location.pathname === path;
   };
 
+  const sidebarItems = [
+    {
+      name: 'Dashboard',
+      path: '/admin',
+      icon: <Home className="h-5 w-5" />,
+    },
+    {
+      name: 'Merchants',
+      path: '/admin/merchants',
+      icon: <Users className="h-5 w-5" />,
+    },
+    {
+      name: 'Escrow',
+      path: '/admin/escrow',
+      icon: <DollarSign className="h-5 w-5" />,
+    },
+    {
+      name: 'Pricing',
+      path: '/admin/pricing',
+      icon: <CreditCard className="h-5 w-5" />,
+    },
+    {
+      name: 'Whitelist',
+      path: '/admin/whitelist',
+      icon: <Shield className="h-5 w-5" />,
+    },
+    {
+      name: 'Monitoring',
+      path: '/admin/monitoring',
+      icon: <MonitorSmartphone className="h-5 w-5" />,
+    },
+    {
+      name: 'Transactions',
+      path: '/admin/transactions',
+      icon: <FileText className="h-5 w-5" />,
+    },
+    {
+      name: 'Analytics',
+      path: '/admin/analytics',
+      icon: <BarChart3 className="h-5 w-5" />,
+    },
+    {
+      name: 'Settings',
+      path: '/admin/settings',
+      icon: <Settings className="h-5 w-5" />,
+    },
+    {
+      name: 'Aasimo AI',
+      path: '/aasimo-ai',
+      icon: <Sparkles className="h-5 w-5" />,
+    },
+  ];
+
   return (
-    <aside
-      className={`fixed inset-y-0 left-0 z-50 transition-all duration-300 flex-shrink-0 overflow-hidden border-r border-gray-100 bg-white ${
-        collapsed ? 'w-20' : 'w-[280px]'
-      }`}
-    >
-      <div className="flex h-full flex-col">
-        {/* Sidebar header */}
-        <div className={`flex h-14 items-center border-b px-4`}>
-          <Link to="/admin" className="flex items-center">
-            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
-            {!collapsed && (
-              <span className="ml-2 font-bold text-xl">
-                RizzPay <span className="text-coinbase">Admin</span>
-              </span>
-            )}
-          </Link>
-          <button
+    <TooltipProvider delayDuration={0}>
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-10 flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
+          collapsed ? "w-20" : "w-[280px]"
+        )}
+      >
+        <div className="flex h-16 items-center justify-between px-4">
+          {!collapsed && (
+            <Link to="/" className="flex items-center">
+              <h1 className="text-xl font-bold text-primary">RizzPay</h1>
+              <Badge variant="outline" className="ml-2 text-xs">
+                Admin
+              </Badge>
+            </Link>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className="ml-auto h-8 w-8 rounded-md hover:bg-gray-100 flex items-center justify-center"
+            className={cn("rounded-full", collapsed && "mx-auto")}
           >
-            {collapsed ? (
-              <ChevronRight className="h-5 w-5 text-gray-500" />
-            ) : (
-              <ChevronLeft className="h-5 w-5 text-gray-500" />
-            )}
-          </button>
+            <ChevronLeft
+              className={cn(
+                "h-5 w-5 transition-transform",
+                collapsed && "rotate-180"
+              )}
+            />
+          </Button>
         </div>
-
-        {/* Sidebar content */}
-        <div className="flex-1 overflow-auto py-2">
-          <nav className="flex flex-col space-y-1 px-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center space-x-3 rounded-md px-3 py-2 transition-colors ${
-                  isActive(item.path)
-                    ? 'bg-[#9970e2]/10 text-[#9970e2]'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <item.icon className={`h-5 w-5 flex-shrink-0 ${
-                  isActive(item.path) ? 'text-[#9970e2]' : 'text-gray-500'
-                }`} />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
+        
+        <div className="flex-1 overflow-auto py-4">
+          <div className="space-y-1 px-3">
+            {sidebarItems.map((item) => (
+              <Tooltip key={item.path} delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Link to={item.path}>
+                    <Button
+                      variant={isActive(item.path) ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start",
+                        collapsed && "h-10 w-10 p-0 justify-center"
+                      )}
+                    >
+                      {item.icon}
+                      {!collapsed && (
+                        <span className="ml-3">{item.name}</span>
+                      )}
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                {collapsed && (
+                  <TooltipContent side="right">
+                    {item.name}
+                  </TooltipContent>
+                )}
+              </Tooltip>
             ))}
-          </nav>
-        </div>
-
-        {/* Sidebar footer */}
-        <div className="mt-auto border-t px-3 py-3">
-          <div className={`flex items-center px-2 ${collapsed ? 'justify-center' : 'justify-between'}`}>
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="text-xs font-medium text-gray-600">Logged in as</span>
-                <span className="text-sm truncate">{userEmail || 'Admin'}</span>
-              </div>
-            )}
-            <button
-              onClick={handleLogout}
-              className={`flex items-center space-x-2 rounded-md p-2 text-rose-500 hover:bg-rose-50 ${
-                collapsed ? 'w-10 h-10 justify-center' : ''
-              }`}
-            >
-              <LogOut className="h-5 w-5" />
-              {!collapsed && <span>Logout</span>}
-            </button>
           </div>
         </div>
+        
+        <div className="p-3 mt-auto">
+          <Separator className="my-2" />
+          {!collapsed && (
+            <div className="mb-2 px-4">
+              <p className="text-sm text-muted-foreground truncate">
+                {userEmail}
+              </p>
+            </div>
+          )}
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50",
+                  collapsed && "h-10 w-10 p-0 justify-center"
+                )}
+                onClick={handleLogout}
+              >
+                <LogOut className="h-5 w-5" />
+                {!collapsed && <span className="ml-3">Logout</span>}
+              </Button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">Logout</TooltipContent>
+            )}
+          </Tooltip>
+        </div>
       </div>
-    </aside>
+    </TooltipProvider>
   );
 };
+
+import { Badge } from '@/components/ui/badge';
+import { ChevronLeft } from 'lucide-react';
 
 export default AdminSidebar;

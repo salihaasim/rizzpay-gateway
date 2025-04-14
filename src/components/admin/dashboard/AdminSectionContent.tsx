@@ -24,6 +24,18 @@ const AdminSectionContent: React.FC<AdminSectionContentProps> = ({ section }) =>
       return <MerchantPricingControl />;
     case 'whitelist':
       return <MerchantWhitelist />;
+    case 'monitoring':
+      return (
+        <Card className="border border-border/50 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium">System Monitoring</CardTitle>
+            <CardDescription>Comprehensive monitoring of all RizzPay systems</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">Please visit the dedicated monitoring page for full system monitoring capabilities.</p>
+          </CardContent>
+        </Card>
+      );
     case 'transactions':
       return (
         <Card className="border border-border/50 shadow-sm">

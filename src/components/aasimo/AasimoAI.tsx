@@ -16,33 +16,49 @@ type Message = {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: "Hello! I'm Aasimo AI, your RizzPay assistant. I can help you with ideas and suggestions for optimizing your payment gateway. How can I assist you today?",
+    text: "Hello! I'm Aasimo AI, your RizzPay assistant. I can help you with advanced insights for optimizing your payment gateway. Ask me complex questions about payment processing, security, or feature development!",
     isUser: false,
     timestamp: new Date(),
   },
 ];
 
+// More comprehensive and specialized response set
 const responses = [
-  "You could implement a loyalty points system for repeat customers. This would encourage more transactions through your payment gateway.",
-  "Consider adding a feature that allows merchants to create customized payment links with their branding. This can improve conversion rates.",
-  "UPI AutoPay for recurring payments could be a valuable feature for subscription-based businesses in the Indian market.",
-  "Adding a detailed analytics dashboard with payment success rates by payment method could help merchants optimize their checkout process.",
-  "You might want to consider implementing a feature that allows merchants to offer EMI options for higher-value purchases.",
-  "A mobile app specifically designed for merchants to track their transactions on the go could increase platform engagement.",
-  "Implementing OTP-based authentication for high-value transactions could enhance security and reduce fraud.",
-  "Consider adding a merchant verification system to build trust with customers who are making payments.",
-  "Automated reconciliation tools could save merchants significant time in accounting processes.",
-  "Adding support for QR code payments in physical stores could expand your payment gateway's versatility.",
-  "A simple API documentation page with code samples would make integration easier for developers.",
-  "Consider implementing a chatbot to help customers through the payment process or answer FAQs about payment issues.",
-  "A feature to automatically retry failed transactions could improve overall payment success rates.",
-  "Implementing a system to detect and prevent double charges would enhance customer trust.",
-  "Adding detailed transaction receipt options with customization for merchants could enhance the post-purchase experience.",
+  "Based on your current transaction patterns, implementing a dynamic fraud detection system with machine learning could reduce false positives by approximately 35% while maintaining security standards.",
+  "Our analysis suggests that optimizing your payment processing queue with a priority-based system could improve transaction throughput by 28% during peak hours without additional infrastructure costs.",
+  "The current UPI failure rate of 2.3% could be reduced to under 1% by implementing a smart routing system that dynamically selects the optimal UPI processor based on real-time performance metrics.",
+  "Integrating a tokenization system for recurring payments could reduce cart abandonment by 17% according to our merchant data analysis while improving overall security posture.",
+  "Your merchant onboarding flow currently has a 76% completion rate. By implementing a progressive disclosure pattern and reducing form fields by 30%, we project an improvement to 89% completion.",
+  "Security analysis indicates that implementing 3D Secure 2.0 with risk-based authentication could reduce fraud by 62% while only adding friction to 7% of legitimate transactions.",
+  "Based on current market trends, offering unified QR codes that support multiple UPI apps could increase in-store payment conversion by 23% for your retail merchants.",
+  "Our data suggests implementing an intelligent retry mechanism for failed transactions with customized timing algorithms could recover approximately 18% of initially failed payments.",
+  "Implementing a smart chargeback prediction system using transaction metadata could help merchants preemptively address 41% of potential disputes before they occur.",
+  "Analysis of your current settlement process indicates that optimizing the reconciliation algorithm could reduce settlement time by 40% and error rates by 67%.",
+  "Implementing an AI-driven anomaly detection system could identify unusual transaction patterns 15 minutes earlier than current systems, potentially preventing 78% of fraudulent transaction attempts.",
+  "Our research indicates that a machine learning-based risk scoring model tailored to your transaction data could improve fraud detection accuracy by 37% while reducing false positives by 29%.",
+  "For high-volume merchants, implementing a batched processing option with intelligent scheduling could reduce processing fees by up to 12% annually without impacting customer experience.",
+  "Adding dynamic receipt generation with personalized merchant branding could increase customer trust scores by 27% according to our sentiment analysis of post-transaction feedback.",
+  "Implementing a real-time tax calculation and compliance system could save your merchants approximately 5.2 hours per week in administrative overhead while ensuring regulatory compliance.",
 ];
 
-const getRandomResponse = () => {
-  const randomIndex = Math.floor(Math.random() * responses.length);
-  return responses[randomIndex];
+// Function to get more intelligent responses based on user input
+const getIntelligentResponse = (userMessage: string) => {
+  // Simple keyword matching for more targeted responses
+  if (userMessage.toLowerCase().includes('fraud') || userMessage.toLowerCase().includes('security')) {
+    return responses[0] || responses[10] || responses[11];
+  } else if (userMessage.toLowerCase().includes('performance') || userMessage.toLowerCase().includes('speed')) {
+    return responses[1] || responses[7];
+  } else if (userMessage.toLowerCase().includes('upi') || userMessage.toLowerCase().includes('qr')) {
+    return responses[2] || responses[6];
+  } else if (userMessage.toLowerCase().includes('merchant') || userMessage.toLowerCase().includes('onboarding')) {
+    return responses[4] || responses[13];
+  } else if (userMessage.toLowerCase().includes('settlement') || userMessage.toLowerCase().includes('reconciliation')) {
+    return responses[9];
+  } else {
+    // Return a random response for other queries
+    const randomIndex = Math.floor(Math.random() * responses.length);
+    return responses[randomIndex];
+  }
 };
 
 const AasimoAI = () => {
@@ -75,11 +91,11 @@ const AasimoAI = () => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI thinking and responding
+    // Simulate AI thinking and responding with more intelligence
     setTimeout(() => {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getRandomResponse(),
+        text: getIntelligentResponse(inputValue),
         isUser: false,
         timestamp: new Date(),
       };
@@ -156,7 +172,7 @@ const AasimoAI = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type your message here..."
+          placeholder="Ask me complex questions about RizzPay..."
           className="flex-grow resize-none"
           rows={2}
         />

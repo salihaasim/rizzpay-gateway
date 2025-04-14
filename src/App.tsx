@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -11,6 +10,7 @@ import WalletPage from './pages/WalletPage';
 import TermsAndConditions from './pages/TermsAndConditions';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import AasimoAI from './components/aasimo/AasimoAI';
+import AdminMonitoring from './pages/AdminMonitoring';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/Transactions'));
@@ -89,6 +89,7 @@ const App = () => {
           <Route path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />
+          <Route path="/admin/monitoring" element={<AdminMonitoring />} />
           
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
