@@ -12,8 +12,7 @@ import {
   Settings,
   Users,
   Shield,
-  MonitorSmartphone,
-  Sparkles
+  MonitorSmartphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -88,11 +87,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({
       name: 'Settings',
       path: '/admin/settings',
       icon: <Settings className="h-5 w-5" />,
-    },
-    {
-      name: 'Aasimo AI',
-      path: '/aasimo-ai',
-      icon: <Sparkles className="h-5 w-5" />,
     },
   ];
 

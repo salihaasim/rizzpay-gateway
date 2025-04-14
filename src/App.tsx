@@ -27,6 +27,7 @@ const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const AdminSettings = React.lazy(() => import('./pages/AdminSettings'));
 const AdminTransactionLog = React.lazy(() => import('./pages/AdminTransactionLog'));
 const MerchantWhitelist = React.lazy(() => import('./pages/MerchantWhitelist'));
+const MonitoringDashboard = React.lazy(() => import('./components/admin/monitoring/MonitoringDashboard'));
 
 const PageLoading = () => <PaymentPageLoading />;
 
@@ -91,7 +92,10 @@ const App = () => {
           <Route path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />
           <Route path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />
-          <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+          <Route path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />
+          
+          {/* Individual monitoring dashboard routes */}
+          <Route path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />
           
           <Route path="/dashboard/*" element={
             <ProtectedRoute>

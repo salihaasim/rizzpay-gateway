@@ -1,13 +1,19 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, AlertTriangle, Database, Server, Users, Lock, Zap, 
-         BarChart3, Globe, Cpu, Signal, FileWarning, Clock, ArrowDownUp } from 'lucide-react';
+import { 
+  Activity, AlertTriangle, Database, Server, Users, Lock, Zap, 
+  BarChart3, Globe, Cpu, Signal, FileWarning, Clock, ArrowDownUp,
+  ExternalLink, Layers, ShieldAlert, Bug, LineChart, Receipt, Network,
+  PanelTop, Gauge
+} from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 // Monitoring data - In a real app, this would come from API calls
 const systemStatus = {
@@ -115,7 +121,100 @@ const Incident = ({ incident }: { incident: any }) => {
   );
 };
 
+// Monitoring section card component
+const MonitoringSectionCard = ({ 
+  title, 
+  description, 
+  icon, 
+  path 
+}: { 
+  title: string; 
+  description: string; 
+  icon: React.ReactNode; 
+  path: string;
+}) => (
+  <Card className="hover:shadow-md transition-shadow">
+    <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <div className="space-y-1">
+        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </div>
+      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+        {icon}
+      </div>
+    </CardHeader>
+    <CardFooter className="pt-0">
+      <Button asChild variant="outline" className="w-full justify-between mt-2">
+        <Link to={path}>
+          <span>Open Dashboard</span>
+          <ExternalLink className="h-4 w-4" />
+        </Link>
+      </Button>
+    </CardFooter>
+  </Card>
+);
+
 const AdminMonitoring = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Define the monitoring sections for the dedicated dashboards
+  const monitoringSections = [
+    {
+      title: "Server Performance",
+      description: "CPU, memory, and system resource monitoring",
+      icon: <Cpu className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/server"
+    },
+    {
+      title: "API Gateway",
+      description: "API performance and endpoint monitoring",
+      icon: <Network className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/api"
+    },
+    {
+      title: "Database Health",
+      description: "Database connections and query performance",
+      icon: <Database className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/database"
+    },
+    {
+      title: "Payment Gateways",
+      description: "Payment processor status and performance",
+      icon: <Receipt className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/payment"
+    },
+    {
+      title: "Security",
+      description: "Security events and threat detection",
+      icon: <ShieldAlert className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/security"
+    },
+    {
+      title: "Transaction Monitoring",
+      description: "Real-time transaction tracking",
+      icon: <ArrowDownUp className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/transactions"
+    },
+    {
+      title: "Error Tracking",
+      description: "Application errors and exceptions",
+      icon: <Bug className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/errors"
+    },
+    {
+      title: "Analytics",
+      description: "User behavior and business metrics",
+      icon: <LineChart className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/analytics"
+    },
+    {
+      title: "System Status",
+      description: "Overall system health dashboard",
+      icon: <Gauge className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/status"
+    }
+  ];
+  
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -126,14 +225,30 @@ const AdminMonitoring = () => {
           </p>
         </div>
         
-        <Tabs defaultValue="overview" className="space-y-4">
+        <Tabs defaultValue="overview" className="space-y-4" value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="dashboards">Monitoring Dashboards</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="payments">Payment Systems</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="incidents">Incidents</TabsTrigger>
           </TabsList>
+          
+          {/* Monitoring Dashboards Tab */}
+          <TabsContent value="dashboards" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {monitoringSections.map((section, index) => (
+                <MonitoringSectionCard
+                  key={index}
+                  title={section.title}
+                  description={section.description}
+                  icon={section.icon}
+                  path={section.path}
+                />
+              ))}
+            </div>
+          </TabsContent>
           
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
@@ -310,6 +425,14 @@ const AdminMonitoring = () => {
                   <li>Resource utilization over time</li>
                   <li>Network traffic analysis</li>
                 </ul>
+                <div className="mt-6">
+                  <Button asChild variant="outline">
+                    <Link to="/admin/monitoring/performance">
+                      <span>Open Detailed Performance Dashboard</span>
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -334,6 +457,14 @@ const AdminMonitoring = () => {
                   <li>Settlement status tracking</li>
                   <li>Failed transaction analysis</li>
                 </ul>
+                <div className="mt-6">
+                  <Button asChild variant="outline">
+                    <Link to="/admin/monitoring/payment">
+                      <span>Open Payment Systems Dashboard</span>
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -358,6 +489,14 @@ const AdminMonitoring = () => {
                   <li>Data access audit logs</li>
                   <li>Compliance status indicators</li>
                 </ul>
+                <div className="mt-6">
+                  <Button asChild variant="outline">
+                    <Link to="/admin/monitoring/security">
+                      <span>Open Security Dashboard</span>
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -382,6 +521,14 @@ const AdminMonitoring = () => {
                   <li>Affected system components</li>
                   <li>Mitigation and prevention measures</li>
                 </ul>
+                <div className="mt-6">
+                  <Button asChild variant="outline">
+                    <Link to="/admin/monitoring/incidents">
+                      <span>Open Incidents Dashboard</span>
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
