@@ -19,7 +19,7 @@ type Message = {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: "Hello! I'm Aasimo AI, your RizzPay documentation assistant. I can help you find information about RizzPay's payment systems, integration guides, and platform features. Ask me anything about RizzPay!",
+    text: "Hello! I'm Aasimo AI, your RizzPay documentation assistant. I can help you find information about RizzPay's payment systems, integration guides, platform features, and processing capacity. Ask me anything about RizzPay!",
     isUser: false,
     timestamp: new Date(),
   },
@@ -130,13 +130,119 @@ const documentationContent = {
   - Database connection status
   - Cache efficiency metrics
   - Real-time active user monitoring`,
+  
+  // Adding payment capacity information from RIZZPAY_PAYMENT_CAPACITY.md
+  payment_capacity: `RizzPay payment processing capacity:
+  
+  Transaction Volume:
+  - Peak Transaction Processing: Up to 1,000 transactions per second (TPS)
+  - Daily Processing Capacity: Approximately 86.4 million transactions per day
+  - Monthly Transaction Volume: Up to 2.6 billion transactions per month
+  
+  Financial Limits:
+  - Per Transaction Limit: ₹10,00,000 (approximately $12,000 USD)
+  - Daily Processing Value: Up to ₹5,000 crores (approximately $600 million USD)
+  - Monthly Value Limit: ₹150,000 crores (approximately $18 billion USD)
+  
+  System Performance:
+  - Average Payment Initiation: < 200ms
+  - Payment Authorization: < 1.5 seconds
+  - System Uptime: 99.99% (less than 53 minutes of downtime per year)
+  - Transaction Success Rate: > 99.5% for properly formatted requests`,
+  
+  storage_capacity: `RizzPay storage capacity:
+  - Active Transaction Records: 100 million detailed transaction records
+  - Archival Storage: Unlimited with tiered storage system
+  - Transaction Data Retention: 7 years for completed transactions
+  - Receipt/Invoice Storage: Unlimited with CDN support
+  - Document Storage: Up to 10GB per merchant account`,
+  
+  reliability_metrics: `RizzPay reliability metrics:
+  - System Uptime: 99.99% (less than 53 minutes of downtime per year)
+  - Transaction Success Rate: > 99.5% for properly formatted requests
+  - Error Recovery: Automatic retry system for failed transactions
+  - Maximum Sustained TPS: 1,200 for 1 hour (with elastic scaling)
+  - Recovery Time: < 5 seconds after 200% normal load`,
+  
+  mobile_performance: `RizzPay mobile processing capacity:
+  
+  Android Devices:
+  - Minimum Requirements: Android 6.0 (Marshmallow) or higher
+  - Recommended: Android 9.0 or higher for optimal performance
+  - Memory Usage: < 100MB RAM during transaction processing
+  
+  iOS Devices:
+  - Minimum Requirements: iOS 12.0 or higher
+  - Recommended: iOS 14.0 or higher for optimal performance
+  - Memory Usage: < 80MB RAM during transaction processing`,
+  
+  compliance_standards: `RizzPay complies with:
+  - PCI DSS Level 1: Highest level of payment card industry compliance
+  - ISO 27001: Information security management standards
+  - RBI Payment Aggregator Guidelines: Full compliance with Reserve Bank of India regulations
+  - GDPR & Data Protection Act: Complete compliance with data protection standards`
 };
 
-// Function to search documentation based on user query
+// Improved search function to better match queries about specific metrics and numbers
 const searchDocumentation = (query: string) => {
   const searchTerms = query.toLowerCase().split(' ');
   
-  // Search through all documentation content
+  // Define key terms that should have higher priority in the search
+  const priorityTerms = {
+    'transaction': ['payment_capacity', 'payment_flow'],
+    'process': ['payment_capacity', 'payment_flow'],
+    'per': ['payment_capacity'],
+    'day': ['payment_capacity'],
+    'daily': ['payment_capacity'],
+    'volume': ['payment_capacity'],
+    'limit': ['payment_capacity'],
+    'amount': ['payment_capacity'],
+    'value': ['payment_capacity'],
+    'crore': ['payment_capacity'],
+    'million': ['payment_capacity'],
+    'billion': ['payment_capacity'],
+    'capacity': ['payment_capacity', 'storage_capacity'],
+    'tps': ['payment_capacity'],
+    'second': ['payment_capacity'],
+    'uptime': ['payment_capacity', 'reliability_metrics'],
+    'reliability': ['reliability_metrics'],
+    'success': ['reliability_metrics'],
+    'mobile': ['mobile_performance'],
+    'android': ['mobile_performance'],
+    'ios': ['mobile_performance'],
+    'compliance': ['compliance_standards'],
+    'webhook': ['webhooks'],
+    'escrow': ['escrow_system'],
+    'merchant': ['merchant_onboarding'],
+    'upi': ['upi_payments', 'payment_methods'],
+    'security': ['security_measures'],
+    'monitoring': ['monitoring_system']
+  };
+  
+  // Check if query is specifically asking about transaction volumes or capacity
+  const isCapacityQuestion = /how (much|many)|capacity|volume|per (day|second)|daily|transaction.*(per|day|capacity|volume|process|handle)/i.test(query);
+  
+  // If it's a capacity question, prioritize the payment_capacity content
+  if (isCapacityQuestion) {
+    // For capacity questions, focus on direct answers from payment_capacity
+    const relevantInfo = documentationContent.payment_capacity;
+    
+    // Further filter based on specific aspects of capacity
+    if (/day|daily/i.test(query)) {
+      const dayMatch = relevantInfo.match(/Daily Processing.*?₹5,000 crores.*?USD\)/s);
+      if (dayMatch) return dayMatch[0];
+    }
+    
+    if (/transaction.*second|tps/i.test(query)) {
+      const tpsMatch = relevantInfo.match(/Peak Transaction Processing.*?per second/s);
+      if (tpsMatch) return tpsMatch[0];
+    }
+    
+    // Default to returning the full capacity information
+    return relevantInfo;
+  }
+  
+  // Search through all documentation content with weighted relevance
   const results: {source: string, content: string, relevance: number}[] = [];
   
   Object.entries(documentationContent).forEach(([key, content]) => {
@@ -144,8 +250,19 @@ const searchDocumentation = (query: string) => {
     
     // Calculate relevance score based on term matches
     let relevance = 0;
+    
+    // Check if any priority terms are in the query
     searchTerms.forEach(term => {
-      if (term.length > 2) { // Ignore very short terms
+      // Check if this term is a priority term
+      if (term.length > 2 && priorityTerms[term as keyof typeof priorityTerms]) {
+        // If the current content key is in the priority list for this term, add extra relevance
+        if (priorityTerms[term as keyof typeof priorityTerms].includes(key)) {
+          relevance += 5;
+        }
+      }
+      
+      // Count normal term occurrences
+      if (term.length > 2) {
         const matches = (lowerContent.match(new RegExp(term, 'g')) || []).length;
         relevance += matches;
       }
@@ -202,9 +319,12 @@ const AasimoAI = () => {
     setInputValue('');
     setIsTyping(true);
 
+    console.log("Query:", inputValue); // Debug logging
+
     // Search documentation based on the query
     setTimeout(() => {
       const documentationResponse = searchDocumentation(inputValue);
+      console.log("Response source found:", documentationResponse.substring(0, 50) + "..."); // Debug logging
       
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -216,7 +336,7 @@ const AasimoAI = () => {
       
       setMessages((prevMessages) => [...prevMessages, aiResponse]);
       setIsTyping(false);
-    }, 1000);
+    }, 800);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -271,7 +391,37 @@ const AasimoAI = () => {
           
           <div className="space-y-2">
             <h3 className="font-medium mb-2">Quick Topics</h3>
-            {Object.keys(documentationContent).map(topic => (
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-sm h-auto py-2"
+              onClick={() => {
+                setInputValue("What is RizzPay's transaction capacity per day?");
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Daily Transaction Capacity
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-sm h-auto py-2"
+              onClick={() => {
+                setInputValue("How many transactions per second can RizzPay handle?");
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Transactions Per Second
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-sm h-auto py-2"
+              onClick={() => {
+                setInputValue("What is the daily processing value limit?");
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Daily Processing Value
+            </Button>
+            {Object.keys(documentationContent).slice(0, 5).map(topic => (
               <Button 
                 key={topic} 
                 variant="ghost" 

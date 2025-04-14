@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,8 +74,22 @@ const MonitoringDashboard = () => {
     ? dashboards[dashboardType as keyof typeof dashboards] 
     : dashboards.server;
   
+  useEffect(() => {
+    console.log("MonitoringDashboard mounted with type:", dashboardType);
+    // Validate that the dashboard type exists, if not redirect to default
+    if (dashboardType && !dashboards[dashboardType as keyof typeof dashboards]) {
+      console.warn(`Dashboard type "${dashboardType}" not found, redirecting to default`);
+      navigate('/admin/monitoring/server');
+    }
+  }, [dashboardType, navigate]);
+  
   const handleBack = () => {
     navigate('/admin/monitoring');
+  };
+  
+  const handleRefresh = () => {
+    console.log("Refreshing monitoring data for:", dashboardType);
+    // In a real implementation, this would fetch fresh monitoring data
   };
   
   console.log("Rendering monitoring dashboard for type:", dashboardType);
@@ -93,7 +107,7 @@ const MonitoringDashboard = () => {
               <p className="text-muted-foreground">{dashboard.description}</p>
             </div>
           </div>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4" />
             <span>Refresh</span>
           </Button>
@@ -121,13 +135,13 @@ const MonitoringDashboard = () => {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle>Detailed Analysis</CardTitle>
-            <CardDescription>Comprehensive {dashboardType} monitoring data with insights</CardDescription>
+            <CardDescription>Comprehensive {dashboardType || 'server'} monitoring data with insights</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="min-h-56 flex items-center justify-center bg-secondary/30 rounded-md">
               <div className="flex flex-col items-center text-muted-foreground">
                 <Monitor className="h-10 w-10 mb-3" />
-                <p>Detailed {dashboardType} analytics dashboard will be displayed here</p>
+                <p>Detailed {dashboardType || 'server'} analytics dashboard will be displayed here</p>
                 <p className="text-sm mt-1">Data is updated in real-time</p>
               </div>
             </div>
