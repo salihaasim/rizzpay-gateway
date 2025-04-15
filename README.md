@@ -14,7 +14,6 @@ RizzPay is a comprehensive payment processing platform designed for the Indian m
 - Comprehensive monitoring dashboards
 - KYC verification for merchants (Aadhaar, PAN, and GST)
 - Detailed technical documentation for investors
-- Interactive 3D visualization of payment flows
 
 ## Monitoring Dashboards
 
@@ -56,7 +55,7 @@ The RizzPay documentation assistant (Aasimo AI) provides quick access to informa
 
 RizzPay provides detailed technical documentation for investors, including:
 
-- **Interactive 3D Animations**: Visualize payment processing flow in 3D
+- **Interactive Demos**: Visual walkthroughs of the payment processing system
 - **Architecture Diagrams**: Detailed explanations of our technical stack
 - **Transaction Flow Visualizations**: Step-by-step illustrations of payment flows
 - **Security Measures**: Comprehensive documentation of our security architecture
@@ -83,4 +82,3 @@ RizzPay provides detailed technical documentation for investors, including:
 - State Management: Zustand
 - Data Fetching: TanStack Query
 - Routing: React Router DOM
-- 3D Visualization: Three.js, React Three Fiber

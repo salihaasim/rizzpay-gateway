@@ -1,6 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 
@@ -9,8 +10,16 @@ const HeroSection = () => {
   const { isAuthenticated } = useMerchantAuth();
   const { userRole } = useTransactionStore();
 
-  const handleExplore = () => {
-    navigate('/how-it-works-technical');
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      if (userRole === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    } else {
+      navigate('/auth');
+    }
   };
 
   return (
@@ -31,6 +40,13 @@ const HeroSection = () => {
             Rizzpay provides a secure, fast and reliable payment gateway for businesses and consumers. 
             Integrate UPI, cards, and more with a single platform.
           </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
+            <Button size="lg" className="rounded-full px-8 shadow-md" onClick={handleGetStarted}>
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </section>
