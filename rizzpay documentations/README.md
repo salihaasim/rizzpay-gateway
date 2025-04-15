@@ -25,6 +25,15 @@ To build the mobile applications:
 4. Build for Android: `npx cap open android`
 5. Build for iOS: `npx cap open ios` (requires macOS with Xcode)
 
+## Performance Optimizations
+
+The application has been optimized for fast loading and performance:
+- Efficient component rendering with React.memo
+- Conditional StrictMode for development only
+- Proper error handling during initialization
+- Semantic HTML structure with main content in <main> tags
+- Reduced unnecessary re-renders
+
 ## Authentication
 
 The application supports multiple user roles:

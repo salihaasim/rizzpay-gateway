@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 
