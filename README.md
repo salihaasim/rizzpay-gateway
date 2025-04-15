@@ -13,6 +13,7 @@ RizzPay is a comprehensive payment processing platform designed for the Indian m
 - Wallet system for internal transfers
 - Comprehensive monitoring dashboards
 - KYC verification for merchants (Aadhaar, PAN, and GST)
+- Detailed technical documentation for investors
 
 ## Monitoring Dashboards
 
@@ -49,6 +50,17 @@ The RizzPay documentation assistant (Aasimo AI) provides quick access to informa
 - Security measures and compliance information
 - Merchant onboarding processes
 - Technical architecture and specifications
+
+## Technical Documentation
+
+RizzPay provides detailed technical documentation for investors, including:
+
+- **Interactive Demos**: Visual walkthroughs of the payment processing system
+- **Architecture Diagrams**: Detailed explanations of our technical stack
+- **Transaction Flow Visualizations**: Step-by-step illustrations of payment flows
+- **Security Measures**: Comprehensive documentation of our security architecture
+- **System Capacity**: Performance benchmarks and capacity specifications
+- **Merchant Ledger**: Detailed explanations of our accounting system
 
 ## Transaction Processing Capacity
 
