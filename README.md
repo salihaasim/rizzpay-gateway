@@ -84,4 +84,3 @@ RizzPay provides detailed technical documentation for investors, including:
 - Data Fetching: TanStack Query
 - Routing: React Router DOM
 - 3D Visualization: Three.js, React Three Fiber
-

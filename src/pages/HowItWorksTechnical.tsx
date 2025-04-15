@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { motion } from '@/components/ui/motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import Footer from '@/components/landing/Footer';
 import PaymentFlowAnimation from '@/components/technical/PaymentFlowAnimation';
@@ -14,8 +13,6 @@ import {
 } from 'lucide-react';
 
 const HowItWorksTechnical = () => {
-  const [activeSection, setActiveSection] = useState('overview');
-  
   useEffect(() => {
     // Scroll to top when page loads
     window.scrollTo(0, 0);
@@ -67,7 +64,6 @@ const HowItWorksTechnical = () => {
             <TabsTrigger value="capacity">System Capacity</TabsTrigger>
           </TabsList>
           
-          {/* Keep existing code for tab contents */}
           <TabsContent value="architecture">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <motion.div
@@ -230,7 +226,6 @@ const HowItWorksTechnical = () => {
             </div>
           </TabsContent>
           
-          {/* Keep existing content for other tabs */}
           <TabsContent value="payment-flow">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <motion.div
@@ -721,4 +716,111 @@ const HowItWorksTechnical = () => {
                         <p className="text-sm text-muted-foreground">
                           Our system is capable of processing up to 1,000 transactions per second (TPS),
                           enabling 86.4 million transactions per day and 2.6 billion per month.
-                        </p
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 bg-primary/5 rounded-lg">
+                        <h4 className="font-medium mb-2">Value Limits</h4>
+                        <p className="text-sm text-muted-foreground">
+                          With our current infrastructure, RizzPay can process up to ₹5,000 crores (approximately $600 million USD) 
+                          in transaction value per day, with built-in scalability for future growth.
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 bg-primary/5 rounded-lg">
+                        <h4 className="font-medium mb-2">Scalability</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Our cloud-based architecture allows for automatic scaling during peak 
+                          periods, ensuring consistent performance regardless of transaction volume.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              <div>
+                <motion.div
+                  className="bg-white p-6 rounded-lg shadow-sm h-full"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <h3 className="text-xl font-medium mb-6">Performance Benchmarks</h3>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <p className="font-medium">Transaction Speed</p>
+                        <p className="text-sm text-muted-foreground">200-300ms average</p>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full" style={{ width: '95%' }}></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Industry average: 500-800ms</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <p className="font-medium">System Availability</p>
+                        <p className="text-sm text-muted-foreground">99.99% uptime</p>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '99.99%' }}></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Industry standard: 99.9%</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <p className="font-medium">Error Rate</p>
+                        <p className="text-sm text-muted-foreground">0.01%</p>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '1%' }}></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Industry average: 0.05-0.1%</p>
+                    </div>
+                    
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <h4 className="font-medium mb-2 text-blue-800">Infrastructure</h4>
+                      <ul className="space-y-2 text-sm text-blue-700">
+                        <li className="flex justify-between">
+                          <span>Cloud Provider:</span>
+                          <span className="font-medium">AWS (Mumbai Region)</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Database Clusters:</span>
+                          <span className="font-medium">Multiple Zones</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Load Balancing:</span>
+                          <span className="font-medium">Automatic</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Backup Strategy:</span>
+                          <span className="font-medium">Real-time + Daily Snapshots</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground mb-4">
+            For more detailed information or to schedule a technical demo for investors,
+            please contact our technical team.
+          </p>
+        </div>
+      </div>
+      
+      <Footer />
+    </div>
+  );
+};
+
+export default HowItWorksTechnical;

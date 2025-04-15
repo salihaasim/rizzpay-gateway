@@ -24,9 +24,9 @@ const LandingNavbar = () => {
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors">
               Features
             </a>
-            <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors">
+            <Link to="/how-it-works-technical" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors">
               How it Works
-            </a>
+            </Link>
             <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors flex items-center">
               <FileText className="h-4 w-4 mr-1" />
               Terms & Conditions
