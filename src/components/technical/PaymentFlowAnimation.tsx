@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Text, Html, RoundedBox } from '@react-three/drei';
 import { Vector3, Mesh, Group } from 'three';
+import { MeshPhongMaterial } from 'three';
 import { motion } from '@/components/ui/motion';
 
 // Node component for the payment flow
@@ -91,10 +92,13 @@ const ConnectionLine = ({
   const ref = useRef<Mesh>(null);
   
   useFrame((state) => {
-    if (ref.current && active) {
-      // Animated pulse effect on active connections
-      ref.current.material.opacity = (Math.sin(state.clock.getElapsedTime() * 4) + 1) * 0.4 + 0.2;
-      ref.current.material.emissiveIntensity = (Math.sin(state.clock.getElapsedTime() * 4) + 1) * 0.3;
+    if (ref.current) {
+      const material = ref.current.material as MeshPhongMaterial;
+      if (active && material) {
+        // Animated pulse effect on active connections
+        material.opacity = (Math.sin(state.clock.getElapsedTime() * 4) + 1) * 0.4 + 0.2;
+        material.emissiveIntensity = (Math.sin(state.clock.getElapsedTime() * 4) + 1) * 0.3;
+      }
     }
   });
   
