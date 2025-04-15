@@ -8,7 +8,7 @@ import PaymentFlow from '@/components/PaymentFlow';
 import { Separator } from '@/components/ui/separator';
 import AnalyticsChart from '@/components/AnalyticsChart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight } from 'lucide-react';
+import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight, Lock } from 'lucide-react';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 import { Button } from '@/components/ui/button';
 import { 
@@ -16,6 +16,7 @@ import {
   getLastMonthTransactions, 
   calculateGrowthRate 
 } from '@/utils/analyticsUtils';
+import TechnicalAccessLink from '@/components/TechnicalAccessLink';
 
 // Static data for additional charts (will be replaced with real data)
 const paymentMethodData = [
@@ -98,7 +99,7 @@ const Dashboard = () => {
             title="Customers"
             value={analytics.customers.unique.toString()}
             icon={<Users className="h-4 w-4" />}
-            trend={{ value: analytics.customers.unique > 0 ? 2.1 : 0, isPositive: true }}
+            trend={{ value: 2.1, isPositive: true }}
           />
           
           <StatCard
@@ -164,6 +165,12 @@ const Dashboard = () => {
                       <div className="font-medium">₹{analytics.performance.avgTransactionValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
                     </div>
                   </div>
+                </div>
+
+                <Separator className="my-4" />
+                
+                <div className="flex justify-center">
+                  <TechnicalAccessLink />
                 </div>
               </div>
             </CardContent>

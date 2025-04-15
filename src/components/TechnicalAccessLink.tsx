@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Lock } from 'lucide-react';
+import { Lock, FileText } from 'lucide-react';
 
 const TechnicalAccessLink = () => {
   const { isAuthenticated } = useMerchantAuth();
@@ -29,12 +29,13 @@ const TechnicalAccessLink = () => {
   return (
     <Button 
       variant="outline" 
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 w-full justify-center bg-blue-50 hover:bg-blue-100 border-blue-200"
       onClick={handleAccessTechnicalDetails}
       disabled={isLoading}
     >
-      <Lock size={16} />
-      <span>Access Technical Details</span>
+      <Lock size={16} className="text-blue-600" />
+      <span className="font-medium text-blue-600">Access Technical Documentation</span>
+      <FileText size={16} className="text-blue-600" />
     </Button>
   );
 };

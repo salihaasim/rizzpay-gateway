@@ -83,7 +83,7 @@ Detailed technical documentation is available for registered users and can be ac
 - API specifications
 - Integration guides
 
-For access to technical documentation, please login to your merchant account.
+For access to technical documentation, please login to your merchant account and look for the "Access Technical Documentation" button on your dashboard.
 
 ## Application Optimization
 
@@ -98,8 +98,7 @@ The application has been optimized for performance:
 
 ## Recent Changes
 
-- Fixed issue with dashboard loading by removing lazy loading for critical components
-- Optimized analytics utility functions
-- Added CSS styles for dashboard components
+- Added access link to technical documentation on the dashboard
+- Fixed TypeScript issues in analytics utilities
+- Optimized dashboard performance
 - Updated documentation with latest application changes
-
