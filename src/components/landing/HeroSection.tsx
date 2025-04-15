@@ -33,13 +33,6 @@ const HeroSection = () => {
             Rizzpay provides a secure, fast and reliable payment gateway for businesses and consumers. 
             Integrate UPI, cards, and more with a single platform.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-            <Button size="lg" className="rounded-full px-8 shadow-md" onClick={handleExplore}>
-              Explore Our Technology
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </div>
     </section>
