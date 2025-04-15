@@ -100,5 +100,6 @@ The application has been optimized for performance:
 
 - Added access link to technical documentation on the dashboard
 - Fixed TypeScript issues in analytics utilities
-- Optimized dashboard performance
-- Updated documentation with latest application changes
+- Updated transaction status handling for compatibility with backend types
+- Improved amount parsing to handle both string and numeric values
+- Optimized dashboard performance with proper type safety

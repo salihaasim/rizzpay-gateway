@@ -34,13 +34,13 @@ export const generateAnalyticsSummary = (transactions: Transaction[]) => {
   const monthTxns = getLastMonthTransactions(transactions);
   
   // Calculate totals for today
-  const todayTotal = todayTxns.reduce((sum, txn) => sum + Number(txn.amount), 0);
-  const todaySuccessful = todayTxns.filter(txn => txn.status === 'completed' || txn.status === 'success').length;
+  const todayTotal = todayTxns.reduce((sum, txn) => sum + (typeof txn.amount === 'string' ? parseFloat(txn.amount) : Number(txn.amount)), 0);
+  const todaySuccessful = todayTxns.filter(txn => txn.status === 'successful' || txn.status === 'settled').length;
   const todayCount = todayTxns.length;
   
   // Calculate totals for month
-  const monthlyTotal = monthTxns.reduce((sum, txn) => sum + Number(txn.amount), 0);
-  const monthlySuccessful = monthTxns.filter(txn => txn.status === 'completed' || txn.status === 'success').length;
+  const monthlyTotal = monthTxns.reduce((sum, txn) => sum + (typeof txn.amount === 'string' ? parseFloat(txn.amount) : Number(txn.amount)), 0);
+  const monthlySuccessful = monthTxns.filter(txn => txn.status === 'successful' || txn.status === 'settled').length;
   const monthlyCount = monthTxns.length;
   
   // Calculate success rates
@@ -57,7 +57,7 @@ export const generateAnalyticsSummary = (transactions: Transaction[]) => {
     return txnDate.getTime() === yesterday.getTime();
   });
   
-  const yesterdayTotal = yesterdayTxns.reduce((sum, txn) => sum + Number(txn.amount), 0);
+  const yesterdayTotal = yesterdayTxns.reduce((sum, txn) => sum + (typeof txn.amount === 'string' ? parseFloat(txn.amount) : Number(txn.amount)), 0);
   const revenueGrowthDaily = calculateGrowthRate(todayTotal, yesterdayTotal);
   
   // Calculate daily growth rate for transactions
