@@ -1,129 +1,97 @@
 
 # RizzPay Payment Gateway
 
-RizzPay is a secure, fast, and reliable payment gateway solution for businesses and consumers.
+RizzPay is a comprehensive payment processing platform designed for the Indian market. It facilitates various types of financial transactions including card payments, UPI transfers, wallet management, and bank transfers.
 
-## Mobile App Support
+## Features
 
-This application is optimized for both Android and iOS mobile platforms via Capacitor. The app provides a seamless payment experience across all devices.
+- Multiple payment methods (UPI, Credit/Debit Cards, NEFT)
+- Merchant dashboard with analytics
+- Transaction monitoring and reporting
+- Secure webhook integration
+- Admin controls and merchant management
+- Wallet system for internal transfers
+- Comprehensive monitoring dashboards
+- KYC verification for merchants (Aadhaar, PAN, and GST)
+- Detailed technical documentation for investors
 
-### Mobile Features
+## Monitoring Dashboards
 
-- **Responsive UI**: Fully responsive design that works on all screen sizes
-- **Native Capabilities**: Uses device capabilities like camera for QR scanning
-- **Offline Support**: Basic functionality works even with intermittent connectivity
-- **Push Notifications**: Get real-time updates on transaction status
-- **Biometric Authentication**: Secure login with fingerprint or face recognition
+RizzPay includes detailed monitoring dashboards for various system components:
 
-### Building Mobile Apps
+- **Server Monitoring**: Real-time CPU, memory, and system resource tracking
+- **API Gateway**: Performance metrics and error tracking
+- **Database Health**: Connection pools, query performance, and storage monitoring
+- **Payment Gateway**: Transaction volumes, success rates, and gateway availability
+- **Security**: Login attempts, authorization failures, and suspicious activity detection
+- **Transactions**: Status tracking, processing steps, and failure analysis
+- **Error Tracking**: Application errors, exceptions, and resolution status
+- **Analytics**: User behavior and business performance metrics
+- **System Status**: Overall health monitoring of all components
+- **Performance**: Detailed performance metrics and optimization insights
+- **Incidents**: Active incident tracking and resolution progress
 
-To build the mobile applications:
+## KYC System
 
-1. Install dependencies: `npm install`
-2. Build the web application: `npm run build`
-3. Sync with Capacitor: `npx cap sync`
-4. Build for Android: `npx cap open android`
-5. Build for iOS: `npx cap open ios` (requires macOS with Xcode)
+RizzPay implements a comprehensive KYC (Know Your Customer) system:
 
-## Authentication
+- **Document Collection**: Upload of Aadhaar Card, PAN Card, and GST Certificate (if applicable)
+- **Verification Process**: Admin review and approval of submitted documents
+- **Status Tracking**: Pending, Approved, or Rejected status for each merchant
+- **Secure Storage**: All documents are securely stored and accessible only to authorized personnel
 
-The application supports multiple user roles:
+## Documentation Assistant
 
-- **Admin**: Full access to all features and management capabilities
-- **Merchant**: Access to merchant-specific features
+The RizzPay documentation assistant (Aasimo AI) provides quick access to information about:
 
-Demo credentials:
-- Admin: username: `rizzpay`, password: `rizzpay123`
-- Merchant: username: `merchant`, password: `password`
+- Payment processing details and workflows
+- Transaction capacity and system limits
+- Integration guides and webhook setup
+- Security measures and compliance information
+- Merchant onboarding processes
+- Technical architecture and specifications
 
-## Admin Features
+## Transaction Processing Capacity
 
-The admin dashboard includes:
+- Peak processing: 1,000 transactions per second
+- Daily capacity: 86.4 million transactions
+- Daily value limit: ₹5,000 crores (approximately $600 million USD)
 
-- **Merchant Management**: Add, edit, and manage merchants
-- **Role Management**: Create and manage user roles with custom permissions
-- **Transaction Logs**: View and export transaction history to Excel
-- **Merchant Whitelist**: Manage trusted merchants with special access
-- **Bank API Integration**: Connect with banking APIs for seamless transactions
-- **Pricing Control**: Set default pricing (payment in: 1%, payment out: 1%)
-- **System Monitoring**: Comprehensive monitoring dashboards for all aspects of the system
+## Getting Started
 
-## Merchant Features
+1. Clone the repository
+2. Install dependencies with `npm install`
+3. Set up environment variables for Supabase connection
+4. Start the development server with `npm run dev`
 
-Merchants have access to:
+## Technology Stack
 
-- **Dashboard**: Overview of transaction metrics and performance
-- **Transactions**: Track and manage payment transactions
-- **Wallet**: Manage funds and perform transactions
-  - **Static UPI QR Codes**: Generate branded QR codes for UPI payments
-  - **Deposits & Withdrawals**: Manage wallet funds
-  - **Transfers**: Send money to other merchants
-- **Webhooks**: Set up integrations with external systems
-- **Settings**: Configure account settings and preferences
+- Frontend: React, TypeScript, Tailwind CSS, Shadcn UI
+- Backend: Supabase (PostgreSQL database, authentication, serverless functions)
+- State Management: Zustand
+- Data Fetching: TanStack Query
+- Routing: React Router DOM
 
-## UPI Payment Features
+## Technical Documentation
 
-RizzPay provides comprehensive UPI payment capabilities:
+Detailed technical documentation is available for registered users and can be accessed through special links provided to authenticated users. This documentation includes:
 
-- **Static QR Generation**: Create branded QR codes for UPI payments
-  - **PDF Export**: Download QR codes as PDFs with full QR image for scanning
-  - **Website Integration**: Generate embed code for websites
-  - **Customizable**: Add payment descriptions and branding
-- **Payment Links**: Generate and share payment links with customers
-- **Direct UPI Integration**: Connect directly with popular UPI apps
-- **Real-time Notifications**: Get instant payment confirmations
-- **Customizable Payment Pages**: Branded payment experience for customers
-- **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
+- System architecture diagrams
+- Data flow visualization
+- Security implementation details
+- Database schema
+- API specifications
+- Integration guides
 
-## Integration Support
+For access to technical documentation, please login to your merchant account.
 
-RizzPay offers flexible integration options with popular technologies:
+## Application Optimization
 
-- **PHP Integration**: Simple API calls from PHP applications
-- **WordPress Plugin**: Seamless integration with WordPress sites
-- **WooCommerce Extension**: For e-commerce stores
-- **Shopify App**: For Shopify merchants
-- **Custom API Access**: For specialized integration needs
-- **SDK Support**: For various programming languages and platforms
+The application has been optimized for performance:
 
-## System Monitoring
-
-RizzPay includes comprehensive monitoring dashboards for all aspects of the system:
-
-- **Server Performance**: Real-time CPU, memory, and system resource monitoring
-- **API Gateway**: Monitor API performance and request rates
-- **Database Health**: Track database performance and query analytics
-- **Payment Gateway**: Monitor payment processor status and transaction metrics
-- **Security**: Track security events and compliance status
-- **Transactions**: Real-time tracking of payment flow
-- **Error Tracking**: Monitor application errors and exceptions
-- **Business Analytics**: Analyze user behavior and business performance
-- **System Status**: Comprehensive overview of all system components
-- **Performance Analytics**: Track detailed performance metrics
-- **Incident Management**: Track and resolve system incidents
-
-## Recent Updates
-
-- **Enhanced Landing Page**: Added more comprehensive marketing content
-- **PHP Integration Examples**: Added code samples for PHP integration
-- **Testimonials Section**: Added client success stories
-- **Technology Integrations**: Added visualization of supported tech platforms
-- **Stats Display**: Added key metrics and performance statistics
-- **Brand Updates**: Updated branding to RizzPay throughout the application
-- **Logo Redesign**: Implemented new professional logo with improved color scheme
-- **UI Improvement**: Fixed layout issues in navbar and dashboard components
-- **Chart Size Adjustment**: Reduced analytics chart height for better display
-- **Layout Spacing**: Optimized content spacing and container widths
-- **Responsive Fixes**: Improved mobile experience with better spacing
-- **Graph Improvements**: Enhanced revenue graph to show actual transaction data
-- **Payment Button Updates**: Updated payment buttons to use consistent RizzPay branding
-- **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
-- **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
-
-## Documentation
-
-For complete documentation on RizzPay Gateway features and APIs, please refer to the documentation files:
-
-- [Payment Processing](PAYMENT_README.md)
-- [Webhook Integration](WEBHOOK_README.md)
-- [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+- Code splitting and lazy loading
+- Optimized component rendering with React.memo
+- Efficient state management
+- Image optimization and asset compression
+- Server-side caching strategies
+- Minified production builds
