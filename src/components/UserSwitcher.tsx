@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore, Merchant } from '@/stores/profileStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { 
   DropdownMenu, 
@@ -16,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import UserRegistrationForm from './UserRegistrationForm';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { v4 as uuidv4 } from 'uuid';
 
 const UserSwitcher = () => {
   const { userEmail, setUserRole } = useTransactionStore();
@@ -57,13 +59,25 @@ const UserSwitcher = () => {
   };
   
   const handleRegisterUser = (userData: { name: string; email: string; phone: string; company: string }) => {
-    // Create new merchant
-    const newMerchant = addMerchant({
+    // Create new merchant with all required properties
+    const newMerchant: Merchant = {
+      id: uuidv4(),
       name: userData.name,
       email: userData.email,
       phone: userData.phone,
-      company: userData.company
-    });
+      company: userData.company,
+      createdAt: new Date().toISOString(),
+      kycStatus: 'pending',
+      kycData: {
+        aadhaarCard: null,
+        panCard: null,
+        gstCertificate: null,
+        gstNumber: null
+      }
+    };
+    
+    // Add the new merchant
+    addMerchant(newMerchant);
     
     // Initialize wallet for the new user
     useTransactionStore.getState().initializeWallet(userData.email);
