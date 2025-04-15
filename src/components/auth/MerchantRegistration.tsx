@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/utils/supabaseClient';
 import { useTransactionStore } from '@/stores/transactionStore';
+import KycDocumentUpload, { KycDocuments } from '@/components/kyc/KycDocumentUpload';
 
 // Validation schema for merchant registration
 const merchantSchema = z.object({
@@ -20,6 +21,7 @@ const merchantSchema = z.object({
   phone: z.string().min(10, { message: "Please enter a valid phone number" }).optional(),
   businessName: z.string().min(2, { message: "Business name is required" }),
   businessType: z.string().min(2, { message: "Business type is required" }).optional(),
+  gstNumber: z.string().optional()
 });
 
 type MerchantFormValues = z.infer<typeof merchantSchema>;
@@ -29,6 +31,11 @@ const MerchantRegistration = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { setUserRole, initializeWallet } = useTransactionStore();
+  const [kycDocuments, setKycDocuments] = useState<KycDocuments>({
+    aadhaarCard: null,
+    panCard: null,
+    gstCertificate: null
+  });
 
   const form = useForm<MerchantFormValues>({
     resolver: zodResolver(merchantSchema),
@@ -39,13 +46,51 @@ const MerchantRegistration = () => {
       phone: "",
       businessName: "",
       businessType: "",
+      gstNumber: ""
     },
   });
 
+  const handleKycDocumentsChange = (documents: KycDocuments) => {
+    setKycDocuments(documents);
+  };
+
+  const handleKycValidation = (): boolean => {
+    // Check for required KYC documents
+    if (!kycDocuments.aadhaarCard || !kycDocuments.panCard) {
+      toast({
+        title: "KYC documents required",
+        description: "Please upload both Aadhaar Card and PAN Card documents",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const onSubmit = async (data: MerchantFormValues) => {
+    // Validate KYC documents first
+    if (!handleKycValidation()) return;
+    
     setLoading(true);
     
     try {
+      // Convert files to base64 strings for storage
+      const kycData = {
+        aadhaarCard: kycDocuments.aadhaarCard ? await convertFileToBase64(kycDocuments.aadhaarCard) : null,
+        panCard: kycDocuments.panCard ? await convertFileToBase64(kycDocuments.panCard) : null,
+        gstCertificate: kycDocuments.gstCertificate ? await convertFileToBase64(kycDocuments.gstCertificate) : null,
+        gstNumber: data.gstNumber || null
+      };
+
       // 1. Create the user in Supabase Auth
       const { data: authData, error: authError } = await supabase().auth.signUp({
         email: data.email,
@@ -72,7 +117,7 @@ const MerchantRegistration = () => {
         return;
       }
 
-      // 2. Create the merchant record in the merchants table
+      // 2. Create the merchant record in the merchants table with KYC data
       const { error: merchantError } = await supabase()
         .from('merchants')
         .insert({
@@ -82,11 +127,11 @@ const MerchantRegistration = () => {
           phone: data.phone || null,
           business_name: data.businessName,
           business_type: data.businessType || null,
+          kyc_data: kycData,
+          kyc_status: 'pending'
         });
 
       if (merchantError) {
-        // If merchant insertion fails, we should delete the auth user
-        // but Supabase doesn't allow this via the client, so we'll just show an error
         toast({
           title: "Registration partially failed",
           description: "Your account was created but merchant details could not be saved. Please contact support.",
@@ -102,7 +147,7 @@ const MerchantRegistration = () => {
 
       toast({
         title: "Registration successful",
-        description: "Your merchant account has been created!",
+        description: "Your merchant account has been created! KYC verification is pending.",
       });
 
       // 4. Navigate to dashboard
@@ -121,7 +166,7 @@ const MerchantRegistration = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -171,7 +216,7 @@ const MerchantRegistration = () => {
             <FormItem>
               <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="+1 (555) 123-4567" {...field} />
+                <Input placeholder="+91 1234567890" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -205,6 +250,23 @@ const MerchantRegistration = () => {
             </FormItem>
           )}
         />
+        
+        <FormField
+          control={form.control}
+          name="gstNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>GST Number <span className="text-muted-foreground text-sm">(if applicable)</span></FormLabel>
+              <FormControl>
+                <Input placeholder="22AAAAA0000A1Z5" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* KYC Document Upload Component */}
+        <KycDocumentUpload onDocumentsChange={handleKycDocumentsChange} />
         
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? (

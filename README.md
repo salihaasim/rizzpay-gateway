@@ -12,6 +12,7 @@ RizzPay is a comprehensive payment processing platform designed for the Indian m
 - Admin controls and merchant management
 - Wallet system for internal transfers
 - Comprehensive monitoring dashboards
+- KYC verification for merchants (Aadhaar, PAN, and GST)
 
 ## Monitoring Dashboards
 
@@ -28,6 +29,15 @@ RizzPay includes detailed monitoring dashboards for various system components:
 - **System Status**: Overall health monitoring of all components
 - **Performance**: Detailed performance metrics and optimization insights
 - **Incidents**: Active incident tracking and resolution progress
+
+## KYC System
+
+RizzPay implements a comprehensive KYC (Know Your Customer) system:
+
+- **Document Collection**: Upload of Aadhaar Card, PAN Card, and GST Certificate (if applicable)
+- **Verification Process**: Admin review and approval of submitted documents
+- **Status Tracking**: Pending, Approved, or Rejected status for each merchant
+- **Secure Storage**: All documents are securely stored and accessible only to authorized personnel
 
 ## Documentation Assistant
 
