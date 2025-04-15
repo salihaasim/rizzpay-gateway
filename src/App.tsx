@@ -71,90 +71,90 @@ const App = () => {
   const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
 
   const routes = [
-    <Route path="/" element={<Index />} />,
-    <Route path="/auth" element={
+    <Route key="index" path="/" element={<Index />} />,
+    <Route key="auth" path="/auth" element={
       isAuthenticated ? 
         (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />) : 
         <Auth />
     } />,
-    <Route path="/terms" element={<TermsAndConditions />} />,
+    <Route key="terms" path="/terms" element={<TermsAndConditions />} />,
     
-    <Route path="/aasimo-ai" element={<AasimoAI />} />,
+    <Route key="aasimo" path="/aasimo-ai" element={<AasimoAI />} />,
     
-    <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/escrow" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/pricing" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/settings" element={isAdmin ? <AdminSettings /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />,
-    <Route path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin" path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-merchants" path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-escrow" path="/admin/escrow" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-pricing" path="/admin/pricing" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-settings" path="/admin/settings" element={isAdmin ? <AdminSettings /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-analytics" path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-transactions" path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-whitelist" path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-monitoring" path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />,
     
-    <Route path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-monitoring-dashboard" path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />,
     
-    <Route path="/dashboard/*" element={
+    <Route key="dashboard" path="/dashboard/*" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Dashboard /></Layout>}
       </ProtectedRoute>
     } />,
     
-    <Route path="/transactions" element={
+    <Route key="transactions" path="/transactions" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Transactions /></Layout>}
       </ProtectedRoute>
     } />,
-    <Route path="/wallet" element={
+    <Route key="wallet" path="/wallet" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WalletPage /></Layout>}
       </ProtectedRoute>
     } />,
     
-    <Route path="/webhook" element={
+    <Route key="webhook" path="/webhook" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
       </ProtectedRoute>
     } />,
-    <Route path="/webhooks" element={
+    <Route key="webhooks" path="/webhooks" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
       </ProtectedRoute>
     } />,
     
-    <Route path="/developers" element={
+    <Route key="developers" path="/developers" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><DeveloperIntegration /></Layout>}
       </ProtectedRoute>
     } />,
-    <Route path="/security" element={
+    <Route key="security" path="/security" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Security /></Layout>}
       </ProtectedRoute>
     } />,
     
-    <Route path="/settings/*" element={
+    <Route key="settings-wild" path="/settings/*" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
       </ProtectedRoute>
     } />,
-    <Route path="/settings" element={
+    <Route key="settings" path="/settings" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
       </ProtectedRoute>
     } />,
     
-    <Route path="/webhook-payment" element={<WebhookPayment />} />,
+    <Route key="webhook-payment" path="/webhook-payment" element={<WebhookPayment />} />,
     
-    <Route path="/upi-payment" element={<UpiPaymentPage />} />,
-    <Route path="/payment/upi" element={<UpiPaymentPage />} />,
+    <Route key="upi-payment" path="/upi-payment" element={<UpiPaymentPage />} />,
+    <Route key="payment-upi" path="/payment/upi" element={<UpiPaymentPage />} />,
     
-    <Route path="/how-it-works-technical" element={
+    <Route key="how-it-works-technical" path="/how-it-works-technical" element={
       <ProtectedRoute>
         <HowItWorksTechnical />
       </ProtectedRoute>
     } />,
     
-    <Route path="*" element={<NotFound />} />
+    <Route key="not-found" path="*" element={<NotFound />} />
   ];
 
   return (
