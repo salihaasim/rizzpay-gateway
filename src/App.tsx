@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -146,7 +147,11 @@ const App = () => {
     <Route path="/upi-payment" element={<UpiPaymentPage />} />,
     <Route path="/payment/upi" element={<UpiPaymentPage />} />,
     
-    <Route path="/how-it-works-technical" element={<HowItWorksTechnical />} />,
+    <Route path="/how-it-works-technical" element={
+      <ProtectedRoute>
+        <HowItWorksTechnical />
+      </ProtectedRoute>
+    } />,
     
     <Route path="*" element={<NotFound />} />
   ];

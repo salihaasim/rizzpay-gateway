@@ -51,17 +51,6 @@ The RizzPay documentation assistant (Aasimo AI) provides quick access to informa
 - Merchant onboarding processes
 - Technical architecture and specifications
 
-## Technical Documentation
-
-RizzPay provides detailed technical documentation for investors, including:
-
-- **Interactive Demos**: Visual walkthroughs of the payment processing system
-- **Architecture Diagrams**: Detailed explanations of our technical stack
-- **Transaction Flow Visualizations**: Step-by-step illustrations of payment flows
-- **Security Measures**: Comprehensive documentation of our security architecture
-- **System Capacity**: Performance benchmarks and capacity specifications
-- **Merchant Ledger**: Detailed explanations of our accounting system
-
 ## Transaction Processing Capacity
 
 - Peak processing: 1,000 transactions per second
@@ -82,3 +71,27 @@ RizzPay provides detailed technical documentation for investors, including:
 - State Management: Zustand
 - Data Fetching: TanStack Query
 - Routing: React Router DOM
+
+## Technical Documentation
+
+Detailed technical documentation is available for registered users and can be accessed through special links provided to authenticated users. This documentation includes:
+
+- System architecture diagrams
+- Data flow visualization
+- Security implementation details
+- Database schema
+- API specifications
+- Integration guides
+
+For access to technical documentation, please login to your merchant account.
+
+## Application Optimization
+
+The application has been optimized for performance:
+
+- Code splitting and lazy loading
+- Optimized component rendering with React.memo
+- Efficient state management
+- Image optimization and asset compression
+- Server-side caching strategies
+- Minified production builds
