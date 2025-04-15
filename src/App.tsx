@@ -18,8 +18,9 @@ import AdminTransactionLog from './pages/AdminTransactionLog';
 import MerchantWhitelist from './pages/MerchantWhitelist';
 import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
 import HowItWorksTechnical from './pages/HowItWorksTechnical';
+import Dashboard from './pages/Dashboard';
 
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+// Lazily load other pages, but not Dashboard which seems to be causing issues
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
 const WebhookSetup = React.lazy(() => import('./pages/WebhookSetup'));

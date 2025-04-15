@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import StatCard from '@/components/StatCard';
@@ -197,4 +198,4 @@ const Dashboard = () => {
   );
 };
 
-export default React.memo(Dashboard);
+export default Dashboard;

@@ -1,218 +1,94 @@
 
-import { Transaction, TransactionStatus } from '@/stores/transactionStore';
-import { subDays, isWithinInterval, startOfDay, endOfDay, format, isValid } from 'date-fns';
+import { Transaction } from '@/stores/transactionStore';
 
-// Get transactions by date range
-export const getTransactionsByDateRange = (
-  transactions: Transaction[],
-  startDate: Date,
-  endDate: Date
-) => {
-  if (!isValid(startDate) || !isValid(endDate)) {
-    console.error('Invalid date range provided', { startDate, endDate });
-    return [];
-  }
+// Function to get transactions from the last 30 days
+export const getLastMonthTransactions = (transactions: Transaction[]): Transaction[] => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   
-  return transactions.filter((transaction) => {
-    const txDate = new Date(transaction.date);
-    if (!isValid(txDate)) return false;
-    
-    return isWithinInterval(txDate, { start: startDate, end: endDate });
+  return transactions.filter(txn => {
+    const txnDate = new Date(txn.date);
+    return txnDate >= thirtyDaysAgo;
   });
 };
 
-// Get today's transactions
-export const getTodayTransactions = (transactions: Transaction[]) => {
-  const today = new Date();
-  return getTransactionsByDateRange(
-    transactions,
-    startOfDay(today),
-    endOfDay(today)
-  );
-};
-
-// Get yesterday's transactions
-export const getYesterdayTransactions = (transactions: Transaction[]) => {
-  const yesterday = subDays(new Date(), 1);
-  return getTransactionsByDateRange(
-    transactions,
-    startOfDay(yesterday),
-    endOfDay(yesterday)
-  );
-};
-
-// Get transactions for last 7 days
-export const getLastWeekTransactions = (transactions: Transaction[]) => {
-  const today = new Date();
-  const lastWeek = subDays(today, 7);
-  return getTransactionsByDateRange(transactions, lastWeek, today);
-};
-
-// Get transactions for last 30 days
-export const getLastMonthTransactions = (transactions: Transaction[]) => {
-  const today = new Date();
-  const lastMonth = subDays(today, 30);
-  return getTransactionsByDateRange(transactions, lastMonth, today);
-};
-
-// Calculate total revenue from transactions
-export const calculateTotalRevenue = (transactions: Transaction[]) => {
-  return transactions.reduce((total, transaction) => {
-    // Skip failed transactions
-    if (transaction.status === 'failed' || transaction.status === 'declined') {
-      return total;
-    }
-    
-    const cleanAmount = transaction.amount.replace(/[^0-9.-]+/g, '');
-    const amount = parseFloat(cleanAmount);
-    return !isNaN(amount) ? total + amount : total;
-  }, 0);
-};
-
-// Calculate average transaction value
-export const calculateAvgTransactionValue = (transactions: Transaction[]) => {
-  const successfulTxns = transactions.filter(
-    t => t.status === 'successful' || t.status === 'settled'
-  );
-  
-  if (successfulTxns.length === 0) return 0;
-  
-  const totalRevenue = calculateTotalRevenue(successfulTxns);
-  return totalRevenue / successfulTxns.length;
-};
-
-// Calculate success rate
-export const calculateSuccessRate = (transactions: Transaction[]) => {
-  if (transactions.length === 0) return 0;
-  
-  const successfulTransactions = transactions.filter(
-    t => t.status === 'successful' || t.status === 'settled'
-  );
-  
-  return (successfulTransactions.length / transactions.length) * 100;
-};
-
-// Get payment method distribution
-export const getPaymentMethodDistribution = (transactions: Transaction[]) => {
-  const distribution: Record<string, number> = {};
-  
-  transactions.forEach(transaction => {
-    const method = transaction.paymentMethod;
-    distribution[method] = (distribution[method] || 0) + 1;
-  });
-  
-  return distribution;
-};
-
-// Get transactions by status
-export const getTransactionsByStatus = (transactions: Transaction[], status: TransactionStatus) => {
-  return transactions.filter(t => t.status === status);
-};
-
-// Calculate growth compared to previous period
-export const calculateGrowthRate = (current: number, previous: number) => {
+// Calculate growth rate between two values
+export const calculateGrowthRate = (current: number, previous: number): number => {
   if (previous === 0) return current > 0 ? 100 : 0;
   return ((current - previous) / previous) * 100;
 };
 
-// Get hourly distribution of transactions
-export const getHourlyDistribution = (transactions: Transaction[]) => {
-  const hourlyDistribution: number[] = Array(24).fill(0);
-  
-  transactions.forEach(transaction => {
-    const txDate = new Date(transaction.date);
-    if (isValid(txDate)) {
-      const hour = txDate.getHours();
-      hourlyDistribution[hour]++;
-    }
-  });
-  
-  return hourlyDistribution;
-};
-
-// Get peak transaction time
-export const getPeakTransactionHour = (transactions: Transaction[]) => {
-  const hourly = getHourlyDistribution(transactions);
-  let peakHour = 0;
-  let peakCount = 0;
-  
-  hourly.forEach((count, hour) => {
-    if (count > peakCount) {
-      peakCount = count;
-      peakHour = hour;
-    }
-  });
-  
-  return { hour: peakHour, count: peakCount };
-};
-
-// Get customer statistics
-export const getCustomerStatistics = (transactions: Transaction[]) => {
-  const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
-  const transactionsPerCustomer = uniqueCustomers > 0 
-    ? transactions.length / uniqueCustomers 
-    : 0;
-    
-  return { uniqueCustomers, transactionsPerCustomer };
-};
-
-// Generate analytics summary for dashboard
+// Generate the analytics summary for the dashboard
 export const generateAnalyticsSummary = (transactions: Transaction[]) => {
-  const todayTxns = getTodayTransactions(transactions);
-  const yesterdayTxns = getYesterdayTransactions(transactions);
-  const lastWeekTxns = getLastWeekTransactions(transactions);
-  const lastMonthTxns = getLastMonthTransactions(transactions);
+  // Filter transactions from today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  // Calculate revenue
-  const todayRevenue = calculateTotalRevenue(todayTxns);
-  const yesterdayRevenue = calculateTotalRevenue(yesterdayTxns);
-  const weeklyRevenue = calculateTotalRevenue(lastWeekTxns);
-  const monthlyRevenue = calculateTotalRevenue(lastMonthTxns);
+  const todayTxns = transactions.filter(txn => {
+    const txnDate = new Date(txn.date);
+    txnDate.setHours(0, 0, 0, 0);
+    return txnDate.getTime() === today.getTime();
+  });
   
-  // Calculate growth rates
-  const dailyRevenueGrowth = calculateGrowthRate(todayRevenue, yesterdayRevenue);
+  // Filter transactions from last 30 days
+  const monthTxns = getLastMonthTransactions(transactions);
   
-  // Calculate payment method distribution
-  const paymentMethods = getPaymentMethodDistribution(lastMonthTxns);
+  // Calculate totals for today
+  const todayTotal = todayTxns.reduce((sum, txn) => sum + txn.amount, 0);
+  const todaySuccessful = todayTxns.filter(txn => txn.status === 'completed').length;
+  const todayCount = todayTxns.length;
   
-  // Get customer stats
-  const customerStats = getCustomerStatistics(lastMonthTxns);
+  // Calculate totals for month
+  const monthlyTotal = monthTxns.reduce((sum, txn) => sum + txn.amount, 0);
+  const monthlySuccessful = monthTxns.filter(txn => txn.status === 'completed').length;
+  const monthlyCount = monthTxns.length;
   
-  // Success rates
-  const dailySuccessRate = calculateSuccessRate(todayTxns);
-  const monthlySuccessRate = calculateSuccessRate(lastMonthTxns);
+  // Calculate success rates
+  const dailySuccessRate = todayCount > 0 ? (todaySuccessful / todayCount) * 100 : 0;
+  const monthlySuccessRate = monthlyCount > 0 ? (monthlySuccessful / monthlyCount) * 100 : 0;
   
-  // Average transaction value
-  const avgTransactionValue = calculateAvgTransactionValue(lastMonthTxns);
+  // Calculate daily growth rate for revenue
+  const yesterdayTxns = transactions.filter(txn => {
+    const txnDate = new Date(txn.date);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    txnDate.setHours(0, 0, 0, 0);
+    return txnDate.getTime() === yesterday.getTime();
+  });
   
-  // Get peak transaction hour
-  const peakHour = getPeakTransactionHour(lastMonthTxns);
+  const yesterdayTotal = yesterdayTxns.reduce((sum, txn) => sum + txn.amount, 0);
+  const revenueGrowthDaily = calculateGrowthRate(todayTotal, yesterdayTotal);
   
+  // Calculate daily growth rate for transactions
+  const yesterdayCount = yesterdayTxns.length;
+  const txnGrowthDaily = calculateGrowthRate(todayCount, yesterdayCount);
+  
+  // Get unique customers
+  const uniqueCustomers = new Set(monthTxns.map(txn => txn.customerId)).size;
+  
+  // Calculate average transaction value
+  const avgTxnValue = monthlyCount > 0 ? monthlyTotal / monthlyCount : 0;
+  
+  // Generate and return the analytics summary
   return {
     revenue: {
-      today: todayRevenue,
-      yesterday: yesterdayRevenue,
-      weekly: weeklyRevenue,
-      monthly: monthlyRevenue,
-      dailyGrowth: dailyRevenueGrowth,
+      today: todayTotal,
+      monthly: monthlyTotal,
+      dailyGrowth: revenueGrowthDaily
     },
     transactions: {
-      today: todayTxns.length,
-      yesterday: yesterdayTxns.length,
-      weekly: lastWeekTxns.length,
-      monthly: lastMonthTxns.length,
-      dailyGrowth: calculateGrowthRate(todayTxns.length, yesterdayTxns.length),
+      today: todayCount,
+      monthly: monthlyCount,
+      dailyGrowth: txnGrowthDaily
     },
     customers: {
-      unique: customerStats.uniqueCustomers,
-      averageTransactions: customerStats.transactionsPerCustomer,
+      unique: uniqueCustomers
     },
     performance: {
       dailySuccessRate,
       monthlySuccessRate,
-      avgTransactionValue,
-      peakHour,
-    },
-    paymentMethods,
+      avgTransactionValue: avgTxnValue
+    }
   };
 };

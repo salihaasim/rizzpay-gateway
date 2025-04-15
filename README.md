@@ -89,9 +89,17 @@ For access to technical documentation, please login to your merchant account.
 
 The application has been optimized for performance:
 
-- Code splitting and lazy loading
+- Code splitting and lazy loading (except for critical components)
 - Optimized component rendering with React.memo
 - Efficient state management
 - Image optimization and asset compression
 - Server-side caching strategies
 - Minified production builds
+
+## Recent Changes
+
+- Fixed issue with dashboard loading by removing lazy loading for critical components
+- Optimized analytics utility functions
+- Added CSS styles for dashboard components
+- Updated documentation with latest application changes
+
