@@ -1,5 +1,5 @@
-
 import { Transaction, TransactionState } from './types';
+import { useActivityLogStore } from '../activityLog';
 
 export interface TransactionSlice {
   transactions: Transaction[];
@@ -15,11 +15,25 @@ export const createTransactionSlice = (
 ): TransactionSlice => ({
   transactions: [],
   
-  addTransaction: (transaction) => 
+  addTransaction: (transaction) => {
+    const activityStore = useActivityLogStore.getState();
+    activityStore.addActivityLog({
+      activityType: transaction.walletTransactionType === 'withdrawal' ? 'payment_out' : 'payment_in',
+      userId: transaction.createdBy || null,
+      userEmail: transaction.customer,
+      details: {
+        amount: transaction.amount,
+        transactionId: transaction.id,
+        description: transaction.description,
+        paymentMethod: transaction.paymentMethod
+      }
+    });
+    
     set((state) => ({ 
       transactions: [transaction, ...state.transactions] 
-    })),
-    
+    }));
+  },
+  
   updateTransaction: (id, updates) =>
     set((state) => ({
       transactions: state.transactions.map(transaction => 

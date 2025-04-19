@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useActivityLogStore } from '@/stores/activityLog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -10,6 +10,19 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Shield, Lock } from "lucide-react";
 
 const SecuritySettings = () => {
+  const { addActivityLog } = useActivityLogStore();
+  
+  const handleSettingChange = (settingType: string, enabled: boolean) => {
+    addActivityLog({
+      activityType: 'security_setting_changed',
+      userId: null,
+      userEmail: null,
+      details: {
+        description: `${settingType} ${enabled ? 'enabled' : 'disabled'}`
+      }
+    });
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -31,7 +44,12 @@ const SecuritySettings = () => {
                       Require 2FA for admin users
                     </div>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    defaultChecked 
+                    onCheckedChange={(checked) => 
+                      handleSettingChange('Two-Factor Authentication', checked)
+                    }
+                  />
                 </div>
                 
                 <div className="flex items-center justify-between">
