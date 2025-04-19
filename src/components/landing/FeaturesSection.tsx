@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Zap, ShieldCheck, CreditCard, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const FeatureCard = ({ 
   icon, 
@@ -39,7 +39,11 @@ const FeaturesSection = () => {
       icon: <Zap className="h-6 w-6 text-primary" />,
       title: "Lightning Fast Domestic Payments",
       description: "Process Indian rupee transactions instantly with our optimized payment infrastructure.",
-      benefits: ["Instant UPI confirmations", "Low-cost domestic transfers"]
+      benefits: [
+        "Process 1,000+ transactions per second",
+        "Real-time payment confirmations",
+        "Instant UPI settlements"
+      ]
     },
     {
       icon: <ShieldCheck className="h-6 w-6 text-primary" />,
@@ -59,11 +63,17 @@ const FeaturesSection = () => {
     <section className="py-16 md:py-24 bg-secondary/50">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Why Choose Rizzpay for Domestic Payments?</h2>
+          <h2 className="text-3xl font-bold mb-4">Why Choose RizzPay for Domestic Payments?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Our powerful platform is designed to meet the needs of Indian merchants, 
             customers, and businesses with an intuitive domestic payment solution.
           </p>
+          <Link 
+            to="/features"
+            className="inline-block mt-4 text-primary hover:text-primary/90 font-medium"
+          >
+            Explore All Features →
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">

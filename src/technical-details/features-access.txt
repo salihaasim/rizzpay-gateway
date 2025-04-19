@@ -1,0 +1,14 @@
+
+How to Access RizzPay Features Page:
+
+1. Direct URL Access:
+   Navigate to: /features
+
+2. Homepage Access:
+   Click the "Explore All Features" link in the Features section of the homepage
+
+The features page provides a comprehensive overview of RizzPay's payment processing capabilities,
+security measures, and platform benefits. This page is public and can be accessed without authentication.
+
+Note: For technical implementation details and API documentation, please refer to the developer
+documentation section after logging in to your merchant account.

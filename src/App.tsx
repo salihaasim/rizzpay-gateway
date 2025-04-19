@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -19,6 +18,7 @@ import MerchantWhitelist from './pages/MerchantWhitelist';
 import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
 import HowItWorksTechnical from './pages/HowItWorksTechnical';
 import Dashboard from './pages/Dashboard';
+import Features from './pages/Features';
 
 // Lazily load other pages, but not Dashboard which seems to be causing issues
 const Transactions = React.lazy(() => import('./pages/Transactions'));
@@ -153,6 +153,8 @@ const App = () => {
         <HowItWorksTechnical />
       </ProtectedRoute>
     } />,
+    
+    <Route key="features" path="/features" element={<Features />} />,
     
     <Route key="not-found" path="*" element={<NotFound />} />
   ];
