@@ -23,7 +23,10 @@ export const WebhookWhitelistTable = () => {
     try {
       const { data, error } = await supabase
         .from('webhook_whitelist')
-        .select('*')
+        .select(`
+          *,
+          merchant:merchants(business_name)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -88,7 +91,7 @@ export const WebhookWhitelistTable = () => {
           {entries.map((entry) => (
             <TableRow key={entry.id}>
               <TableCell>{entry.domain}</TableCell>
-              <TableCell>{entry.merchant_id}</TableCell>
+              <TableCell>{entry.merchant?.business_name}</TableCell>
               <TableCell>
                 <Badge variant={entry.status === 'active' ? 'default' : 'secondary'}>
                   {entry.status}

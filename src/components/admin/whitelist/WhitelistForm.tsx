@@ -1,13 +1,19 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/lib/api/supabase";
 import { toast } from "sonner";
-import type { IpWhitelistEntry, WebhookWhitelistEntry, WhitelistFormData } from './types';
+import type { IpWhitelistEntry, WebhookWhitelistEntry, WhitelistFormData, Merchant } from './types';
 
 interface WhitelistFormProps {
   type: 'ip' | 'webhook';
@@ -17,12 +23,32 @@ interface WhitelistFormProps {
 }
 
 export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormProps) => {
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [formData, setFormData] = useState<WhitelistFormData>({
     merchant_id: entry?.merchant_id || '',
     entry: type === 'ip' ? (entry as IpWhitelistEntry)?.ip_address || '' : 
                           (entry as WebhookWhitelistEntry)?.domain || '',
     status: (entry?.status as 'active' | 'inactive') || 'active'
   });
+
+  useEffect(() => {
+    fetchMerchants();
+  }, []);
+
+  const fetchMerchants = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('merchants')
+        .select('id, name, business_name')
+        .order('business_name');
+
+      if (error) throw error;
+      setMerchants(data || []);
+    } catch (error) {
+      toast.error('Failed to load merchants');
+      console.error('Error fetching merchants:', error);
+    }
+  };
 
   const validateInput = () => {
     if (!formData.merchant_id.trim()) {
@@ -57,7 +83,8 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
       const data = {
         merchant_id: formData.merchant_id,
         [field]: formData.entry,
-        status: formData.status
+        status: formData.status,
+        created_by: (await supabase.auth.getUser()).data.user?.id
       };
 
       if (entry) {
@@ -80,6 +107,7 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
       onSubmit();
     } catch (error) {
       toast.error('Failed to save changes');
+      console.error('Error saving whitelist entry:', error);
     }
   };
 
@@ -94,12 +122,22 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Merchant ID</Label>
-            <Input
+            <Label>Merchant</Label>
+            <Select
               value={formData.merchant_id}
-              onChange={(e) => setFormData({ ...formData, merchant_id: e.target.value })}
-              placeholder="Enter merchant ID"
-            />
+              onValueChange={(value) => setFormData({ ...formData, merchant_id: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select merchant" />
+              </SelectTrigger>
+              <SelectContent>
+                {merchants.map((merchant) => (
+                  <SelectItem key={merchant.id} value={merchant.id}>
+                    {merchant.business_name} ({merchant.name})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -120,7 +158,7 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select status" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">Active</SelectItem>

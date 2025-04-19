@@ -23,7 +23,10 @@ export const IpWhitelistTable = () => {
     try {
       const { data, error } = await supabase
         .from('ip_whitelist')
-        .select('*')
+        .select(`
+          *,
+          merchant:merchants(business_name)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -88,7 +91,7 @@ export const IpWhitelistTable = () => {
           {entries.map((entry) => (
             <TableRow key={entry.id}>
               <TableCell className="font-mono">{entry.ip_address}</TableCell>
-              <TableCell>{entry.merchant_id}</TableCell>
+              <TableCell>{entry.merchant?.business_name}</TableCell>
               <TableCell>
                 <Badge variant={entry.status === 'active' ? 'default' : 'secondary'}>
                   {entry.status}
