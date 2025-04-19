@@ -1,0 +1,15 @@
+
+How to Access RizzPay Technical Features Page:
+
+1. Direct URL Access:
+   Navigate to: /features2
+
+2. Features Page Access:
+   First go to /features, then click on the "Technical Architecture" link
+
+This page provides a comprehensive technical overview of RizzPay's architecture,
+technology stack, and implementation details. The page includes interactive
+diagrams and detailed explanations of our system components.
+
+Note: This page is designed for technical users, investors, and stakeholders
+who want to understand the technical infrastructure of the RizzPay platform.

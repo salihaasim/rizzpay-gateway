@@ -19,8 +19,8 @@ import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboa
 import HowItWorksTechnical from './pages/HowItWorksTechnical';
 import Dashboard from './pages/Dashboard';
 import Features from './pages/Features';
+import Features2 from './pages/Features2';
 
-// Lazily load other pages, but not Dashboard which seems to be causing issues
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
 const WebhookSetup = React.lazy(() => import('./pages/WebhookSetup'));
@@ -155,6 +155,7 @@ const App = () => {
     } />,
     
     <Route key="features" path="/features" element={<Features />} />,
+    <Route key="features2" path="/features2" element={<Features2 />} />,
     
     <Route key="not-found" path="*" element={<NotFound />} />
   ];
