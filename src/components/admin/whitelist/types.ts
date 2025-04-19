@@ -1,6 +1,4 @@
 
-import type { Database } from "@/integrations/supabase/types";
-
 export type Merchant = {
   id: string;
   name: string;
@@ -13,8 +11,8 @@ export interface IpWhitelistEntry {
   ip_address: string;
   status: 'active' | 'inactive';
   created_at: string;
-  created_by: string;
-  updated_at: string;
+  created_by?: string;
+  updated_at?: string;
   merchant?: {
     business_name: string;
   };
@@ -26,8 +24,8 @@ export interface WebhookWhitelistEntry {
   domain: string;
   status: 'active' | 'inactive';
   created_at: string;
-  created_by: string;
-  updated_at: string;
+  created_by?: string;
+  updated_at?: string;
   merchant?: {
     business_name: string;
   };

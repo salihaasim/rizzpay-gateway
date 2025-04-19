@@ -21,6 +21,7 @@ export const WebhookWhitelistTable = () => {
 
   const fetchEntries = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('webhook_whitelist')
         .select(`
@@ -33,6 +34,7 @@ export const WebhookWhitelistTable = () => {
       setEntries(data || []);
     } catch (error) {
       toast.error('Failed to load webhook domain entries');
+      console.error('Error fetching webhook whitelist entries:', error);
     } finally {
       setIsLoading(false);
     }
@@ -60,11 +62,17 @@ export const WebhookWhitelistTable = () => {
       fetchEntries();
     } catch (error) {
       toast.error('Failed to remove domain');
+      console.error('Error deleting webhook whitelist entry:', error);
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center p-6">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-2 text-sm text-muted-foreground">Loading domain entries...</p>
+      </div>
+    </div>;
   }
 
   return (
@@ -77,51 +85,64 @@ export const WebhookWhitelistTable = () => {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Domain</TableHead>
-            <TableHead>Merchant</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Added On</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {entries.map((entry) => (
-            <TableRow key={entry.id}>
-              <TableCell>{entry.domain}</TableCell>
-              <TableCell>{entry.merchant?.business_name || 'Unknown'}</TableCell>
-              <TableCell>
-                <Badge variant={entry.status === 'active' ? 'default' : 'secondary'}>
-                  {entry.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {format(new Date(entry.created_at), 'yyyy-MM-dd HH:mm')}
-              </TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleAddEdit(entry)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleDelete(entry.id)}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+      {entries.length === 0 ? (
+        <div className="text-center py-8 border rounded-md bg-muted/20">
+          <p className="text-muted-foreground">No domains whitelisted yet.</p>
+          <Button 
+            variant="link" 
+            onClick={() => handleAddEdit()}
+            className="mt-2"
+          >
+            Add your first webhook domain
+          </Button>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Domain</TableHead>
+              <TableHead>Merchant</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Added On</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {entries.map((entry) => (
+              <TableRow key={entry.id}>
+                <TableCell>{entry.domain}</TableCell>
+                <TableCell>{entry.merchant?.business_name || 'Unknown'}</TableCell>
+                <TableCell>
+                  <Badge variant={entry.status === 'active' ? 'default' : 'secondary'}>
+                    {entry.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {format(new Date(entry.created_at), 'yyyy-MM-dd HH:mm')}
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleAddEdit(entry)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleDelete(entry.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       {showForm && (
         <WhitelistForm
