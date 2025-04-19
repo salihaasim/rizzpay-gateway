@@ -91,7 +91,7 @@ export const WebhookWhitelistTable = () => {
           {entries.map((entry) => (
             <TableRow key={entry.id}>
               <TableCell>{entry.domain}</TableCell>
-              <TableCell>{entry.merchant?.business_name}</TableCell>
+              <TableCell>{entry.merchant?.business_name || 'Unknown'}</TableCell>
               <TableCell>
                 <Badge variant={entry.status === 'active' ? 'default' : 'secondary'}>
                   {entry.status}
