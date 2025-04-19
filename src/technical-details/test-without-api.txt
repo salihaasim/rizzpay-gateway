@@ -1,0 +1,53 @@
+
+RizzPay Test Instructions (Without External API Integration)
+
+This guide explains how to test RizzPay payment processing without the actual Razorpay API integration.
+
+1. Test Environment Setup:
+   - All payments will be simulated locally
+   - No actual money will be transferred
+   - Test cards and bank details can be used without validation
+
+2. Available Test Payment Methods:
+   - Credit/Debit Cards (Simulated)
+   - UPI (Simulated)
+   - NetBanking (Simulated)
+   - Wallet (Fully functional with local state)
+
+3. Test Card Numbers:
+   - Success Card: 4111 1111 1111 1111
+   - Failure Card: 4242 4242 4242 4242
+   - Any expiry date in the future and any CVV can be used
+
+4. Test Bank Details:
+   - Bank: Any bank name
+   - IFSC: Any valid format IFSC (e.g., HDFC0001234)
+   - Account Number: Any number sequence
+
+5. Test UPI IDs:
+   - Success: test@rizzpay
+   - Failure: fail@rizzpay
+
+6. Expected Behaviors:
+   - 80% of transactions will succeed
+   - 20% will fail with various error messages
+   - Transactions are stored locally and persist until page refresh
+   - Wallet balance updates are immediate
+
+7. How to Test:
+   a. Visit /payment or click "Make Payment" from homepage
+   b. Enter any amount
+   c. Choose payment method
+   d. Use test credentials from above
+   e. Observe the transaction flow and notifications
+   f. Check transaction history for records
+
+8. Test Scenarios:
+   - Regular payment flow
+   - Payment failures and error handling
+   - Wallet transfers between users
+   - Transaction history and receipt generation
+
+Note: All transactions are simulated and no real API calls are made to payment gateways.
+This is purely for testing the UI/UX flow and frontend functionality.
+
