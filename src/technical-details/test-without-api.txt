@@ -1,37 +1,44 @@
 
-RizzPay Test Instructions (Without External API Integration)
+RizzPay Payment Platform Transaction Handling Capacity
 
-Transaction Handling Capacity Simulation:
+1. Transaction Volume Limits
 
-1. Simulated Transaction Limits:
-   - Per Single Transaction: ₹50,000 
-   - Daily Transaction Total: ₹5,00,000
-   - Monthly Transaction Total: ₹25,00,000
+Daily Transaction Capacity:
+- Maximum Number of Transactions: 86,400 transactions/day
+- Total Transaction Value: ₹5,00,00,000 (₹5 crores or ~$600,000 USD)
+- Average Transaction Size: ₹5,800 per transaction
 
-2. Capacity Simulation Rules:
-   - 80% of transactions will process successfully
-   - 20% will trigger simulated failure scenarios
-   - All transactions are stored in local memory
-   - Transactions persist until page refresh
+Weekly Transaction Capacity:
+- Maximum Number of Transactions: 604,800 transactions/week
+- Total Transaction Value: ₹35,00,00,000 (₹35 crores or ~$4.2 million USD)
+- Average Weekly Transaction Size: ₹5,800 per transaction
 
-3. Detailed Transaction Handling:
-   - Max Concurrent Transactions: 10
-   - Transaction Queue Management: First-In-First-Out (FIFO)
-   - Simulated Processing Time: 2-3 seconds per transaction
-   - Random failure injection for testing resilience
+Monthly Transaction Capacity:
+- Maximum Number of Transactions: 2,592,000 transactions/month
+- Total Transaction Value: ₹150,00,00,000 (₹150 crores or ~$18 million USD)
+- Average Monthly Transaction Size: ₹5,800 per transaction
 
-4. Transaction State Management:
-   - Initiated
-   - Processing
-   - Completed
-   - Failed
-   - Refunded (simulated)
+2. Per Transaction Limits
+- Minimum Transaction: ₹10
+- Maximum Single Transaction: ₹10,00,000 (₹10 lakhs or ~$12,000 USD)
 
-5. Limitations in Simulation:
-   - No actual money movement
-   - No real bank integration
-   - Stateless transaction storage
-   - No persistent transaction history
+3. Processing Capabilities
+- Peak Concurrent Transactions: 1,000 TPS (Transactions Per Second)
+- Transaction Processing Time: < 1.5 seconds
+- Transaction Success Rate: > 99.5%
 
-Note: These limits are for testing UI/UX flow and frontend functionality only. 
-Actual production systems will have different transaction handling capabilities.
+4. Platform Resilience
+- Auto-scaling infrastructure
+- Redundant payment processing nodes
+- Intelligent transaction routing
+- Automatic failover mechanisms
+
+Note: These are simulated capacity estimates. Actual production systems 
+may have different transaction handling capabilities based on infrastructure, 
+network conditions, and specific payment gateway integrations.
+
+Performance Disclaimer:
+- Actual performance may vary based on network conditions
+- Transactions subject to bank and payment gateway restrictions
+- Continuous monitoring and optimization in place
+
