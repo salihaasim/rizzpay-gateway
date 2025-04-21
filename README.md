@@ -114,6 +114,7 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Flow](src/design/payment-flow/PAYMENT_FLOW.md)
 - [Color Theme](documentations/COLOR_THEME.md)
 - [Design System](src/design/rizzpay/README.md)
+- [Backend Technical Stack](src/documentation/RIZZPAY_BACKEND_STACK.md)
 
 ## Project Structure
 
@@ -129,6 +130,8 @@ rizzpay/
 │   ├── design/           # Design system files
 │   │   ├── rizzpay/      # Figma design exports
 │   │   └── payment-flow/ # Payment flow documentation
+│   ├── documentation/    # Technical documentation
 │   └── integrations/     # External API integrations
 └── documentations/       # Project documentation
 ```
+
