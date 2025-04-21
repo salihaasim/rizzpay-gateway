@@ -13,6 +13,7 @@ import {
 const Features2 = () => {
   const [selectedComponent, setSelectedComponent] = useState('');
 
+  // Cleaner: strictly domestic architecture
   const architectureComponents = [
     {
       icon: <Database className="h-6 w-6 text-primary" />,
@@ -28,9 +29,9 @@ const Features2 = () => {
     {
       icon: <Server className="h-6 w-6 text-primary" />,
       title: "API Gateway",
-      description: "Secure API routing and request handling for payment processing.",
+      description: "Secure API routing and request handling for domestic payment processing.",
       details: [
-        "Load balancing across regions",
+        "Load balancing across Indian regions",
         "DDoS protection built-in",
         "API rate limiting and quotas",
         "Custom routing rules"
@@ -50,7 +51,7 @@ const Features2 = () => {
     {
       icon: <Zap className="h-6 w-6 text-primary" />,
       title: "Transaction Engine",
-      description: "High-performance payment processing up to 1,000 TPS.",
+      description: "High-performance domestic payment processing up to 1,000 TPS.",
       details: [
         "Multi-threaded processing",
         "Automatic retry mechanism",
@@ -69,7 +70,7 @@ const Features2 = () => {
         "Component-driven architecture",
         "Server-side rendering support",
         "Progressive Web App features",
-        "Responsive design system"
+        "Responsive mobile-first design"
       ]
     },
     {
@@ -86,7 +87,7 @@ const Features2 = () => {
     {
       icon: <Layers className="h-6 w-6 text-primary" />,
       title: "Backend Services",
-      description: "Serverless functions, WebSocket support, Webhook system",
+      description: "Serverless functions, WebSocket support, Webhook system for domestic transactions",
       details: [
         "Auto-scaling infrastructure",
         "Event-driven architecture",
@@ -97,7 +98,7 @@ const Features2 = () => {
     {
       icon: <RefreshCcw className="h-6 w-6 text-primary" />,
       title: "Integration Layer",
-      description: "RESTful APIs, SDK support, developer tools",
+      description: "RESTful APIs, SDK support, developer tools for Indian partners",
       details: [
         "Comprehensive API documentation",
         "Multiple SDK versions",
@@ -111,7 +112,7 @@ const Features2 = () => {
     {
       icon: <Brain className="h-6 w-6 text-primary" />,
       title: "Smart Routing",
-      description: "Intelligent payment routing based on success rates and costs",
+      description: "Intelligent payment routing for domestic transactions based on success rates and costs",
       details: [
         "Dynamic gateway selection",
         "Cost optimization",
@@ -144,11 +145,11 @@ const Features2 = () => {
     {
       icon: <Wallet className="h-6 w-6 text-primary" />,
       title: "Digital Wallet",
-      description: "Built-in wallet system for instant transfers",
+      description: "Built-in wallet system for instant domestic transfers",
       details: [
         "Instant settlements",
         "P2P transfers",
-        "Multi-currency support",
+        "Multi-currency support (INR only)",
         "Transaction history"
       ]
     },
@@ -188,7 +189,7 @@ const Features2 = () => {
     {
       icon: <Puzzle className="h-6 w-6 text-primary" />,
       title: "Integration Tools",
-      description: "Plugins and tools for easy integration",
+      description: "Plugins and tools for seamless Indian payment integration",
       details: [
         "CMS plugins",
         "Mobile SDKs",
@@ -338,3 +339,4 @@ const Features2 = () => {
 };
 
 export default Features2;
+

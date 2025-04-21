@@ -98,7 +98,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({
           collapsed ? "w-20" : "w-[280px]"
         )}
       >
-        <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex h-16 items-center justify-between px-2 md:px-4">
           {!collapsed && (
             <Link to="/" className="flex items-center">
               <h1 className="text-xl font-bold text-primary">RizzPay</h1>
@@ -112,6 +112,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
             className={cn("rounded-full", collapsed && "mx-auto")}
+            aria-label={collapsed ? "Expand menu" : "Collapse menu"}
           >
             <ChevronLeft
               className={cn(
@@ -122,17 +123,18 @@ const AdminSidebar: React.FC<SidebarProps> = ({
           </Button>
         </div>
         
-        <div className="flex-1 overflow-auto py-4">
-          <div className="space-y-1 px-3">
+        <div className="flex-1 overflow-auto py-2 md:py-4">
+          <div className="space-y-1 px-1 md:px-3">
             {sidebarItems.map((item) => (
               <Tooltip key={item.path} delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Link to={item.path}>
+                  <Link to={item.path} tabIndex={0}>
                     <Button
                       variant={isActive(item.path) ? "default" : "ghost"}
                       className={cn(
-                        "w-full justify-start",
-                        collapsed && "h-10 w-10 p-0 justify-center"
+                        "w-full justify-start touch-manipulation",
+                        collapsed && "h-12 w-12 p-0 justify-center",
+                        "rounded-lg sm:rounded-md"
                       )}
                     >
                       {item.icon}
@@ -152,10 +154,10 @@ const AdminSidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
         
-        <div className="p-3 mt-auto">
+        <div className="p-2 md:p-3 mt-auto">
           <Separator className="my-2" />
           {!collapsed && (
-            <div className="mb-2 px-4">
+            <div className="mb-2 px-2 md:px-4">
               <p className="text-sm text-muted-foreground truncate">
                 {userEmail}
               </p>
@@ -166,10 +168,11 @@ const AdminSidebar: React.FC<SidebarProps> = ({
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50",
-                  collapsed && "h-10 w-10 p-0 justify-center"
+                  "w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 touch-manipulation",
+                  collapsed && "h-12 w-12 p-0 justify-center"
                 )}
                 onClick={handleLogout}
+                aria-label="Logout"
               >
                 <LogOut className="h-5 w-5" />
                 {!collapsed && <span className="ml-3">Logout</span>}

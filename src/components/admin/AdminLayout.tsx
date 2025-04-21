@@ -61,14 +61,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <main className={cn(
           "flex-1 min-h-screen transition-all duration-300",
-          collapsed ? "lg:ml-20" : "lg:ml-[280px]"
+          collapsed ? "lg:ml-20" : "lg:ml-[280px]",
+          "px-0 sm:px-0" // Remove padding for mobile, handled below
         )}>
           <AdminHeader 
             userEmail={userEmail} 
             handleLogout={handleLogout} 
           />
           
-          <div className="p-6">
+          <div className="p-4 sm:p-6 md:p-8 lg:p-6">
+            {/* Add mobile-specific padding */}
             {children}
           </div>
         </main>
@@ -88,3 +90,4 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 };
 
 export default AdminLayout;
+
