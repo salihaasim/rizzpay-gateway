@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -83,11 +82,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({
       name: 'Analytics',
       path: '/admin/analytics',
       icon: <BarChart3 className="h-5 w-5" />,
-    },
-    {
-      name: 'Aasimo AI',
-      path: '/admin/aasimo',
-      icon: <MessageSquare className="h-5 w-5" />,
     },
     {
       name: 'Settings',

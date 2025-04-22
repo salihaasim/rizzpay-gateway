@@ -19,7 +19,6 @@ import HowItWorksTechnical from './pages/HowItWorksTechnical';
 import Dashboard from './pages/Dashboard';
 import Features from './pages/Features';
 import Features2 from './pages/Features2';
-import AdminAasimoAI from './pages/AdminAasimoAI';
 import { default as AasimoAIComponent } from './components/aasimo/AasimoAI';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
@@ -91,7 +90,6 @@ const App = () => {
     <Route key="admin-transactions" path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />,
     <Route key="admin-whitelist" path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />,
     <Route key="admin-monitoring" path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-aasimo" path="/admin/aasimo" element={isAdmin ? <AdminAasimoAI /> : <Navigate to="/auth" replace />} />,
     
     <Route key="admin-monitoring-dashboard" path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />,
     
