@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -9,7 +10,6 @@ import PaymentPageLoading from './components/payment/PaymentPageLoading';
 import WalletPage from './pages/WalletPage';
 import TermsAndConditions from './pages/TermsAndConditions';
 import UpiPaymentPage from './pages/UpiPaymentPage';
-import AasimoAI from './components/aasimo/AasimoAI';
 import AdminMonitoring from './pages/AdminMonitoring';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminSettings from './pages/AdminSettings';
@@ -20,6 +20,7 @@ import HowItWorksTechnical from './pages/HowItWorksTechnical';
 import Dashboard from './pages/Dashboard';
 import Features from './pages/Features';
 import Features2 from './pages/Features2';
+import AdminAasimoAI from './pages/AdminAasimoAI';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -90,6 +91,7 @@ const App = () => {
     <Route key="admin-transactions" path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />,
     <Route key="admin-whitelist" path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />,
     <Route key="admin-monitoring" path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />,
+    <Route key="admin-aasimo" path="/admin/aasimo" element={isAdmin ? <AdminAasimoAI /> : <Navigate to="/auth" replace />} />,
     
     <Route key="admin-monitoring-dashboard" path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />,
     
