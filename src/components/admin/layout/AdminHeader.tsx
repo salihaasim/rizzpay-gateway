@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Bell, Settings, Monitor, LogOut, Users, Wallet, FileText, MessageSquare } from 'lucide-react';
+import { Bell, Settings, Monitor, LogOut, Users, Wallet, FileText } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SupabaseStatus from '@/components/SupabaseStatus';
@@ -20,7 +19,6 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) => {
-  // Get user initials for avatar
   const getUserInitials = () => {
     if (!userEmail) return 'A';
     return userEmail.substring(0, 2).toUpperCase();
@@ -30,14 +28,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
     <header className="h-16 bg-white border-b flex items-center px-4 sticky top-0 z-10">
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center">
-          {/* Empty div to maintain spacing for desktop */}
           <div className="hidden lg:block"></div>
         </div>
         
         <div className="flex items-center space-x-2 md:space-x-3">
           <SupabaseStatus />
           
-          {/* Mobile-optimized buttons with responsive spacing */}
           <div className="hidden md:flex space-x-2">
             <Link to="/admin/merchants">
               <Button variant="outline" size="sm" className="flex items-center">
@@ -53,14 +49,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
               </Button>
             </Link>
           </div>
-
-          {/* Aasimo AI Button */}
-          <Link to="/admin/aasimo">
-            <Button variant="default" size="sm" className="flex items-center bg-[#9970e2] hover:bg-[#8b5cf6]">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline ml-1">Aasimo AI</span>
-            </Button>
-          </Link>
           
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
@@ -109,12 +97,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
                 <Link to="/admin/settings" className="cursor-pointer flex items-center">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Admin Settings</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/admin/aasimo" className="cursor-pointer flex items-center">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  <span>Aasimo AI</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
