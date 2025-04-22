@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -49,7 +48,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex">
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar with improved responsiveness */}
       <AdminSidebar 
         userEmail={userEmail} 
         collapsed={collapsed} 
@@ -57,20 +56,19 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         handleLogout={handleLogout}
       />
 
-      {/* Mobile sidebar trigger */}
+      {/* Mobile-optimized main content */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <main className={cn(
           "flex-1 min-h-screen transition-all duration-300",
           collapsed ? "lg:ml-20" : "lg:ml-[280px]",
-          "px-0 sm:px-0" // Remove padding for mobile, handled below
+          "px-2 sm:px-4 md:px-6" // Improved responsive padding
         )}>
           <AdminHeader 
             userEmail={userEmail} 
             handleLogout={handleLogout} 
           />
           
-          <div className="p-4 sm:p-6 md:p-8 lg:p-6">
-            {/* Add mobile-specific padding */}
+          <div className="p-2 sm:p-4 md:p-6 lg:p-8">
             {children}
           </div>
         </main>
@@ -90,4 +88,3 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 };
 
 export default AdminLayout;
-

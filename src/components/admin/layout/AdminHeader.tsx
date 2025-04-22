@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, Settings, Monitor, LogOut, Users, Wallet, FileText } from 'lucide-react';
+import { Bell, Settings, Monitor, LogOut, Users, Wallet, FileText, MessageSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SupabaseStatus from '@/components/SupabaseStatus';
@@ -34,20 +34,31 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
           <div className="hidden lg:block"></div>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 md:space-x-3">
           <SupabaseStatus />
           
-          <Link to="/admin/merchants">
-            <Button variant="outline" size="sm" className="flex items-center mr-2">
-              <Users className="h-4 w-4 mr-1" />
-              Manage Merchants
-            </Button>
-          </Link>
-          
-          <Link to="/admin/escrow">
-            <Button variant="outline" size="sm" className="flex items-center mr-2">
-              <Wallet className="h-4 w-4 mr-1" />
-              Escrow
+          {/* Mobile-optimized buttons with responsive spacing */}
+          <div className="hidden md:flex space-x-2">
+            <Link to="/admin/merchants">
+              <Button variant="outline" size="sm" className="flex items-center">
+                <Users className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Manage Merchants</span>
+              </Button>
+            </Link>
+            
+            <Link to="/admin/escrow">
+              <Button variant="outline" size="sm" className="flex items-center">
+                <Wallet className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Escrow</span>
+              </Button>
+            </Link>
+          </div>
+
+          {/* Aasimo AI Button */}
+          <Link to="/admin/aasimo">
+            <Button variant="default" size="sm" className="flex items-center bg-[#9970e2] hover:bg-[#8b5cf6]">
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1">Aasimo AI</span>
             </Button>
           </Link>
           
@@ -60,7 +71,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-coinbase text-white text-xs">
+                  <AvatarFallback className="bg-[#9970e2] text-white text-xs">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
