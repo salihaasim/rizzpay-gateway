@@ -112,6 +112,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) =>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
+                <Link to="/admin/aasimo" className="cursor-pointer flex items-center">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  <span>Aasimo AI</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link to="/dashboard" className="cursor-pointer flex items-center">
                   <Monitor className="mr-2 h-4 w-4" />
                   <span>Merchant View</span>

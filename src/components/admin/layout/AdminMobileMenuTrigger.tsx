@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ShieldCheck, Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { SheetTrigger } from '@/components/ui/sheet';
 
 interface AdminMobileMenuTriggerProps {
@@ -10,7 +10,7 @@ interface AdminMobileMenuTriggerProps {
 
 const AdminMobileMenuTrigger: React.FC<AdminMobileMenuTriggerProps> = ({ setMobileMenuOpen }) => {
   return (
-    <div className="lg:hidden flex items-center">
+    <div className="lg:hidden flex items-center fixed top-4 left-4 z-20">
       <SheetTrigger asChild className="lg:hidden">
         <Button variant="ghost" size="icon" className="mr-2">
           <Menu className="h-5 w-5" />
