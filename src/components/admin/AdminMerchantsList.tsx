@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProfileStore, Merchant } from '@/stores/profileStore';
@@ -19,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import KycDocumentViewer from './KycDocumentViewer';
 import { toast } from 'sonner';
+import MerchantGamblingSwitch from './MerchantGamblingSwitch';
 
 const MerchantWalletDetails = ({ merchant }: { merchant: Merchant }) => {
   const { getWalletBalance, transactions } = useTransactionStore();
@@ -94,6 +94,14 @@ const MerchantWalletDetails = ({ merchant }: { merchant: Merchant }) => {
         </Card>
       </div>
       
+      <div className="mt-6">
+        <h3 className="text-lg font-medium mb-3">Advanced Settings</h3>
+        <MerchantGamblingSwitch 
+          merchantId={merchant.id} 
+          merchantName={merchant.name} 
+        />
+      </div>
+      
       <Card className="border-0 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Recent Transactions</CardTitle>
@@ -150,14 +158,12 @@ const AdminMerchantsList = () => {
   };
   
   const getFilteredMerchants = () => {
-    // Filter by search query
     let filtered = merchants.filter(merchant => 
       merchant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       merchant.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       merchant.company.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
-    // Filter by KYC status
     if (activeTab !== 'all') {
       filtered = filtered.filter(merchant => 
         merchant.kycStatus === activeTab

@@ -2,63 +2,108 @@
 # RizzPay Webhook Testing Guide
 
 ## Overview
-This guide covers testing webhook integrations with RizzPay.
+This document provides guidelines for testing RizzPay's webhook integrations.
 
-## Setting Up Webhook Testing
+## Webhook Registration
+```bash
+curl -X POST https://sandbox.rizzpay.co.in/api/webhooks \
+  -H "Authorization: Bearer YOUR_TEST_TOKEN" \
+  -d '{
+    "url": "https://your-server.com/webhook",
+    "events": ["payment.success", "payment.failed"],
+    "secret": "your_webhook_secret"
+  }'
+```
 
-### Local Testing
-1. Use ngrok or localtunnel for local webhook testing
-2. Set up a local endpoint to receive webhook events
-3. Configure webhook URL in RizzPay dashboard
+## Event Types
+Test webhooks for these event types:
+- `payment.success`
+- `payment.failed`
+- `payment.processing`
+- `payout.initiated`
+- `payout.processed`
+- `payout.failed`
 
-### Test Webhook Payload
+## Gambling Mode Webhook Events
+When testing in Gambling Mode, these additional events are available:
+- `gambling.deposit.initiated`
+- `gambling.deposit.completed`
+- `gambling.withdrawal.queued`
+- `gambling.withdrawal.processed`
+- `gambling.risk.alert`
+
+## Webhook Payload Format
+
+### Standard Payment Webhook
 ```json
 {
   "event": "payment.success",
+  "created": 1656089985,
   "data": {
-    "payment_id": "pay_test_123",
+    "id": "pay_123456789",
     "amount": 1000,
     "currency": "INR",
-    "status": "completed"
+    "status": "successful",
+    "customer_email": "customer@example.com",
+    "description": "Purchase"
   }
 }
 ```
 
-## Webhook Test Scenarios
-
-### 1. Payment Success
-Test successful payment webhook delivery:
-```bash
-# Simulate webhook
-curl -X POST http://your-endpoint/webhook \
-  -H "Content-Type: application/json" \
-  -d '{
-    "event": "payment.success",
-    "data": {
-      "payment_id": "test_123",
-      "status": "completed"
-    }
-  }'
+### Gambling Mode Payment Webhook
+```json
+{
+  "event": "gambling.deposit.completed",
+  "created": 1656089985,
+  "data": {
+    "id": "pay_123456789",
+    "amount": 1000,
+    "currency": "INR",
+    "status": "successful",
+    "description": "Entertainment Services"
+  }
+}
 ```
 
-### 2. Payment Failure
-Test failed payment webhook:
-```bash
-# Simulate webhook
-curl -X POST http://your-endpoint/webhook \
-  -H "Content-Type: application/json" \
-  -d '{
-    "event": "payment.failed",
-    "data": {
-      "payment_id": "test_124",
-      "status": "failed",
-      "error": "insufficient_funds"
-    }
-  }'
+## Webhook Signature Verification
+```javascript
+const crypto = require('crypto');
+
+function verifySignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
 ```
 
-## Security Testing
-1. Verify webhook signatures
-2. Test IP whitelist functionality
-3. Validate payload structure
-4. Check retry mechanism
+## Testing Steps
+
+1. **Register webhook endpoint** in RizzPay dashboard or via API
+2. **Set up webhook receiver** on your server
+3. **Verify request signatures** using your webhook secret
+4. **Test different event types** by triggering corresponding actions
+5. **Implement proper error handling** and retries
+6. **Test idempotency** by processing the same webhook multiple times
+
+## Sandbox Testing Tools
+
+RizzPay provides these sandbox testing tools:
+1. **Webhook Simulator**: Generate test webhook events
+2. **Event Logs**: View webhook delivery history
+3. **Retry Failed Webhooks**: Manually retry failed webhooks
+
+Access these tools from the RizzPay dashboard under Developers > Webhooks.
+
+## Gambling Mode Webhook Testing
+
+When testing gambling mode webhooks:
+1. Set up your endpoint to handle obfuscated data
+2. Test all gambling-specific event types
+3. Verify that sensitive data is properly masked
+4. Test webhook delivery from rotating IP addresses
