@@ -7,6 +7,7 @@
 import { Transaction, WalletTransactionType } from '@/stores/transactions/types';
 import { useTransactionStore } from '@/stores/transactions';
 import { delay } from '@/utils/commonUtils';
+import { GamblingPaymentDetails } from './types';
 
 /**
  * Process gambling deposit with enhanced anonymity
@@ -32,11 +33,11 @@ export const processGamblingDeposit = async (
   store.updateTransaction(transactionId, {
     description: description,
     paymentDetails: {
-      ...transaction.paymentDetails,
+      ...(transaction.paymentDetails || {}),
       isGamblingTransaction: true,
       obfuscated: true,
       routedVia: 'entertainment-gateway'
-    }
+    } as GamblingPaymentDetails
   });
   
   return transactionId;
@@ -68,7 +69,7 @@ export const processGamblingWithdrawal = async (
       isGamblingTransaction: true,
       obfuscated: true,
       routedVia: 'entertainment-payout'
-    }
+    } as GamblingPaymentDetails
   });
   
   return transactionId;
@@ -84,14 +85,14 @@ export const getFilteredGamblingTransactions = (userEmail: string): Transaction[
   // Filter transactions related to this user
   const userTransactions = allTransactions.filter(t => 
     (t.customer === userEmail || t.createdBy === userEmail) &&
-    t.paymentDetails?.isGamblingTransaction === true
+    (t.paymentDetails as GamblingPaymentDetails)?.isGamblingTransaction === true
   );
   
   // Return filtered transactions with sensitive data removed
   return userTransactions.map(t => ({
     ...t,
     paymentDetails: {
-      ...t.paymentDetails,
+      ...(t.paymentDetails || {}),
       routingDetails: undefined,
       processingDetails: undefined,
       internalNotes: undefined

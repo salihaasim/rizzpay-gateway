@@ -8,6 +8,7 @@ export * from './upi_integration';
 export * from './payout_queue';
 export * from './risk_controls';
 export * from './admin_controls';
+export * from './types';
 
 export interface GamblingModeContext {
   merchantId: string;
@@ -16,4 +17,4 @@ export interface GamblingModeContext {
 }
 
 // Export common gambling mode types and utilities
-export { GamblingModeContext } from './admin_controls';
+// Remove the duplicate export that's causing the error

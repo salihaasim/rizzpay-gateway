@@ -3,6 +3,7 @@
  * RizzPay Gambling Mode - API Routes
  * Defines the API endpoints for gambling mode functionality
  */
+import { GamblingModeContext } from './types';
 
 interface GamblingModeApiConfig {
   baseUrl: string;
