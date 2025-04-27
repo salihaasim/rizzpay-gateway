@@ -88,6 +88,7 @@ export type Database = {
       }
       merchant_profiles: {
         Row: {
+          api_key: string | null
           business_address: string
           business_name: string
           business_type: string
@@ -103,6 +104,7 @@ export type Database = {
             | null
         }
         Insert: {
+          api_key?: string | null
           business_address: string
           business_name: string
           business_type: string
@@ -118,6 +120,7 @@ export type Database = {
             | null
         }
         Update: {
+          api_key?: string | null
           business_address?: string
           business_name?: string
           business_type?: string
@@ -287,7 +290,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_or_create_api_key: {
+        Args: { user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

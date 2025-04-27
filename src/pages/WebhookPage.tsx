@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -40,46 +39,23 @@ const WebhookPage: React.FC = () => {
           return;
         }
         
-        // Fetch from merchant_profiles instead of merchants
-        const { data, error } = await supabase
-          .from('merchant_profiles')
-          .select('id')
-          .eq('id', user.id)
-          .single();
+        // Call the RPC function to get or create API key
+        const { data: apiKeyData, error: apiKeyError } = await supabase.rpc(
+          'get_or_create_api_key',
+          { user_id: user.id }
+        );
         
-        if (error) {
-          console.error('Error fetching merchant profile:', error);
-          toast.error('Could not retrieve your merchant profile');
-        } else if (data) {
-          // Generate or retrieve an API key
-          const apiKey = await generateOrRetrieveApiKey(user.id);
-          setApiKey(apiKey);
+        if (apiKeyError) {
+          console.error('Error with API key:', apiKeyError);
+          toast.error('Could not retrieve your API key');
+        } else {
+          setApiKey(apiKeyData);
         }
         
         setIsLoading(false);
       } catch (err) {
         console.error('Unexpected error fetching API key:', err);
         setIsLoading(false);
-      }
-    };
-    
-    const generateOrRetrieveApiKey = async (userId: string) => {
-      try {
-        // Check if user already has an API key
-        const { data, error } = await supabase.rpc('get_or_create_api_key', { 
-          user_id: userId 
-        });
-        
-        if (error) {
-          console.error('Error with API key:', error);
-          toast.error('Could not generate API key');
-          return null;
-        }
-        
-        return data;
-      } catch (err) {
-        console.error('Error generating API key:', err);
-        return null;
       }
     };
     
