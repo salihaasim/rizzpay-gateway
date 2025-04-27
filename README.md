@@ -93,6 +93,7 @@ RizzPay supports various payment methods including:
 - Added better error handling for API key management
 - Improved developer documentation
 - Added code samples for integration methods
+- Resolved TypeScript errors and missing dependencies
 
 ## Security
 
