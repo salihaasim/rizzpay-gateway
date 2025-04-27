@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -39,7 +40,7 @@ const WebhookPage: React.FC = () => {
           return;
         }
         
-        // Call the RPC function to get or create API key
+        // Call the RPC function to get or create API key with better error handling
         const { data: apiKeyData, error: apiKeyError } = await supabase.rpc(
           'get_or_create_api_key',
           { user_id: user.id }
@@ -48,13 +49,18 @@ const WebhookPage: React.FC = () => {
         if (apiKeyError) {
           console.error('Error with API key:', apiKeyError);
           toast.error('Could not retrieve your API key');
-        } else {
+        } else if (apiKeyData) {
           setApiKey(apiKeyData);
+          console.log('API key retrieved successfully');
+        } else {
+          console.error('No API key data returned');
+          toast.error('API key generation failed');
         }
         
         setIsLoading(false);
       } catch (err) {
         console.error('Unexpected error fetching API key:', err);
+        toast.error('An unexpected error occurred while retrieving your API key');
         setIsLoading(false);
       }
     };

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -17,10 +17,11 @@ import {
   CreditCard, 
   ArrowRight, 
   Link,
-  Loader2 
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/utils/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WebhookIntegrationProps {
   apiKey: string | null;
@@ -29,6 +30,7 @@ interface WebhookIntegrationProps {
 const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
   const [copied, setCopied] = useState<string | null>(null);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [isRegeneratingKey, setIsRegeneratingKey] = useState(false);
   const [paymentLink, setPaymentLink] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
   
@@ -48,6 +50,44 @@ const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
     }, 2000);
     
     toast.success('Copied to clipboard!');
+  };
+  
+  const handleRegenerateApiKey = async () => {
+    try {
+      setIsRegeneratingKey(true);
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast.error('Authentication error. Please login again.');
+        setIsRegeneratingKey(false);
+        return;
+      }
+      
+      // Generate a new API key
+      const newApiKey = `rizz_${crypto.randomUUID().replace(/-/g, '')}`;
+      
+      // Update the merchant profile with the new API key
+      const { error: updateError } = await supabase
+        .from('merchant_profiles')
+        .update({ api_key: newApiKey })
+        .eq('id', user.id);
+        
+      if (updateError) {
+        console.error('Error updating API key:', updateError);
+        toast.error('Failed to regenerate API key');
+      } else {
+        toast.success('API key has been regenerated');
+        // Force reload of the page to get the new API key
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error regenerating API key:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsRegeneratingKey(false);
+    }
   };
   
   const generatePaymentLink = async () => {
@@ -129,7 +169,29 @@ const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Your API Key</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Your API Key</Label>
+                  {apiKey && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleRegenerateApiKey}
+                      disabled={isRegeneratingKey}
+                    >
+                      {isRegeneratingKey ? (
+                        <>
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          Regenerating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                          Regenerate
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
                 <div className="flex">
                   <Input
                     type="text"
@@ -154,8 +216,8 @@ const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
                   )}
                 </div>
                 {!apiKey && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    No API key found. Please contact support to get your API key or refresh the page to generate one.
+                  <p className="text-sm text-red-500 mt-1">
+                    No API key found. Please reload the page or contact support for assistance.
                   </p>
                 )}
               </div>

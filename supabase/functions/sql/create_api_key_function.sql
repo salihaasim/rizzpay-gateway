@@ -8,7 +8,18 @@ AS $$
 DECLARE
   existing_api_key TEXT;
   new_api_key TEXT;
+  profile_exists BOOLEAN;
 BEGIN
+  -- Check if merchant profile exists
+  SELECT EXISTS(
+    SELECT 1 FROM merchant_profiles WHERE id = user_id
+  ) INTO profile_exists;
+  
+  -- If profile doesn't exist, return null (edge function will handle creation)
+  IF NOT profile_exists THEN
+    RETURN NULL;
+  END IF;
+
   -- Check if API key already exists for this user
   SELECT api_key INTO existing_api_key 
   FROM merchant_profiles 
