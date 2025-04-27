@@ -24,10 +24,7 @@ export const regenerateApiKey = async (): Promise<string | null> => {
     // Update the merchant profile
     const { error: updateError } = await supabase
       .from('merchant_profiles')
-      .update({ 
-        api_key: newApiKey,
-        updated_at: new Date().toISOString()
-      })
+      .update({ api_key: newApiKey })
       .eq('id', user.id);
     
     if (updateError) {

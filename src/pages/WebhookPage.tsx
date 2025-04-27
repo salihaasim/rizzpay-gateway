@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { regenerateApiKey } from '@/utils/merchantApiUtils';
+import { regenerateApiKey, getMerchantProfile } from '@/utils/merchantApiUtils';
 
 const WebhookPage: React.FC = () => {
   const { userEmail } = useTransactionStore();
@@ -25,49 +25,20 @@ const WebhookPage: React.FC = () => {
     try {
       setIsLoading(true);
       
-      // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      // Get the merchant profile which includes the API key
+      const profileData = await getMerchantProfile();
       
-      if (userError) {
-        console.error('Error getting user:', userError);
-        toast.error('Authentication error');
-        setIsLoading(false);
-        return;
-      }
-
-      if (!user) {
-        console.error('No authenticated user found');
-        toast.error('Please log in to access webhook features');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Call the RPC function to get or create API key with better error handling
-      const { data: apiKeyData, error: apiKeyError } = await supabase.rpc(
-        'get_or_create_api_key',
-        { user_id: user.id }
-      );
-      
-      if (apiKeyError) {
-        console.error('Error with API key:', apiKeyError);
-        toast.error('Could not retrieve your API key');
-        setApiKey(null);
-      } else if (apiKeyData === 'INACTIVE_ACCOUNT') {
-        toast.error('Your merchant account is inactive. Please contact support.');
-        setApiKey(null);
-      } else if (apiKeyData) {
-        setApiKey(apiKeyData);
-        console.log('API key retrieved successfully');
+      if (profileData?.api_key) {
+        setApiKey(profileData.api_key);
+        console.log('API key retrieved successfully from profile');
       } else {
-        console.error('No API key data returned');
-        toast.error('API key generation failed');
-        setApiKey(null);
+        console.log('No API key found in profile, will regenerate');
+        await handleRegenerateApiKey();
       }
-      
-      setIsLoading(false);
     } catch (err) {
-      console.error('Unexpected error fetching API key:', err);
-      toast.error('An unexpected error occurred while retrieving your API key');
+      console.error('Error fetching API key:', err);
+      toast.error('Failed to retrieve API key');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -80,6 +51,8 @@ const WebhookPage: React.FC = () => {
       if (newApiKey) {
         setApiKey(newApiKey);
         toast.success('API key regenerated successfully');
+      } else {
+        toast.error('Failed to regenerate API key');
       }
     } catch (err) {
       console.error('Error regenerating API key:', err);
