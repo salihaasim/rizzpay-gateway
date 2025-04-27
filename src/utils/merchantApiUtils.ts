@@ -37,22 +37,28 @@ export const regenerateApiKey = async (): Promise<string | null> => {
     }
     
     // Also update merchants table for backward compatibility
-    await supabase
-      .from('merchants')
-      .update({ api_key: newApiKey })
-      .eq('id', user.id)
-      .catch(e => console.error('Failed to update merchants table:', e));
+    try {
+      await supabase
+        .from('merchants')
+        .update({ api_key: newApiKey })
+        .eq('id', user.id);
+    } catch (e) {
+      console.error('Failed to update merchants table:', e);
+    }
     
     // Log this activity
-    await supabase
-      .from('activity_logs')
-      .insert({
-        user_id: user.id,
-        user_email: user.email,
-        activity_type: 'api_key_regenerated',
-        details: { method: 'manual', reason: 'user_requested' }
-      })
-      .catch(e => console.error('Failed to log activity:', e));
+    try {
+      await supabase
+        .from('activity_logs')
+        .insert({
+          user_id: user.id,
+          user_email: user.email,
+          activity_type: 'api_key_regenerated',
+          details: { method: 'manual', reason: 'user_requested' }
+        });
+    } catch (e) {
+      console.error('Failed to log activity:', e);
+    }
     
     toast.success('API key regenerated successfully');
     return newApiKey;
@@ -101,7 +107,7 @@ export const getMerchantProfile = async () => {
  * @param {Object} updates - The fields to update
  * @returns {Promise<boolean>} Whether the update was successful
  */
-export const updateMerchantProfile = async (updates: Partial<any>): Promise<boolean> => {
+export const updateMerchantProfile = async (updates: Record<string, any>): Promise<boolean> => {
   try {
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -112,11 +118,17 @@ export const updateMerchantProfile = async (updates: Partial<any>): Promise<bool
       return false;
     }
     
+    // Remove updated_at from updates if present (we'll set it ourselves)
+    const safeUpdates = { ...updates };
+    if ('updated_at' in safeUpdates) {
+      delete safeUpdates.updated_at;
+    }
+    
     // Update the merchant profile
     const { error: updateError } = await supabase
       .from('merchant_profiles')
       .update({
-        ...updates,
+        ...safeUpdates,
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id);

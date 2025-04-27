@@ -87,6 +87,13 @@ RizzPay supports various payment methods including:
 - **Settlement Processing**: Automated settlement to your bank account
 - **Reporting & Analytics**: Detailed reports and insights into your payment data
 
+## Recent Updates
+
+- Fixed issues with the webhook integration system
+- Added better error handling for API key management
+- Improved developer documentation
+- Added code samples for integration methods
+
 ## Security
 
 - PCI DSS compliant payment processing
