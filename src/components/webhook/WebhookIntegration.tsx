@@ -134,7 +134,9 @@ async function initiateRizzpayPayment(paymentDetails) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between p-3 bg-secondary rounded-md">
+          <div className="flex items-center justify-between p
+
+-3 bg-secondary rounded-md">
             <code className="text-sm font-mono break-all">{apiKey}</code>
             <Button
               size="sm"
