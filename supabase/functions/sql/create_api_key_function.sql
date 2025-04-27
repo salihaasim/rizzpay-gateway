@@ -1,5 +1,5 @@
 
--- SQL function to get or create API key
+-- SQL function to get or create API key with improved validation and security
 CREATE OR REPLACE FUNCTION public.get_or_create_api_key(user_id UUID)
 RETURNS TEXT
 LANGUAGE plpgsql
@@ -9,6 +9,7 @@ DECLARE
   existing_api_key TEXT;
   new_api_key TEXT;
   profile_exists BOOLEAN;
+  merchant_status TEXT;
 BEGIN
   -- Check if merchant profile exists
   SELECT EXISTS(
@@ -18,6 +19,15 @@ BEGIN
   -- If profile doesn't exist, return null (edge function will handle creation)
   IF NOT profile_exists THEN
     RETURN NULL;
+  END IF;
+
+  -- Check if merchant is active
+  SELECT is_active INTO merchant_status 
+  FROM merchant_profiles 
+  WHERE id = user_id;
+  
+  IF NOT merchant_status THEN
+    RETURN 'INACTIVE_ACCOUNT';
   END IF;
 
   -- Check if API key already exists for this user
@@ -30,12 +40,13 @@ BEGIN
     RETURN existing_api_key;
   END IF;
   
-  -- Generate new API key with 'rizz_' prefix
-  new_api_key := 'rizz_' || replace(gen_random_uuid()::text, '-', '');
+  -- Generate new API key with 'rizz_' prefix and improved randomness
+  new_api_key := 'rizz_' || replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '');
   
   -- Update the merchant profile with new API key
   UPDATE merchant_profiles 
-  SET api_key = new_api_key
+  SET api_key = new_api_key,
+      updated_at = now()
   WHERE id = user_id;
   
   -- Return the new API key

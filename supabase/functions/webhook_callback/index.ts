@@ -88,6 +88,10 @@ Deno.serve(async (req) => {
       paymentProcessor: callbackData.processor || 'external',
       paymentId: callbackData.payment_id || null,
       processorReference: callbackData.reference || null,
+      processorResponse: callbackData.processor_response || null,
+      processorFee: callbackData.processor_fee || null,
+      settlementId: callbackData.settlement_id || null,
+      cardData: callbackData.card_data || null
     }
     
     // Prepare processing timeline update
@@ -133,24 +137,50 @@ Deno.serve(async (req) => {
       try {
         // Get merchant details
         const { data: merchant } = await supabase
-          .from('merchants')
-          .select('id, email')
+          .from('merchant_profiles')
+          .select('id, contact_email')
           .eq('id', transaction.merchant_id)
           .single()
         
-        if (merchant && merchant.email) {
-          // For this example, we're just logging; in a real implementation,
-          // you would add money to the merchant's wallet
-          console.log(`Adding ${transaction.amount} to merchant ${merchant.email}'s wallet`)
+        if (merchant && merchant.contact_email) {
+          console.log(`Adding ${transaction.amount} to merchant ${merchant.contact_email}'s wallet`)
           
-          // This would be the real implementation if you had a wallet_transactions table
-          // await supabase.from('wallet_transactions').insert({
-          //   user_id: merchant.id,
-          //   amount: transaction.amount,
-          //   type: 'deposit',
-          //   source: 'webhook_payment',
-          //   reference_id: transaction.id
-          // })
+          // Create wallet transaction entry
+          await supabase
+            .from('wallet_transactions')
+            .insert({
+              user_id: merchant.id,
+              amount: transaction.amount,
+              currency: transaction.currency || 'INR',
+              transaction_type: 'credit',
+              source: 'payment',
+              reference_id: transaction.id,
+              status: 'completed',
+              description: `Payment received from ${transaction.customer_name || 'customer'}`,
+              metadata: {
+                payment_method: transaction.payment_method,
+                customer_email: transaction.customer_email
+              }
+            })
+            .catch(err => {
+              console.error('Error creating wallet transaction:', err);
+            });
+            
+          // Log this activity
+          await supabase
+            .from('activity_logs')
+            .insert({
+              user_id: merchant.id,
+              user_email: merchant.contact_email,
+              activity_type: 'payment_received',
+              details: {
+                amount: transaction.amount,
+                currency: transaction.currency || 'INR',
+                payment_method: transaction.payment_method,
+                transaction_id: transaction.id
+              }
+            })
+            .catch(e => console.error('Failed to log activity:', e));
         }
       } catch (walletError) {
         console.error('Error processing wallet update:', walletError)
@@ -162,7 +192,9 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         status: 'success',
-        message: 'Payment callback processed successfully'
+        message: 'Payment callback processed successfully',
+        transaction_id: transaction.id,
+        payment_status: paymentStatus
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
