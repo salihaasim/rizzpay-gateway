@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { 
   Card, 
@@ -33,7 +32,6 @@ const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
   const [paymentLink, setPaymentLink] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
   
-  // Form state for payment link generation
   const [paymentAmount, setPaymentAmount] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -157,7 +155,7 @@ const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
                 </div>
                 {!apiKey && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    No API key found. Please contact support to get your API key.
+                    No API key found. Please contact support to get your API key or refresh the page to generate one.
                   </p>
                 )}
               </div>
@@ -414,7 +412,6 @@ const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ apiKey }) => {
   );
 };
 
-// Example code snippets
 const jsExample = `// JavaScript/Node.js Example
 const fetch = require('node-fetch');
 
