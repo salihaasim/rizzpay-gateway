@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -97,7 +96,7 @@ const WebhookPage: React.FC = () => {
     <div className="container px-4 pt-6 pb-16 mx-auto">
       <div className="flex flex-col md:flex-row items-baseline justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-1">Webhook Setup</h1>
+          <h1 className="text-3xl font-bold mb-1">Developer Tools</h1>
           <p className="text-muted-foreground">Integrate RizzPay with your website or application</p>
         </div>
         

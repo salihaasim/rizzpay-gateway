@@ -18,14 +18,14 @@ const Navbar = () => {
   };
 
   const handleBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Transactions', path: '/transactions' },
     { name: 'Wallet', path: '/wallet' },
-    { name: 'Webhook', path: '/webhook' },
+    { name: 'Developer Tools', path: '/webhook' },
     { name: 'Security', path: '/security' },
     { name: 'Settings', path: '/settings' },
   ];
