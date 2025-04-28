@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from "@/components/ui/sonner"
@@ -31,7 +32,7 @@ import AdminSettings from './pages/AdminSettings'
 import MerchantOnboarding from './pages/merchant-onboarding'
 import RegisterMerchant from './pages/register-merchant'
 
-// New Developer Integration page
+// Developer Integration page
 import DeveloperIntegration from './pages/DeveloperIntegration'
 
 // Supabase integration
@@ -59,8 +60,8 @@ function App() {
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/security" element={<Security />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/webhook" element={<DeveloperIntegration />} />
-        <Route path="/developer" element={<DeveloperIntegration />} /> // Add new route
+        <Route path="/developer" element={<DeveloperIntegration />} />
+        <Route path="/webhook" element={<WebhookPayment />} />
         <Route path="/features" element={<Features />} />
         <Route path="/features2" element={<Features2 />} />
         <Route path="/technical" element={<HowItWorksTechnical />} />

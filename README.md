@@ -62,7 +62,7 @@ Merchants have access to:
   - **Static UPI QR Codes**: Generate branded QR codes for UPI payments
   - **Deposits & Withdrawals**: Manage wallet funds
   - **Transfers**: Send money to other merchants
-- **Webhooks**: Set up integrations with external systems
+- **Developer Tools**: Set up integrations with external systems
 - **Settings**: Configure account settings and preferences
 
 ## UPI Payment Features
@@ -127,6 +127,9 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 - **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
 - **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
 - **Router Fix**: Added BrowserRouter to properly handle React Router navigation
+- **Home Page Access**: Fixed navigation to home page from dashboard
+- **UI Enhancements**: Improved overall UI with better spacing and visual hierarchy
+- **Developer Tools**: Consolidated technical documentation and developer tools
 
 ## Server Requirements
 
