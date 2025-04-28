@@ -1,7 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Regenerates an API key for the currently authenticated merchant
@@ -18,17 +17,12 @@ export const regenerateApiKey = async (): Promise<string | null> => {
       return null;
     }
     
-    // Generate a new API key with better entropy
-    const newApiKey = `rizz_${uuidv4().replace(/-/g, '')}${uuidv4().replace(/-/g, '')}`;
+    // Generate a new API key with better entropy using the database function
+    const { data: newApiKey, error: fnError } = await supabase
+      .rpc('get_or_create_api_key', { user_id: user.id });
     
-    // Update the merchant profile
-    const { error: updateError } = await supabase
-      .from('merchant_profiles')
-      .update({ api_key: newApiKey })
-      .eq('id', user.id);
-    
-    if (updateError) {
-      console.error('Error updating API key:', updateError);
+    if (fnError) {
+      console.error('Error regenerating API key:', fnError);
       toast.error('Failed to regenerate API key');
       return null;
     }

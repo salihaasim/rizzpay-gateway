@@ -67,6 +67,14 @@ npm run dev
 
 RizzPay uses Supabase Auth for authentication. JWT tokens are used to authenticate API requests.
 
+### API Key Management
+
+API keys are managed securely through database functions and edge functions:
+- Merchant profiles have unique API keys generated with high entropy
+- Keys are prefixed with 'rizz_' for easy identification
+- Key regeneration is available through secure merchant dashboard
+- Database functions ensure proper validation and security checks
+
 ### Webhook Integration
 
 See [Webhook Integration Guide](src/documentation/WEBHOOK_INTEGRATION.md) for details on integrating with the RizzPay webhook system.
@@ -89,6 +97,9 @@ RizzPay supports various payment methods including:
 
 ## Recent Updates
 
+- Implemented secure database function for API key management
+- Enhanced API key entropy with double UUID implementation
+- Improved merchant profile validation
 - Fixed issues with the webhook integration system
 - Added better error handling for API key management
 - Improved developer documentation
