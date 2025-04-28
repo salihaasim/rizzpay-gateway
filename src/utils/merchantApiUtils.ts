@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { useActivityLogStore } from '@/stores/activityLog';
 
 /**
  * Regenerates an API key for the currently authenticated merchant
@@ -45,24 +46,15 @@ export const regenerateApiKey = async (): Promise<string | null> => {
       console.error('Failed to update merchants table:', e);
     }
     
-    // Log this activity - use try/catch instead of .catch()
+    // Log this activity using our client-side store instead of database
     try {
-      // Check if activity_logs table exists before trying to insert
-      const { count } = await supabase
-        .from('merchants')
-        .select('*', { count: 'exact', head: true });
-      
-      // Only attempt to log if we have database access
-      if (count !== null) {
-        // Use safeSupabaseTable to handle tables that might not be in the typed schema
-        await safeSupabaseTable('activity_logs')
-          .insert({
-            user_id: user.id,
-            email: user.email,
-            activity_type: 'api_key_regenerated',
-            details: { method: 'manual', reason: 'user_requested' }
-          });
-      }
+      // Create log entry in the client-side store
+      useActivityLogStore.getState().addActivityLog({
+        activityType: 'api_key_regenerated',
+        userId: user.id,
+        userEmail: user.email,
+        details: { method: 'manual', reason: 'user_requested' }
+      });
     } catch (e) {
       console.error('Failed to log activity:', e);
       // Non-critical error, continue execution
