@@ -1,14 +1,14 @@
 
-# Rizzpay Webhook Integration Guide
+# RizzPay Integration Guide
 
 ## Overview
 
-Rizzpay provides a simple webhook integration that allows merchants to accept payments directly from their websites or applications. This guide explains how to integrate with Rizzpay's webhook system to start accepting payments.
+RizzPay provides a simple webhook integration that allows merchants to accept payments directly from their websites or applications. This guide explains how to integrate with RizzPay's system to start accepting payments.
 
 ## Getting Started
 
-1. **Generate Your Webhook Token**: Create your unique webhook token from your Rizzpay merchant dashboard in the Webhooks section.
-2. **Implement the Integration**: Add the Rizzpay payment button or form to your website/application using one of our integration methods.
+1. **Generate Your API Token**: Create your unique API token from your RizzPay merchant dashboard in the Developer section.
+2. **Implement the Integration**: Add the RizzPay payment button or form to your website/application using one of our integration methods.
 3. **Test Your Integration**: Use our sandbox environment to test your integration before going live.
 
 ## Integration Methods
@@ -17,14 +17,14 @@ Rizzpay provides a simple webhook integration that allows merchants to accept pa
 
 ```html
 <form action="https://yourdomain.com/api/webhook" method="POST">
-  <input type="hidden" name="token" value="YOUR_WEBHOOK_TOKEN" />
+  <input type="hidden" name="token" value="YOUR_API_TOKEN" />
   <input type="hidden" name="amount" value="100.00" />
   <input type="hidden" name="currency" value="INR" />
   <input type="hidden" name="description" value="Payment for Product X" />
   <input type="hidden" name="customer_name" value="John Doe" />
   <input type="hidden" name="customer_email" value="john@example.com" />
   <input type="hidden" name="callback_url" value="https://yourwebsite.com/payment-callback" />
-  <button type="submit">Pay Now</button>
+  <button type="submit">Pay with RizzPay</button>
 </form>
 ```
 
@@ -40,7 +40,7 @@ async function initiateRizzpayPayment(paymentDetails) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token: "YOUR_WEBHOOK_TOKEN",
+        token: "YOUR_API_TOKEN",
         amount: paymentDetails.amount,
         currency: paymentDetails.currency || "INR",
         description: paymentDetails.description,
@@ -62,18 +62,6 @@ async function initiateRizzpayPayment(paymentDetails) {
     console.error("Error:", error);
   }
 }
-
-// Example usage
-document.getElementById("payment-button").addEventListener("click", () => {
-  initiateRizzpayPayment({
-    amount: "100.00",
-    currency: "INR",
-    description: "Payment for Product X",
-    customerName: "John Doe",
-    customerEmail: "john@example.com",
-    callbackUrl: "https://yourwebsite.com/payment-callback"
-  });
-});
 ```
 
 ### 3. Direct API Request
@@ -81,14 +69,14 @@ document.getElementById("payment-button").addEventListener("click", () => {
 You can also make a direct GET or POST request to our webhook endpoint:
 
 ```
-GET https://yourdomain.com/api/webhook?token=YOUR_WEBHOOK_TOKEN&amount=100.00&currency=INR&description=Product+Purchase&customer_name=John+Doe&customer_email=john@example.com&callback_url=https://yourwebsite.com/payment-callback
+GET https://yourdomain.com/api/webhook?token=YOUR_API_TOKEN&amount=100.00&currency=INR&description=Product+Purchase&customer_name=John+Doe&customer_email=john@example.com&callback_url=https://yourwebsite.com/payment-callback
 ```
 
 ## Required Parameters
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| token | Yes | Your unique webhook token (found in your dashboard) |
+| token | Yes | Your unique API token (found in your dashboard) |
 | amount | Yes | Payment amount (e.g., 100.00) |
 | currency | No | Currency code (default: INR) |
 | description | No | Payment description or purpose |
@@ -98,7 +86,7 @@ GET https://yourdomain.com/api/webhook?token=YOUR_WEBHOOK_TOKEN&amount=100.00&cu
 
 ## Handling Callbacks
 
-After payment completion, Rizzpay will redirect the customer to your `callback_url` with the following parameters:
+After payment completion, RizzPay will redirect the customer to your `callback_url` with the following parameters:
 
 ```
 https://yourwebsite.com/payment-callback?transaction_id=TXN_123456&status=success
@@ -111,10 +99,10 @@ Parameters in the callback:
 
 ## Webhook Notifications
 
-Rizzpay can also send webhook notifications to your server when payment status changes:
+RizzPay can also send webhook notifications to your server when payment status changes:
 
 1. Set up a webhook endpoint on your server
-2. Add the endpoint URL in your Rizzpay dashboard
+2. Add the endpoint URL in your RizzPay dashboard
 3. We will send POST requests to your endpoint with payment details
 
 Example webhook payload:
