@@ -25,7 +25,7 @@ const Navbar = () => {
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Transactions', path: '/transactions' },
     { name: 'Wallet', path: '/wallet' },
-    { name: 'Developer Tools', path: '/webhook' },
+    { name: 'Developer Tools', path: '/developers' },
     { name: 'Security', path: '/security' },
     { name: 'Settings', path: '/settings' },
   ];

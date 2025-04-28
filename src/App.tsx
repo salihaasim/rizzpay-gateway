@@ -112,12 +112,12 @@ const App = () => {
     
     <Route key="webhook" path="/webhook" element={
       <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
+        {isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/developers" replace />}
       </ProtectedRoute>
     } />,
     <Route key="webhooks" path="/webhooks" element={
       <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
+        {isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/developers" replace />}
       </ProtectedRoute>
     } />,
     

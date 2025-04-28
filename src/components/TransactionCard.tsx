@@ -41,6 +41,9 @@ const TransactionCard = ({
 }: TransactionCardProps) => {
   const { icon: StatusIcon, color, bgColor, label } = statusConfig[status];
 
+  // Format payment method for display
+  const displayPaymentMethod = paymentMethod ? paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1) : 'Unknown';
+
   return (
     <Card className={cn("border shadow-sm transition-all hover:shadow-md", className)}>
       <CardContent className="p-4">
@@ -54,11 +57,11 @@ const TransactionCard = ({
             
             <div className="mt-1">
               <span className="font-semibold">{amount}</span>
-              <span className="text-sm text-muted-foreground ml-1 hidden md:inline">via {paymentMethod}</span>
+              <span className="text-sm text-muted-foreground ml-1 hidden md:inline">via {displayPaymentMethod}</span>
             </div>
             
             <div className="text-sm text-muted-foreground mt-1 md:hidden">
-              via {paymentMethod}
+              via {displayPaymentMethod}
             </div>
           </div>
           
