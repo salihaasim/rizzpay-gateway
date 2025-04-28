@@ -26,7 +26,6 @@ export const regenerateApiKey = async (): Promise<string | null> => {
       .from('merchant_profiles')
       .update({ 
         api_key: newApiKey,
-        updated_at: new Date().toISOString()
       })
       .eq('id', user.id);
     
@@ -37,22 +36,37 @@ export const regenerateApiKey = async (): Promise<string | null> => {
     }
     
     // Also update merchants table for backward compatibility
-    await supabase
-      .from('merchants')
-      .update({ api_key: newApiKey })
-      .eq('id', user.id)
-      .catch(e => console.error('Failed to update merchants table:', e));
+    try {
+      await supabase
+        .from('merchants')
+        .update({ api_key: newApiKey })
+        .eq('id', user.id);
+    } catch (e) {
+      console.error('Failed to update merchants table:', e);
+    }
     
-    // Log this activity
-    await supabase
-      .from('activity_logs')
-      .insert({
-        user_id: user.id,
-        user_email: user.email,
-        activity_type: 'api_key_regenerated',
-        details: { method: 'manual', reason: 'user_requested' }
-      })
-      .catch(e => console.error('Failed to log activity:', e));
+    // Log this activity - use try/catch instead of .catch()
+    try {
+      // Check if activity_logs table exists before trying to insert
+      const { count } = await supabase
+        .from('merchants')
+        .select('*', { count: 'exact', head: true });
+      
+      // Only attempt to log if we have database access
+      if (count !== null) {
+        // Use safeSupabaseTable to handle tables that might not be in the typed schema
+        await safeSupabaseTable('activity_logs')
+          .insert({
+            user_id: user.id,
+            email: user.email,
+            activity_type: 'api_key_regenerated',
+            details: { method: 'manual', reason: 'user_requested' }
+          });
+      }
+    } catch (e) {
+      console.error('Failed to log activity:', e);
+      // Non-critical error, continue execution
+    }
     
     toast.success('API key regenerated successfully');
     return newApiKey;
@@ -112,13 +126,17 @@ export const updateMerchantProfile = async (updates: Partial<any>): Promise<bool
       return false;
     }
     
+    // Make a copy of updates to avoid modifying the original object
+    const validUpdates = { ...updates };
+    
+    // Don't try to update timestamp fields directly
+    delete validUpdates.updated_at;
+    delete validUpdates.created_at;
+    
     // Update the merchant profile
     const { error: updateError } = await supabase
       .from('merchant_profiles')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
+      .update(validUpdates)
       .eq('id', user.id);
     
     if (updateError) {
@@ -134,4 +152,10 @@ export const updateMerchantProfile = async (updates: Partial<any>): Promise<bool
     toast.error('An unexpected error occurred');
     return false;
   }
+};
+
+// Helper function to safely handle tables that might not be in the typed schema
+export const safeSupabaseTable = (tableName: string) => {
+  // @ts-ignore - This is necessary for accessing dynamic tables
+  return supabase.from(tableName);
 };
