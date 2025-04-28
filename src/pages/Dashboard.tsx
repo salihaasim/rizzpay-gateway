@@ -8,7 +8,7 @@ import PaymentFlow from '@/components/PaymentFlow';
 import { Separator } from '@/components/ui/separator';
 import AnalyticsChart from '@/components/AnalyticsChart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight } from 'lucide-react';
+import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight, Lock } from 'lucide-react';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 import { Button } from '@/components/ui/button';
 import { 
@@ -16,6 +16,7 @@ import {
   getLastMonthTransactions, 
   calculateGrowthRate 
 } from '@/utils/analyticsUtils';
+import TechnicalAccessLink from '@/components/TechnicalAccessLink';
 
 // Static data for additional charts (will be replaced with real data)
 const paymentMethodData = [
@@ -169,15 +170,7 @@ const Dashboard = () => {
                 <Separator className="my-4" />
                 
                 <div className="flex justify-center">
-                  <Button 
-                    variant="outline" 
-                    asChild
-                    className="w-full bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-600 font-medium"
-                  >
-                    <Link to="/developer">
-                      Developer Tools
-                    </Link>
-                  </Button>
+                  <TechnicalAccessLink />
                 </div>
               </div>
             </CardContent>

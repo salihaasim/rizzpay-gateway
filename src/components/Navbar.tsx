@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ArrowLeft, Home } from "lucide-react";
+import { Menu, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
 import logoSvg from '../assets/logo.svg';
@@ -22,18 +22,17 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { name: 'Home', path: '/' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Transactions', path: '/transactions' },
     { name: 'Wallet', path: '/wallet' },
-    { name: 'Developer', path: '/developer' },
+    { name: 'Webhook', path: '/webhook' },
     { name: 'Security', path: '/security' },
     { name: 'Settings', path: '/settings' },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 max-w-screen-2xl items-center px-4 md:px-6 mx-auto">
+      <div className="flex h-14 max-w-screen-2xl items-center px-4 md:px-6 mx-auto">
         <div className="flex items-center gap-2">
           {location.pathname !== '/' && (
             <Button 
@@ -49,25 +48,24 @@ const Navbar = () => {
           
           <Link 
             to="/" 
-            className="font-semibold text-xl text-[#0052FF] flex items-center gap-2"
+            className="font-semibold text-xl text-[#0052FF] flex items-center gap-1"
           >
-            <img src={logoSvg} alt="RizzPay Logo" className="h-8 w-8" />
+            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
             <span className="font-bold">RizzPay</span>
           </Link>
           
-          <nav className="hidden md:flex gap-6 ml-8">
+          <nav className="hidden md:flex gap-6 ml-6">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-[#0052FF] flex items-center gap-1",
+                  "text-sm font-medium transition-colors hover:text-[#0052FF]",
                   isActive(item.path)
-                    ? "text-[#0052FF] font-semibold"
+                    ? "text-foreground"
                     : "text-muted-foreground"
                 )}
               >
-                {item.path === '/' && <Home className="h-4 w-4" />}
                 {item.name}
               </Link>
             ))}
@@ -88,8 +86,8 @@ const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
-              <Link to="/" className="flex items-center gap-2 mb-8">
-                <img src={logoSvg} alt="RizzPay Logo" className="h-7 w-7" />
+              <Link to="/" className="flex items-center gap-1 mb-8">
+                <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
                 <span className="font-bold text-xl">RizzPay</span>
               </Link>
               <div className="grid gap-2 py-6">
@@ -100,12 +98,11 @@ const Navbar = () => {
                     className={cn(
                       "flex w-full items-center py-2 text-lg font-semibold",
                       isActive(item.path)
-                        ? "text-[#0052FF]"
+                        ? "text-foreground"
                         : "text-muted-foreground"
                     )}
                     onClick={() => setOpen(false)}
                   >
-                    {item.path === '/' && <Home className="h-4 w-4 mr-2" />}
                     {item.name}
                   </Link>
                 ))}

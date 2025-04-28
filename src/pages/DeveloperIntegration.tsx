@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -8,283 +7,519 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import WebhookIntegration from '@/components/webhook/WebhookIntegration';
-import { toast } from 'sonner';
-import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { regenerateApiKey, getMerchantProfile } from '@/utils/merchantApiUtils';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Check, Copy, Code, Server, Globe, Key, AlertCircle, Webhook, CreditCard } from 'lucide-react';
+import { toast } from 'sonner';
+import { useMobile } from '@/hooks/use-mobile';
+import { motion } from '@/components/ui/motion';
 
 const DeveloperIntegration: React.FC = () => {
-  const { userEmail } = useTransactionStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("api-keys");
+  const isMobile = useMobile();
   
-  const fetchMerchantApiKey = async () => {
-    if (!userEmail) {
-      setIsLoading(false);
-      return;
-    }
+  const handleCopy = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(field);
     
-    try {
-      setIsLoading(true);
-      
-      // Get the merchant profile which includes the API key
-      const profileData = await getMerchantProfile();
-      
-      if (profileData?.api_key) {
-        setApiKey(profileData.api_key);
-        console.log('API key retrieved successfully from profile');
-      } else {
-        console.log('No API key found in profile, will regenerate');
-        await handleRegenerateApiKey();
-      }
-    } catch (err) {
-      console.error('Error fetching API key:', err);
-      toast.error('Failed to retrieve API key');
-    } finally {
-      setIsLoading(false);
-    }
+    setTimeout(() => {
+      setCopied(null);
+    }, 2000);
+    
+    toast.success('Copied to clipboard!');
   };
 
-  const handleRegenerateApiKey = async () => {
-    try {
-      setIsRegenerating(true);
-      const newApiKey = await regenerateApiKey();
-      
-      if (newApiKey) {
-        setApiKey(newApiKey);
-        toast.success('API key regenerated successfully');
-      } else {
-        toast.error('Failed to regenerate API key');
-      }
-    } catch (err) {
-      console.error('Error regenerating API key:', err);
-      toast.error('Failed to regenerate API key');
-    } finally {
-      setIsRegenerating(false);
-    }
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
   
-  useEffect(() => {
-    fetchMerchantApiKey();
-  }, [userEmail]);
-  
   return (
-    <div className="container px-4 pt-6 pb-16 mx-auto">
-      <div className="flex flex-col md:flex-row items-baseline justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">Developer Integration</h1>
-          <p className="text-muted-foreground">Integrate RizzPay with your website or application</p>
-        </div>
-        
-        {!isLoading && apiKey && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRegenerateApiKey}
-            disabled={isRegenerating}
-            className="mt-4 md:mt-0"
-          >
-            {isRegenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Regenerating...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Regenerate Key
-              </>
-            )}
-          </Button>
-        )}
-      </div>
+    <div className="container py-6 md:py-10 max-w-6xl px-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-2xl md:text-3xl font-bold mb-3 md:mb-6">Developer Integration</h1>
+        <p className="text-muted-foreground mb-6 md:mb-8 text-sm md:text-base">
+          Integrate Rizzpay payment solutions into your applications with our API documentation and tools.
+        </p>
+      </motion.div>
       
-      {!userEmail ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Please login as a merchant to access developer integration features.
-            </p>
-          </CardContent>
-        </Card>
-      ) : isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <Tabs defaultValue="api-keys" className="space-y-6">
-          <TabsList className="grid w-full md:w-auto grid-cols-4">
-            <TabsTrigger value="api-keys">API Keys</TabsTrigger>
-            <TabsTrigger value="webhook">Webhook</TabsTrigger>
-            <TabsTrigger value="server-api">Server API</TabsTrigger>
-            <TabsTrigger value="events">Event Callbacks</TabsTrigger>
-          </TabsList>
-          
+      <Tabs defaultValue="api-keys" className="w-full" onValueChange={handleTabChange}>
+        <TabsList className={`grid ${isMobile ? 'grid-cols-2 gap-2 mb-4' : 'grid-cols-4 mb-8'} w-full`}>
+          <TabsTrigger value="api-keys" className="flex items-center gap-2 text-xs md:text-sm">
+            <Key className="h-3 w-3 md:h-4 md:w-4" />
+            <span>API Keys</span>
+          </TabsTrigger>
+          <TabsTrigger value="web-integration" className="flex items-center gap-2 text-xs md:text-sm">
+            <Globe className="h-3 w-3 md:h-4 md:w-4" />
+            <span>Web Integration</span>
+          </TabsTrigger>
+          <TabsTrigger value="webhooks" className="flex items-center gap-2 text-xs md:text-sm">
+            <Webhook className="h-3 w-3 md:h-4 md:w-4" />
+            <span>Webhooks</span>
+          </TabsTrigger>
+          <TabsTrigger value="payment-methods" className="flex items-center gap-2 text-xs md:text-sm">
+            <CreditCard className="h-3 w-3 md:h-4 md:w-4" />
+            <span>Payment Methods</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full"
+        >
           <TabsContent value="api-keys" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>API Keys</CardTitle>
+                <CardTitle className="text-lg md:text-xl">API Keys</CardTitle>
                 <CardDescription>
                   Secure keys to authenticate your integration with our payment API
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-md">
-                  <code className="text-sm font-mono break-all">{apiKey}</code>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      if (apiKey) {
-                        navigator.clipboard.writeText(apiKey);
-                        toast.success('API Key copied to clipboard');
-                      }
-                    }}
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Production API Key</Label>
+                  <div className="flex items-center">
+                    <Input 
+                      type="password" 
+                      value="••••••••••••••••••••••••••" 
+                      readOnly 
+                      className="flex-1 font-mono text-xs md:text-sm"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="ml-2" 
+                      onClick={() => handleCopy("rzp_live_XXXXXXXXXXXXX", "production")}
+                    >
+                      {copied === "production" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Use for live transactions in production environment.</p>
+                </div>
+                
+                <motion.div 
+                  className="space-y-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Label className="text-sm font-medium">Test API Key</Label>
+                  <div className="flex items-center">
+                    <Input 
+                      value="rzp_test_JXIkZl2p0iUbRw" 
+                      readOnly 
+                      className="flex-1 font-mono text-xs md:text-sm"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="ml-2" 
+                      onClick={() => handleCopy("rzp_test_JXIkZl2p0iUbRw", "test")}
+                    >
+                      {copied === "test" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Use for testing in development environment.</p>
+                </motion.div>
+                
+                <Alert variant="destructive" className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Security Notice</AlertTitle>
+                  <AlertDescription>
+                    Never expose your API keys in client-side code or public repositories.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="web-integration" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg md:text-xl">Web Integration</CardTitle>
+                <CardDescription>
+                  Integrate payment functionality directly into your website
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">Quick Start</Label>
+                  <div className="bg-muted p-4 rounded-md overflow-x-auto text-xs md:text-sm">
+                    <pre className="text-xs md:text-sm">
+                      <code>{`
+// 1. Include the Razorpay script
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+// 2. Configure payment options
+const options = {
+  key: "rzp_test_JXIkZl2p0iUbRw", // Your API Key
+  amount: 50000, // Amount in paise (500 INR)
+  currency: "INR",
+  name: "Your Business Name",
+  description: "Test Transaction",
+  order_id: "order_id_from_backend", // Generated from your backend
+  handler: function (response) {
+    // Handle success
+    alert("Payment ID: " + response.razorpay_payment_id);
+  },
+  prefill: {
+    name: "Customer Name",
+    email: "customer@example.com"
+  },
+  theme: {
+    color: "#2563eb"
+  }
+};
+
+// 3. Initialize Razorpay
+const paymentObject = new Razorpay(options);
+paymentObject.open();
+                      `}</code>
+                    </pre>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={() => handleCopy(`// 1. Include the Razorpay script
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+// 2. Configure payment options
+const options = {
+  key: "rzp_test_JXIkZl2p0iUbRw", // Your API Key
+  amount: 50000, // Amount in paise (500 INR)
+  currency: "INR",
+  name: "Your Business Name",
+  description: "Test Transaction",
+  order_id: "order_id_from_backend", // Generated from your backend
+  handler: function (response) {
+    // Handle success
+    alert("Payment ID: " + response.razorpay_payment_id);
+  },
+  prefill: {
+    name: "Customer Name",
+    email: "customer@example.com"
+  },
+  theme: {
+    color: "#2563eb"
+  }
+};
+
+// 3. Initialize Razorpay
+const paymentObject = new Razorpay(options);
+paymentObject.open();`, "code")}
                   >
-                    <span className="sr-only">Copy API Key</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
+                    {copied === "code" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    Copy Code
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Keep this API key secret. Never share it or include it in client-side code.
-                </p>
+                
+                <motion.div 
+                  className="space-y-4 mt-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Label className="text-base font-medium">Backend Integration</Label>
+                  <p className="text-sm text-muted-foreground">
+                    You need to create an order on your backend before initializing payment:
+                  </p>
+                  <div className="bg-muted p-4 rounded-md overflow-x-auto">
+                    <pre className="text-xs md:text-sm">
+                      <code>{`
+// Example Node.js code to create an order
+const Razorpay = require('razorpay');
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+app.post('/create-order', async (req, res) => {
+  try {
+    const order = await razorpay.orders.create({
+      amount: req.body.amount * 100, // amount in paise
+      currency: 'INR',
+      receipt: 'receipt_' + Date.now()
+    });
+    
+    res.json({
+      orderId: order.id
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+                      `}</code>
+                    </pre>
+                  </div>
+                </motion.div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="webhook" className="space-y-6">
-            <WebhookIntegration 
-              apiKey={apiKey} 
-              onRegenerateApiKey={handleRegenerateApiKey}
-              isRegenerating={isRegenerating}
-            />
-          </TabsContent>
-          
-          <TabsContent value="server-api" className="space-y-6">
+          <TabsContent value="webhooks" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Server API Reference</CardTitle>
+                <CardTitle className="text-lg md:text-xl">Webhooks</CardTitle>
                 <CardDescription>
-                  Integrate with our server APIs for advanced payment processing
+                  Receive real-time payment events on your server
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="border p-4 rounded-md">
-                    <h3 className="font-medium text-lg mb-2">Create Payment</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Initiate a payment request
-                    </p>
-                    <pre className="bg-muted p-2 rounded-md text-xs font-mono overflow-x-auto">
-                      POST /api/payments/create
-                    </pre>
-                    <div className="mt-2">
-                      <p className="text-sm font-medium">Required Parameters:</p>
-                      <ul className="text-xs text-muted-foreground list-disc pl-5 mt-1">
-                        <li>amount: number (in smallest currency unit)</li>
-                        <li>currency: string (e.g., "INR")</li>
-                        <li>customer_id: string</li>
-                      </ul>
+              <CardContent className="space-y-6">
+                <p className="text-sm">
+                  Configure webhooks to get notified when payment events occur. Webhooks allow your application
+                  to receive real-time updates about payment status changes.
+                </p>
+                
+                <motion.div 
+                  className="space-y-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Label htmlFor="webhook-url">Webhook URL</Label>
+                  <Input
+                    id="webhook-url"
+                    placeholder="https://example.com/webhook/payment"
+                    className="text-xs md:text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Your server endpoint that will receive webhook events
+                  </p>
+                </motion.div>
+                
+                <motion.div 
+                  className="space-y-4 mt-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Label className="text-base font-medium">Webhook Events</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="payment-authorized" className="rounded border-gray-300" defaultChecked />
+                      <label htmlFor="payment-authorized" className="text-sm">Payment Authorized</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="payment-failed" className="rounded border-gray-300" defaultChecked />
+                      <label htmlFor="payment-failed" className="text-sm">Payment Failed</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="payment-captured" className="rounded border-gray-300" defaultChecked />
+                      <label htmlFor="payment-captured" className="text-sm">Payment Captured</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="refund-initiated" className="rounded border-gray-300" />
+                      <label htmlFor="refund-initiated" className="text-sm">Refund Initiated</label>
                     </div>
                   </div>
-                  
-                  <div className="border p-4 rounded-md">
-                    <h3 className="font-medium text-lg mb-2">Verify Payment</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Verify a payment's status
-                    </p>
-                    <pre className="bg-muted p-2 rounded-md text-xs font-mono overflow-x-auto">
-                      GET /api/payments/verify/:payment_id
-                    </pre>
-                    <div className="mt-2">
-                      <p className="text-sm font-medium">Required Parameters:</p>
-                      <ul className="text-xs text-muted-foreground list-disc pl-5 mt-1">
-                        <li>payment_id: string</li>
-                      </ul>
-                    </div>
+                </motion.div>
+                
+                <motion.div 
+                  className="space-y-4 mt-6"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Label htmlFor="webhook-secret">Webhook Secret</Label>
+                  <div className="flex items-center">
+                    <Input
+                      id="webhook-secret"
+                      type="password"
+                      value="••••••••••••••••••••••••••"
+                      readOnly
+                      className="text-xs md:text-sm"
+                    />
+                    <Button variant="outline" size="sm" className="ml-2">
+                      <Copy className="h-4 w-4" />
+                    </Button>
                   </div>
-                  
-                  <div className="border p-4 rounded-md">
-                    <h3 className="font-medium text-lg mb-2">Retrieve Transactions</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Get a list of transactions
-                    </p>
-                    <pre className="bg-muted p-2 rounded-md text-xs font-mono overflow-x-auto">
-                      GET /api/transactions?limit=10&offset=0
-                    </pre>
-                    <div className="mt-2">
-                      <p className="text-sm font-medium">Optional Parameters:</p>
-                      <ul className="text-xs text-muted-foreground list-disc pl-5 mt-1">
-                        <li>limit: number (default: 10)</li>
-                        <li>offset: number (default: 0)</li>
-                        <li>status: string (e.g., "success", "pending", "failed")</li>
-                      </ul>
-                    </div>
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Use this secret to verify webhook signatures
+                  </p>
+                </motion.div>
+                
+                <div className="mt-6">
+                  <Button className="w-full md:w-auto">Save Webhook Configuration</Button>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="events" className="space-y-6">
+          <TabsContent value="payment-methods" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Event Callbacks</CardTitle>
+                <CardTitle className="text-lg md:text-xl">Available Payment Methods</CardTitle>
                 <CardDescription>
-                  Configure callback URLs for payment events
+                  Configure which payment methods to accept in your integration
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Payment Success URL</label>
-                    <input 
-                      type="url" 
-                      placeholder="https://your-website.com/payment/success" 
-                      className="w-full px-3 py-2 border rounded-md text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      URL to redirect users after successful payment
-                    </p>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <motion.div 
+                    className="border rounded-lg p-4"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <CreditCard className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+                      <div>
+                        <h3 className="font-medium">Credit/Debit Cards</h3>
+                        <p className="text-xs md:text-sm text-muted-foreground">All major cards accepted</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Visa</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Mastercard</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">RuPay</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">American Express</span>
+                        <input type="checkbox" className="rounded border-gray-300" />
+                      </div>
+                    </div>
+                  </motion.div>
                   
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Payment Failure URL</label>
-                    <input 
-                      type="url" 
-                      placeholder="https://your-website.com/payment/failure" 
-                      className="w-full px-3 py-2 border rounded-md text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      URL to redirect users after failed payment
-                    </p>
-                  </div>
+                  <motion.div 
+                    className="border rounded-lg p-4"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary h-6 w-6 md:h-8 md:w-8">
+                        <path d="M8 9v6" />
+                        <path d="M16 15V9" />
+                        <path d="M12 12h4" />
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      </svg>
+                      <div>
+                        <h3 className="font-medium">UPI</h3>
+                        <p className="text-xs md:text-sm text-muted-foreground">Unified Payments Interface</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Google Pay</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">PhonePe</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Paytm</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">BHIM</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                    </div>
+                  </motion.div>
                   
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Webhook Notification URL</label>
-                    <input 
-                      type="url" 
-                      placeholder="https://your-website.com/webhooks/payment" 
-                      className="w-full px-3 py-2 border rounded-md text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      URL to send server-to-server notifications
-                    </p>
-                  </div>
+                  <motion.div 
+                    className="border rounded-lg p-4"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Server className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+                      <div>
+                        <h3 className="font-medium">Net Banking</h3>
+                        <p className="text-xs md:text-sm text-muted-foreground">Bank transfers</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">HDFC Bank</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">ICICI Bank</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">SBI</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Other Banks</span>
+                        <input type="checkbox" className="rounded border-gray-300" />
+                      </div>
+                    </div>
+                  </motion.div>
                   
-                  <Button type="submit">Save Callback Settings</Button>
-                </form>
+                  <motion.div 
+                    className="border rounded-lg p-4"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary h-6 w-6 md:h-8 md:w-8">
+                        <rect width="20" height="14" x="2" y="5" rx="2" />
+                        <path d="M2 10h20" />
+                      </svg>
+                      <div>
+                        <h3 className="font-medium">Wallets</h3>
+                        <p className="text-xs md:text-sm text-muted-foreground">Digital wallets</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Paytm Wallet</span>
+                        <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Amazon Pay</span>
+                        <input type="checkbox" className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">MobiKwik</span>
+                        <input type="checkbox" className="rounded border-gray-300" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs md:text-sm">Freecharge</span>
+                        <input type="checkbox" className="rounded border-gray-300" />
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+                
+                <motion.div 
+                  className="mt-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Button className="w-full md:w-auto">Save Payment Methods</Button>
+                </motion.div>
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
-      )}
+        </motion.div>
+      </Tabs>
     </div>
   );
 };

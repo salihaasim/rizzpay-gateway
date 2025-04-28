@@ -1,144 +1,99 @@
 
-# RizzPay Payment Gateway
+# RizzPay
 
-RizzPay is a secure, fast, and reliable payment gateway solution for businesses and consumers.
+RizzPay is a comprehensive payment processing platform designed to handle legal INR transactions for e-commerce businesses, digital services, and online marketplaces.
 
-## Router Configuration
+## Architecture Overview
 
-This application uses React Router for navigation. The main App component is wrapped with BrowserRouter in the main.tsx file to provide routing context throughout the application.
+RizzPay follows a modular architecture pattern with the following core components:
 
-## Mobile App Support
+### Backend Modules
 
-This application is optimized for both Android and iOS mobile platforms via Capacitor. The app provides a seamless payment experience across all devices.
+| Module | Description |
+|--------|-------------|
+| API Gateway | NestJS backend API |
+| Authentication | Supabase Auth (JWT-based, custom claims for admin/merchant) |
+| Merchant Management | CRUD API for merchants onboarding |
+| Transaction Engine | Payment creation, updating, and status handling |
+| Payout Engine | Withdrawals & settlements |
+| Escrow Fund Management | Separate ledgering for deposits vs payouts |
+| Fraud Detection Engine | Monitoring for suspicious activity |
+| Webhook Processor | Handling incoming and outgoing webhooks (success, failure) |
+| Database | PostgreSQL with tables for Users, Merchants, Transactions, Settlements, Webhooks |
 
-### Mobile Features
+### Frontend Features
 
-- **Responsive UI**: Fully responsive design that works on all screen sizes
-- **Native Capabilities**: Uses device capabilities like camera for QR scanning
-- **Offline Support**: Basic functionality works even with intermittent connectivity
-- **Push Notifications**: Get real-time updates on transaction status
-- **Biometric Authentication**: Secure login with fingerprint or face recognition
+- React-based admin and merchant dashboards
+- Transaction management interface
+- Analytics and reporting tools
+- Webhook integration setup
+- User and role management
 
-### Building Mobile Apps
+## Getting Started
 
-To build the mobile applications:
+### Prerequisites
 
-1. Install dependencies: `npm install`
-2. Build the web application: `npm run build`
-3. Sync with Capacitor: `npx cap sync`
-4. Build for Android: `npx cap open android`
-5. Build for iOS: `npx cap open ios` (requires macOS with Xcode)
+- Node.js (v16+)
+- Supabase account
+- PostgreSQL database
 
-## Authentication
+### Installation
 
-The application supports multiple user roles:
+1. Clone the repository
+```
+git clone https://github.com/yourusername/rizzpay.git
+```
 
-- **Admin**: Full access to all features and management capabilities
-- **Merchant**: Access to merchant-specific features
+2. Install dependencies
+```
+cd rizzpay
+npm install
+```
 
-Demo credentials:
-- Admin: username: `rizzpay`, password: `rizzpay123`
-- Merchant: username: `merchant`, password: `password`
+3. Set up environment variables
+```
+cp .env.example .env
+```
+Edit the .env file with your Supabase credentials
 
-## Admin Features
+4. Start the development server
+```
+npm run dev
+```
 
-The admin dashboard includes:
+## API Documentation
 
-- **Merchant Management**: Add, edit, and manage merchants
-- **Role Management**: Create and manage user roles with custom permissions
-- **Transaction Logs**: View and export transaction history to Excel
-- **Merchant Whitelist**: Manage trusted merchants with special access
-- **Bank API Integration**: Connect with banking APIs for seamless transactions
-- **Pricing Control**: Set default pricing (payment in: 1%, payment out: 1%)
-- **System Monitoring**: Comprehensive monitoring dashboards for all aspects of the system
+### Authentication
 
-## Merchant Features
+RizzPay uses Supabase Auth for authentication. JWT tokens are used to authenticate API requests.
 
-Merchants have access to:
+### Webhook Integration
 
-- **Dashboard**: Overview of transaction metrics and performance
-- **Transactions**: Track and manage payment transactions
-- **Wallet**: Manage funds and perform transactions
-  - **Static UPI QR Codes**: Generate branded QR codes for UPI payments
-  - **Deposits & Withdrawals**: Manage wallet funds
-  - **Transfers**: Send money to other merchants
-- **Developer Tools**: Set up integrations with external systems
-- **Settings**: Configure account settings and preferences
+See [Webhook Integration Guide](src/documentation/WEBHOOK_INTEGRATION.md) for details on integrating with the RizzPay webhook system.
 
-## UPI Payment Features
+### Payment Processing
 
-RizzPay provides comprehensive UPI payment capabilities:
+RizzPay supports various payment methods including:
+- Credit/Debit Cards
+- UPI
+- Net Banking
+- Wallet
 
-- **Static QR Generation**: Create branded QR codes for UPI payments
-  - **PDF Export**: Download QR codes as PDFs with full QR image for scanning
-  - **Website Integration**: Generate embed code for websites
-  - **Customizable**: Add payment descriptions and branding
-- **Payment Links**: Generate and share payment links with customers
-- **Direct UPI Integration**: Connect directly with popular UPI apps
-- **Real-time Notifications**: Get instant payment confirmations
-- **Customizable Payment Pages**: Branded payment experience for customers
-- **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
+## Core Features
 
-## Developer Tools
+- **Secure Payment Processing**: End-to-end encryption for all transactions
+- **Webhook Integration**: Easy integration with your website or application
+- **Transaction Management**: Comprehensive dashboard for viewing and managing transactions
+- **Settlement Processing**: Automated settlement to your bank account
+- **Reporting & Analytics**: Detailed reports and insights into your payment data
 
-RizzPay offers a comprehensive set of developer tools for integrating payment functionality:
+## Security
 
-- **API Keys**: Generate and manage secure API keys for authentication
-- **Webhooks**: Configure webhook endpoints to receive real-time event notifications
-- **Server API**: Detailed documentation for server-side integration
-- **Event Callbacks**: Customize event handling for payment lifecycle
+- PCI DSS compliant payment processing
+- End-to-end encryption
+- Robust fraud detection
+- IP and domain whitelisting
 
-## System Monitoring
+## License
 
-RizzPay includes comprehensive monitoring dashboards for all aspects of the system:
-
-- **Server Performance**: Real-time CPU, memory, and system resource monitoring
-- **API Gateway**: Monitor API performance and request rates
-- **Database Health**: Track database performance and query analytics
-- **Payment Gateway**: Monitor payment processor status and transaction metrics
-- **Security**: Track security events and compliance status
-- **Transactions**: Real-time tracking of payment flow
-- **Error Tracking**: Monitor application errors and exceptions
-- **Business Analytics**: Analyze user behavior and business performance
-- **System Status**: Comprehensive overview of all system components
-- **Performance Analytics**: Track detailed performance metrics
-- **Incident Management**: Track and resolve system incidents
-
-## Special Features
-
-### Aasimo AI Assistant
-
-RizzPay includes a specialized AI assistant named Aasimo AI that provides strategic insights and feature suggestions. This tool is accessible via a special URL and is designed to help the development team optimize the payment platform.
-
-- **Access**: Visit `/aasimo-ai` to interact with the AI assistant
-- **Purpose**: Get ideas for new features and improvements to the payment gateway
-- **Availability**: This feature is not linked from admin or merchant dashboards
-
-## Recent Updates
-
-- **Brand Updates**: Updated branding to RizzPay throughout the application
-- **Logo Redesign**: Implemented new professional logo with improved color scheme
-- **UI Improvement**: Fixed layout issues in navbar and dashboard components
-- **Chart Size Adjustment**: Reduced analytics chart height for better display
-- **Layout Spacing**: Optimized content spacing and container widths
-- **Responsive Fixes**: Improved mobile experience with better spacing
-- **Graph Improvements**: Enhanced revenue graph to show actual transaction data
-- **Payment Button Updates**: Updated payment buttons to use consistent RizzPay branding
-- **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
-- **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
-- **Router Fix**: Added BrowserRouter to properly handle React Router navigation
-- **Home Page Access**: Fixed navigation to home page from dashboard
-- **UI Enhancements**: Improved overall UI with better spacing and visual hierarchy
-- **Developer Tools**: Consolidated technical documentation and developer tools
-
-## Server Requirements
-
-See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.
-
-## Documentation
-
-For complete documentation on RizzPay Gateway features and APIs, please refer to the documentation files:
-
-- [Payment Processing](PAYMENT_README.md)
-- [Webhook Integration](WEBHOOK_README.md)
-- [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+[MIT](LICENSE)
