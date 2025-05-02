@@ -32,7 +32,7 @@ const Wallet = () => {
   
   return (
     <Card className="mb-4 sm:mb-8 border-0 shadow-sm">
-      <CardContent className="p-3 sm:p-6">
+      <CardContent className="p-2 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="md:col-span-2">
             <WalletBalance balance={walletBalance} />

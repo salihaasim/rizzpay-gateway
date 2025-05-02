@@ -1,9 +1,11 @@
+
 # RizzPay Payment Gateway
 
 RizzPay is a secure, fast, and reliable payment gateway solution for businesses and consumers.
 
 ## Recent Changes
 
+- **Mobile UI Improvements**: Enhanced responsiveness for wallet deposit and bulk withdrawal forms
 - **Code Block Component**: Implemented a custom CodeBlock component to replace the dependency on react-syntax-highlighter 
 - **Improved Styling**: Added CSS styling for code blocks to ensure consistent display across the application
 
@@ -108,6 +110,7 @@ RizzPay supports various payment methods including:
 
 ## Recent Updates
 
+- **Mobile Responsiveness**: Fixed tablet and mobile views in wallet deposit and bulk withdrawal forms
 - **Syntax Highlighting**: Replaced react-syntax-highlighter with a custom lightweight solution
 - **Brand Updates**: Updated branding to RizzPay throughout the application
 - **Logo Redesign**: Implemented new professional logo with improved color scheme
