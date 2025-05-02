@@ -5,14 +5,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { CopyIcon, RefreshCw, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface WebhookIntegrationProps {
   apiKey: string | null;
   onRegenerateApiKey?: () => void;
   isRegenerating?: boolean;
 }
+
+const CodeBlock = ({ code, language }: { code: string, language: string }) => {
+  return (
+    <pre className="relative p-4 rounded-md bg-slate-950 text-slate-50 overflow-x-auto text-xs md:text-sm">
+      <code className={`language-${language}`}>
+        {code}
+      </code>
+    </pre>
+  );
+};
 
 const WebhookIntegration: React.FC<WebhookIntegrationProps> = ({ 
   apiKey,
@@ -167,13 +175,7 @@ async function initiateRizzpayPayment(paymentDetails) {
             </TabsList>
             <TabsContent value="html" className="mt-4 space-y-4">
               <div className="relative">
-                <SyntaxHighlighter
-                  language="html"
-                  style={nord}
-                  customStyle={{ borderRadius: '0.5rem' }}
-                >
-                  {htmlCode}
-                </SyntaxHighlighter>
+                <CodeBlock code={htmlCode} language="html" />
                 <Button
                   size="sm"
                   variant="ghost"
@@ -189,13 +191,7 @@ async function initiateRizzpayPayment(paymentDetails) {
             </TabsContent>
             <TabsContent value="js" className="mt-4 space-y-4">
               <div className="relative">
-                <SyntaxHighlighter
-                  language="javascript"
-                  style={nord}
-                  customStyle={{ borderRadius: '0.5rem' }}
-                >
-                  {jsCode}
-                </SyntaxHighlighter>
+                <CodeBlock code={jsCode} language="javascript" />
                 <Button
                   size="sm"
                   variant="ghost"
@@ -211,13 +207,7 @@ async function initiateRizzpayPayment(paymentDetails) {
             </TabsContent>
             <TabsContent value="direct" className="mt-4 space-y-4">
               <div className="relative">
-                <SyntaxHighlighter
-                  language="markup"
-                  style={nord}
-                  customStyle={{ borderRadius: '0.5rem' }}
-                >
-                  {urlCode}
-                </SyntaxHighlighter>
+                <CodeBlock code={urlCode} language="markup" />
                 <Button
                   size="sm"
                   variant="ghost"
