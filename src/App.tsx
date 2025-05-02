@@ -20,6 +20,7 @@ import Dashboard from './pages/Dashboard';
 import Features from './pages/Features';
 import Features2 from './pages/Features2';
 import { default as AasimoAIComponent } from './components/aasimo/AasimoAI';
+import KycPage from './pages/KycPage';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -156,6 +157,8 @@ const App = () => {
     
     <Route key="features" path="/features" element={<Features />} />,
     <Route key="features2" path="/features2" element={<Features2 />} />,
+    
+    <Route key="kyc" path="/kyc" element={<KycPage />} />,
     
     <Route key="not-found" path="*" element={<NotFound />} />
   ];
