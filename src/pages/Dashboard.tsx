@@ -35,8 +35,14 @@ const RecentTransactionsList = React.memo(({ transactions }: { transactions: Tra
 RecentTransactionsList.displayName = 'RecentTransactionsList';
 
 const Dashboard = () => {
-  const { transactions, userRole } = useTransactionStore();
+  const { transactions, userRole, userEmail } = useTransactionStore();
   const [activeTab, setActiveTab] = useState(userRole === 'admin' ? 'admin' : 'merchant');
+  
+  // Merchant name from email (simplified version)
+  const merchantName = useMemo(() => {
+    if (!userEmail) return "Merchant";
+    return userEmail.split('@')[0].charAt(0).toUpperCase() + userEmail.split('@')[0].slice(1);
+  }, [userEmail]);
   
   // Generate analytics summary from transactions
   const analytics = useMemo(() => generateAnalyticsSummary(transactions), [transactions]);
@@ -52,6 +58,8 @@ const Dashboard = () => {
         <div className="page-header">
           <div>
             <h1 className="page-title">Dashboard</h1>
+            {/* Welcome message with merchant name */}
+            <p className="text-muted-foreground mt-1">Welcome, {merchantName}! Here's your payment overview</p>
           </div>
           
           {userRole === 'admin' && (

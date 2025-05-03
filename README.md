@@ -13,6 +13,8 @@
 
 ## Recent Updates
 
+- Added welcome message with merchant name to Dashboard
+- Simplified transaction charts by removing Instamojo and Net Banking data
 - Fixed TypeScript errors related to UPI Transaction ID display
 - Changed FileExcel icon to FileDown in UPI transaction exports
 - Added UPI Transaction ID to PaymentDetails interface
@@ -48,4 +50,3 @@
 - Zustand for state management
 - React Router for navigation
 - Supabase for backend and storage
-
