@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -80,29 +81,38 @@ const Transactions = () => {
   const failedTotal = getTotalAmount('failed');
   const processingTotal = getTotalAmount('processing');
 
-  // Generate payment method data for pie chart
+  // Generate payment method data for pie chart with improved rendering
   const getPaymentMethodData = () => {
     const methodCounts: Record<string, number> = {};
     
     transactions.forEach(transaction => {
-      const method = transaction.paymentMethod;
+      // Group similar payment methods together for cleaner display
+      let method = transaction.paymentMethod;
+      
+      // Group similar payment methods
+      if (method.includes('upi')) method = 'UPI';
+      else if (method.includes('card')) method = 'Card';
+      else if (method.includes('netbanking')) method = 'Netbanking';
+      else if (method.includes('neft')) method = 'NEFT';
+      else if (method.includes('wallet')) method = 'Wallet';
+      else method = method.charAt(0).toUpperCase() + method.slice(1);
+      
       methodCounts[method] = (methodCounts[method] || 0) + 1;
     });
     
     const colors: Record<string, string> = {
-      'upi': '#34A853',
-      'Google Pay': '#4285F4',
       'UPI': '#34A853',
-      'card': '#EA4335',
-      'Credit Card': '#EA4335',
-      'Debit Card': '#FBBC05',
-      'netbanking': '#003087',
-      'PayPal': '#003087',
-      'Cash': '#6B7280',
+      'Card': '#EA4335',
+      'Netbanking': '#003087',
+      'NEFT': '#4285F4', 
+      'Wallet': '#FBBC05',
     };
     
+    // Calculate percentages
+    const total = Object.values(methodCounts).reduce((a, b) => a + b, 0);
+    
     return Object.entries(methodCounts).map(([name, value]) => ({
-      name,
+      name: `${name} (${Math.round((value / total) * 100)}%)`,
       value,
       color: colors[name] || '#6B7280',
     }));
@@ -214,7 +224,7 @@ const Transactions = () => {
             <CardDescription>Distribution by type</CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="h-[200px]">
+            <div className="h-[250px]">
               {paymentMethodData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -226,14 +236,13 @@ const Transactions = () => {
                       outerRadius={80}
                       paddingAngle={2}
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       labelLine={false}
+                      label={({ name }) => name}
                     >
                       {paymentMethodData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Legend verticalAlign="bottom" height={36} />
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
