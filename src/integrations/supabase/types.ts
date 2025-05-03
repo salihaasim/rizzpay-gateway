@@ -47,6 +47,45 @@ export type Database = {
           },
         ]
       }
+      kyc_submissions: {
+        Row: {
+          aadhaar_document_path: string | null
+          gst_document_path: string | null
+          gst_number: string | null
+          id: string
+          notes: string | null
+          pan_document_path: string | null
+          status: string | null
+          submitted_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          aadhaar_document_path?: string | null
+          gst_document_path?: string | null
+          gst_number?: string | null
+          id?: string
+          notes?: string | null
+          pan_document_path?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          aadhaar_document_path?: string | null
+          gst_document_path?: string | null
+          gst_number?: string | null
+          id?: string
+          notes?: string | null
+          pan_document_path?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       merchant_documents: {
         Row: {
           document_type: string

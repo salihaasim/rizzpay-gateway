@@ -12,7 +12,10 @@
 
 ## Recent Updates
 
-- Added KYC Verification page and navigation
+- Added database integration for KYC document storage and verification
+- Fixed navigation bar display on KYC page
+- Implemented document upload functionality with Supabase Storage
+- Added admin document verification interface
 - Enhanced mobile responsiveness for Wallet page
 - Fixed layout issues in deposit and bulk withdrawal forms
 
@@ -23,6 +26,7 @@
 - Shadcn UI components
 - Zustand for state management
 - React Router for navigation
+- Supabase for backend and storage
 
 ## Getting Started
 
