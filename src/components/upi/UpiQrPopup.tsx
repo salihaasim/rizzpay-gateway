@@ -72,10 +72,10 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
     addTransaction({
       id: reference,
       amount: amount.toString(),
-      method: 'upi_manual',
+      paymentMethod: 'upi_manual',
       status: 'pending',
-      customerName: 'Manual UPI Payment',
-      timestamp: new Date().toISOString(),
+      customer: 'Manual UPI Payment',
+      date: new Date().toISOString(),
       processingState: 'initiated',
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
