@@ -18,7 +18,7 @@ const UpiTransactionCard: React.FC<UpiTransactionCardProps> = ({
 }) => {
   // Get UPI ID from payment details if available
   const upiId = transaction.paymentDetails?.upiId;
-  // Get UPI Transaction ID if available
+  // Get UPI Transaction ID if available (could be from razorpay_payment_id or the new upiTransactionId field)
   const upiTransactionId = transaction.paymentDetails?.upiTransactionId || transaction.paymentDetails?.razorpay_payment_id;
   
   return (

@@ -13,6 +13,9 @@
 
 ## Recent Updates
 
+- Fixed TypeScript errors related to UPI Transaction ID display
+- Changed FileExcel icon to FileDown in UPI transaction exports
+- Added UPI Transaction ID to PaymentDetails interface
 - Added UPI Transaction ID display in UPI transaction cards
 - Added Excel export functionality for UPI transactions and all transactions
 - Simplified Dashboard interface with cleaner layout and improved data visualization
@@ -45,3 +48,4 @@
 - Zustand for state management
 - React Router for navigation
 - Supabase for backend and storage
+

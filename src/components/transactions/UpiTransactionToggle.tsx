@@ -2,7 +2,7 @@
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { QrCode, FileExcel } from 'lucide-react';
+import { QrCode, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Transaction } from '@/stores/transactionStore';
 import * as XLSX from 'xlsx';
@@ -77,7 +77,7 @@ const UpiTransactionToggle: React.FC<UpiTransactionToggleProps> = ({
           className="flex items-center gap-1 border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/10"
           onClick={exportToExcel}
         >
-          <FileExcel className="h-4 w-4" />
+          <FileDown className="h-4 w-4" />
           <span>Export UPI Data</span>
         </Button>
       )}
