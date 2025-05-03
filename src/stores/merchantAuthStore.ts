@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { toast } from 'sonner';
 
 interface MerchantCredentials {
+  id?: string; // Added ID field to fix type errors
   username: string;
   password: string;
   fullName: string;

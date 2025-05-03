@@ -40,9 +40,11 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
     }
   };
 
-  const handleDialogOpen = async () => {
+  const handleDialogOpen = async (open: boolean) => {
+    setIsOpen(open);
+    
     // Load document URLs when dialog opens
-    if (merchantId && isOpen) {
+    if (merchantId && open) {
       try {
         const urls: Record<string, string> = {};
         
@@ -126,7 +128,7 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen} onOpenChange={handleDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={handleDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <FileUp className="h-4 w-4 mr-2" />

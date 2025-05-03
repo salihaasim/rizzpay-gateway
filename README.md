@@ -12,7 +12,9 @@
 
 ## Recent Updates
 
-- Added database integration for KYC document storage and verification
+- Fixed TypeScript errors in KYC components to ensure proper functionality
+- Enhanced database integration for KYC document storage and verification
+- Added proper handling for document types and file uploads
 - Fixed navigation bar display on KYC page
 - Implemented document upload functionality with Supabase Storage
 - Added admin document verification interface

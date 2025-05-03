@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { FileUp, IdCard, UserCheck, Check, X } from "lucide-react";
+import { FileUp, UserCheck, Check, X } from "lucide-react";
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -116,17 +116,18 @@ const KycUploadForm: React.FC = () => {
       for (const [key, file] of Object.entries(documents)) {
         if (!file) continue;
         
-        const fileKey = key as keyof typeof documents;
+        const fileKey = key as string;
         const fileName = `${currentMerchant.id}/${fileKey}_${Date.now()}`;
         
+        // Cast file to any to bypass TypeScript error temporarily
         const { data, error } = await supabase.storage
           .from('kyc_documents')
-          .upload(fileName, file);
+          .upload(fileName, file as File);
           
         if (error) throw error;
         
         // Convert document key to path field name
-        const pathKey = `${fileKey.toLowerCase()}_document_path`;
+        const pathKey = `${String(fileKey).toLowerCase()}_document_path`;
         documentPaths[pathKey] = fileName;
       }
       
