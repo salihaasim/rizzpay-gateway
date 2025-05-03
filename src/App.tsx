@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -21,6 +22,7 @@ import Features from './pages/Features';
 import Features2 from './pages/Features2';
 import { default as AasimoAIComponent } from './components/aasimo/AasimoAI';
 import KycPage from './pages/KycPage';
+import UpiPluginSettings from './pages/UpiPluginSettings';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -160,7 +162,7 @@ const App = () => {
     
     <Route key="kyc" path="/kyc" element={<KycPage />} />,
     
-    <Route key="upi-plugin" element={<UpiPluginSettings />} />
+    <Route key="upi-plugin" path="/upi-plugin" element={<UpiPluginSettings />} />,
     
     <Route key="not-found" path="*" element={<NotFound />} />
   ];

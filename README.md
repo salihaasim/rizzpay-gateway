@@ -13,6 +13,7 @@
 
 ## Recent Updates
 
+- Fixed routing configuration in App.tsx for UPI Plugin page
 - Added UPI QR Popup Plugin with manual verification capability
 - Fixed TypeScript errors in KYC components to ensure proper functionality
 - Enhanced database integration for KYC document storage and verification
