@@ -78,11 +78,11 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
       reference: transactionId,
       customerName: 'Manual UPI Payment',
       timestamp: new Date().toISOString(),
-      processingState: 'pending', // Using a valid value
+      processingState: 'initiated', // Using a valid PaymentProcessingState value
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
         upiId: upiId,
-        reference: transactionId, // Use a valid property name
+        razorpay_order_id: transactionId, // Use a valid property name from PaymentDetails
         manualVerificationRequired: true
       }
     });
