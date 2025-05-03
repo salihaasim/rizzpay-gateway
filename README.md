@@ -13,6 +13,7 @@
 
 ## Recent Updates
 
+- Simplified Dashboard interface with cleaner layout and improved data visualization
 - Added Manual UPI Plugin Transaction filter and verification to Transactions page
 - Added specialized UPI transaction cards with UPI ID display and verification status
 - Added verification actions for pending UPI transactions

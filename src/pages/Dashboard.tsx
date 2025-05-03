@@ -8,7 +8,7 @@ import PaymentFlow from '@/components/PaymentFlow';
 import { Separator } from '@/components/ui/separator';
 import AnalyticsChart from '@/components/AnalyticsChart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight, Lock } from 'lucide-react';
+import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight } from 'lucide-react';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 import { Button } from '@/components/ui/button';
 import { 
@@ -17,14 +17,6 @@ import {
   calculateGrowthRate 
 } from '@/utils/analyticsUtils';
 import TechnicalAccessLink from '@/components/TechnicalAccessLink';
-
-// Static data for additional charts (will be replaced with real data)
-const paymentMethodData = [
-  { name: 'UPI', value: 55 },
-  { name: 'Card', value: 30 },
-  { name: 'Netbanking', value: 10 },
-  { name: 'Wallet', value: 5 },
-];
 
 const RecentTransactionsList = React.memo(({ transactions }: { transactions: Transaction[] }) => (
   <div className="space-y-4">
@@ -60,9 +52,6 @@ const Dashboard = () => {
         <div className="page-header">
           <div>
             <h1 className="page-title">Dashboard</h1>
-            <p className="page-description">
-              {userRole === 'admin' ? 'Admin Control Panel' : 'Merchant Dashboard'}
-            </p>
           </div>
           
           {userRole === 'admin' && (
