@@ -10,6 +10,8 @@ import TransactionDetails from '@/components/TransactionDetails';
 import { Search, Download, Filter, ArrowUpDown } from 'lucide-react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { useLocation } from 'react-router-dom';
+import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
+import UpiTransactionCard from '@/components/transactions/UpiTransactionCard';
 
 const Transactions = () => {
   const location = useLocation();
@@ -21,6 +23,7 @@ const Transactions = () => {
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(transactionIdParam);
+  const [showUpiTransactions, setShowUpiTransactions] = useState(false);
   
   useEffect(() => {
     if (transactionIdParam) {
@@ -30,20 +33,30 @@ const Transactions = () => {
   
   const selectedTransaction = transactions.find(t => t.id === selectedTransactionId);
   
-  // Filter transactions based on selected filter
+  // Filter transactions based on selected filter and UPI toggle
   const filteredTransactions = transactions.filter(transaction => {
-    if (filter === 'all') return true;
-    return transaction.status === filter;
-  }).filter(transaction => {
-    if (!searchQuery) return true;
+    // Apply status filter
+    if (filter !== 'all' && transaction.status !== filter) {
+      return false;
+    }
     
-    const query = searchQuery.toLowerCase();
-    return (
-      transaction.id.toLowerCase().includes(query) ||
-      transaction.customer.toLowerCase().includes(query) ||
-      transaction.amount.toLowerCase().includes(query) ||
-      transaction.paymentMethod.toLowerCase().includes(query)
-    );
+    // Apply UPI filter if toggled on
+    if (showUpiTransactions) {
+      return transaction.paymentMethod === 'upi_manual';
+    }
+    
+    // Apply search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        transaction.id.toLowerCase().includes(query) ||
+        transaction.customer.toLowerCase().includes(query) ||
+        transaction.amount.toLowerCase().includes(query) ||
+        transaction.paymentMethod.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
   });
 
   // Calculate totals
@@ -119,6 +132,11 @@ const Transactions = () => {
         </div>
       </div>
       
+      <UpiTransactionToggle 
+        showUpiTransactions={showUpiTransactions} 
+        setShowUpiTransactions={setShowUpiTransactions}
+      />
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <Card className="border-0 shadow-sm overflow-hidden lg:col-span-2">
           <CardHeader className="pb-2">
@@ -193,120 +211,139 @@ const Transactions = () => {
         </Card>
       </div>
       
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative w-full md:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex gap-3 flex-1 items-center">
-            <div className="flex items-center">
-              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm mr-2">Filter:</span>
+      <div className="space-y-6 mt-6">
+        {!showUpiTransactions && (
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative w-full md:w-[280px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search transactions..."
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Filter by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Transactions</SelectItem>
-                <SelectItem value="successful">Successful</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <div className="flex items-center ml-1">
-              <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm mr-2">Sort:</span>
+            <div className="flex gap-3 flex-1 items-center">
+              <div className="flex items-center">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-sm mr-2">Filter:</span>
+              </div>
+              
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Filter by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Transactions</SelectItem>
+                  <SelectItem value="successful">Successful</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <div className="flex items-center ml-1">
+                <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-sm mr-2">Sort:</span>
+              </div>
+              
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="amount">Amount</SelectItem>
+                  <SelectItem value="customer">Customer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="amount">Amount</SelectItem>
-                <SelectItem value="customer">Customer</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </div>
+        )}
         
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full max-w-md grid grid-cols-5">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="successful">Successful</TabsTrigger>
-            <TabsTrigger value="processing">Processing</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="failed">Failed</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="all" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.length > 0 ? (
-                filteredTransactions.map((transaction) => (
+        {showUpiTransactions ? (
+          <div className="space-y-4">
+            {filteredTransactions.length > 0 ? (
+              filteredTransactions.map((transaction) => (
+                <UpiTransactionCard 
+                  key={transaction.id}
+                  transaction={transaction}
+                />
+              ))
+            ) : (
+              <div className="text-center py-12 border rounded-lg">
+                <p className="text-muted-foreground">No UPI plugin transactions found</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="w-full max-w-md grid grid-cols-5">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="successful">Successful</TabsTrigger>
+              <TabsTrigger value="processing">Processing</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="failed">Failed</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="all" className="mt-6">
+              <div className="space-y-4">
+                {filteredTransactions.length > 0 ? (
+                  filteredTransactions.map((transaction) => (
+                    <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                      <TransactionCard {...transaction} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 border rounded-lg">
+                    <p className="text-muted-foreground">No transactions found</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="successful" className="mt-6">
+              <div className="space-y-4">
+                {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (
                   <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
                     <TransactionCard {...transaction} />
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-12 border rounded-lg">
-                  <p className="text-muted-foreground">No transactions found</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="successful" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="processing" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'processing').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="pending" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'pending').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="failed" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'failed').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="processing" className="mt-6">
+              <div className="space-y-4">
+                {filteredTransactions.filter(t => t.status === 'processing').map((transaction) => (
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="pending" className="mt-6">
+              <div className="space-y-4">
+                {filteredTransactions.filter(t => t.status === 'pending').map((transaction) => (
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="failed" className="mt-6">
+              <div className="space-y-4">
+                {filteredTransactions.filter(t => t.status === 'failed').map((transaction) => (
+                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
+                    <TransactionCard {...transaction} />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   );

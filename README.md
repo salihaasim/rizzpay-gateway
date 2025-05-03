@@ -13,6 +13,9 @@
 
 ## Recent Updates
 
+- Added Manual UPI Plugin Transaction filter and verification to Transactions page
+- Added specialized UPI transaction cards with UPI ID display and verification status
+- Added verification actions for pending UPI transactions
 - Optimized desktop navbar design with improved navigation experience
 - Fixed syntax error in Navbar component that was causing build failures
 - Added animations and icons to all navigation items in the navbar
