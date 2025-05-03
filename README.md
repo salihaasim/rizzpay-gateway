@@ -13,8 +13,10 @@
 
 ## Recent Updates
 
+- Optimized desktop navbar design with improved navigation experience
 - Fixed syntax error in Navbar component that was causing build failures
 - Added animations and icons to all navigation items in the navbar
+- Fixed TypeScript errors in UPI QR Popup component
 - Fixed TypeScript error in UPI QR Popup component by removing invalid property
 - Fixed TypeScript errors in UPI QR Popup component to use correct processing state and payment detail properties
 - Fixed TypeScript errors in UPI QR Popup component and added missing react-helmet dependency

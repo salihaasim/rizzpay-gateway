@@ -20,12 +20,14 @@ import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
 import logoSvg from '../assets/logo.svg';
 import { motion } from "@/components/ui/motion";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   // Set mounted state to true after initial render for animations
   useEffect(() => {
@@ -53,14 +55,14 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 max-w-screen-2xl items-center px-3 sm:px-4 md:px-6 mx-auto">
-        <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex h-16 max-w-screen-2xl items-center px-4 lg:px-6 mx-auto">
+        <div className="flex items-center gap-2 lg:gap-3">
           {location.pathname !== '/' && (
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={handleBack} 
-              className="mr-1 sm:mr-2"
+              className="mr-2"
               aria-label="Go back"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -69,13 +71,15 @@ const Navbar = () => {
           
           <Link 
             to="/" 
-            className="font-semibold text-lg sm:text-xl text-[#0052FF] flex items-center gap-1"
+            className="font-semibold text-xl lg:text-2xl text-[#0052FF] flex items-center gap-2"
           >
-            <img src={logoSvg} alt="RizzPay Logo" className="h-5 w-5 sm:h-6 sm:w-6" />
+            <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6 lg:h-7 lg:w-7" />
             <span className="font-bold">RizzPay</span>
           </Link>
-          
-          <nav className="hidden md:flex gap-4 lg:gap-6 ml-4 lg:ml-6">
+        </div>
+        
+        <nav className="hidden lg:flex items-center justify-center flex-1 px-4">
+          <div className="flex gap-1 bg-secondary/30 p-1 rounded-lg">
             {navItems.map((item, index) => 
               mounted ? (
                 <motion.div
@@ -87,11 +91,10 @@ const Navbar = () => {
                   <Link
                     to={item.path}
                     className={cn(
-                      "text-sm font-medium transition-all duration-200 hover:text-[#0052FF] flex items-center",
+                      "px-3 py-1.5 text-sm font-medium transition-all duration-200 hover:text-[#0052FF] flex items-center rounded-md",
                       isActive(item.path)
-                        ? "text-[#0052FF]"
-                        : "text-muted-foreground",
-                      "relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-left after:scale-x-0 hover:after:scale-x-100 after:bg-[#0052FF] after:transition-transform"
+                        ? "text-[#0052FF] bg-background shadow-sm"
+                        : "text-muted-foreground hover:bg-background/50"
                     )}
                   >
                     {item.icon}
@@ -103,10 +106,10 @@ const Navbar = () => {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-[#0052FF] flex items-center",
+                    "px-3 py-1.5 text-sm font-medium transition-colors hover:text-[#0052FF] flex items-center rounded-md",
                     isActive(item.path)
-                      ? "text-foreground"
-                      : "text-muted-foreground"
+                      ? "text-[#0052FF] bg-background shadow-sm"
+                      : "text-muted-foreground hover:bg-background/50"
                   )}
                 >
                   {item.icon}
@@ -114,10 +117,53 @@ const Navbar = () => {
                 </Link>
               )
             )}
-          </nav>
-        </div>
+          </div>
+        </nav>
         
-        <div className="flex items-center gap-1 sm:gap-2 ml-auto">
+        {/* Tablet view: simplified navigation */}
+        <nav className="hidden md:flex lg:hidden gap-1 mx-4 overflow-x-auto pb-2 flex-1 justify-center">
+          {navItems.map((item, index) => 
+            mounted ? (
+              <motion.div
+                key={item.path}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <Link
+                  to={item.path}
+                  className={cn(
+                    "p-2 text-sm font-medium transition-all duration-200 hover:text-[#0052FF] flex items-center",
+                    isActive(item.path)
+                      ? "text-[#0052FF]"
+                      : "text-muted-foreground"
+                  )}
+                  title={item.name}
+                >
+                  {React.cloneElement(item.icon, { className: "h-5 w-5 mr-0" })}
+                  <span className="sr-only">{item.name}</span>
+                </Link>
+              </motion.div>
+            ) : (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "p-2 text-sm font-medium transition-colors hover:text-[#0052FF] flex items-center",
+                  isActive(item.path)
+                    ? "text-[#0052FF]"
+                    : "text-muted-foreground"
+                )}
+                title={item.name}
+              >
+                {React.cloneElement(item.icon, { className: "h-5 w-5 mr-0" })}
+                <span className="sr-only">{item.name}</span>
+              </Link>
+            )
+          )}
+        </nav>
+        
+        <div className="flex items-center gap-2 ml-auto">
           <UserSwitcher />
           
           <Sheet open={open} onOpenChange={setOpen}>
@@ -131,11 +177,11 @@ const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
-              <Link to="/" className="flex items-center gap-1 mb-6 sm:mb-8">
-                <img src={logoSvg} alt="RizzPay Logo" className="h-6 w-6" />
+              <Link to="/" className="flex items-center gap-2 mb-6 sm:mb-8">
+                <img src={logoSvg} alt="RizzPay Logo" className="h-7 w-7" />
                 <span className="font-bold text-xl">RizzPay</span>
               </Link>
-              <div className="grid gap-1 py-4 sm:gap-2 sm:py-6">
+              <div className="grid gap-1 py-4">
                 {navItems.map((item, index) => (
                   <motion.div
                     key={item.path}
@@ -146,10 +192,10 @@ const Navbar = () => {
                     <Link
                       to={item.path}
                       className={cn(
-                        "flex w-full items-center py-2 text-base sm:text-lg font-semibold",
+                        "flex w-full items-center py-2 px-3 text-base font-medium rounded-md",
                         isActive(item.path)
-                          ? "text-[#0052FF]"
-                          : "text-muted-foreground"
+                          ? "text-[#0052FF] bg-secondary/50"
+                          : "text-muted-foreground hover:bg-secondary/30"
                       )}
                       onClick={() => setOpen(false)}
                     >
