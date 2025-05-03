@@ -71,18 +71,18 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
     // Add to transaction store
     addTransaction({
       id: reference,
-      amount: amount,
+      amount: amount.toString(), // Convert to string to fix type error
       currency: 'INR',
       method: 'upi_manual',
       status: 'pending',
       reference: transactionId,
       customerName: 'Manual UPI Payment',
       timestamp: new Date().toISOString(),
-      processingState: 'manual_verification',
+      processingState: 'pending', // Using a valid value
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
         upiId: upiId,
-        customerUpiTransactionId: transactionId,
+        reference: transactionId, // Use a valid property name
         manualVerificationRequired: true
       }
     });

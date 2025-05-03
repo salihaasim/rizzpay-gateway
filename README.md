@@ -13,6 +13,7 @@
 
 ## Recent Updates
 
+- Fixed TypeScript errors in UPI QR Popup component and added missing react-helmet dependency
 - Fixed routing configuration in App.tsx for UPI Plugin page
 - Added UPI QR Popup Plugin with manual verification capability
 - Fixed TypeScript errors in KYC components to ensure proper functionality
@@ -39,4 +40,3 @@
 2. Install dependencies: `npm install`
 3. Run development server: `npm run dev`
 4. Build for production: `npm run build`
-
