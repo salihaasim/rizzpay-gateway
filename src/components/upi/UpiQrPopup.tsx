@@ -83,7 +83,7 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
       paymentDetails: {
         upiId: upiId,
         razorpay_order_id: transactionId, // Use a valid property name from PaymentDetails
-        manualVerificationRequired: true
+        // Remove the invalid property manualVerificationRequired
       }
     });
     

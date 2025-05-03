@@ -13,6 +13,8 @@
 
 ## Recent Updates
 
+- Added animations and icons to all navigation items in the navbar
+- Fixed TypeScript error in UPI QR Popup component by removing invalid property
 - Fixed TypeScript errors in UPI QR Popup component to use correct processing state and payment detail properties
 - Fixed TypeScript errors in UPI QR Popup component and added missing react-helmet dependency
 - Fixed routing configuration in App.tsx for UPI Plugin page

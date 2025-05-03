@@ -1,20 +1,39 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ArrowLeft, IdCard, QrCode } from "lucide-react";
+import { 
+  Menu, 
+  ArrowLeft, 
+  LayoutDashboard, 
+  Settings,
+  IdCard, 
+  QrCode, 
+  FileText,
+  Wallet,
+  ShieldCheck,
+  Code,
+  ActivitySquare
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
 import logoSvg from '../assets/logo.svg';
+import { motion } from "@/components/ui/motion";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted state to true after initial render for animations
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   const handleBack = () => {
@@ -22,14 +41,14 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Transactions', path: '/transactions' },
-    { name: 'Wallet', path: '/wallet' },
-    { name: 'KYC Verification', path: '/kyc' },
-    { name: 'UPI Plugin', path: '/upi-plugin' },
-    { name: 'Developer Tools', path: '/developers' },
-    { name: 'Security', path: '/security' },
-    { name: 'Settings', path: '/settings' },
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-4 w-4 mr-2" /> },
+    { name: 'Transactions', path: '/transactions', icon: <ActivitySquare className="h-4 w-4 mr-2" /> },
+    { name: 'Wallet', path: '/wallet', icon: <Wallet className="h-4 w-4 mr-2" /> },
+    { name: 'KYC Verification', path: '/kyc', icon: <IdCard className="h-4 w-4 mr-2" /> },
+    { name: 'UPI Plugin', path: '/upi-plugin', icon: <QrCode className="h-4 w-4 mr-2" /> },
+    { name: 'Developer Tools', path: '/developers', icon: <Code className="h-4 w-4 mr-2" /> },
+    { name: 'Security', path: '/security', icon: <ShieldCheck className="h-4 w-4 mr-2" /> },
+    { name: 'Settings', path: '/settings', icon: <Settings className="h-4 w-4 mr-2" /> },
   ];
 
   return (
@@ -57,22 +76,44 @@ const Navbar = () => {
           </Link>
           
           <nav className="hidden md:flex gap-4 lg:gap-6 ml-4 lg:ml-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-[#0052FF]",
-                  isActive(item.path)
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                )}
-              >
-                {item.name === 'KYC Verification' && <IdCard className="mr-2 h-5 w-5 inline-block" />}
-                {item.name === 'UPI Plugin' && <QrCode className="mr-2 h-5 w-5 inline-block" />}
-                {item.name}
-              </Link>
-            ))}
+            {navItems.map((item, index) => (
+              mounted ? (
+                <motion.div
+                  key={item.path}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <Link
+                    to={item.path}
+                    className={cn(
+                      "text-sm font-medium transition-all duration-200 hover:text-[#0052FF] flex items-center",
+                      isActive(item.path)
+                        ? "text-[#0052FF]"
+                        : "text-muted-foreground",
+                      "relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-left after:scale-x-0 hover:after:scale-x-100 after:bg-[#0052FF] after:transition-transform"
+                    )}
+                  >
+                    {item.icon}
+                    {item.name}
+                  </Link>
+                </motion.div>
+              ) : (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-[#0052FF] flex items-center",
+                    isActive(item.path)
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {item.icon}
+                  {item.name}
+                </Link>
+              )
+            )}
           </nav>
         </div>
         
@@ -95,22 +136,27 @@ const Navbar = () => {
                 <span className="font-bold text-xl">RizzPay</span>
               </Link>
               <div className="grid gap-1 py-4 sm:gap-2 sm:py-6">
-                {navItems.map((item) => (
-                  <Link
+                {navItems.map((item, index) => (
+                  <motion.div
                     key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "flex w-full items-center py-2 text-base sm:text-lg font-semibold",
-                      isActive(item.path)
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                    )}
-                    onClick={() => setOpen(false)}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
-                    {item.name === 'KYC Verification' && <IdCard className="mr-2 h-5 w-5" />}
-                    {item.name === 'UPI Plugin' && <QrCode className="mr-2 h-5 w-5" />}
-                    {item.name}
-                  </Link>
+                    <Link
+                      to={item.path}
+                      className={cn(
+                        "flex w-full items-center py-2 text-base sm:text-lg font-semibold",
+                        isActive(item.path)
+                          ? "text-[#0052FF]"
+                          : "text-muted-foreground"
+                      )}
+                      onClick={() => setOpen(false)}
+                    >
+                      {React.cloneElement(item.icon, { className: "mr-3 h-5 w-5" })}
+                      {item.name}
+                    </Link>
+                  </motion.div>
                 ))}
               </div>
             </SheetContent>
