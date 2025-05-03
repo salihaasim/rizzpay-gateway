@@ -76,7 +76,7 @@ const Navbar = () => {
           </Link>
           
           <nav className="hidden md:flex gap-4 lg:gap-6 ml-4 lg:ml-6">
-            {navItems.map((item, index) => (
+            {navItems.map((item, index) => 
               mounted ? (
                 <motion.div
                   key={item.path}
