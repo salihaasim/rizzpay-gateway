@@ -160,6 +160,8 @@ const App = () => {
     
     <Route key="kyc" path="/kyc" element={<KycPage />} />,
     
+    <Route key="upi-plugin" element={<UpiPluginSettings />} />
+    
     <Route key="not-found" path="*" element={<NotFound />} />
   ];
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ArrowLeft, IdCard } from "lucide-react";
+import { Menu, ArrowLeft, IdCard, QrCode } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
 import logoSvg from '../assets/logo.svg';
@@ -26,6 +26,7 @@ const Navbar = () => {
     { name: 'Transactions', path: '/transactions' },
     { name: 'Wallet', path: '/wallet' },
     { name: 'KYC Verification', path: '/kyc' },
+    { name: 'UPI Plugin', path: '/upi-plugin' },
     { name: 'Developer Tools', path: '/developers' },
     { name: 'Security', path: '/security' },
     { name: 'Settings', path: '/settings' },
@@ -67,6 +68,8 @@ const Navbar = () => {
                     : "text-muted-foreground"
                 )}
               >
+                {item.name === 'KYC Verification' && <IdCard className="mr-2 h-5 w-5 inline-block" />}
+                {item.name === 'UPI Plugin' && <QrCode className="mr-2 h-5 w-5 inline-block" />}
                 {item.name}
               </Link>
             ))}
@@ -105,6 +108,7 @@ const Navbar = () => {
                     onClick={() => setOpen(false)}
                   >
                     {item.name === 'KYC Verification' && <IdCard className="mr-2 h-5 w-5" />}
+                    {item.name === 'UPI Plugin' && <QrCode className="mr-2 h-5 w-5" />}
                     {item.name}
                   </Link>
                 ))}

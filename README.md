@@ -8,10 +8,12 @@
 - **Transaction Management**: View and track all payment transactions.
 - **Developer Tools**: API integration documentation and testing tools.
 - **KYC Verification**: Upload identity and business documents for verification.
+- **UPI QR Plugin**: Embed UPI QR code payment option on any website.
 - **Security Settings**: Manage account security preferences.
 
 ## Recent Updates
 
+- Added UPI QR Popup Plugin with manual verification capability
 - Fixed TypeScript errors in KYC components to ensure proper functionality
 - Enhanced database integration for KYC document storage and verification
 - Added proper handling for document types and file uploads
@@ -36,3 +38,4 @@
 2. Install dependencies: `npm install`
 3. Run development server: `npm run dev`
 4. Build for production: `npm run build`
+
