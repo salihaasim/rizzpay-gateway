@@ -12,6 +12,8 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { useLocation } from 'react-router-dom';
 import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
 import UpiTransactionCard from '@/components/transactions/UpiTransactionCard';
+import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 
 const Transactions = () => {
   const location = useLocation();
@@ -32,6 +34,9 @@ const Transactions = () => {
   }, [transactionIdParam]);
   
   const selectedTransaction = transactions.find(t => t.id === selectedTransactionId);
+  
+  // Get UPI transactions
+  const upiTransactions = transactions.filter(t => t.paymentMethod === 'upi_manual');
   
   // Filter transactions based on selected filter and UPI toggle
   const filteredTransactions = transactions.filter(transaction => {
@@ -104,6 +109,36 @@ const Transactions = () => {
   };
 
   const paymentMethodData = getPaymentMethodData();
+  
+  const exportAllTransactions = () => {
+    // Format data for Excel
+    const data = filteredTransactions.map(t => ({
+      'Transaction ID': t.id,
+      'Date': new Date(t.date).toLocaleString(),
+      'Amount': t.amount,
+      'Status': t.status.charAt(0).toUpperCase() + t.status.slice(1),
+      'Payment Method': t.paymentMethod,
+      'Customer': t.customer || 'N/A',
+      'UPI ID': t.paymentDetails?.upiId || '',
+      'UPI Transaction ID': t.paymentDetails?.upiTransactionId || t.paymentDetails?.razorpay_payment_id || '',
+    }));
+    
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(data);
+    
+    // Create workbook and add worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+    
+    // Get current date for filename
+    const date = new Date();
+    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    
+    // Export to file
+    XLSX.writeFile(wb, `RizzPay_Transactions_${dateString}.xlsx`);
+    
+    toast.success('Transactions downloaded successfully');
+  };
 
   if (selectedTransaction) {
     return (
@@ -125,9 +160,9 @@ const Transactions = () => {
         </div>
         
         <div className="flex gap-2 mt-4 md:mt-0">
-          <Button variant="outline" size="sm" className="flex items-center">
+          <Button variant="outline" size="sm" className="flex items-center" onClick={exportAllTransactions}>
             <Download className="mr-2 h-4 w-4" />
-            Export
+            Export All
           </Button>
         </div>
       </div>
@@ -135,6 +170,7 @@ const Transactions = () => {
       <UpiTransactionToggle 
         showUpiTransactions={showUpiTransactions} 
         setShowUpiTransactions={setShowUpiTransactions}
+        upiTransactions={upiTransactions}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

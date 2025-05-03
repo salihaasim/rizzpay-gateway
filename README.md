@@ -13,6 +13,8 @@
 
 ## Recent Updates
 
+- Added UPI Transaction ID display in UPI transaction cards
+- Added Excel export functionality for UPI transactions and all transactions
 - Simplified Dashboard interface with cleaner layout and improved data visualization
 - Added Manual UPI Plugin Transaction filter and verification to Transactions page
 - Added specialized UPI transaction cards with UPI ID display and verification status
@@ -43,10 +45,3 @@
 - Zustand for state management
 - React Router for navigation
 - Supabase for backend and storage
-
-## Getting Started
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Run development server: `npm run dev`
-4. Build for production: `npm run build`

@@ -18,6 +18,8 @@ const UpiTransactionCard: React.FC<UpiTransactionCardProps> = ({
 }) => {
   // Get UPI ID from payment details if available
   const upiId = transaction.paymentDetails?.upiId;
+  // Get UPI Transaction ID if available
+  const upiTransactionId = transaction.paymentDetails?.upiTransactionId || transaction.paymentDetails?.razorpay_payment_id;
   
   return (
     <Card className={cn("border shadow-sm transition-all hover:shadow-md", className)}>
@@ -45,6 +47,13 @@ const UpiTransactionCard: React.FC<UpiTransactionCardProps> = ({
                   <span className="text-xs sm:text-sm text-gray-400">Pending UPI submission</span>
                 )}
               </div>
+              
+              {upiTransactionId && (
+                <div className="mt-1">
+                  <span className="text-xs font-medium text-muted-foreground mr-2">UPI Transaction ID:</span>
+                  <span className="text-xs sm:text-sm font-mono">{upiTransactionId}</span>
+                </div>
+              )}
             </div>
           </div>
           
