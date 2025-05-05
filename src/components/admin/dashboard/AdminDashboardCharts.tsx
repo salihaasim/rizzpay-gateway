@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Activity, BarChart3, PieChart, LineChart } from 'lucide-react';
 import { 
   ComposedChart, 
   Line, 
@@ -17,6 +16,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
 
 // Sample data - in production, this would come from API calls
 const transactionData = [
@@ -37,6 +37,8 @@ const paymentMethodData = [
 const COLORS = ['#0088FE', '#00C49F', '#FF8042'];
 
 const AdminDashboardCharts = () => {
+  const isMobile = useMediaQuery(mediaQueries.isMobile);
+  
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
       <Card className="border border-border/50 shadow-sm xl:col-span-2">
@@ -47,14 +49,14 @@ const AdminDashboardCharts = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
             <ComposedChart
               data={transactionData}
               margin={{
                 top: 20,
-                right: 20,
+                right: isMobile ? 10 : 20,
                 bottom: 20,
-                left: 20,
+                left: isMobile ? 10 : 20,
               }}
             >
               <CartesianGrid stroke="#f5f5f5" />
@@ -78,7 +80,7 @@ const AdminDashboardCharts = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
             <RechartsPieChart>
               <Pie
                 data={paymentMethodData}
@@ -86,7 +88,7 @@ const AdminDashboardCharts = () => {
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
+                outerRadius={isMobile ? 70 : 80}
                 fill="#8884d8"
                 dataKey="value"
               >

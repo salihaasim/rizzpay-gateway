@@ -8,7 +8,7 @@ import PaymentFlow from '@/components/PaymentFlow';
 import { Separator } from '@/components/ui/separator';
 import AnalyticsChart from '@/components/AnalyticsChart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, Users, DollarSign, Percent, Clock, ArrowRight } from 'lucide-react';
+import { BarChart3, CreditCard, ArrowUpRight, ArrowDownRight, DollarSign, Percent, Clock, ArrowRight } from 'lucide-react';
 import { useTransactionStore, Transaction } from '@/stores/transactionStore';
 import { Button } from '@/components/ui/button';
 import { 
@@ -17,6 +17,7 @@ import {
   calculateGrowthRate 
 } from '@/utils/analyticsUtils';
 import TechnicalAccessLink from '@/components/TechnicalAccessLink';
+import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
 
 const RecentTransactionsList = React.memo(({ transactions }: { transactions: Transaction[] }) => (
   <div className="space-y-4">
@@ -37,6 +38,7 @@ RecentTransactionsList.displayName = 'RecentTransactionsList';
 const Dashboard = () => {
   const { transactions, userRole, userEmail } = useTransactionStore();
   const [activeTab, setActiveTab] = useState(userRole === 'admin' ? 'admin' : 'merchant');
+  const isMobile = useMediaQuery(mediaQueries.isMobile);
   
   // Merchant name from email (simplified version)
   const merchantName = useMemo(() => {
@@ -77,7 +79,7 @@ const Dashboard = () => {
           )}
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           <StatCard
             title="Total Revenue"
             value={`₹${analytics.revenue.monthly.toLocaleString('en-IN')}`}
@@ -90,13 +92,6 @@ const Dashboard = () => {
             value={analytics.transactions.monthly.toString()}
             icon={<CreditCard className="h-4 w-4" />}
             trend={{ value: analytics.transactions.dailyGrowth, isPositive: analytics.transactions.dailyGrowth > 0 }}
-          />
-          
-          <StatCard
-            title="Customers"
-            value={analytics.customers.unique.toString()}
-            icon={<Users className="h-4 w-4" />}
-            trend={{ value: 2.1, isPositive: true }}
           />
           
           <StatCard
@@ -175,7 +170,7 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3 space-y-6">
+          <div className={`${isMobile ? '' : 'lg:col-span-3'} space-y-6`}>
             <div className="flex justify-between items-center">
               <h2 className="section-heading">Recent Transactions</h2>
               <Link to="/transactions">
@@ -188,7 +183,7 @@ const Dashboard = () => {
             <RecentTransactionsList transactions={recentTxns} />
           </div>
           
-          <div className="lg:col-span-2">
+          <div className={`${isMobile ? 'mt-6' : 'lg:col-span-2'}`}>
             <h2 className="section-heading">Quick Payment</h2>
             <Card className="dashboard-card backdrop-blur-sm shadow-lg border-0">
               <CardContent className="p-4">
