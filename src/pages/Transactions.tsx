@@ -1,20 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import TransactionCard from '@/components/TransactionCard';
-import TransactionDetails from '@/components/TransactionDetails';
-import { Search, Download, Filter, ArrowUpDown } from 'lucide-react';
-import { useTransactionStore } from '@/stores/transactionStore';
 import { useLocation } from 'react-router-dom';
-import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
-import UpiTransactionCard from '@/components/transactions/UpiTransactionCard';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
+import { useTransactionStore } from '@/stores/transactionStore';
+import TransactionDetails from '@/components/TransactionDetails';
+import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
+import UpiTransactionCard from '@/components/transactions/UpiTransactionCard';
+import TransactionHeader from '@/components/transactions/TransactionHeader';
+import TransactionStats from '@/components/transactions/TransactionStats';
+import TransactionFilters from '@/components/transactions/TransactionFilters';
+import TransactionTabsContent from '@/components/transactions/TransactionTabsContent';
 
 const Transactions = () => {
   const location = useLocation();
@@ -65,61 +62,6 @@ const Transactions = () => {
     return true;
   });
 
-  // Calculate totals
-  const getTotalAmount = (status: string) => {
-    return transactions
-      .filter(t => status === 'all' || t.status === status)
-      .reduce((sum, t) => {
-        // Remove non-numeric characters and convert to number
-        const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
-        return sum + (isNaN(amount) ? 0 : amount);
-      }, 0);
-  };
-
-  const successfulTotal = getTotalAmount('successful');
-  const pendingTotal = getTotalAmount('pending');
-  const failedTotal = getTotalAmount('failed');
-  const processingTotal = getTotalAmount('processing');
-
-  // Generate payment method data for pie chart with improved rendering
-  const getPaymentMethodData = () => {
-    const methodCounts: Record<string, number> = {};
-    
-    transactions.forEach(transaction => {
-      // Group similar payment methods together for cleaner display
-      let method = transaction.paymentMethod;
-      
-      // Group similar payment methods
-      if (method.includes('upi')) method = 'UPI';
-      else if (method.includes('card')) method = 'Card';
-      else if (method.includes('netbanking')) method = 'Netbanking';
-      else if (method.includes('neft')) method = 'NEFT';
-      else if (method.includes('wallet')) method = 'Wallet';
-      else method = method.charAt(0).toUpperCase() + method.slice(1);
-      
-      methodCounts[method] = (methodCounts[method] || 0) + 1;
-    });
-    
-    const colors: Record<string, string> = {
-      'UPI': '#34A853',
-      'Card': '#EA4335',
-      'Netbanking': '#003087',
-      'NEFT': '#4285F4', 
-      'Wallet': '#FBBC05',
-    };
-    
-    // Calculate percentages
-    const total = Object.values(methodCounts).reduce((a, b) => a + b, 0);
-    
-    return Object.entries(methodCounts).map(([name, value]) => ({
-      name: `${name} (${Math.round((value / total) * 100)}%)`,
-      value,
-      color: colors[name] || '#6B7280',
-    }));
-  };
-
-  const paymentMethodData = getPaymentMethodData();
-  
   const exportAllTransactions = () => {
     // Format data for Excel
     const data = filteredTransactions.map(t => ({
@@ -163,19 +105,7 @@ const Transactions = () => {
 
   return (
     <div className="container py-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">Transactions</h1>
-          <p className="text-muted-foreground">View and manage all your payment transactions</p>
-        </div>
-        
-        <div className="flex gap-2 mt-4 md:mt-0">
-          <Button variant="outline" size="sm" className="flex items-center" onClick={exportAllTransactions}>
-            <Download className="mr-2 h-4 w-4" />
-            Export All
-          </Button>
-        </div>
-      </div>
+      <TransactionHeader exportAllTransactions={exportAllTransactions} />
       
       <UpiTransactionToggle 
         showUpiTransactions={showUpiTransactions} 
@@ -183,128 +113,18 @@ const Transactions = () => {
         upiTransactions={upiTransactions}
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="border-0 shadow-sm overflow-hidden lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Transaction Overview</CardTitle>
-            <CardDescription>Summary of transaction status</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex gap-4 flex-wrap">
-              <div className="bg-emerald-50 text-emerald-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Successful</div>
-                <div className="text-2xl font-bold">₹{successfulTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-emerald-600 mt-1">{transactions.filter(t => t.status === 'successful').length} transactions</div>
-              </div>
-              
-              <div className="bg-blue-50 text-blue-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Processing</div>
-                <div className="text-2xl font-bold">₹{processingTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-blue-600 mt-1">{transactions.filter(t => t.status === 'processing').length} transactions</div>
-              </div>
-              
-              <div className="bg-amber-50 text-amber-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Pending</div>
-                <div className="text-2xl font-bold">₹{pendingTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-amber-600 mt-1">{transactions.filter(t => t.status === 'pending').length} transactions</div>
-              </div>
-              
-              <div className="bg-rose-50 text-rose-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Failed</div>
-                <div className="text-2xl font-bold">₹{failedTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-rose-600 mt-1">{transactions.filter(t => t.status === 'failed').length} transactions</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-0 shadow-sm overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Payment Methods</CardTitle>
-            <CardDescription>Distribution by type</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="h-[250px]">
-              {paymentMethodData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={paymentMethodData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      labelLine={false}
-                      label={({ name }) => name}
-                    >
-                      {paymentMethodData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
-                  No transaction data available
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <TransactionStats transactions={transactions} />
       
       <div className="space-y-6 mt-6">
         {!showUpiTransactions && (
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative w-full md:w-[280px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search transactions..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <div className="flex gap-3 flex-1 items-center">
-              <div className="flex items-center">
-                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm mr-2">Filter:</span>
-              </div>
-              
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Filter by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Transactions</SelectItem>
-                  <SelectItem value="successful">Successful</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <div className="flex items-center ml-1">
-                <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm mr-2">Sort:</span>
-              </div>
-              
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date">Date</SelectItem>
-                  <SelectItem value="amount">Amount</SelectItem>
-                  <SelectItem value="customer">Customer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <TransactionFilters 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filter={filter}
+            setFilter={setFilter}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+          />
         )}
         
         {showUpiTransactions ? (
@@ -332,61 +152,11 @@ const Transactions = () => {
               <TabsTrigger value="failed">Failed</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="all" className="mt-6">
-              <div className="space-y-4">
-                {filteredTransactions.length > 0 ? (
-                  filteredTransactions.map((transaction) => (
-                    <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                      <TransactionCard {...transaction} />
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-12 border rounded-lg">
-                    <p className="text-muted-foreground">No transactions found</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="successful" className="mt-6">
-              <div className="space-y-4">
-                {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (
-                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                    <TransactionCard {...transaction} />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="processing" className="mt-6">
-              <div className="space-y-4">
-                {filteredTransactions.filter(t => t.status === 'processing').map((transaction) => (
-                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                    <TransactionCard {...transaction} />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="pending" className="mt-6">
-              <div className="space-y-4">
-                {filteredTransactions.filter(t => t.status === 'pending').map((transaction) => (
-                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                    <TransactionCard {...transaction} />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="failed" className="mt-6">
-              <div className="space-y-4">
-                {filteredTransactions.filter(t => t.status === 'failed').map((transaction) => (
-                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                    <TransactionCard {...transaction} />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
+            <TransactionTabsContent 
+              transactions={transactions}
+              filteredTransactions={filteredTransactions}
+              onSelectTransaction={setSelectedTransactionId}
+            />
           </Tabs>
         )}
       </div>
