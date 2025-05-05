@@ -13,6 +13,7 @@
 
 ## Recent Updates
 
+- Renamed default merchant account to "Salih Aasim 001"
 - Fixed payment method chart in Transactions page to display consolidated payment methods with percentages
 - Added welcome message with merchant name to Dashboard
 - Simplified transaction charts by removing Instamojo and Net Banking data

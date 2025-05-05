@@ -41,11 +41,11 @@ export const useMerchantAuth = create<MerchantAuthState>()(
       isAuthenticated: false,
       currentMerchant: null,
       merchants: [
-        // Default merchant for testing
+        // Default merchant for testing - renamed as requested
         {
           username: 'merchant',
           password: 'password',
-          fullName: 'Demo Merchant',
+          fullName: 'Salih Aasim 001',
           role: 'merchant',
           pricing: {
             transactionFee: 1.0, // Updated to 1.0% as requested
