@@ -45,35 +45,38 @@ SLAM Engine (Smart Labeling & Masking Module) is a sophisticated transaction obf
 - `types.ts` - Core types and interfaces
 - `upiRotation.ts` - UPI handle rotation implementation
 - `labelRewriter.ts` - Transaction description cleaning and merchant name obfuscation
+- `upiIntegration.ts` - API-friendly UPI integration layer for external systems
 - `index.ts` - Main entry point integrating all modules
 - `SLAMAdmin.tsx` - Admin interface for configuration and monitoring
+
+### Enhanced AI Integration
+
+The SLAM Engine now includes an enhanced API layer for easy integration with AI assistants and external systems:
+
+- Simple, standardized interfaces for UPI payment generation
+- Developer-friendly validation functions
+- Consistent response structures for easy parsing
+- Automatic masking and cleaning of sensitive information
+- Built-in QR code generation
 
 ### Usage Example
 
 ```typescript
 // Import the SLAM Engine
-import { processSLAMTransaction } from '@/slam_engine';
+import { generateUpiPayment } from '@/slam_engine';
 
-// Process a transaction through the SLAM Engine
-const transaction = {
+// Generate a UPI payment with automatic masking
+const payment = generateUpiPayment({
+  amount: 999.99,
   description: "Fantasy cricket winnings payment",
-  merchantName: "BetCricket Gaming",
-  upiId: "betcricket@okaxis",
-  payeeName: "BetCricket Gaming LLP"
-};
-
-const merchantId = "merchant_123";
-
-// Get clean transaction data
-const cleanTransaction = processSLAMTransaction(transaction, merchantId);
+  merchantId: "merchant_123",
+  merchantName: "BetCricket Gaming"
+});
 
 // Use the clean values for payment processing
-const {
-  description,  // "Invoice Payment #INV8021"
-  merchantName, // "RIZZ RETAIL SERVICES"
-  upiId,        // "rizzretail@icici" 
-  payeeName     // "RPay Commercial"
-} = cleanTransaction.maskedValues;
+console.log(payment.paymentUrl);  // UPI URL with clean values
+console.log(payment.qrCodeUrl);   // QR code URL for the payment
+console.log(payment.maskedDescription);  // Clean description
 ```
 
 ## Admin Dashboard

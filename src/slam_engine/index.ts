@@ -7,6 +7,7 @@
 import { ObfuscationConfig, TransactionMaskingResult } from './types';
 import { getNextUpiHandle } from './upiRotation';
 import { cleanTransactionDescription, cleanMerchantName, getRandomSafeLabel } from './labelRewriter';
+import { generateUpiPayment, generateStaticUpiQr, validateUpiId, getUpiStats } from './upiIntegration';
 
 // Default configuration for SLAM Engine
 const DEFAULT_CONFIG: ObfuscationConfig = {
@@ -110,3 +111,4 @@ export const generateCleanUpiIntent = (
 export * from './types';
 export * from './upiRotation';
 export * from './labelRewriter';
+export * from './upiIntegration'; // Export the new UPI integration utilities
