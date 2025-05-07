@@ -121,6 +121,21 @@ Add UPI payment collection to any website with a simple integration code:
 <button class="rizzpay-upi-button">Pay with RizzPay</button>
 ```
 
+### Static vs Dynamic Payment Links
+
+The SLAM Engine now supports both static and dynamic payment links:
+
+1. **Dynamic Payment Links**: Include a fixed amount that the customer must pay
+   - Useful for invoice payments, product purchases with known prices
+   - Customer cannot modify the amount in their UPI app
+
+2. **Static Payment Links**: Allow customers to enter any amount
+   - Useful for donations, variable payments, or general-purpose collection
+   - Customer enters their desired amount in the UPI app
+   - Great for tips, subscriptions with flexible amounts
+
+Toggle between static and dynamic modes in the UPI payment generator.
+
 ## Admin Dashboard
 
 The SLAM Engine includes an admin interface that provides:
@@ -130,6 +145,7 @@ The SLAM Engine includes an admin interface that provides:
 - Testing tool for transaction masking
 - Analytics on masking effectiveness
 - Payment link generation and management
+- Static and dynamic payment QR code generation
 
 ## Legal & Ethical Considerations
 

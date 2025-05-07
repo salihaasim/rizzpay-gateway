@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Copy, Check, ExternalLink, Link as LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateUpiPayment } from '@/slam_engine/upiIntegration';
@@ -15,6 +16,7 @@ const UpiPaymentLinkGenerator: React.FC = () => {
   const [linkCopied, setLinkCopied] = useState(false);
   const [paymentLink, setPaymentLink] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [isStaticQR, setIsStaticQR] = useState(false);
   const [formData, setFormData] = useState({
     amount: '',
     customerName: '',
@@ -29,7 +31,7 @@ const UpiPaymentLinkGenerator: React.FC = () => {
   };
 
   const generateLink = () => {
-    if (!formData.amount || isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0) {
+    if (!isStaticQR && (!formData.amount || isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0)) {
       toast.error('Please enter a valid amount');
       return;
     }
@@ -37,7 +39,7 @@ const UpiPaymentLinkGenerator: React.FC = () => {
     try {
       // Generate a UPI payment using the SLAM Engine
       const upiPayment = generateUpiPayment({
-        amount: parseFloat(formData.amount),
+        amount: isStaticQR ? 0 : parseFloat(formData.amount),
         description: formData.description || 'Payment via RizzPay',
         merchantId: merchantId,
         merchantName: currentMerchant?.fullName || 'Merchant',
@@ -50,7 +52,7 @@ const UpiPaymentLinkGenerator: React.FC = () => {
       
       // Create the payment collection link
       const baseUrl = window.location.origin;
-      const collectionLink = `${baseUrl}/upi-link-payment?amount=${formData.amount}&mid=${merchantId}&name=${encodeURIComponent(currentMerchant?.fullName || 'Merchant')}&desc=${encodeURIComponent(formData.description || 'Payment via RizzPay')}&upi=${encodeURIComponent(currentMerchant?.upiSettings?.upiId || '')}`;
+      const collectionLink = `${baseUrl}/upi-link-payment?${!isStaticQR ? `amount=${formData.amount}&` : ''}mid=${merchantId}&name=${encodeURIComponent(currentMerchant?.fullName || 'Merchant')}&desc=${encodeURIComponent(formData.description || 'Payment via RizzPay')}&upi=${encodeURIComponent(currentMerchant?.upiSettings?.upiId || '')}${isStaticQR ? '&static=true' : ''}`;
       
       // Update the payment link to our custom link
       setPaymentLink(collectionLink);
@@ -73,10 +75,10 @@ const UpiPaymentLinkGenerator: React.FC = () => {
   };
 
   const getEmbedCode = () => {
+    const staticParam = isStaticQR ? ' data-static="true"' : '';
     return `<!-- RizzPay Payment Link Button -->
 <script src="https://cdn.rizzpay.com/payment-link.js" 
-  data-merchant="${merchantId}" 
-  data-amount="${formData.amount || ''}" 
+  data-merchant="${merchantId}"${!isStaticQR ? `\n  data-amount="${formData.amount || ''}"` : ''}${staticParam} 
   data-description="${formData.description || ''}">
 </script>
 <button class="rizzpay-payment-button">Pay with RizzPay</button>`;
@@ -99,19 +101,30 @@ const UpiPaymentLinkGenerator: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="isStatic" 
+            checked={isStaticQR} 
+            onCheckedChange={setIsStaticQR}
+          />
+          <Label htmlFor="isStatic">Generate Static QR (Any amount payment)</Label>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="amount">Amount (₹)</Label>
-            <Input
-              id="amount"
-              name="amount"
-              type="number"
-              placeholder="Enter amount"
-              value={formData.amount}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
+          {!isStaticQR && (
+            <div>
+              <Label htmlFor="amount">Amount (₹)</Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                placeholder="Enter amount"
+                value={formData.amount}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
+          <div className={isStaticQR ? "md:col-span-2" : ""}>
             <Label htmlFor="customerName">Customer Name (Optional)</Label>
             <Input
               id="customerName"
@@ -163,7 +176,9 @@ const UpiPaymentLinkGenerator: React.FC = () => {
 
             {qrCodeUrl && (
               <div className="border rounded-md p-4 flex flex-col items-center">
-                <h3 className="text-sm font-medium mb-2">Payment QR Code</h3>
+                <h3 className="text-sm font-medium mb-2">
+                  {isStaticQR ? "Static Payment QR Code" : "Payment QR Code"}
+                </h3>
                 <div className="bg-white p-4 rounded-md border">
                   <img
                     src={qrCodeUrl}
@@ -171,7 +186,9 @@ const UpiPaymentLinkGenerator: React.FC = () => {
                     className="h-48 w-48 object-contain"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">Scan with any UPI app to pay</p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {isStaticQR ? "Scan with any UPI app to pay any amount" : "Scan with any UPI app to pay"}
+                </p>
               </div>
             )}
 

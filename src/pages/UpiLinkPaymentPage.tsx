@@ -24,6 +24,7 @@ const UpiLinkPaymentPage = () => {
   const description = searchParams.get('desc') || 'Payment via RizzPay';
   const upiId = searchParams.get('upi') || '';
   const returnUrl = searchParams.get('return_url') || '';
+  const isStatic = searchParams.get('static') === 'true';
   
   // Format the amount for display
   const formattedAmount = parseFloat(amount).toLocaleString('en-IN', {
@@ -60,7 +61,7 @@ const UpiLinkPaymentPage = () => {
   return (
     <>
       <Helmet>
-        <title>RizzPay - Pay ₹{formattedAmount}</title>
+        <title>RizzPay - {isStatic ? 'UPI Payment' : `Pay ₹${formattedAmount}`}</title>
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
@@ -80,10 +81,20 @@ const UpiLinkPaymentPage = () => {
             </CardHeader>
             
             <CardContent className="space-y-6">
-              <div className="text-center">
-                <p className="text-muted-foreground text-sm">Amount to Pay</p>
-                <p className="text-3xl font-bold">₹{formattedAmount}</p>
-              </div>
+              {!isStatic && (
+                <div className="text-center">
+                  <p className="text-muted-foreground text-sm">Amount to Pay</p>
+                  <p className="text-3xl font-bold">₹{formattedAmount}</p>
+                </div>
+              )}
+              
+              {isStatic && (
+                <div className="text-center">
+                  <p className="text-muted-foreground text-sm">Payment Type</p>
+                  <p className="text-xl font-medium">Any Amount Payment</p>
+                  <p className="text-sm text-muted-foreground mt-1">Enter your desired amount in UPI app</p>
+                </div>
+              )}
               
               {description && (
                 <div className="bg-muted/50 p-3 rounded-md text-sm text-center">

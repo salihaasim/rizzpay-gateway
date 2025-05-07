@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Toggle } from '@/components/ui/toggle';
 import { Check, Copy, QrCode, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -42,9 +43,12 @@ const UpiLinkPayment: React.FC<UpiLinkPaymentProps> = ({
   const [utrId, setUtrId] = useState('');
   const [copied, setCopied] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [isStaticQR, setIsStaticQR] = useState(false);
   
   // Generate UPI URL for payment
-  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(description)}`;
+  const upiUrl = isStaticQR
+    ? `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&tn=${encodeURIComponent(description)}`
+    : `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(description)}`;
   
   // Generate QR code URL using a free QR code API
   React.useEffect(() => {
@@ -83,7 +87,7 @@ const UpiLinkPayment: React.FC<UpiLinkPaymentProps> = ({
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
         upiId,
-        utrReference: utrId,
+        utrId,
         description
       }
     });
@@ -108,16 +112,32 @@ const UpiLinkPayment: React.FC<UpiLinkPaymentProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Pay ₹{amount.toFixed(2)} via UPI</DialogTitle>
+          <DialogTitle>{isStaticQR ? 'Pay via UPI' : `Pay ₹${amount.toFixed(2)} via UPI`}</DialogTitle>
           <DialogDescription>
             Scan the QR code or use the UPI ID below to make your payment
           </DialogDescription>
         </DialogHeader>
         
+        <div className="flex justify-center mb-4">
+          <Toggle
+            pressed={isStaticQR}
+            onPressedChange={setIsStaticQR}
+            className="relative px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          >
+            {isStaticQR ? "Static QR (Any Amount)" : "Fixed Amount QR"}
+          </Toggle>
+        </div>
+        
         <div className="flex flex-col items-center p-4">
           <div className="border rounded-md p-2 bg-white">
             <img src={qrCodeUrl} alt="UPI QR Code" width="200" height="200" />
           </div>
+          
+          {isStaticQR && (
+            <p className="mt-2 text-sm text-center text-muted-foreground">
+              Enter any amount in your UPI app when scanning
+            </p>
+          )}
           
           <div className="mt-4 w-full">
             <Label>UPI ID</Label>
