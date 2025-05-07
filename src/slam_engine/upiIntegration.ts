@@ -5,7 +5,7 @@
  */
 
 import { UpiHandle } from './types';
-import { getNextUpiHandle } from './upiRotation';
+import { getNextUpiHandle, getUpiHandleStats } from './upiRotation';
 import { cleanTransactionDescription, cleanMerchantName } from './labelRewriter';
 
 /**
