@@ -82,7 +82,7 @@ console.log(payment.maskedDescription);  // Clean description
 
 ### Payment Link Integration
 
-The SLAM Engine now supports easy payment link generation and integration:
+The SLAM Engine now supports easy payment link and UTR verification:
 
 ```typescript
 // Generate a payment link that can be shared with customers
@@ -97,6 +97,16 @@ const paymentLink = generateUpiPayment({
 const shareableLink = paymentLink.paymentUrl;
 const qrCodeUrl = paymentLink.qrCodeUrl;
 ```
+
+### UTR Verification Flow
+
+The SLAM Engine supports UTR (Unique Transaction Reference) verification:
+
+1. Customer makes a payment using the provided UPI ID
+2. Customer receives a UTR ID from their bank after payment
+3. Customer enters the UTR ID in the verification form
+4. Merchant can verify the UTR ID against their bank statement
+5. Payment is marked as verified after confirmation
 
 ### Website Integration
 

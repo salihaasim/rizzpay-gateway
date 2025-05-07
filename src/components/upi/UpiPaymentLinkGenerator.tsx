@@ -47,6 +47,13 @@ const UpiPaymentLinkGenerator: React.FC = () => {
       // Set the payment link and QR code URL
       setPaymentLink(upiPayment.paymentUrl);
       setQrCodeUrl(upiPayment.qrCodeUrl);
+      
+      // Create the payment collection link
+      const baseUrl = window.location.origin;
+      const collectionLink = `${baseUrl}/upi-link-payment?amount=${formData.amount}&mid=${merchantId}&name=${encodeURIComponent(currentMerchant?.fullName || 'Merchant')}&desc=${encodeURIComponent(formData.description || 'Payment via RizzPay')}&upi=${encodeURIComponent(currentMerchant?.upiSettings?.upiId || '')}`;
+      
+      // Update the payment link to our custom link
+      setPaymentLink(collectionLink);
 
       toast.success('Payment link generated successfully');
     } catch (error) {
@@ -133,7 +140,10 @@ const UpiPaymentLinkGenerator: React.FC = () => {
         {paymentLink && (
           <div className="space-y-4 mt-4">
             <div className="border rounded-md p-4">
-              <h3 className="text-sm font-medium mb-2">Payment Link</h3>
+              <h3 className="text-sm font-medium mb-2">Payment Collection Link</h3>
+              <p className="text-xs text-muted-foreground mb-2">
+                Share this link with your customers to collect payment with UTR verification
+              </p>
               <div className="flex items-center space-x-2 relative">
                 <Input
                   value={paymentLink}
