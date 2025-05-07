@@ -75,6 +75,17 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Customizable Payment Pages**: Branded payment experience for customers
 - **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
 
+## SLAM Engine (Smart Labeling & Masking Module)
+
+RizzPay includes an advanced SLAM Engine that provides intelligent transaction obfuscation:
+
+- **UPI Handle Rotation**: Automatically rotates clean UPI handles to prevent pattern detection
+- **Transaction Label Rewriting**: Rewrites transaction descriptions to use neutral, business-friendly terms
+- **Merchant Name Obfuscation**: Shows clean business names in payment flows
+- **Dashboard/Webhook Cleaning**: Ensures all transaction displays show appropriate terminology
+
+The SLAM Engine helps maintain a clean payment ecosystem and improves transaction success rates by preventing inappropriate flagging by banking systems.
+
 ## System Monitoring
 
 RizzPay includes comprehensive monitoring dashboards for all aspects of the system:
@@ -100,6 +111,7 @@ The codebase has been refactored for better maintainability and performance:
 - **Transaction Components**: Decomposed the Transactions page into modular components
 - **Mobile Responsiveness**: Enhanced UI for better experience on Android and iOS devices
 - **Code Structure**: Improved organization with proper component separation
+- **SLAM Engine**: Added advanced transaction masking and cleaning system
 
 ## Special Features
 
