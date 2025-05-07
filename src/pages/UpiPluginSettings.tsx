@@ -12,7 +12,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UpiPluginCode from '@/components/upi/UpiPluginCode';
 import UpiQrPopup from '@/components/upi/UpiQrPopup';
-import { QrCode, Wallet } from 'lucide-react';
+import UpiPaymentLinkGenerator from '@/components/upi/UpiPaymentLinkGenerator';
+import { QrCode, Wallet, Link as LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UpiPluginSettings: React.FC = () => {
@@ -92,7 +93,8 @@ const UpiPluginSettings: React.FC = () => {
         <Tabs defaultValue="settings">
           <TabsList className="mb-6">
             <TabsTrigger value="settings">Settings</TabsTrigger>
-            <TabsTrigger value="integration">Integration</TabsTrigger>
+            <TabsTrigger value="integration">QR Integration</TabsTrigger>
+            <TabsTrigger value="payment-links">Payment Links</TabsTrigger>
           </TabsList>
           
           <TabsContent value="settings">
@@ -174,6 +176,10 @@ const UpiPluginSettings: React.FC = () => {
                 <Button onClick={handleTestPopup}>Launch Test Popup</Button>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="payment-links">
+            <UpiPaymentLinkGenerator />
           </TabsContent>
         </Tabs>
       </div>

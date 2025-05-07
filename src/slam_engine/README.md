@@ -58,6 +58,7 @@ The SLAM Engine now includes an enhanced API layer for easy integration with AI 
 - Consistent response structures for easy parsing
 - Automatic masking and cleaning of sensitive information
 - Built-in QR code generation
+- Payment link generation and sharing capabilities
 
 ### Usage Example
 
@@ -79,6 +80,37 @@ console.log(payment.qrCodeUrl);   // QR code URL for the payment
 console.log(payment.maskedDescription);  // Clean description
 ```
 
+### Payment Link Integration
+
+The SLAM Engine now supports easy payment link generation and integration:
+
+```typescript
+// Generate a payment link that can be shared with customers
+const paymentLink = generateUpiPayment({
+  amount: 1500,
+  description: "Monthly subscription",
+  merchantId: "merchant_123",
+  merchantName: "Your Business"
+});
+
+// Share the payment link with customers
+const shareableLink = paymentLink.paymentUrl;
+const qrCodeUrl = paymentLink.qrCodeUrl;
+```
+
+### Website Integration
+
+Add UPI payment collection to any website with a simple integration code:
+
+```html
+<!-- RizzPay Payment Button -->
+<script src="https://cdn.rizzpay.com/upi-plugin.js" 
+  data-merchant="your_merchant_id" 
+  data-amount="1000">
+</script>
+<button class="rizzpay-upi-button">Pay with RizzPay</button>
+```
+
 ## Admin Dashboard
 
 The SLAM Engine includes an admin interface that provides:
@@ -87,6 +119,7 @@ The SLAM Engine includes an admin interface that provides:
 - Configuration of masking rules and sensitivity
 - Testing tool for transaction masking
 - Analytics on masking effectiveness
+- Payment link generation and management
 
 ## Legal & Ethical Considerations
 
