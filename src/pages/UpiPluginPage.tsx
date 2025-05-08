@@ -130,7 +130,7 @@ const UpiPluginPage = () => {
         {isTestPopupOpen && (
           <UpiQrPopup 
             amount={parseFloat(testAmount)} 
-            merchantName={currentMerchant?.fullName}
+            merchantName={currentMerchant?.fullName || "RizzPay Merchant"}
             isOpen={isTestPopupOpen}
             setIsOpen={setIsTestPopupOpen}
             onSuccess={(txnId) => toast.success(`Test transaction created: ${txnId}`)}

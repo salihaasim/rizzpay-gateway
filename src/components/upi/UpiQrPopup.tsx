@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { Check, Copy, QrCode, Download, Share2 } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { toast } from 'sonner';
@@ -140,103 +139,6 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
     }
   };
 
-  // Generating code snippets for integration in different languages
-  const codeSnippets = {
-    javascript: `
-// JavaScript/TypeScript integration
-const upiPayment = {
-  upiId: "${upiId}",
-  amount: ${amount},
-  name: "${merchantName || 'RizzPay'}",
-  currency: "INR"
-};
-
-// Generate QR code
-const qrCodeUrl = \`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=\${encodeURIComponent(
-  \`upi://pay?pa=\${upiPayment.upiId}&pn=\${upiPayment.name}&am=\${upiPayment.amount}&cu=\${upiPayment.currency}\`
-)}\`;
-
-// Display the QR code
-document.getElementById('upi-qr').src = qrCodeUrl;
-
-// Handle payment verification
-function verifyUpiPayment(transactionId) {
-  return fetch('https://api.rizzpay.com/v1/upi/verify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ transactionId })
-  }).then(res => res.json());
-}
-`,
-    php: `
-<?php
-// PHP integration
-$upiPayment = [
-  'upiId' => '${upiId}',
-  'amount' => ${amount},
-  'name' => '${merchantName || 'RizzPay'}',
-  'currency' => 'INR'
-];
-
-// Generate UPI URI as per specification
-$upiUri = 'upi://pay?pa=' . urlencode($upiPayment['upiId']) . 
-          '&pn=' . urlencode($upiPayment['name']) . 
-          '&am=' . $upiPayment['amount'] . 
-          '&cu=' . $upiPayment['currency'];
-
-// Generate QR code URL
-$qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($upiUri);
-
-// Display the QR code
-echo '<img src="' . $qrCodeUrl . '" alt="UPI QR Code" />';
-
-// Function to verify payment
-function verifyUpiPayment($transactionId) {
-  $ch = curl_init('https://api.rizzpay.com/v1/upi/verify');
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['transactionId' => $transactionId]));
-  curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-  $response = curl_exec($ch);
-  curl_close($ch);
-  return json_decode($response, true);
-}
-?>
-`,
-    python: `
-# Python integration
-import urllib.parse
-import requests
-
-upi_payment = {
-    "upiId": "${upiId}",
-    "amount": ${amount},
-    "name": "${merchantName || 'RizzPay'}",
-    "currency": "INR"
-}
-
-# Generate UPI URI
-upi_uri = f"upi://pay?pa={urllib.parse.quote(upi_payment['upiId'])}&pn={urllib.parse.quote(upi_payment['name'])}&am={upi_payment['amount']}&cu={upi_payment['currency']}"
-
-# Generate QR code URL
-qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_uri)}"
-
-# Verify payment (Flask example)
-def verify_upi_payment(transaction_id):
-    response = requests.post(
-        'https://api.rizzpay.com/v1/upi/verify',
-        json={'transactionId': transaction_id},
-        headers={'Content-Type': 'application/json'}
-    )
-    return response.json()
-
-# Use in your web framework (e.g., Django, Flask)
-# return render_template('payment.html', qr_code_url=qr_code_url)
-`
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-md">
@@ -307,29 +209,6 @@ def verify_upi_payment(transaction_id):
             Please enter the transaction ID you received after completing the UPI payment
           </p>
         </div>
-        
-        <Tabs defaultValue="javascript" className="w-full">
-          <TabsList className="grid grid-cols-3 w-full">
-            <TabsTrigger value="javascript">JavaScript</TabsTrigger>
-            <TabsTrigger value="php">PHP</TabsTrigger>
-            <TabsTrigger value="python">Python</TabsTrigger>
-          </TabsList>
-          <TabsContent value="javascript" className="mt-2">
-            <div className="bg-muted rounded-md p-2 text-xs overflow-x-auto">
-              <pre>{codeSnippets.javascript}</pre>
-            </div>
-          </TabsContent>
-          <TabsContent value="php" className="mt-2">
-            <div className="bg-muted rounded-md p-2 text-xs overflow-x-auto">
-              <pre>{codeSnippets.php}</pre>
-            </div>
-          </TabsContent>
-          <TabsContent value="python" className="mt-2">
-            <div className="bg-muted rounded-md p-2 text-xs overflow-x-auto">
-              <pre>{codeSnippets.python}</pre>
-            </div>
-          </TabsContent>
-        </Tabs>
         
         <DialogFooter className="sm:justify-between">
           <Button variant="outline" onClick={handleClose}>
