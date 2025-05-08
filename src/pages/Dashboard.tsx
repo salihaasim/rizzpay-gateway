@@ -7,6 +7,7 @@ import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
 import DashboardAnalyticsSection from '@/components/dashboard/DashboardAnalyticsSection';
 import DashboardTransactionsSection from '@/components/dashboard/DashboardTransactionsSection';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import Navbar from '@/components/Navbar';
 
 const Dashboard = () => {
   const { userRole, userEmail } = useTransactionStore();
@@ -21,28 +22,31 @@ const Dashboard = () => {
   }, [userEmail]);
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <DashboardSidebar 
-        collapsed={sidebarCollapsed} 
-        setCollapsed={setSidebarCollapsed} 
-      />
-      
-      {/* Main content */}
-      <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-0 lg:ml-[280px]"}`}>
-        <div className="content-wrapper p-4 sm:p-6">
-          <DashboardHeader 
-            merchantName={merchantName}
-            userRole={userRole}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          />
-          
-          <DashboardStatCards />
-          
-          <DashboardAnalyticsSection />
-          
-          <DashboardTransactionsSection />
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <div className="flex flex-1 pt-16">
+        {/* Sidebar */}
+        <DashboardSidebar 
+          collapsed={sidebarCollapsed} 
+          setCollapsed={setSidebarCollapsed} 
+        />
+        
+        {/* Main content */}
+        <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-0 lg:ml-[280px]"}`}>
+          <div className="content-wrapper p-4 sm:p-6">
+            <DashboardHeader 
+              merchantName={merchantName}
+              userRole={userRole}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
+            
+            <DashboardStatCards />
+            
+            <DashboardAnalyticsSection />
+            
+            <DashboardTransactionsSection />
+          </div>
         </div>
       </div>
     </div>

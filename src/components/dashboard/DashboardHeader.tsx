@@ -17,9 +17,9 @@ const DashboardHeader = ({
   onTabChange
 }: DashboardHeaderProps) => {
   return (
-    <div className="page-header">
+    <div className="page-header mb-6 flex justify-between items-center">
       <div>
-        <h1 className="page-title">Dashboard</h1>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground mt-1">Welcome, {merchantName}! Here's your payment overview</p>
       </div>
       

@@ -12,7 +12,11 @@ const DashboardStatCards = () => {
   const analytics = React.useMemo(() => generateAnalyticsSummary(transactions), [transactions]);
   
   // Calculate pay-in and pay-out totals
-  const { payInTotal, payOutTotal } = React.useMemo(() => {
+  const { payInTotal, payOutTotal, todayPayIn, todayPayOut } = React.useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTimestamp = today.getTime();
+    
     const payIn = transactions
       .filter(txn => 
         (txn.status === 'successful' || txn.status === 'settled') && 
@@ -26,8 +30,30 @@ const DashboardStatCards = () => {
         txn.walletTransactionType?.includes('withdrawal')
       )
       .reduce((sum, txn) => sum + (typeof txn.amount === 'string' ? parseFloat(txn.amount) : Number(txn.amount)), 0);
+
+    // Calculate today's pay-in and pay-out
+    const todayIn = transactions
+      .filter(txn => 
+        (txn.status === 'successful' || txn.status === 'settled') && 
+        !txn.walletTransactionType?.includes('withdrawal') &&
+        new Date(txn.date).getTime() >= todayTimestamp
+      )
+      .reduce((sum, txn) => sum + (typeof txn.amount === 'string' ? parseFloat(txn.amount) : Number(txn.amount)), 0);
       
-    return { payInTotal: payIn, payOutTotal: payOut };
+    const todayOut = transactions
+      .filter(txn => 
+        (txn.status === 'successful' || txn.status === 'settled') && 
+        txn.walletTransactionType?.includes('withdrawal') &&
+        new Date(txn.date).getTime() >= todayTimestamp
+      )
+      .reduce((sum, txn) => sum + (typeof txn.amount === 'string' ? parseFloat(txn.amount) : Number(txn.amount)), 0);
+      
+    return { 
+      payInTotal: payIn, 
+      payOutTotal: payOut,
+      todayPayIn: todayIn,
+      todayPayOut: todayOut
+    };
   }, [transactions]);
   
   return (
@@ -37,6 +63,26 @@ const DashboardStatCards = () => {
         value={`₹${analytics.revenue.monthly.toLocaleString('en-IN')}`}
         icon={<DollarSign className="h-4 w-4" />}
         trend={{ value: analytics.revenue.dailyGrowth, isPositive: analytics.revenue.dailyGrowth > 0 }}
+      />
+      
+      <StatCard
+        title="Today's Pay-in"
+        value={`₹${todayPayIn.toLocaleString('en-IN')}`}
+        icon={<ArrowRight className="h-4 w-4" />}
+        trend={{ value: 0, isPositive: true }}
+        className="bg-green-50 border-green-100"
+        iconBackground="bg-green-100"
+        iconColor="text-green-600"
+      />
+      
+      <StatCard
+        title="Today's Pay-out"
+        value={`₹${todayPayOut.toLocaleString('en-IN')}`}
+        icon={<ArrowLeft className="h-4 w-4" />}
+        trend={{ value: 0, isPositive: false }}
+        className="bg-red-50 border-red-100"
+        iconBackground="bg-red-100"
+        iconColor="text-red-600"
       />
       
       <StatCard
@@ -57,26 +103,6 @@ const DashboardStatCards = () => {
           ), 
           isPositive: analytics.performance.dailySuccessRate >= analytics.performance.monthlySuccessRate 
         }}
-      />
-      
-      <StatCard
-        title="Total Pay-in"
-        value={`₹${payInTotal.toLocaleString('en-IN')}`}
-        icon={<ArrowRight className="h-4 w-4" />}
-        trend={{ value: 0, isPositive: true }}
-        className="bg-green-50 border-green-100"
-        iconBackground="bg-green-100"
-        iconColor="text-green-600"
-      />
-      
-      <StatCard
-        title="Total Pay-out"
-        value={`₹${payOutTotal.toLocaleString('en-IN')}`}
-        icon={<ArrowLeft className="h-4 w-4" />}
-        trend={{ value: 0, isPositive: false }}
-        className="bg-red-50 border-red-100"
-        iconBackground="bg-red-100"
-        iconColor="text-red-600"
       />
     </div>
   );
