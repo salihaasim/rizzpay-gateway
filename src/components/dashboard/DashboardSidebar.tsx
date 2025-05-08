@@ -3,17 +3,18 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  ArrowRight, 
-  ArrowLeft, 
+  CreditCard,
   FileText, 
   Settings, 
   Users, 
   Wallet,
-  CreditCard,
   ChevronLeft,
-  QrCode,
-  Code,
-  ShieldCheck,
+  ArrowRightLeft,
+  Upload,
+  Download,
+  BarChart3,
+  Layers,
+  Repeat,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -44,11 +45,16 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   
   const sidebarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
-    { name: 'Transactions', path: '/transactions', icon: <FileText className="h-5 w-5" /> },
+    { name: 'Banking', path: '/banking', icon: <CreditCard className="h-5 w-5" /> },
+    { name: 'Deposit', path: '/deposit', icon: <Upload className="h-5 w-5" /> },
+    { name: 'Payout', path: '/payout', icon: <Download className="h-5 w-5" /> },
+    { name: 'IMPS / UPI / NEFT', path: '/transfers', icon: <ArrowRightLeft className="h-5 w-5" /> },
+    { name: 'Users', path: '/users', icon: <Users className="h-5 w-5" /> },
+    { name: 'Reports', path: '/reports', icon: <BarChart3 className="h-5 w-5" /> },
+    { name: 'Payment Retry', path: '/payment-retry', icon: <Repeat className="h-5 w-5" /> },
     { name: 'Wallet', path: '/wallet', icon: <Wallet className="h-5 w-5" /> },
-    { name: 'UPI Plugin', path: '/upi-plugin', icon: <QrCode className="h-5 w-5" /> },
-    { name: 'Developer Tools', path: '/developers', icon: <Code className="h-5 w-5" /> },
-    { name: 'Security', path: '/security', icon: <ShieldCheck className="h-5 w-5" /> },
+    { name: 'Payment Tools', path: '/tools', icon: <Layers className="h-5 w-5" /> },
+    { name: 'Services', path: '/services', icon: <FileText className="h-5 w-5" /> },
     { name: 'Settings', path: '/settings', icon: <Settings className="h-5 w-5" /> },
   ];
   
@@ -103,74 +109,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               </Tooltip>
             ))}
           </div>
-          
-          <Separator className="my-4" />
-          
-          {/* Pay-in and Pay-out Summary */}
-          <div className={cn("px-3", collapsed && "hidden")}>
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">Transaction Summary</h3>
-            
-            <div className="space-y-3">
-              <div className="bg-muted/50 p-3 rounded-md">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                      <ArrowRight className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Total Pay-in</p>
-                      <p className="text-lg font-bold">₹32,450.00</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-muted/50 p-3 rounded-md">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
-                      <ArrowLeft className="h-4 w-4 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Total Pay-out</p>
-                      <p className="text-lg font-bold">₹18,750.00</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Compact Pay-in/Pay-out for collapsed state */}
-          {collapsed && (
-            <div className="px-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center space-y-3">
-                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                      <ArrowRight className="h-5 w-5 text-green-600" />
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                      <ArrowLeft className="h-5 w-5 text-red-600" />
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="w-40">
-                  <div className="space-y-2">
-                    <p className="text-xs">Pay-in: ₹32,450.00</p>
-                    <p className="text-xs">Pay-out: ₹18,750.00</p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          )}
         </div>
-        
-        {!collapsed && userEmail && (
-          <div className="p-4 mt-auto">
-            <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
-          </div>
-        )}
       </div>
     </TooltipProvider>
   );

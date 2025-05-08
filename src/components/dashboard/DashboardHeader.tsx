@@ -17,24 +17,24 @@ const DashboardHeader = ({
   onTabChange
 }: DashboardHeaderProps) => {
   return (
-    <div className="page-header mb-6 flex justify-between items-center">
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Welcome, {merchantName}! Here's your payment overview</p>
-      </div>
+    <div className="page-header mb-6">
+      <h1 className="text-2xl font-bold mb-1">Welcome, {merchantName}</h1>
+      <p className="text-muted-foreground">Here's your payment overview</p>
       
       {userRole === 'admin' && (
-        <Tabs 
-          defaultValue="admin" 
-          value={activeTab}
-          onValueChange={onTabChange}
-          className="w-[180px]"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="admin">Admin</TabsTrigger>
-            <TabsTrigger value="merchant">Merchant</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="mt-4">
+          <Tabs 
+            defaultValue="admin" 
+            value={activeTab}
+            onValueChange={onTabChange}
+            className="w-[180px]"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="admin">Admin</TabsTrigger>
+              <TabsTrigger value="merchant">Merchant</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       )}
     </div>
   );

@@ -53,12 +53,20 @@ The admin dashboard includes:
 Merchants have access to:
 
 - **Dashboard**: Overview of transaction metrics and performance
-- **Transactions**: Track and manage payment transactions
+  - **Current Balance**: Real-time wallet balance
+  - **Pay-Ins**: Track incoming payments with success/pending rates
+  - **Pay-Outs**: Monitor outgoing payments with success/failure rates
+  - **Transaction Overview**: Visual representation of transaction history
+- **Banking**: Manage bank accounts and banking operations
+- **Deposit & Payout**: Dedicated sections for depositing funds and processing payouts
+- **IMPS/UPI/NEFT**: Integrated payment methods for Indian banking
+- **Reports**: Generate custom transaction reports
 - **Wallet**: Manage funds and perform transactions
   - **Static UPI QR Codes**: Generate branded QR codes for UPI payments
   - **Deposits & Withdrawals**: Manage wallet funds
   - **Transfers**: Send money to other merchants
-- **Webhooks**: Set up integrations with external systems
+- **Payment Tools**: Access specialized payment processing tools
+- **Services**: Additional merchant services and features
 - **Settings**: Configure account settings and preferences
 
 ## UPI Payment Features
@@ -103,6 +111,13 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 
 ## Recent Updates
 
+- **UI Redesign**: Updated dashboard layout to match simplified mockup design
+- **Current Balance**: Added prominent current balance card on dashboard
+- **Pay-In/Pay-Out Metrics**: Enhanced pay-in and pay-out tracking with success rates
+- **Transaction Overview**: Added visual charts for transaction monitoring
+- **Improved Navigation**: Updated sidebar with comprehensive navigation options
+- **Recent Pay-Ins**: Added dedicated section for recent transactions
+- **Transaction Mode**: Added visualization for payment distribution by method
 - **Brand Updates**: Updated branding to RizzPay throughout the application
 - **Logo Redesign**: Implemented new professional logo with improved color scheme
 - **UI Improvement**: Fixed layout issues in navbar and dashboard components
@@ -125,3 +140,4 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+

@@ -4,6 +4,7 @@ import StatCard from '@/components/StatCard';
 import { DollarSign, CreditCard, Percent, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { generateAnalyticsSummary, calculateGrowthRate } from '@/utils/analyticsUtils';
+import { Card, CardContent } from '@/components/ui/card';
 
 const DashboardStatCards = () => {
   const { transactions } = useTransactionStore();
@@ -57,53 +58,92 @@ const DashboardStatCards = () => {
   }, [transactions]);
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
-      <StatCard
-        title="Total Revenue"
-        value={`₹${analytics.revenue.monthly.toLocaleString('en-IN')}`}
-        icon={<DollarSign className="h-4 w-4" />}
-        trend={{ value: analytics.revenue.dailyGrowth, isPositive: analytics.revenue.dailyGrowth > 0 }}
-      />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      {/* Current Balance Card */}
+      <Card className="border border-gray-100 shadow-sm">
+        <CardContent className="pt-6">
+          <h3 className="text-base font-medium text-gray-700 mb-2">Current Balance</h3>
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center mr-3">
+              <DollarSign className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">₹{(payInTotal - payOutTotal).toLocaleString('en-IN')}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
-      <StatCard
-        title="Today's Pay-in"
-        value={`₹${todayPayIn.toLocaleString('en-IN')}`}
-        icon={<ArrowRight className="h-4 w-4" />}
-        trend={{ value: 0, isPositive: true }}
-        className="bg-green-50 border-green-100"
-        iconBackground="bg-green-100"
-        iconColor="text-green-600"
-      />
+      {/* Total Pay-Ins Card */}
+      <Card className="border border-gray-100 shadow-sm">
+        <CardContent className="pt-6">
+          <h3 className="text-base font-medium text-gray-700 mb-2">Total Pay - Ins</h3>
+          <div className="flex flex-col">
+            <div className="flex justify-between mb-1">
+              <span className="text-sm text-gray-500">Amount</span>
+              <span className="text-sm">₹{payInTotal.toLocaleString('en-IN')}</span>
+            </div>
+            <div className="flex justify-between mb-1">
+              <span className="text-sm text-gray-500">Success</span>
+              <div className="h-2 w-24 bg-gray-200 rounded self-center">
+                <div className="h-full w-3/4 bg-green-500 rounded"></div>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">Pending</span>
+              <div className="h-2 w-24 bg-gray-200 rounded self-center">
+                <div className="h-full w-1/4 bg-yellow-500 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
-      <StatCard
-        title="Today's Pay-out"
-        value={`₹${todayPayOut.toLocaleString('en-IN')}`}
-        icon={<ArrowLeft className="h-4 w-4" />}
-        trend={{ value: 0, isPositive: false }}
-        className="bg-red-50 border-red-100"
-        iconBackground="bg-red-100"
-        iconColor="text-red-600"
-      />
+      {/* Total Payouts Card */}
+      <Card className="border border-gray-100 shadow-sm">
+        <CardContent className="pt-6">
+          <div className="flex justify-between mb-2">
+            <h3 className="text-base font-medium text-gray-700">Total Payouts</h3>
+            <span className="text-xs text-blue-600">Actions</span>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex justify-between mb-1">
+              <span className="text-sm text-gray-500">Amount</span>
+              <span className="text-sm">₹{payOutTotal.toLocaleString('en-IN')}</span>
+            </div>
+            <div className="flex justify-between mb-1">
+              <span className="text-sm text-gray-500">Success</span>
+              <div className="h-2 w-24 bg-gray-200 rounded self-center">
+                <div className="h-full w-5/6 bg-green-500 rounded"></div>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">Faunt</span>
+              <div className="h-2 w-24 bg-gray-200 rounded self-center">
+                <div className="h-full w-1/6 bg-red-500 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
-      <StatCard
-        title="Transactions"
-        value={analytics.transactions.monthly.toString()}
-        icon={<CreditCard className="h-4 w-4" />}
-        trend={{ value: analytics.transactions.dailyGrowth, isPositive: analytics.transactions.dailyGrowth > 0 }}
-      />
-      
-      <StatCard
-        title="Success Rate"
-        value={`${analytics.performance.monthlySuccessRate.toFixed(1)}%`}
-        icon={<Percent className="h-4 w-4" />}
-        trend={{ 
-          value: calculateGrowthRate(
-            analytics.performance.dailySuccessRate, 
-            analytics.performance.monthlySuccessRate
-          ), 
-          isPositive: analytics.performance.dailySuccessRate >= analytics.performance.monthlySuccessRate 
-        }}
-      />
+      {/* Transaction Overview Card */}
+      <Card className="border border-gray-100 shadow-sm">
+        <CardContent className="pt-6">
+          <h3 className="text-base font-medium text-gray-700 mb-2">Transaction Overview</h3>
+          <div className="h-24 w-full bg-gray-100 rounded-md flex items-center justify-center">
+            <div className="h-full w-full flex items-end p-2 space-x-1">
+              {[30, 45, 60, 40, 50, 70, 55].map((height, index) => (
+                <div 
+                  key={index} 
+                  className="bg-gray-300 rounded-t" 
+                  style={{ height: `${height}%`, width: '14%' }}
+                ></div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
