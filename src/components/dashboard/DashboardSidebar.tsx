@@ -53,7 +53,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     navigate('/');
   };
   
-  // Updated merchant-related pages with removed items and reorganized
+  // Updated merchant-related pages with removed items
   const sidebarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: 'Banking', path: '/banking', icon: <CreditCard className="h-5 w-5" /> },
@@ -70,7 +70,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const DesktopSidebar = (
     <div className={cn(
       "fixed inset-y-0 left-0 z-20 hidden md:flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
-      collapsed ? "w-20" : "w-[280px]"
+      collapsed ? "w-20" : "w-[260px]"
     )}>
       <div className="flex h-16 items-center justify-between px-4">
         {!collapsed && (
@@ -91,8 +91,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         </Button>
       </div>
       
-      <div className="flex-1 overflow-auto py-4">
-        <div className="space-y-1 px-3">
+      <div className="flex-1 overflow-auto py-4 px-2">
+        <div className="space-y-1">
           {sidebarItems.map((item) => (
             <Tooltip key={item.path} delayDuration={0}>
               <TooltipTrigger asChild>
@@ -105,7 +105,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                     )}
                   >
                     {item.icon}
-                    {!collapsed && <span className="ml-3">{item.name}</span>}
+                    {!collapsed && <span className="ml-3 text-sm">{item.name}</span>}
                   </Button>
                 </Link>
               </TooltipTrigger>
@@ -120,10 +120,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </div>
       
       {/* Profile and logout section */}
-      <div className="p-3 mt-auto">
-        <Separator className="mb-3" />
+      <div className="p-2 mt-auto">
+        <Separator className="mb-2" />
         {!collapsed && userEmail && (
-          <div className="px-3 mb-3">
+          <div className="px-2 mb-2">
             <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
           </div>
         )}
@@ -184,7 +184,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     </div>
   );
 
-  // Mobile sidebar (sheet)
+  // Mobile sidebar (sheet) - Making it more responsive
   const MobileSidebar = (
     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
       <SheetTrigger asChild className="md:hidden absolute left-4 top-4 z-20">
@@ -193,14 +193,14 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-[280px]">
+      <SheetContent side="left" className="p-0 w-[260px]">
         <div className="flex h-16 items-center px-4 border-b">
           <Link to="/" className="flex items-center">
             <h1 className="text-xl font-bold text-primary">RizzPay</h1>
           </Link>
         </div>
-        <div className="flex-1 overflow-auto py-4">
-          <div className="space-y-1 px-3">
+        <div className="flex-1 overflow-auto py-4 px-2">
+          <div className="space-y-1">
             {sidebarItems.map((item) => (
               <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}>
                 <Button
@@ -208,7 +208,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                   className="w-full justify-start"
                 >
                   {item.icon}
-                  <span className="ml-3">{item.name}</span>
+                  <span className="ml-3 text-sm">{item.name}</span>
                 </Button>
               </Link>
             ))}
@@ -216,10 +216,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         </div>
         
         {/* Profile and logout section for mobile */}
-        <div className="p-3 mt-auto">
-          <Separator className="mb-3" />
+        <div className="p-2 mt-auto">
+          <Separator className="mb-2" />
           {userEmail && (
-            <div className="px-3 mb-3">
+            <div className="px-2 mb-2">
               <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
             </div>
           )}
