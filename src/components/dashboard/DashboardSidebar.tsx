@@ -4,8 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   CreditCard,
-  Upload,
-  Download,
   ArrowRightLeft,
   BarChart3,
   Wallet,
@@ -15,7 +13,6 @@ import {
   LogOut,
   User,
   Settings,
-  FileType2,
   Webhook,
   UserCheck,
 } from 'lucide-react';
@@ -56,12 +53,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     navigate('/');
   };
   
-  // Updated merchant-related pages with new sections
+  // Updated merchant-related pages with removed items and reorganized
   const sidebarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: 'Banking', path: '/banking', icon: <CreditCard className="h-5 w-5" /> },
-    { name: 'Deposit', path: '/deposit', icon: <Upload className="h-5 w-5" /> },
-    { name: 'Payout', path: '/payout', icon: <Download className="h-5 w-5" /> },
     { name: 'Transfers', path: '/transfers', icon: <ArrowRightLeft className="h-5 w-5" /> },
     { name: 'Reports', path: '/reports', icon: <BarChart3 className="h-5 w-5" /> },
     { name: 'Wallet', path: '/wallet', icon: <Wallet className="h-5 w-5" /> },
@@ -69,7 +64,6 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     { name: 'KYC Verification', path: '/kyc', icon: <UserCheck className="h-5 w-5" /> },
     { name: 'UPI Plugin', path: '/upi-plugin', icon: <CreditCard className="h-5 w-5" /> },
     { name: 'Developers', path: '/developers', icon: <Webhook className="h-5 w-5" /> },
-    { name: 'Favicon', path: '/favicon', icon: <FileType2 className="h-5 w-5" /> },
   ];
   
   // Sidebar for desktop
