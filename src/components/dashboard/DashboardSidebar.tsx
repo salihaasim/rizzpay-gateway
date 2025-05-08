@@ -15,6 +15,9 @@ import {
   LogOut,
   User,
   Settings,
+  FileType2,
+  Webhook,
+  UserCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -53,7 +56,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     navigate('/');
   };
   
-  // Only include merchant-related pages
+  // Updated merchant-related pages with new sections
   const sidebarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: 'Banking', path: '/banking', icon: <CreditCard className="h-5 w-5" /> },
@@ -63,6 +66,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     { name: 'Reports', path: '/reports', icon: <BarChart3 className="h-5 w-5" /> },
     { name: 'Wallet', path: '/wallet', icon: <Wallet className="h-5 w-5" /> },
     { name: 'Services', path: '/services', icon: <FileText className="h-5 w-5" /> },
+    { name: 'KYC Verification', path: '/kyc', icon: <UserCheck className="h-5 w-5" /> },
+    { name: 'UPI Plugin', path: '/upi-plugin', icon: <CreditCard className="h-5 w-5" /> },
+    { name: 'Developers', path: '/developers', icon: <Webhook className="h-5 w-5" /> },
+    { name: 'Favicon', path: '/favicon', icon: <FileType2 className="h-5 w-5" /> },
   ];
   
   // Sidebar for desktop

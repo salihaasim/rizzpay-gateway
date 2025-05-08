@@ -56,9 +56,9 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       />
       
       <div className={`flex-1 min-h-screen transition-all duration-300 ${
-        sidebarCollapsed ? "ml-20" : "ml-0 lg:ml-[280px]"
+        sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]"
       }`}>
-        <main className="p-3 sm:p-5">
+        <main className="p-4 sm:p-6">
           {children}
         </main>
         
