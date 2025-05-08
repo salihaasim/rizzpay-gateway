@@ -35,6 +35,7 @@ import { useWalletActions } from '@/hooks/useWalletActions';
 import { toast } from 'sonner';
 import WithdrawForm from '@/components/wallet/WithdrawForm';
 import TransferForm from '@/components/wallet/TransferForm';
+import { Merchant } from '@/stores/profileStore';
 
 const TransfersPage = () => {
   const [transferAmount, setTransferAmount] = useState<string>('');
@@ -49,11 +50,32 @@ const TransfersPage = () => {
   const { transferFunds, getWalletBalance, userEmail } = useTransactionStore();
   const { handleWithdraw, handleTransfer, walletBalance, isProcessing } = useWalletActions(userEmail);
   
-  // Sample merchants for the transfer form
-  const sampleMerchants = [
-    { id: '1', name: 'Merchant 1', email: 'merchant1@example.com' },
-    { id: '2', name: 'Merchant 2', email: 'merchant2@example.com' },
-    { id: '3', name: 'Merchant 3', email: 'merchant3@example.com' },
+  // Updated sampleMerchants to match the Merchant type
+  const sampleMerchants: Merchant[] = [
+    { 
+      id: '1', 
+      name: 'Merchant 1', 
+      email: 'merchant1@example.com',
+      company: 'Company 1',
+      phone: '+91 9876543210',
+      createdAt: '2025-01-01T00:00:00Z'
+    },
+    { 
+      id: '2', 
+      name: 'Merchant 2', 
+      email: 'merchant2@example.com',
+      company: 'Company 2',
+      phone: '+91 9876543211',
+      createdAt: '2025-01-02T00:00:00Z'
+    },
+    { 
+      id: '3', 
+      name: 'Merchant 3', 
+      email: 'merchant3@example.com',
+      company: 'Company 3',
+      phone: '+91 9876543212',
+      createdAt: '2025-01-03T00:00:00Z'
+    },
   ];
   
   const handleTransferSubmit = (recipient: string, amount: number, description?: string) => {
