@@ -18,6 +18,7 @@ import {
   ArrowRightLeft, 
   Download,
   CreditCard,
+  IndianRupee,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +31,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTransactionStore } from '@/stores/transactionStore';
+import { useWalletActions } from '@/hooks/useWalletActions';
 import { toast } from 'sonner';
+import WithdrawForm from '@/components/wallet/WithdrawForm';
+import TransferForm from '@/components/wallet/TransferForm';
 
 const TransfersPage = () => {
   const [transferAmount, setTransferAmount] = useState<string>('');
@@ -43,68 +47,34 @@ const TransfersPage = () => {
   const [payoutMethod, setPayoutMethod] = useState<string>('bank');
   
   const { transferFunds, getWalletBalance, userEmail } = useTransactionStore();
+  const { handleWithdraw, handleTransfer, walletBalance, isProcessing } = useWalletActions(userEmail);
   
-  const walletBalance = getWalletBalance(userEmail || '');
+  // Sample merchants for the transfer form
+  const sampleMerchants = [
+    { id: '1', name: 'Merchant 1', email: 'merchant1@example.com' },
+    { id: '2', name: 'Merchant 2', email: 'merchant2@example.com' },
+    { id: '3', name: 'Merchant 3', email: 'merchant3@example.com' },
+  ];
   
-  const handleTransfer = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!userEmail || !recipientEmail || !transferAmount) {
-      toast.error('Please fill all required fields');
+  const handleTransferSubmit = (recipient: string, amount: number, description?: string) => {
+    if (!userEmail) {
+      toast.error('You must be logged in to transfer funds');
       return;
     }
-    
-    try {
-      const amount = parseFloat(transferAmount);
-      
-      if (isNaN(amount) || amount <= 0) {
-        toast.error('Please enter a valid amount');
-        return;
-      }
-      
-      if (amount > walletBalance) {
-        toast.error('Insufficient balance');
-        return;
-      }
-      
-      transferFunds(userEmail, recipientEmail, amount, transferNote || 'Wallet transfer');
-      toast.success(`Successfully transferred ₹${amount} to ${recipientEmail}`);
-      
-      // Reset form
-      setTransferAmount('');
-      setRecipientEmail('');
-      setTransferNote('');
-    } catch (error: any) {
-      toast.error(error.message || 'Transfer failed');
-    }
+    handleTransfer(recipient, amount, description);
   };
   
-  const handlePayoutRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!userEmail || !bankAccount || !payoutAmount) {
-      toast.error('Please fill all required fields');
+  const handleWithdrawSubmit = (amount: number, description?: string, bankDetails?: {
+    accountNumber: string;
+    ifscCode: string;
+    beneficiaryName: string;
+    method: string;
+  }) => {
+    if (!userEmail) {
+      toast.error('You must be logged in to withdraw funds');
       return;
     }
-    
-    try {
-      const amount = parseFloat(payoutAmount);
-      
-      if (isNaN(amount) || amount <= 0) {
-        toast.error('Please enter a valid amount');
-        return;
-      }
-      
-      // Simulate payout request
-      toast.success(`Payout request for ₹${amount} has been submitted`);
-      
-      // Reset form
-      setPayoutAmount('');
-      setBankAccount('');
-      setPayoutNote('');
-    } catch (error: any) {
-      toast.error(error.message || 'Payout request failed');
-    }
+    handleWithdraw(amount, description, bankDetails);
   };
   
   return (
@@ -127,123 +97,27 @@ const TransfersPage = () => {
                       <span>Transfer Funds</span>
                     </div>
                   </TabsTrigger>
-                  <TabsTrigger value="payout">
+                  <TabsTrigger value="withdraw">
                     <div className="flex items-center">
                       <Download className="mr-2 h-4 w-4" />
-                      <span>Request Payout</span>
+                      <span>Withdraw Money</span>
                     </div>
                   </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="transfer" className="space-y-4 mt-4">
-                  <form onSubmit={handleTransfer} className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4">
-                      <div>
-                        <Label htmlFor="recipientEmail">Recipient Email</Label>
-                        <Input 
-                          id="recipientEmail"
-                          type="email"
-                          placeholder="Enter recipient's email"
-                          value={recipientEmail}
-                          onChange={(e) => setRecipientEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="transferAmount">Amount (₹)</Label>
-                        <Input
-                          id="transferAmount"
-                          type="number"
-                          placeholder="0.00"
-                          min="1"
-                          step="0.01"
-                          value={transferAmount}
-                          onChange={(e) => setTransferAmount(e.target.value)}
-                          required
-                        />
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Available balance: ₹{walletBalance.toFixed(2)}
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="transferNote">Note (Optional)</Label>
-                        <Input
-                          id="transferNote"
-                          placeholder="Add a note"
-                          value={transferNote}
-                          onChange={(e) => setTransferNote(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    
-                    <Button type="submit" className="w-full">Transfer Funds</Button>
-                  </form>
+                  <TransferForm 
+                    merchants={sampleMerchants}
+                    onTransfer={handleTransferSubmit}
+                    isProcessing={isProcessing}
+                  />
                 </TabsContent>
                 
-                <TabsContent value="payout" className="space-y-4 mt-4">
-                  <form onSubmit={handlePayoutRequest} className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4">
-                      <div>
-                        <Label htmlFor="payoutMethod">Payout Method</Label>
-                        <Select
-                          value={payoutMethod}
-                          onValueChange={setPayoutMethod}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select payout method" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="bank">Bank Transfer</SelectItem>
-                            <SelectItem value="upi">UPI</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="bankAccount">
-                          {payoutMethod === 'bank' ? 'Bank Account Number' : 'UPI ID'}
-                        </Label>
-                        <Input 
-                          id="bankAccount"
-                          placeholder={payoutMethod === 'bank' ? 'Enter bank account number' : 'Enter UPI ID'}
-                          value={bankAccount}
-                          onChange={(e) => setBankAccount(e.target.value)}
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="payoutAmount">Amount (₹)</Label>
-                        <Input
-                          id="payoutAmount"
-                          type="number"
-                          placeholder="0.00"
-                          min="1"
-                          step="0.01"
-                          value={payoutAmount}
-                          onChange={(e) => setPayoutAmount(e.target.value)}
-                          required
-                        />
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Available balance: ₹{walletBalance.toFixed(2)}
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="payoutNote">Note (Optional)</Label>
-                        <Input
-                          id="payoutNote"
-                          placeholder="Add a note"
-                          value={payoutNote}
-                          onChange={(e) => setPayoutNote(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    
-                    <Button type="submit" className="w-full">Request Payout</Button>
-                  </form>
+                <TabsContent value="withdraw" className="space-y-4 mt-4">
+                  <WithdrawForm 
+                    onWithdraw={handleWithdrawSubmit}
+                    isProcessing={isProcessing}
+                  />
                 </TabsContent>
               </Tabs>
             </CardContent>

@@ -23,6 +23,7 @@ import { default as AasimoAIComponent } from './components/aasimo/AasimoAI';
 import KycPage from './pages/KycPage';
 import UpiPluginSettings from './pages/UpiPluginSettings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
+import ReportsPage from './pages/ReportsPage';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -165,6 +166,8 @@ const App = () => {
     <Route key="kyc" path="/kyc" element={<KycPage />} />,
     
     <Route key="upi-plugin" path="/upi-plugin" element={<UpiPluginSettings />} />,
+    
+    <Route key="reports" path="/reports" element={<ReportsPage />} />,
     
     <Route key="not-found" path="*" element={<NotFound />} />
   ];
