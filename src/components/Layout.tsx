@@ -1,11 +1,10 @@
 
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
-import { useState } from 'react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -48,22 +47,16 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Skip the sidebar for the dashboard page since it already has its own sidebar
-  const isDashboardPage = location.pathname === '/dashboard';
-
-  // Display responsive layout for authenticated users
+  // Display responsive layout for authenticated users with sidebar
   return (
     <div className="min-h-screen flex bg-[#f5f5f7]">
-      {/* Only show sidebar if not on dashboard page */}
-      {!isDashboardPage && (
-        <DashboardSidebar 
-          collapsed={sidebarCollapsed} 
-          setCollapsed={setSidebarCollapsed} 
-        />
-      )}
+      <DashboardSidebar 
+        collapsed={sidebarCollapsed} 
+        setCollapsed={setSidebarCollapsed} 
+      />
       
       <div className={`flex-1 min-h-screen transition-all duration-300 ${
-        !isDashboardPage && (sidebarCollapsed ? "ml-20" : "ml-0 lg:ml-[280px]")
+        sidebarCollapsed ? "ml-20" : "ml-0 lg:ml-[280px]"
       }`}>
         <main className="p-3 sm:p-5">
           {children}

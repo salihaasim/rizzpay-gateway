@@ -22,15 +22,9 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-[#f5f5f7]">
-      {/* Sidebar */}
-      <DashboardSidebar 
-        collapsed={sidebarCollapsed} 
-        setCollapsed={setSidebarCollapsed} 
-      />
-      
       {/* Main content */}
-      <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-0 lg:ml-[280px]"}`}>
-        <div className="content-wrapper p-3 sm:p-5">
+      <div className="flex-1 min-h-screen">
+        <div className="content-wrapper p-4 sm:p-6 max-w-[1500px] mx-auto">
           <DashboardHeader 
             merchantName={merchantName}
             userRole={userRole}
@@ -38,16 +32,21 @@ const Dashboard = () => {
             onTabChange={setActiveTab}
           />
           
-          <DashboardStatCards />
+          <div className="mb-8">
+            <DashboardStatCards />
+          </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <DashboardAnalyticsSection />
             <DashboardTransactionsSection />
           </div>
           
           {/* Recent Pay-Ins Section */}
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-5">
-            <h3 className="text-lg font-semibold mb-3">Recent Pay-Ins</h3>
+          <div className="bg-white rounded-lg shadow-sm p-5 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Recent Pay-Ins</h3>
+              <button className="text-primary text-sm font-medium">View All</button>
+            </div>
             <div className="overflow-x-auto -mx-2 px-2">
               <table className="w-full">
                 <thead>
@@ -79,33 +78,73 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Transaction Mode Section */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-lg font-semibold mb-3">Transaction Mode</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Payments by Time</span>
-                <div className="h-2 w-24 sm:w-32 md:w-40 bg-gray-200 rounded">
-                  <div className="h-full w-3/4 bg-blue-500 rounded"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Transaction Mode Section */}
+            <div className="bg-white rounded-lg shadow-sm p-5">
+              <h3 className="text-lg font-semibold mb-4">Transaction Mode</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Payments by Time</span>
+                  <div className="h-2.5 w-32 md:w-48 bg-gray-200 rounded">
+                    <div className="h-full w-3/4 bg-blue-500 rounded"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">UPI</span>
+                  <div className="h-2.5 w-32 md:w-48 bg-gray-200 rounded">
+                    <div className="h-full w-1/2 bg-blue-500 rounded"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Bank</span>
+                  <div className="h-2.5 w-32 md:w-48 bg-gray-200 rounded">
+                    <div className="h-full w-2/3 bg-blue-500 rounded"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Cards</span>
+                  <div className="h-2.5 w-32 md:w-48 bg-gray-200 rounded">
+                    <div className="h-full w-1/4 bg-blue-500 rounded"></div>
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">UPI</span>
-                <div className="h-2 w-24 sm:w-32 md:w-40 bg-gray-200 rounded">
-                  <div className="h-full w-1/2 bg-blue-500 rounded"></div>
+            </div>
+
+            {/* Quick Payment Form */}
+            <div className="bg-white rounded-lg shadow-sm p-5">
+              <h3 className="text-lg font-semibold mb-4">Quick Payment</h3>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-1">Your Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
                 </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Bank</span>
-                <div className="h-2 w-24 sm:w-32 md:w-40 bg-gray-200 rounded">
-                  <div className="h-full w-2/3 bg-blue-500 rounded"></div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="your@email.com"
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Required for receipt</p>
                 </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Cards</span>
-                <div className="h-2 w-24 sm:w-32 md:w-40 bg-gray-200 rounded">
-                  <div className="h-full w-1/4 bg-blue-500 rounded"></div>
+                <div>
+                  <label htmlFor="amount" className="block text-sm font-medium mb-1">Payment Amount (₹)</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    placeholder="0.00"
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
                 </div>
+                <button className="w-full bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                  Make Payment
+                </button>
               </div>
             </div>
           </div>

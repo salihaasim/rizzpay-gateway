@@ -1,21 +1,20 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   CreditCard,
-  FileText, 
-  Settings, 
-  Users, 
-  Wallet,
-  ChevronLeft,
-  ArrowRightLeft,
   Upload,
   Download,
+  ArrowRightLeft,
   BarChart3,
-  Layers,
-  Repeat,
+  Wallet,
+  FileText, 
   Menu,
+  ChevronLeft,
+  LogOut,
+  User,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -28,6 +27,7 @@ import {
   TooltipTrigger 
 } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 interface DashboardSidebarProps {
   collapsed: boolean;
@@ -39,26 +39,30 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   setCollapsed 
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { userEmail } = useTransactionStore();
+  const { logout } = useMerchantAuth();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path;
   };
   
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+  
+  // Only include merchant-related pages
   const sidebarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: 'Banking', path: '/banking', icon: <CreditCard className="h-5 w-5" /> },
     { name: 'Deposit', path: '/deposit', icon: <Upload className="h-5 w-5" /> },
     { name: 'Payout', path: '/payout', icon: <Download className="h-5 w-5" /> },
-    { name: 'IMPS / UPI / NEFT', path: '/transfers', icon: <ArrowRightLeft className="h-5 w-5" /> },
-    { name: 'Users', path: '/users', icon: <Users className="h-5 w-5" /> },
+    { name: 'Transfers', path: '/transfers', icon: <ArrowRightLeft className="h-5 w-5" /> },
     { name: 'Reports', path: '/reports', icon: <BarChart3 className="h-5 w-5" /> },
-    { name: 'Payment Retry', path: '/payment-retry', icon: <Repeat className="h-5 w-5" /> },
     { name: 'Wallet', path: '/wallet', icon: <Wallet className="h-5 w-5" /> },
-    { name: 'Payment Tools', path: '/tools', icon: <Layers className="h-5 w-5" /> },
     { name: 'Services', path: '/services', icon: <FileText className="h-5 w-5" /> },
-    { name: 'Settings', path: '/settings', icon: <Settings className="h-5 w-5" /> },
   ];
   
   // Sidebar for desktop
@@ -113,6 +117,69 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           ))}
         </div>
       </div>
+      
+      {/* Profile and logout section */}
+      <div className="p-3 mt-auto">
+        <Separator className="mb-3" />
+        {!collapsed && userEmail && (
+          <div className="px-3 mb-3">
+            <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
+          </div>
+        )}
+        
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Link to="/settings">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start",
+                  collapsed && "justify-center px-0"
+                )}
+              >
+                <Settings className="h-5 w-5" />
+                {!collapsed && <span className="ml-3">Settings</span>}
+              </Button>
+            </Link>
+          </TooltipTrigger>
+          {collapsed && <TooltipContent side="right">Settings</TooltipContent>}
+        </Tooltip>
+        
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Link to="/profile">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start",
+                  collapsed && "justify-center px-0"
+                )}
+              >
+                <User className="h-5 w-5" />
+                {!collapsed && <span className="ml-3">Profile</span>}
+              </Button>
+            </Link>
+          </TooltipTrigger>
+          {collapsed && <TooltipContent side="right">Profile</TooltipContent>}
+        </Tooltip>
+        
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50",
+                collapsed && "justify-center px-0"
+              )}
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5" />
+              {!collapsed && <span className="ml-3">Logout</span>}
+            </Button>
+          </TooltipTrigger>
+          {collapsed && <TooltipContent side="right">Logout</TooltipContent>}
+        </Tooltip>
+      </div>
     </div>
   );
 
@@ -145,6 +212,39 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               </Link>
             ))}
           </div>
+        </div>
+        
+        {/* Profile and logout section for mobile */}
+        <div className="p-3 mt-auto">
+          <Separator className="mb-3" />
+          {userEmail && (
+            <div className="px-3 mb-3">
+              <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
+            </div>
+          )}
+          
+          <Link to="/settings" onClick={() => setMobileOpen(false)}>
+            <Button variant="ghost" className="w-full justify-start">
+              <Settings className="h-5 w-5" />
+              <span className="ml-3">Settings</span>
+            </Button>
+          </Link>
+          
+          <Link to="/profile" onClick={() => setMobileOpen(false)}>
+            <Button variant="ghost" className="w-full justify-start">
+              <User className="h-5 w-5" />
+              <span className="ml-3">Profile</span>
+            </Button>
+          </Link>
+          
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="ml-3">Logout</span>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
