@@ -7,7 +7,6 @@ import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
 import DashboardAnalyticsSection from '@/components/dashboard/DashboardAnalyticsSection';
 import DashboardTransactionsSection from '@/components/dashboard/DashboardTransactionsSection';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
-import Navbar from '@/components/Navbar';
 
 const Dashboard = () => {
   const { userRole, userEmail } = useTransactionStore();
@@ -23,8 +22,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f5f5f7]">
-      <Navbar />
-      <div className="flex flex-1 pt-16">
+      <div className="flex flex-1">
         {/* Sidebar */}
         <DashboardSidebar 
           collapsed={sidebarCollapsed} 
