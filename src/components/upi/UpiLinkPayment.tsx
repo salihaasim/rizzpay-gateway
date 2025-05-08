@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Toggle } from '@/components/ui/toggle';
-import { Check, Copy, QrCode, AlertCircle } from 'lucide-react';
+import { Check, Copy, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { v4 as uuidv4 } from 'uuid';
@@ -87,7 +87,7 @@ const UpiLinkPayment: React.FC<UpiLinkPaymentProps> = ({
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
         upiId,
-        utrId,
+        upiTransactionId: utrId, // Using upiTransactionId instead of utrId to match the type
         description
       }
     });

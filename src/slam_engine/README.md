@@ -37,6 +37,7 @@ SLAM Engine (Smart Labeling & Masking Module) is a sophisticated transaction obf
   - ✅ Clean Tags: "Customer Payment", "Recharge", "Wallet Load"
   - ❌ Avoids: "Casino", "4rabet", "GamingXYZ"
 - Implements tagging logic in webhook delivery and admin dashboard layer
+- Enhanced sidebar navigation with pay-in and pay-out tracking
 
 ## Technical Implementation
 
@@ -146,6 +147,7 @@ The SLAM Engine includes an admin interface that provides:
 - Analytics on masking effectiveness
 - Payment link generation and management
 - Static and dynamic payment QR code generation
+- Enhanced sidebar navigation with pay-in and pay-out tracking
 
 ## Legal & Ethical Considerations
 
