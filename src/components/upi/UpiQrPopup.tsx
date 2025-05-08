@@ -18,6 +18,7 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { v4 as uuidv4 } from 'uuid';
+import { generateUpiUrl } from '@/utils/upiQrUtils';
 
 interface UpiQrPopupProps {
   amount: number;
@@ -46,7 +47,7 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
   const upiId = currentMerchant?.upiSettings?.upiId || 'default@rizzpay';
   
   // Generate UPI URL for payment
-  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName || 'RizzPay')}&am=${amount}&cu=INR`;
+  const upiUrl = generateUpiUrl(upiId, amount, `Payment to ${merchantName || 'RizzPay'}`);
   
   // Generate QR code URL using a free QR code API
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUrl)}`;
@@ -157,6 +158,17 @@ const qrCodeUrl = \`https://api.qrserver.com/v1/create-qr-code/?size=200x200&dat
 
 // Display the QR code
 document.getElementById('upi-qr').src = qrCodeUrl;
+
+// Handle payment verification
+function verifyUpiPayment(transactionId) {
+  return fetch('https://api.rizzpay.com/v1/upi/verify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ transactionId })
+  }).then(res => res.json());
+}
 `,
     php: `
 <?php
@@ -168,7 +180,7 @@ $upiPayment = [
   'currency' => 'INR'
 ];
 
-// Generate UPI URI
+// Generate UPI URI as per specification
 $upiUri = 'upi://pay?pa=' . urlencode($upiPayment['upiId']) . 
           '&pn=' . urlencode($upiPayment['name']) . 
           '&am=' . $upiPayment['amount'] . 
@@ -179,10 +191,25 @@ $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . 
 
 // Display the QR code
 echo '<img src="' . $qrCodeUrl . '" alt="UPI QR Code" />';
+
+// Function to verify payment
+function verifyUpiPayment($transactionId) {
+  $ch = curl_init('https://api.rizzpay.com/v1/upi/verify');
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['transactionId' => $transactionId]));
+  curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+  $response = curl_exec($ch);
+  curl_close($ch);
+  return json_decode($response, true);
+}
 ?>
 `,
     python: `
 # Python integration
+import urllib.parse
+import requests
+
 upi_payment = {
     "upiId": "${upiId}",
     "amount": ${amount},
@@ -191,11 +218,19 @@ upi_payment = {
 }
 
 # Generate UPI URI
-import urllib.parse
 upi_uri = f"upi://pay?pa={urllib.parse.quote(upi_payment['upiId'])}&pn={urllib.parse.quote(upi_payment['name'])}&am={upi_payment['amount']}&cu={upi_payment['currency']}"
 
 # Generate QR code URL
 qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_uri)}"
+
+# Verify payment (Flask example)
+def verify_upi_payment(transaction_id):
+    response = requests.post(
+        'https://api.rizzpay.com/v1/upi/verify',
+        json={'transactionId': transaction_id},
+        headers={'Content-Type': 'application/json'}
+    )
+    return response.json()
 
 # Use in your web framework (e.g., Django, Flask)
 # return render_template('payment.html', qr_code_url=qr_code_url)

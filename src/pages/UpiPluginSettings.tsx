@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import Navbar from '@/components/Navbar';
+import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,11 +22,23 @@ const UpiPluginSettings: React.FC = () => {
   const [testAmount, setTestAmount] = useState('100');
   
   const [formState, setFormState] = useState({
-    upiId: currentMerchant?.upiSettings?.upiId || '',
-    enabled: currentMerchant?.upiSettings?.enabled || false,
-    allowManualVerification: currentMerchant?.upiSettings?.allowManualVerification || true,
-    customWebhookUrl: currentMerchant?.upiSettings?.customWebhookUrl || ''
+    upiId: '',
+    enabled: false,
+    allowManualVerification: true,
+    customWebhookUrl: ''
   });
+  
+  // Initialize form state from merchant data when available
+  useEffect(() => {
+    if (currentMerchant?.upiSettings) {
+      setFormState({
+        upiId: currentMerchant.upiSettings.upiId || '',
+        enabled: currentMerchant.upiSettings.enabled || false,
+        allowManualVerification: currentMerchant.upiSettings.allowManualVerification !== false,
+        customWebhookUrl: currentMerchant.upiSettings.customWebhookUrl || ''
+      });
+    }
+  }, [currentMerchant]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,7 +56,10 @@ const UpiPluginSettings: React.FC = () => {
   };
   
   const handleSaveSettings = () => {
-    if (!currentMerchant) return;
+    if (!currentMerchant) {
+      toast.error('You must be logged in to save settings');
+      return;
+    }
     
     if (!formState.upiId.includes('@')) {
       toast.error('Please enter a valid UPI ID with @ symbol');
@@ -57,6 +72,8 @@ const UpiPluginSettings: React.FC = () => {
       allowManualVerification: formState.allowManualVerification,
       customWebhookUrl: formState.customWebhookUrl || undefined
     });
+    
+    toast.success('UPI settings saved successfully');
   };
   
   const handleTestPopup = () => {
@@ -70,21 +87,19 @@ const UpiPluginSettings: React.FC = () => {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>UPI QR Plugin Settings | RizzPay</title>
-      </Helmet>
-      
-      <Navbar />
-      
+    <Layout>
       <div className="container max-w-7xl mx-auto p-4 sm:p-6">
+        <Helmet>
+          <title>UPI QR Plugin Settings | RizzPay</title>
+        </Helmet>
+        
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">UPI QR Popup Plugin</h1>
             <p className="text-muted-foreground">Configure and integrate UPI payments on your website</p>
           </div>
           
-          <Button onClick={handleTestPopup} className="flex items-center gap-2">
+          <Button onClick={handleTestPopup} className="flex items-center gap-2 bg-[#0052FF]">
             <QrCode className="h-4 w-4" />
             <span className="hidden sm:inline">Test QR Popup</span>
           </Button>
@@ -152,7 +167,7 @@ const UpiPluginSettings: React.FC = () => {
                   </p>
                 </div>
                 
-                <Button onClick={handleSaveSettings} className="w-full sm:w-auto">Save Settings</Button>
+                <Button onClick={handleSaveSettings} className="w-full sm:w-auto bg-[#0052FF]">Save Settings</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -173,7 +188,7 @@ const UpiPluginSettings: React.FC = () => {
                     className="mt-1"
                   />
                 </div>
-                <Button onClick={handleTestPopup}>Launch Test Popup</Button>
+                <Button onClick={handleTestPopup} className="bg-[#0052FF]">Launch Test Popup</Button>
               </div>
             </div>
           </TabsContent>
@@ -193,7 +208,7 @@ const UpiPluginSettings: React.FC = () => {
           onSuccess={(txnId) => toast.success(`Test transaction created: ${txnId}`)}
         />
       )}
-    </>
+    </Layout>
   );
 };
 
