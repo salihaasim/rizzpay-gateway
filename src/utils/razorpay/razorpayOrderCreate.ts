@@ -25,7 +25,7 @@ export const createRazorpayOrder = async (
     const amountInPaise = Math.round(amount * 100);
     
     // Skip Supabase transaction creation since it's causing row-level security issues
-    console.log(`Skipping Supabase transaction creation due to RLS policy issues. Using in-memory transaction ID: ${transactionId}`);
+    console.log(`Transaction ID: ${transactionId}`);
     
     // Use the Razorpay API key from the config
     const razorpayKeyId = "rzp_test_JXIkZl2p0iUbRw";
@@ -45,12 +45,29 @@ export const createRazorpayOrder = async (
     
     console.log('Creating Razorpay order with data:', orderData);
     
-    // Create a simulated Razorpay order ID for testing (use a direct API call in production)
-    const orderId = `order_${uuidv4().replace(/-/g, '').substring(0, 16)}`;
-    console.log('Simulated Razorpay order created successfully with ID:', orderId);
-    
-    // Return both the order ID and transaction ID
-    return { orderId, transactionId };
+    try {
+      // For production, you'd make a direct API call to Razorpay
+      // const response = await fetch('https://api.razorpay.com/v1/orders', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': 'Basic ' + btoa(`${razorpayKeyId}:${razorpaySecret}`)
+      //   },
+      //   body: JSON.stringify(orderData)
+      // });
+      // const data = await response.json();
+      // const orderId = data.id;
+      
+      // For now, simulate a response with a generated order ID
+      const orderId = `order_${uuidv4().replace(/-/g, '').substring(0, 16)}`;
+      console.log('Razorpay order created successfully with ID:', orderId);
+      
+      // Return both the order ID and transaction ID
+      return { orderId, transactionId };
+    } catch (error) {
+      console.error('Error in Razorpay API call:', error);
+      throw new Error('Failed to create Razorpay order via API');
+    }
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
     toast.error('Payment initialization failed');

@@ -1,304 +1,250 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Check, Code, ExternalLink } from 'lucide-react';
+import { Check, Copy, Code as CodeIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 
-const UpiPluginCode: React.FC = () => {
+const UpiPluginCode = () => {
   const { currentMerchant } = useMerchantAuth();
-  const [copied, setCopied] = useState<string | null>(null);
-  const [customAmount, setCustomAmount] = useState('');
-  const [customMerchantId, setCustomMerchantId] = useState('');
+  const [copiedTab, setCopiedTab] = useState<string | null>(null);
   
-  const merchantId = customMerchantId || currentMerchant?.username || 'merchant';
+  // Get merchant API key
+  const apiKey = currentMerchant?.apiKey || 'rizz_api_key_placeholder';
   
-  // Generate script that the merchant can embed on their website
-  const generatePluginCode = (amount?: string) => {
-    const amountParam = amount ? `data-amount="${amount}"` : 'data-amount="auto"';
-    return `<script src="https://cdn.rizzpay.com/upi-plugin.js" ${amountParam} data-merchant="${merchantId}"></script>
-<button class="rizzpay-upi-button">Pay with RizzPay UPI</button>`;
-  };
-  
-  // Generate different integration methods code snippets
-  const generateHtmlSnippet = (amount?: string) => {
-    return generatePluginCode(amount);
-  };
-  
-  const generateReactSnippet = (amount?: string) => {
-    const amountStr = amount ? ` data-amount="${amount}"` : '';
-    return `// React Component
-import React, { useEffect } from 'react';
+  // Code snippets for different languages
+  const codeSnippets = {
+    html: `<!-- Add this HTML where you want the UPI QR button to appear -->
+<button id="rizzpay-upi-button" class="rizzpay-button">
+  Pay with UPI QR
+</button>
 
-const RizzPayButton = ({ onSuccess }) => {
-  useEffect(() => {
-    // Load RizzPay script
-    const script = document.createElement('script');
-    script.src = 'https://cdn.rizzpay.com/upi-plugin.js';
-    script.setAttribute('data-merchant', '${merchantId}');
-    script.setAttribute('data-amount', '${amount || 'auto'}');
-    script.async = true;
-    
-    // Setup callback
-    window.RizzPayCallback = (response) => {
-      if (response.status === 'success') {
-        onSuccess && onSuccess(response.transactionId);
+<!-- Include RizzPay UPI plugin script -->
+<script src="https://cdn.rizzpay.com/js/upi-plugin.js"></script>
+
+<script>
+  // Initialize RizzPay UPI QR plugin
+  document.addEventListener('DOMContentLoaded', function() {
+    const rizzpayUPI = new RizzPayUPI({
+      apiKey: '${apiKey}',
+      merchantName: '${currentMerchant?.fullName || "Your Business Name"}',
+      buttonId: 'rizzpay-upi-button',
+      onSuccess: function(transactionId) {
+        console.log('Payment successful with ID:', transactionId);
+        // Handle successful payment
+      },
+      onFailure: function(error) {
+        console.error('Payment failed:', error);
+        // Handle payment failure
       }
-    };
-    
+    });
+  });
+</script>`,
+
+    react: `import React from 'react';
+import { useEffect } from 'react';
+
+const UpiPaymentButton = () => {
+  useEffect(() => {
+    // Load RizzPay UPI script
+    const script = document.createElement('script');
+    script.src = 'https://cdn.rizzpay.com/js/upi-plugin.js';
+    script.async = true;
     document.body.appendChild(script);
+    
+    script.onload = () => {
+      // Initialize RizzPay UPI QR plugin
+      window.RizzPayUPI && new window.RizzPayUPI({
+        apiKey: '${apiKey}',
+        merchantName: '${currentMerchant?.fullName || "Your Business Name"}',
+        buttonId: 'rizzpay-upi-button',
+        onSuccess: function(transactionId) {
+          console.log('Payment successful with ID:', transactionId);
+          // Handle successful payment
+        },
+        onFailure: function(error) {
+          console.error('Payment failed:', error);
+          // Handle payment failure
+        }
+      });
+    };
     
     return () => {
       document.body.removeChild(script);
     };
-  }, [onSuccess]);
-  
+  }, []);
+
   return (
-    <button className="rizzpay-upi-button">
-      Pay with RizzPay UPI
+    <button id="rizzpay-upi-button" className="your-button-class">
+      Pay with UPI QR
     </button>
   );
 };
 
-export default RizzPayButton;`;
-  };
-  
-  const generateJavaScriptSnippet = (amount?: string) => {
-    return `// Vanilla JavaScript Integration
-document.addEventListener('DOMContentLoaded', () => {
-  // Create script element
+export default UpiPaymentButton;`,
+
+    javascript: `// Simple JavaScript integration (can be added to any website)
+
+// Add this button to your HTML
+// <button id="rizzpay-upi-button">Pay with UPI QR</button>
+
+// Load RizzPay UPI script
+function loadRizzPayScript() {
   const script = document.createElement('script');
-  script.src = 'https://cdn.rizzpay.com/upi-plugin.js';
-  script.setAttribute('data-merchant', '${merchantId}');
-  script.setAttribute('data-amount', '${amount || 'auto'}');
-  
-  // Add success callback
-  window.RizzPayCallback = function(response) {
-    if (response.status === 'success') {
-      console.log('Payment successful!', response.transactionId);
-      // Handle success - update UI, redirect, etc.
-    }
-  };
-  
-  // Add to document
+  script.src = 'https://cdn.rizzpay.com/js/upi-plugin.js';
+  script.async = true;
   document.body.appendChild(script);
   
-  // Find buttons and initialize
-  const buttons = document.querySelectorAll('.rizzpay-upi-button');
-  buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      // You can optionally set dynamic amount here
-      window.RizzPay.openPayment({
-        amount: ${amount ? amount : 'document.getElementById("price").value'},
-        description: 'Purchase from My Store'
-      });
-    });
+  script.onload = initializeRizzPay;
+}
+
+// Initialize RizzPay UPI plugin
+function initializeRizzPay() {
+  if (!window.RizzPayUPI) return;
+  
+  new window.RizzPayUPI({
+    apiKey: '${apiKey}',
+    merchantName: '${currentMerchant?.fullName || "Your Business Name"}',
+    buttonId: 'rizzpay-upi-button',
+    onSuccess: function(transactionId) {
+      console.log('Payment successful with ID:', transactionId);
+      // Handle successful payment
+    },
+    onFailure: function(error) {
+      console.error('Payment failed:', error);
+      // Handle payment failure
+    }
   });
-});`;
-  };
-  
-  const generatePHPSnippet = (amount?: string) => {
-    return `<?php
-// PHP Integration
-
-// 1. Add this to your HTML head or before closing body
-echo '<script src="https://cdn.rizzpay.com/upi-plugin.js" data-merchant="${merchantId}" data-amount="${amount || 'auto'}"></script>';
-
-// 2. Create a payment button
-function rizzpay_payment_button($label = 'Pay Now', $amount = null, $description = 'Payment') {
-  $button_id = 'rizzpay_' . uniqid();
-  $amount_attr = $amount ? 'data-amount="' . htmlspecialchars($amount) . '"' : '';
-  $desc_attr = 'data-description="' . htmlspecialchars($description) . '"';
-  
-  return '<button id="' . $button_id . '" class="rizzpay-upi-button" ' 
-    . $amount_attr . ' ' . $desc_attr . '>' 
-    . htmlspecialchars($label) . '</button>';
 }
 
-// 3. Use the function in your template
-echo rizzpay_payment_button('Pay with UPI', '${amount || '99.00'}', 'Product purchase');
+// Load script when page loads
+document.addEventListener('DOMContentLoaded', loadRizzPayScript);`,
 
-// 4. Server-side verification (webhook handling)
-function verify_rizzpay_payment($transaction_id) {
-  $api_key = 'YOUR_API_KEY'; // Get from RizzPay dashboard
-  $verify_url = 'https://api.rizzpay.com/v1/transactions/verify';
-  
-  $ch = curl_init($verify_url);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'transaction_id' => $transaction_id
-  ]));
-  curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $api_key,
-    'Content-Type: application/json'
-  ]);
-  
-  $response = curl_exec($ch);
-  curl_close($ch);
-  
-  return json_decode($response, true);
+    php: `<?php
+// PHP integration example with HTML
+
+// Your RizzPay API key should be stored in a secure environment variable
+// This is just for demonstration purposes
+$apiKey = '${apiKey}';
+$merchantName = '${currentMerchant?.fullName || "Your Business Name"}';
+
+// Function to generate a unique transaction ID (optional)
+function generateTransactionId() {
+  return 'txn_' . uniqid();
 }
-?>`;
+
+// You can customize this based on your application's needs
+$transactionId = generateTransactionId();
+$amount = isset($_POST['amount']) ? (float)$_POST['amount'] : 0;
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>UPI Payment</title>
+</head>
+<body>
+  <h2>Pay with UPI</h2>
+  
+  <?php if ($amount > 0): ?>
+    <p>Amount to pay: ₹<?php echo number_format($amount, 2); ?></p>
+    
+    <!-- RizzPay UPI Button -->
+    <button id="rizzpay-upi-button">Pay ₹<?php echo number_format($amount, 2); ?> with UPI</button>
+    
+    <!-- Include RizzPay UPI plugin script -->
+    <script src="https://cdn.rizzpay.com/js/upi-plugin.js"></script>
+    
+    <script>
+      // Initialize RizzPay UPI QR plugin
+      document.addEventListener('DOMContentLoaded', function() {
+        const rizzpayUPI = new RizzPayUPI({
+          apiKey: '<?php echo $apiKey; ?>',
+          merchantName: '<?php echo $merchantName; ?>',
+          buttonId: 'rizzpay-upi-button',
+          amount: <?php echo $amount; ?>,
+          transactionId: '<?php echo $transactionId; ?>',
+          onSuccess: function(transactionId) {
+            console.log('Payment successful with ID:', transactionId);
+            window.location.href = 'payment-success.php?id=' + transactionId;
+          },
+          onFailure: function(error) {
+            console.error('Payment failed:', error);
+            alert('Payment failed: ' + error);
+          }
+        });
+      });
+    </script>
+  <?php else: ?>
+    <p>Please enter an amount to pay:</p>
+    <form method="post">
+      <input type="number" name="amount" step="0.01" min="1" required />
+      <button type="submit">Continue</button>
+    </form>
+  <?php endif; ?>
+</body>
+</html>`
   };
 
-  const pluginCode = generatePluginCode(customAmount || undefined);
-  
-  const handleCopy = (value: string, type: string) => {
-    navigator.clipboard.writeText(value);
-    setCopied(type);
-    toast.success(`${type} code copied to clipboard`);
+  const handleCopyCode = (language: string) => {
+    navigator.clipboard.writeText(codeSnippets[language as keyof typeof codeSnippets]);
+    setCopiedTab(language);
+    toast.success(`${language.toUpperCase()} code copied to clipboard`);
     
     setTimeout(() => {
-      setCopied(null);
-    }, 3000);
+      setCopiedTab(null);
+    }, 2000);
   };
 
   return (
-    <Card className="max-w-3xl shadow-md border border-border/60">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Code className="h-5 w-5 text-[#0052FF]" />
-          UPI Plugin Integration Code
-        </CardTitle>
-        <CardDescription>
-          Copy these code snippets to add the RizzPay UPI payment popup to your website
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="amount">Pre-set Amount (Optional)</Label>
-              <Input
-                id="amount" 
-                type="number" 
-                placeholder="Enter amount or leave blank for dynamic pricing"
-                value={customAmount}
-                onChange={(e) => setCustomAmount(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Leave blank if the amount will be determined by your website at runtime
-              </p>
-            </div>
-            
-            <div>
-              <Label htmlFor="merchantId">Custom Merchant ID (Optional)</Label>
-              <Input
-                id="merchantId" 
-                placeholder={currentMerchant?.username || "Enter merchant ID"}
-                value={customMerchantId}
-                onChange={(e) => setCustomMerchantId(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Leave blank to use your account's merchant ID
-              </p>
-            </div>
-          </div>
-          
-          <Tabs defaultValue="html" className="mt-6">
-            <TabsList className="grid grid-cols-4 w-full">
+    <Card>
+      <CardContent className="pt-6">
+        <Tabs defaultValue="html" className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
               <TabsTrigger value="html">HTML</TabsTrigger>
-              <TabsTrigger value="js">JavaScript</TabsTrigger>
               <TabsTrigger value="react">React</TabsTrigger>
+              <TabsTrigger value="javascript">JavaScript</TabsTrigger>
               <TabsTrigger value="php">PHP</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="html" className="mt-4">
-              <div className="relative">
-                <Label className="text-sm font-medium mb-2 block">HTML Integration</Label>
-                <div className="bg-muted p-4 rounded-md overflow-x-auto relative">
-                  <pre className="text-sm whitespace-pre-wrap">
-                    <code>{generateHtmlSnippet(customAmount)}</code>
-                  </pre>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="absolute top-2 right-2"
-                    onClick={() => handleCopy(generateHtmlSnippet(customAmount), 'HTML')}
-                  >
-                    {copied === 'HTML' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="js" className="mt-4">
-              <div className="relative">
-                <Label className="text-sm font-medium mb-2 block">JavaScript Integration</Label>
-                <div className="bg-muted p-4 rounded-md overflow-x-auto relative">
-                  <pre className="text-sm whitespace-pre-wrap">
-                    <code>{generateJavaScriptSnippet(customAmount)}</code>
-                  </pre>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="absolute top-2 right-2"
-                    onClick={() => handleCopy(generateJavaScriptSnippet(customAmount), 'JavaScript')}
-                  >
-                    {copied === 'JavaScript' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="react" className="mt-4">
-              <div className="relative">
-                <Label className="text-sm font-medium mb-2 block">React Integration</Label>
-                <div className="bg-muted p-4 rounded-md overflow-x-auto relative">
-                  <pre className="text-sm whitespace-pre-wrap">
-                    <code>{generateReactSnippet(customAmount)}</code>
-                  </pre>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="absolute top-2 right-2"
-                    onClick={() => handleCopy(generateReactSnippet(customAmount), 'React')}
-                  >
-                    {copied === 'React' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="php" className="mt-4">
-              <div className="relative">
-                <Label className="text-sm font-medium mb-2 block">PHP Integration</Label>
-                <div className="bg-muted p-4 rounded-md overflow-x-auto relative">
-                  <pre className="text-sm whitespace-pre-wrap">
-                    <code>{generatePHPSnippet(customAmount)}</code>
-                  </pre>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="absolute top-2 right-2"
-                    onClick={() => handleCopy(generatePHPSnippet(customAmount), 'PHP')}
-                  >
-                    {copied === 'PHP' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-          
-          <div className="bg-amber-50 border border-amber-200 rounded-md p-4">
-            <h4 className="font-medium text-amber-800 flex items-center gap-2">
-              <ExternalLink className="h-4 w-4" />
-              Integration Instructions
-            </h4>
-            <ol className="text-sm text-amber-700 mt-2 space-y-2 list-decimal list-inside">
-              <li>Add the code to your website based on your tech stack</li>
-              <li>Customize the button appearance with CSS using the <code className="bg-amber-100 px-1 rounded">.rizzpay-upi-button</code> selector</li>
-              <li>When clicked, the UPI popup will open with your merchant details</li>
-              <li>You can verify transactions using our API or receive webhooks</li>
-              <li>Login to your RizzPay merchant dashboard to view and verify submitted transactions</li>
-            </ol>
           </div>
-        </div>
+          
+          {Object.entries(codeSnippets).map(([language, code]) => (
+            <TabsContent key={language} value={language} className="relative">
+              <div className="absolute top-2 right-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleCopyCode(language)}
+                  className="h-8 px-2"
+                >
+                  {copiedTab === language ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                  <span className="ml-2">{copiedTab === language ? 'Copied!' : 'Copy'}</span>
+                </Button>
+              </div>
+              
+              <div className="relative bg-muted p-4 rounded-md overflow-auto max-h-[400px]">
+                <pre className="text-sm font-mono whitespace-pre-wrap break-words">{code}</pre>
+              </div>
+              
+              <div className="mt-4 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <CodeIcon className="h-4 w-4 mt-0.5" />
+                  <p>
+                    To integrate the UPI payment plugin in your {language.toUpperCase()} project, copy and paste the above code. 
+                    Make sure to customize the parameters according to your needs.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </CardContent>
     </Card>
   );

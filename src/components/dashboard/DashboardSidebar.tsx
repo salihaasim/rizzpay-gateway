@@ -1,32 +1,26 @@
 
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  CreditCard,
-  ArrowRightLeft,
-  BarChart3,
-  Wallet,
-  FileText, 
-  Menu,
-  ChevronLeft,
-  LogOut,
-  User,
-  Settings,
-  Webhook,
-  UserCheck,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  ArrowLeft,
+  BarChart3,
+  CreditCard,
+  CircleDollarSign,
+  Wallet,
+  Globe,
+  Settings,
+  ChevronRight,
+  ChevronLeft,
+  QrCode,
+  Shield,
+  Link as LinkIcon,
+  BanknoteIcon,
+  IndianRupee
+} from 'lucide-react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 interface DashboardSidebarProps {
@@ -34,228 +28,142 @@ interface DashboardSidebarProps {
   setCollapsed: (collapsed: boolean) => void;
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ 
-  collapsed, 
-  setCollapsed 
-}) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { userEmail } = useTransactionStore();
-  const { logout } = useMerchantAuth();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) => {
+  const { pathname } = useLocation();
+  const { currentMerchant } = useMerchantAuth();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  // Only show sidebar toggle on desktop
+  const showToggle = !isMobile;
   
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-  
-  // Updated merchant-related pages with removed items
-  const sidebarItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
-    { name: 'Banking', path: '/banking', icon: <CreditCard className="h-5 w-5" /> },
-    { name: 'Transfers', path: '/transfers', icon: <ArrowRightLeft className="h-5 w-5" /> },
-    { name: 'Reports', path: '/reports', icon: <BarChart3 className="h-5 w-5" /> },
-    { name: 'Wallet', path: '/wallet', icon: <Wallet className="h-5 w-5" /> },
-    { name: 'Services', path: '/services', icon: <FileText className="h-5 w-5" /> },
-    { name: 'KYC Verification', path: '/kyc', icon: <UserCheck className="h-5 w-5" /> },
-    { name: 'UPI Plugin', path: '/upi-plugin', icon: <CreditCard className="h-5 w-5" /> },
-    { name: 'Developers', path: '/developers', icon: <Webhook className="h-5 w-5" /> },
+  const navigationItems = [
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: <BarChart3 className="h-5 w-5" />
+    },
+    {
+      title: "Transactions",
+      href: "/transactions",
+      icon: <CreditCard className="h-5 w-5" />
+    },
+    {
+      title: "Wallet",
+      href: "/wallet",
+      icon: <Wallet className="h-5 w-5" />
+    },
+    {
+      title: "Transfers",
+      href: "/transfers",
+      icon: <CircleDollarSign className="h-5 w-5" />
+    },
+    {
+      title: "Banking",
+      href: "/banking",
+      icon: <BanknoteIcon className="h-5 w-5" />
+    },
+    {
+      title: "UPI Payment Link",
+      href: "/link-payment",
+      icon: <LinkIcon className="h-5 w-5" />
+    },
+    {
+      title: "UPI Plugin",
+      href: "/plugin",
+      icon: <QrCode className="h-5 w-5" />
+    },
+    {
+      title: "Webhooks",
+      href: "/webhooks",
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      title: "Whitelist",
+      href: "/whitelist",
+      icon: <Shield className="h-5 w-5" />
+    },
+    {
+      title: "Settings",
+      href: "/settings",
+      icon: <Settings className="h-5 w-5" />
+    }
   ];
-  
-  // Sidebar for desktop
-  const DesktopSidebar = (
-    <div className={cn(
-      "fixed inset-y-0 left-0 z-20 hidden md:flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
-      collapsed ? "w-20" : "w-[260px]"
-    )}>
-      <div className="flex h-16 items-center justify-between px-4">
-        {!collapsed && (
-          <Link to="/" className="flex items-center">
-            <h1 className="text-xl font-bold text-primary">RizzPay</h1>
-          </Link>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn("rounded-full", collapsed && "mx-auto")}
-        >
-          <ChevronLeft className={cn(
-            "h-5 w-5 transition-transform",
-            collapsed && "rotate-180"
-          )} />
-        </Button>
-      </div>
-      
-      <div className="flex-1 overflow-auto py-4 px-2">
-        <div className="space-y-1">
-          {sidebarItems.map((item) => (
-            <Tooltip key={item.path} delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Link to={item.path}>
-                  <Button
-                    variant={isActive(item.path) ? "default" : "ghost"}
-                    className={cn(
-                      "w-full justify-start",
-                      collapsed && "justify-center px-0"
-                    )}
-                  >
-                    {item.icon}
-                    {!collapsed && <span className="ml-3 text-sm">{item.name}</span>}
-                  </Button>
-                </Link>
-              </TooltipTrigger>
-              {collapsed && (
-                <TooltipContent side="right">
-                  {item.name}
-                </TooltipContent>
-              )}
-            </Tooltip>
-          ))}
-        </div>
-      </div>
-      
-      {/* Profile and logout section */}
-      <div className="p-2 mt-auto">
-        <Separator className="mb-2" />
-        {!collapsed && userEmail && (
-          <div className="px-2 mb-2">
-            <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
-          </div>
-        )}
-        
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <Link to="/settings">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start",
-                  collapsed && "justify-center px-0"
-                )}
-              >
-                <Settings className="h-5 w-5" />
-                {!collapsed && <span className="ml-3">Settings</span>}
-              </Button>
-            </Link>
-          </TooltipTrigger>
-          {collapsed && <TooltipContent side="right">Settings</TooltipContent>}
-        </Tooltip>
-        
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <Link to="/profile">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start",
-                  collapsed && "justify-center px-0"
-                )}
-              >
-                <User className="h-5 w-5" />
-                {!collapsed && <span className="ml-3">Profile</span>}
-              </Button>
-            </Link>
-          </TooltipTrigger>
-          {collapsed && <TooltipContent side="right">Profile</TooltipContent>}
-        </Tooltip>
-        
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50",
-                collapsed && "justify-center px-0"
-              )}
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5" />
-              {!collapsed && <span className="ml-3">Logout</span>}
-            </Button>
-          </TooltipTrigger>
-          {collapsed && <TooltipContent side="right">Logout</TooltipContent>}
-        </Tooltip>
-      </div>
-    </div>
-  );
 
-  // Mobile sidebar (sheet) - Making it more responsive
-  const MobileSidebar = (
-    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-      <SheetTrigger asChild className="md:hidden absolute left-4 top-4 z-20">
-        <Button variant="outline" size="icon">
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle Menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-[260px]">
-        <div className="flex h-16 items-center px-4 border-b">
-          <Link to="/" className="flex items-center">
-            <h1 className="text-xl font-bold text-primary">RizzPay</h1>
-          </Link>
-        </div>
-        <div className="flex-1 overflow-auto py-4 px-2">
-          <div className="space-y-1">
-            {sidebarItems.map((item) => (
-              <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}>
-                <Button
-                  variant={isActive(item.path) ? "default" : "ghost"}
-                  className="w-full justify-start"
-                >
-                  {item.icon}
-                  <span className="ml-3 text-sm">{item.name}</span>
-                </Button>
-              </Link>
-            ))}
+  return (
+    <div
+      className={cn(
+        "flex flex-col fixed inset-y-0 z-50 h-full bg-[#111827] text-white transition-all duration-300",
+        collapsed ? "w-20" : "w-[280px]"
+      )}
+    >
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
+        <Link to="/dashboard" className="flex items-center space-x-3">
+          {!collapsed && (
+            <>
+              <CircleDollarSign className="h-6 w-6 text-[#0052FF]" />
+              <span className="font-bold text-lg text-white">RizzPay</span>
+            </>
+          )}
+          {collapsed && <CircleDollarSign className="h-6 w-6 mx-auto text-[#0052FF]" />}
+        </Link>
+        {showToggle && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-auto h-8 w-8 text-muted-foreground hover:bg-gray-800"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {collapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </Button>
+        )}
+      </div>
+
+      <ScrollArea className="flex-1 py-2">
+        <nav className="grid gap-1 px-2">
+          {navigationItems.map((item, index) => (
+            <Link
+              key={index}
+              to={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800",
+                pathname === item.href && "bg-gray-800 text-white"
+              )}
+            >
+              {item.icon}
+              {!collapsed && <span>{item.title}</span>}
+            </Link>
+          ))}
+        </nav>
+      </ScrollArea>
+
+      <div className="mt-auto border-t border-gray-800 p-4">
+        <div className={cn("flex items-center", collapsed ? "justify-center" : "space-x-3")}>
+          <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
+            {currentMerchant?.fullName ? (
+              <span className="text-sm font-medium">
+                {currentMerchant.fullName.charAt(0).toUpperCase()}
+              </span>
+            ) : (
+              <span className="text-sm font-medium">M</span>
+            )}
           </div>
-        </div>
-        
-        {/* Profile and logout section for mobile */}
-        <div className="p-2 mt-auto">
-          <Separator className="mb-2" />
-          {userEmail && (
-            <div className="px-2 mb-2">
-              <p className="text-sm text-muted-foreground truncate">{userEmail}</p>
+          {!collapsed && (
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none truncate max-w-[180px]">
+                {currentMerchant?.fullName || "Merchant"}
+              </p>
+              <p className="text-xs leading-none text-gray-400 truncate max-w-[180px]">
+                {currentMerchant?.email || "merchant@example.com"}
+              </p>
             </div>
           )}
-          
-          <Link to="/settings" onClick={() => setMobileOpen(false)}>
-            <Button variant="ghost" className="w-full justify-start">
-              <Settings className="h-5 w-5" />
-              <span className="ml-3">Settings</span>
-            </Button>
-          </Link>
-          
-          <Link to="/profile" onClick={() => setMobileOpen(false)}>
-            <Button variant="ghost" className="w-full justify-start">
-              <User className="h-5 w-5" />
-              <span className="ml-3">Profile</span>
-            </Button>
-          </Link>
-          
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="ml-3">Logout</span>
-          </Button>
         </div>
-      </SheetContent>
-    </Sheet>
-  );
-  
-  return (
-    <TooltipProvider delayDuration={0}>
-      {DesktopSidebar}
-      {MobileSidebar}
-    </TooltipProvider>
+      </div>
+    </div>
   );
 };
 

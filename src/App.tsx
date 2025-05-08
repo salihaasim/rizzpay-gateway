@@ -25,6 +25,10 @@ import UpiPluginSettings from './pages/UpiPluginSettings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 import ReportsPage from './pages/ReportsPage';
 import TransfersPage from './pages/TransfersPage';
+import RegisterMerchant from './pages/RegisterMerchant';
+import BankingPage from './pages/BankingPage';
+import DeveloperPage from './pages/DeveloperPage';
+import MerchantOnboarding from './pages/MerchantOnboarding';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -76,107 +80,30 @@ const App = () => {
   const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
 
   const routes = [
-    <Route key="index" path="/" element={<Index />} />,
-    <Route key="auth" path="/auth" element={
-      isAuthenticated ? 
-        (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />) : 
-        <Auth />
-    } />,
-    <Route key="terms" path="/terms" element={<TermsAndConditions />} />,
-    
-    <Route key="aasimo" path="/aasimo-ai" element={<AasimoAIComponent />} />,
-    
-    <Route key="admin" path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-merchants" path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-escrow" path="/admin/escrow" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-pricing" path="/admin/pricing" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-settings" path="/admin/settings" element={isAdmin ? <AdminSettings /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-analytics" path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-transactions" path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-whitelist" path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-monitoring" path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />,
-    
-    <Route key="admin-monitoring-dashboard" path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />,
-    
-    <Route key="dashboard" path="/dashboard/*" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Dashboard /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="transactions" path="/transactions" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Transactions /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="wallet" path="/wallet" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WalletPage /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="transfers" path="/transfers" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <TransfersPage />}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="webhook" path="/webhook" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/developers" replace />}
-      </ProtectedRoute>
-    } />,
-    <Route key="webhooks" path="/webhooks" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/developers" replace />}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="developers" path="/developers" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><DeveloperIntegration /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="security" path="/security" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Security /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="settings-wild" path="/settings/*" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="settings" path="/settings" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="webhook-payment" path="/webhook-payment" element={<WebhookPayment />} />,
-    
-    <Route key="upi-payment" path="/upi-payment" element={<UpiPaymentPage />} />,
-    <Route key="payment-upi" path="/payment/upi" element={<UpiPaymentPage />} />,
-    
-    <Route key="upi-link-payment" path="/upi-link-payment" element={<UpiLinkPaymentPage />} />,
-    
-    <Route key="how-it-works-technical" path="/how-it-works-technical" element={
-      <ProtectedRoute>
-        <HowItWorksTechnical />
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="features" path="/features" element={<Features />} />,
-    <Route key="features2" path="/features2" element={<Features2 />} />,
-    
-    <Route key="kyc" path="/kyc" element={<KycPage />} />,
-    
-    <Route key="upi-plugin" path="/upi-plugin" element={<UpiPluginSettings />} />,
-    
-    <Route key="reports" path="/reports" element={<ReportsPage />} />,
-    
-    <Route key="not-found" path="*" element={<NotFound />} />
+    { path: "/", element: <Index /> },
+    { path: "/auth", element: <Auth /> },
+    { path: "/register-merchant", element: <RegisterMerchant /> },
+    { path: "/dashboard", element: <Dashboard /> },
+    { path: "/transactions", element: <Transactions /> },
+    { path: "/transfers", element: <TransfersPage /> },
+    { path: "/wallet", element: <WalletPage /> },
+    { path: "/payment", element: <UpiPaymentPage /> },
+    { path: "/payment/:status", element: <UpiPaymentPage /> },
+    { path: "/link-payment", element: <UpiLinkPaymentPage /> },
+    { path: "/link-payment/:paymentId", element: <UpiLinkPaymentPage /> },
+    { path: "/plugin", element: <UpiPluginSettings /> },
+    { path: "/webhooks", element: <WebhookPage /> },
+    { path: "/webhook-payment", element: <WebhookPayment /> },
+    { path: "/webhook-setup", element: <WebhookSetup /> },
+    { path: "/settings", element: <Settings /> },
+    { path: "/kyc", element: <KycPage /> },
+    { path: "/whitelist", element: <MerchantWhitelist /> },
+    { path: "/banking", element: <BankingPage /> },
+    { path: "/reports", element: <ReportsPage /> },
+    { path: "/developer", element: <DeveloperPage /> },
+    { path: "/developer/integration", element: <DeveloperIntegration /> },
+    { path: "/merchant-onboarding", element: <MerchantOnboarding /> },
+    { path: "*", element: <NotFound /> }
   ];
 
   return (

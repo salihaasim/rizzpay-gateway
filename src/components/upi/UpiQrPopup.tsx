@@ -119,7 +119,7 @@ const UpiQrPopup: React.FC<UpiQrPopupProps> = ({
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
         upiId: upiId,
-        razorpay_order_id: transactionId
+        customerTransactionId: transactionId
       }
     });
     
