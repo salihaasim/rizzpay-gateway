@@ -15,6 +15,7 @@ import {
   BarChart3,
   Layers,
   Repeat,
+  Menu,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from '@/components/ui/tooltip';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface DashboardSidebarProps {
   collapsed: boolean;
@@ -38,6 +40,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 }) => {
   const location = useLocation();
   const { userEmail } = useTransactionStore();
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -58,59 +61,99 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     { name: 'Settings', path: '/settings', icon: <Settings className="h-5 w-5" /> },
   ];
   
-  return (
-    <TooltipProvider delayDuration={0}>
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-20 flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
-        collapsed ? "w-20" : "w-[280px]"
-      )}>
-        <div className="flex h-16 items-center justify-between px-4">
-          {!collapsed && (
-            <Link to="/" className="flex items-center">
-              <h1 className="text-xl font-bold text-primary">RizzPay</h1>
-            </Link>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className={cn("rounded-full", collapsed && "mx-auto")}
-          >
-            <ChevronLeft className={cn(
-              "h-5 w-5 transition-transform",
-              collapsed && "rotate-180"
-            )} />
-          </Button>
+  // Sidebar for desktop
+  const DesktopSidebar = (
+    <div className={cn(
+      "fixed inset-y-0 left-0 z-20 hidden md:flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
+      collapsed ? "w-20" : "w-[280px]"
+    )}>
+      <div className="flex h-16 items-center justify-between px-4">
+        {!collapsed && (
+          <Link to="/" className="flex items-center">
+            <h1 className="text-xl font-bold text-primary">RizzPay</h1>
+          </Link>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCollapsed(!collapsed)}
+          className={cn("rounded-full", collapsed && "mx-auto")}
+        >
+          <ChevronLeft className={cn(
+            "h-5 w-5 transition-transform",
+            collapsed && "rotate-180"
+          )} />
+        </Button>
+      </div>
+      
+      <div className="flex-1 overflow-auto py-4">
+        <div className="space-y-1 px-3">
+          {sidebarItems.map((item) => (
+            <Tooltip key={item.path} delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Link to={item.path}>
+                  <Button
+                    variant={isActive(item.path) ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    {item.icon}
+                    {!collapsed && <span className="ml-3">{item.name}</span>}
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              {collapsed && (
+                <TooltipContent side="right">
+                  {item.name}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          ))}
         </div>
-        
+      </div>
+    </div>
+  );
+
+  // Mobile sidebar (sheet)
+  const MobileSidebar = (
+    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+      <SheetTrigger asChild className="md:hidden absolute left-4 top-4 z-20">
+        <Button variant="outline" size="icon">
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle Menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="p-0 w-[280px]">
+        <div className="flex h-16 items-center px-4 border-b">
+          <Link to="/" className="flex items-center">
+            <h1 className="text-xl font-bold text-primary">RizzPay</h1>
+          </Link>
+        </div>
         <div className="flex-1 overflow-auto py-4">
           <div className="space-y-1 px-3">
             {sidebarItems.map((item) => (
-              <Tooltip key={item.path} delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Link to={item.path}>
-                    <Button
-                      variant={isActive(item.path) ? "default" : "ghost"}
-                      className={cn(
-                        "w-full justify-start",
-                        collapsed && "justify-center px-0"
-                      )}
-                    >
-                      {item.icon}
-                      {!collapsed && <span className="ml-3">{item.name}</span>}
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                {collapsed && (
-                  <TooltipContent side="right">
-                    {item.name}
-                  </TooltipContent>
-                )}
-              </Tooltip>
+              <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}>
+                <Button
+                  variant={isActive(item.path) ? "default" : "ghost"}
+                  className="w-full justify-start"
+                >
+                  {item.icon}
+                  <span className="ml-3">{item.name}</span>
+                </Button>
+              </Link>
             ))}
           </div>
         </div>
-      </div>
+      </SheetContent>
+    </Sheet>
+  );
+  
+  return (
+    <TooltipProvider delayDuration={0}>
+      {DesktopSidebar}
+      {MobileSidebar}
     </TooltipProvider>
   );
 };
