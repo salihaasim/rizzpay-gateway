@@ -20,20 +20,11 @@ import {
   CreditCard,
   IndianRupee,
   Wallet,
-  Clock
+  Clock,
+  Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useTransactionStore } from '@/stores/transactionStore';
-import { useWalletActions } from '@/hooks/useWalletActions';
 import { toast } from 'sonner';
 import WithdrawForm from '@/components/wallet/WithdrawForm';
 import TransferForm from '@/components/wallet/TransferForm';
@@ -41,9 +32,10 @@ import { Merchant } from '@/stores/profileStore';
 
 const TransfersPage = () => {
   const [activeTab, setActiveTab] = useState<string>('transfer');
+  const [walletBalance, setWalletBalance] = useState(5000); // Default wallet balance
+  const [isProcessing, setIsProcessing] = useState(false);
   
-  const { transferFunds, getWalletBalance, userEmail } = useTransactionStore();
-  const { handleWithdraw, handleTransfer, walletBalance, isProcessing } = useWalletActions(userEmail);
+  const { transferFunds, userEmail } = useTransactionStore();
   
   // Updated sampleMerchants to match the Merchant type
   const sampleMerchants: Merchant[] = [
@@ -78,7 +70,23 @@ const TransfersPage = () => {
       toast.error('You must be logged in to transfer funds');
       return;
     }
-    handleTransfer(recipient, amount, description);
+    
+    setIsProcessing(true);
+    
+    // Simulate transfer process
+    setTimeout(() => {
+      try {
+        transferFunds(userEmail, recipient, amount, description);
+        toast.success(`₹${amount.toFixed(2)} has been transferred successfully`);
+        setWalletBalance(prev => prev - amount); // Update wallet balance
+      } catch (error) {
+        toast.error("Transfer failed", {
+          description: error instanceof Error ? error.message : "An unexpected error occurred"
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    }, 1500);
   };
   
   const handleWithdrawSubmit = (amount: number, description?: string, bankDetails?: {
@@ -91,7 +99,31 @@ const TransfersPage = () => {
       toast.error('You must be logged in to withdraw funds');
       return;
     }
-    handleWithdraw(amount, description, bankDetails);
+    
+    setIsProcessing(true);
+    
+    // Simulate withdrawal process
+    setTimeout(() => {
+      try {
+        if (amount > walletBalance) {
+          throw new Error("Insufficient wallet balance");
+        }
+        
+        toast.success(`₹${amount.toFixed(2)} withdrawal initiated successfully`);
+        setWalletBalance(prev => prev - amount); // Update wallet balance
+        
+        // Show details of the withdrawal
+        if (bankDetails) {
+          toast.info(`Withdrawal to ${bankDetails.beneficiaryName}'s account will be processed within 24 hours`);
+        }
+      } catch (error) {
+        toast.error("Withdrawal failed", {
+          description: error instanceof Error ? error.message : "An unexpected error occurred"
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    }, 1500);
   };
   
   return (
