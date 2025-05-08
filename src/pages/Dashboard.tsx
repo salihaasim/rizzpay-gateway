@@ -1,11 +1,14 @@
 
 import React, { useState, useMemo } from 'react';
 import { useTransactionStore } from '@/stores/transactionStore';
-import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import Layout from '@/components/Layout';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
-import DashboardAnalyticsSection from '@/components/dashboard/DashboardAnalyticsSection';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Dashboard = () => {
   const { userRole, userEmail } = useTransactionStore();
@@ -19,7 +22,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="container max-w-7xl mx-auto px-4 py-8">
+      <div className="container max-w-7xl mx-auto px-4 py-6">
         <DashboardHeader 
           merchantName={merchantName}
           userRole={userRole}
@@ -32,45 +35,86 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <DashboardAnalyticsSection />
+          {/* Quick Payment Card - Improved layout and spacing */}
+          <Card className="shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-semibold text-primary">
+                Quick Payment
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">Customer Name</Label>
+                  <Input
+                    type="text"
+                    id="name"
+                    placeholder="Enter customer name"
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+                  <Input
+                    type="email"
+                    id="email"
+                    placeholder="customer@email.com"
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Required for payment receipt</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="amount" className="text-sm font-medium">Amount (₹)</Label>
+                  <Input
+                    type="number"
+                    id="amount"
+                    placeholder="0.00"
+                    className="w-full"
+                  />
+                </div>
+                
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
+                  Generate Payment Link
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
           
-          {/* Quick Payment Form */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Payment</h3>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">Customer Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  placeholder="Enter customer name"
-                  className="w-full p-2.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                />
+          {/* Additional card for dashboard balance */}
+          <Card className="shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-semibold text-primary">
+                Account Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Available Balance</h4>
+                  <p className="text-3xl font-bold">₹24,500.00</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-muted/20 rounded-lg">
+                    <h4 className="text-sm font-medium text-muted-foreground">Today's Transactions</h4>
+                    <p className="text-xl font-semibold mt-1">12</p>
+                  </div>
+                  <div className="p-4 bg-muted/20 rounded-lg">
+                    <h4 className="text-sm font-medium text-muted-foreground">Pending Approvals</h4>
+                    <p className="text-xl font-semibold mt-1">3</p>
+                  </div>
+                </div>
+                
+                <div className="pt-4">
+                  <Button variant="outline" className="w-full">
+                    View Transaction History
+                  </Button>
+                </div>
               </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="customer@email.com"
-                  className="w-full p-2.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <p className="mt-1 text-xs text-gray-500">Required for receipt</p>
-              </div>
-              <div>
-                <label htmlFor="amount" className="block text-sm font-medium mb-1">Amount (₹)</label>
-                <input
-                  type="number"
-                  id="amount"
-                  placeholder="0.00"
-                  className="w-full p-2.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <button className="w-full bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition-colors">
-                Generate Payment Link
-              </button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </Layout>
