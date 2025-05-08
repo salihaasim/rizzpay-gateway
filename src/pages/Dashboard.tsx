@@ -10,11 +10,15 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CreditCard, IndianRupee, ArrowRight } from 'lucide-react';
+import { CreditCard, IndianRupee, ArrowRight, Send, QrCode } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const { userRole, userEmail } = useTransactionStore();
   const [activeTab, setActiveTab] = useState(userRole === 'admin' ? 'admin' : 'merchant');
+  const navigate = useNavigate();
   
   // Simplified merchant name - just use the email without GROUP suffix
   const merchantName = useMemo(() => {
@@ -24,6 +28,33 @@ const Dashboard = () => {
 
   // Payment method state
   const [paymentMethod, setPaymentMethod] = useState('card');
+  
+  // Form states
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [amount, setAmount] = useState('');
+  
+  // UPI states
+  const [upiProvider, setUpiProvider] = useState('gpay');
+  
+  const handlePaymentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!customerName || !customerEmail || !amount) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+    
+    // Display success message
+    toast.success('Payment link generated!', {
+      description: `A ${paymentMethod.toUpperCase()} payment link for ₹${amount} has been sent to ${customerEmail}`
+    });
+    
+    // Clear form
+    setCustomerName('');
+    setCustomerEmail('');
+    setAmount('');
+  };
 
   return (
     <Layout>
@@ -40,143 +71,117 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Quick Payment Card - Enhanced with payment options */}
-          <Card className="shadow-md">
+          {/* Quick Payment Card - Redesigned with modern UI */}
+          <Card className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-semibold text-primary">
+              <CardTitle className="text-xl font-semibold text-primary flex items-center gap-2">
+                <Send className="h-5 w-5" />
                 Quick Payment
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="card" value={paymentMethod} onValueChange={setPaymentMethod}>
-                <TabsList className="grid grid-cols-3 mb-4">
-                  <TabsTrigger value="card">Card</TabsTrigger>
-                  <TabsTrigger value="neft">NEFT</TabsTrigger>
-                  <TabsTrigger value="upi">UPI</TabsTrigger>
+                <TabsList className="grid grid-cols-3 mb-4 bg-muted/50">
+                  <TabsTrigger value="card" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Card
+                  </TabsTrigger>
+                  <TabsTrigger value="neft" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <IndianRupee className="mr-2 h-4 w-4" />
+                    NEFT
+                  </TabsTrigger>
+                  <TabsTrigger value="upi" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <QrCode className="mr-2 h-4 w-4" />
+                    UPI
+                  </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="card">
-                  <form className="space-y-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium">Customer Name</Label>
-                      <Input
-                        type="text"
-                        id="name"
-                        placeholder="Enter customer name"
-                        className="w-full"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
-                      <Input
-                        type="email"
-                        id="email"
-                        placeholder="customer@email.com"
-                        className="w-full"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">Required for payment receipt</p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="amount" className="text-sm font-medium">Amount (₹)</Label>
+                <form onSubmit={handlePaymentSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">Customer Name*</Label>
+                    <Input
+                      type="text"
+                      id="name"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      placeholder="Enter customer name"
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">Email Address*</Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      placeholder="customer@email.com"
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Required for payment receipt</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="amount" className="text-sm font-medium">Amount (₹)*</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
                       <Input
                         type="number"
                         id="amount"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full"
+                        className="pl-8 w-full"
                       />
                     </div>
-                    
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Generate Card Payment Link
-                    </Button>
-                  </form>
-                </TabsContent>
-                
-                <TabsContent value="neft">
-                  <form className="space-y-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="neft-name" className="text-sm font-medium">Customer Name</Label>
-                      <Input
-                        type="text"
-                        id="neft-name"
-                        placeholder="Enter customer name"
-                        className="w-full"
-                      />
+                  </div>
+                  
+                  {paymentMethod === 'upi' && (
+                    <div className="space-y-2 p-4 bg-muted/20 rounded-md">
+                      <Label className="text-sm font-medium">UPI Provider</Label>
+                      <RadioGroup value={upiProvider} onValueChange={setUpiProvider} className="grid grid-cols-2 gap-2 mt-2">
+                        <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                          <RadioGroupItem value="gpay" id="gpay" />
+                          <Label htmlFor="gpay" className="cursor-pointer">Google Pay</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                          <RadioGroupItem value="phonepe" id="phonepe" />
+                          <Label htmlFor="phonepe" className="cursor-pointer">PhonePe</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                          <RadioGroupItem value="paytm" id="paytm" />
+                          <Label htmlFor="paytm" className="cursor-pointer">Paytm</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                          <RadioGroupItem value="other" id="other" />
+                          <Label htmlFor="other" className="cursor-pointer">Other UPI</Label>
+                        </div>
+                      </RadioGroup>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="neft-email" className="text-sm font-medium">Email Address</Label>
-                      <Input
-                        type="email"
-                        id="neft-email"
-                        placeholder="customer@email.com"
-                        className="w-full"
-                      />
+                  )}
+                  
+                  {paymentMethod === 'neft' && (
+                    <div className="space-y-2 p-4 bg-muted/20 rounded-md">
+                      <p className="text-sm">
+                        NEFT transfer will generate payment details that can be shared with the customer.
+                      </p>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="neft-amount" className="text-sm font-medium">Amount (₹)</Label>
-                      <Input
-                        type="number"
-                        id="neft-amount"
-                        placeholder="0.00"
-                        className="w-full"
-                      />
-                    </div>
-                    
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-                      <IndianRupee className="mr-2 h-4 w-4" />
-                      Generate NEFT Details
-                    </Button>
-                  </form>
-                </TabsContent>
-                
-                <TabsContent value="upi">
-                  <form className="space-y-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="upi-name" className="text-sm font-medium">Customer Name</Label>
-                      <Input
-                        type="text"
-                        id="upi-name"
-                        placeholder="Enter customer name"
-                        className="w-full"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="upi-email" className="text-sm font-medium">Email Address</Label>
-                      <Input
-                        type="email"
-                        id="upi-email"
-                        placeholder="customer@email.com"
-                        className="w-full"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="upi-amount" className="text-sm font-medium">Amount (₹)</Label>
-                      <Input
-                        type="number"
-                        id="upi-amount"
-                        placeholder="0.00"
-                        className="w-full"
-                      />
-                    </div>
-                    
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-                      Generate UPI QR Code
-                    </Button>
-                  </form>
-                </TabsContent>
+                  )}
+                  
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
+                    {paymentMethod === 'card' && <CreditCard className="mr-2 h-4 w-4" />}
+                    {paymentMethod === 'neft' && <IndianRupee className="mr-2 h-4 w-4" />}
+                    {paymentMethod === 'upi' && <QrCode className="mr-2 h-4 w-4" />}
+                    Generate {paymentMethod.toUpperCase()} Payment Link
+                  </Button>
+                </form>
               </Tabs>
             </CardContent>
           </Card>
           
-          {/* Additional card for dashboard balance */}
-          <Card className="shadow-md">
+          {/* Account Overview Card */}
+          <Card className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl font-semibold text-primary">
                 Account Overview
@@ -201,8 +206,12 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="pt-4">
-                  <Button variant="outline" className="w-full flex items-center justify-center" onClick={() => window.location.href = '/transfers'}>
-                    View Transaction History
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center" 
+                    onClick={() => navigate('/transfers')}
+                  >
+                    Manage Transfers & Withdrawals
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>

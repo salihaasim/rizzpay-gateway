@@ -19,6 +19,8 @@ import {
   Download,
   CreditCard,
   IndianRupee,
+  Wallet,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,14 +40,7 @@ import TransferForm from '@/components/wallet/TransferForm';
 import { Merchant } from '@/stores/profileStore';
 
 const TransfersPage = () => {
-  const [transferAmount, setTransferAmount] = useState<string>('');
-  const [recipientEmail, setRecipientEmail] = useState<string>('');
-  const [transferNote, setTransferNote] = useState<string>('');
-  
-  const [payoutAmount, setPayoutAmount] = useState<string>('');
-  const [bankAccount, setBankAccount] = useState<string>('');
-  const [payoutNote, setPayoutNote] = useState<string>('');
-  const [payoutMethod, setPayoutMethod] = useState<string>('bank');
+  const [activeTab, setActiveTab] = useState<string>('transfer');
   
   const { transferFunds, getWalletBalance, userEmail } = useTransactionStore();
   const { handleWithdraw, handleTransfer, walletBalance, isProcessing } = useWalletActions(userEmail);
@@ -102,27 +97,39 @@ const TransfersPage = () => {
   return (
     <Layout>
       <div className="container py-6">
-        <h1 className="text-3xl font-bold mb-6">Transfers</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Transfers & Withdrawals</h1>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Available Balance</p>
+            <p className="text-2xl font-bold">₹{walletBalance.toFixed(2)}</p>
+          </div>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 border-0 shadow-md bg-gradient-to-br from-white to-gray-50">
             <CardHeader>
-              <CardTitle>Fund Transfer & Payout</CardTitle>
-              <CardDescription>Transfer funds to another account or request a payout to your bank</CardDescription>
+              <CardTitle className="text-xl">Fund Transfer & Payout</CardTitle>
+              <CardDescription>Transfer funds to another account or withdraw to your bank</CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="transfer" className="w-full">
-                <TabsList className="grid grid-cols-2 w-full">
-                  <TabsTrigger value="transfer">
+              <Tabs defaultValue="transfer" value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid grid-cols-2 w-full bg-muted/50">
+                  <TabsTrigger 
+                    value="transfer"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
                     <div className="flex items-center">
                       <ArrowRightLeft className="mr-2 h-4 w-4" />
                       <span>Transfer Funds</span>
                     </div>
                   </TabsTrigger>
-                  <TabsTrigger value="withdraw">
+                  <TabsTrigger 
+                    value="withdraw"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
                     <div className="flex items-center">
                       <Download className="mr-2 h-4 w-4" />
-                      <span>Withdraw Money</span>
+                      <span>Withdraw to Bank</span>
                     </div>
                   </TabsTrigger>
                 </TabsList>
@@ -145,11 +152,11 @@ const TransfersPage = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="border-0 shadow-md bg-gradient-to-br from-white to-gray-50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Transaction History
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Clock className="h-5 w-5 text-primary" />
+                Recent Activity
               </CardTitle>
               <CardDescription>
                 Recent transfers and payouts
@@ -158,22 +165,31 @@ const TransfersPage = () => {
             <CardContent className="px-0">
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="px-6 py-2 hover:bg-gray-50">
+                  <div key={i} className="px-6 py-3 hover:bg-muted/20 transition-colors">
                     <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-sm">
-                          {i % 2 === 0 ? 'Transfer to merchant' : 'Payout to bank'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date().toLocaleDateString()}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        {i % 2 === 0 ? 
+                          <ArrowRightLeft className="h-8 w-8 p-1.5 rounded-full bg-blue-100 text-blue-600" /> : 
+                          <Download className="h-8 w-8 p-1.5 rounded-full bg-green-100 text-green-600" />
+                        }
+                        <div>
+                          <p className="font-medium text-sm">
+                            {i % 2 === 0 ? 'Transfer to merchant' : 'Withdrawal to bank'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date().toLocaleDateString()} • {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </p>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className={`font-medium ${i % 2 === 0 ? 'text-red-500' : 'text-green-500'}`}>
                           {i % 2 === 0 ? '-' : '+'} ₹{(Math.random() * 5000).toFixed(2)}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {i % 2 === 0 ? 'Completed' : 'Processing'}
+                        <p className="text-xs">
+                          {i % 2 === 0 ? 
+                            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px]">Completed</span> : 
+                            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px]">Processing</span>
+                          }
                         </p>
                       </div>
                     </div>

@@ -24,6 +24,7 @@ import KycPage from './pages/KycPage';
 import UpiPluginSettings from './pages/UpiPluginSettings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 import ReportsPage from './pages/ReportsPage';
+import TransfersPage from './pages/TransfersPage';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -111,6 +112,12 @@ const App = () => {
     <Route key="wallet" path="/wallet" element={
       <ProtectedRoute>
         {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WalletPage /></Layout>}
+      </ProtectedRoute>
+    } />,
+    
+    <Route key="transfers" path="/transfers" element={
+      <ProtectedRoute>
+        {isAdmin ? <Navigate to="/admin" replace /> : <TransfersPage />}
       </ProtectedRoute>
     } />,
     
