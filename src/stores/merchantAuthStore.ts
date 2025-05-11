@@ -4,22 +4,33 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { toast } from 'sonner';
 
 interface MerchantCredentials {
-  id?: string; // Added ID field to fix type errors
+  id?: string;
   username: string;
   password: string;
   fullName: string;
+  email: string;
   pricing?: {
     transactionFee: number; // percentage
     fixedFee: number; // in rupees
     monthlyFee: number; // in rupees
   };
-  role?: 'admin' | 'merchant'; // Added role field
+  role?: 'admin' | 'merchant';
   upiSettings?: {
     upiId: string;
+    name: string;
     enabled: boolean;
     allowManualVerification: boolean;
     customWebhookUrl?: string;
   };
+  bankAccounts?: Array<{
+    id: string;
+    accountName: string;
+    accountNumber: string;
+    ifscCode: string;
+    bankName: string;
+    isPrimary: boolean;
+  }>;
+  apiKey?: string;
 }
 
 interface MerchantAuthState {
@@ -30,6 +41,7 @@ interface MerchantAuthState {
   addMerchant: (merchant: MerchantCredentials) => void;
   updateMerchantPricing: (username: string, pricing: MerchantCredentials['pricing']) => void;
   updateMerchantUpiSettings: (username: string, upiSettings: MerchantCredentials['upiSettings']) => void;
+  updateMerchantDetails: (updates: Partial<MerchantCredentials>) => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
   changePassword: (username: string, currentPassword: string, newPassword: string) => boolean;
@@ -46,6 +58,7 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           username: 'merchant',
           password: 'password',
           fullName: 'Salih Aasim 001',
+          email: 'merchant@rizzpay.com',
           role: 'merchant',
           pricing: {
             transactionFee: 1.0, // Updated to 1.0% as requested
@@ -54,23 +67,30 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           },
           upiSettings: {
             upiId: 'demo.merchant@rizzpay',
+            name: 'Demo Merchant',
             enabled: true,
             allowManualVerification: true
-          }
+          },
+          bankAccounts: [],
+          apiKey: 'rizz_test_api_key_123456'
         },
         // Default admin account
         {
           username: 'admin',
           password: 'admin',
           fullName: 'Admin User',
-          role: 'admin'
+          email: 'admin@rizzpay.com',
+          role: 'admin',
+          apiKey: 'rizz_test_admin_key_123456'
         },
         // New admin account with requested credentials
         {
           username: 'rizzpay',
           password: 'rizzpay123',
           fullName: 'RizzPay Admin',
-          role: 'admin'
+          email: 'admin@rizzpay.co.in',
+          role: 'admin',
+          apiKey: 'rizz_live_admin_key_123456'
         }
       ],
       loading: false,
@@ -89,9 +109,12 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           // Set default UPI settings
           upiSettings: merchant.upiSettings || {
             upiId: `${merchant.username.toLowerCase()}@rizzpay`,
+            name: merchant.fullName || 'RizzPay Merchant',
             enabled: false,
             allowManualVerification: true
-          }
+          },
+          // Generate API key
+          apiKey: `rizz_${Math.random().toString(36).substring(2, 15)}`
         };
         
         set((state) => ({
@@ -119,6 +142,22 @@ export const useMerchantAuth = create<MerchantAuthState>()(
             state.currentMerchant
         }));
         toast.success('UPI settings updated successfully');
+      },
+
+      updateMerchantDetails: (updates) => {
+        set((state) => {
+          if (!state.currentMerchant) return state;
+          
+          const updatedMerchant = { ...state.currentMerchant, ...updates };
+          
+          return {
+            currentMerchant: updatedMerchant,
+            merchants: state.merchants.map(m => 
+              m.username === updatedMerchant.username ? updatedMerchant : m
+            )
+          };
+        });
+        toast.success('Merchant details updated successfully');
       },
 
       login: (username, password) => {

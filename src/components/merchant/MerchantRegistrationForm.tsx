@@ -1,227 +1,139 @@
 
-import React, { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-
-const merchantSchema = z.object({
-  businessName: z.string().min(2, 'Business name must be at least 2 characters'),
-  businessType: z.string().min(2, 'Business type is required'),
-  gstNumber: z.string().optional(),
-  panNumber: z.string().min(10, 'Valid PAN number is required'),
-  contactEmail: z.string().email('Please enter a valid email'),
-  contactPhone: z.string().min(10, 'Valid phone number is required'),
-  businessAddress: z.string().min(10, 'Complete business address is required'),
-  password: z.string().min(8, 'Password must be at least 8 characters')
-});
-
-type MerchantFormValues = z.infer<typeof merchantSchema>;
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function MerchantRegistrationForm() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const form = useForm<MerchantFormValues>({
-    resolver: zodResolver(merchantSchema),
-    defaultValues: {
-      businessName: '',
-      businessType: '',
-      gstNumber: '',
-      panNumber: '',
-      contactEmail: '',
-      contactPhone: '',
-      businessAddress: '',
-      password: ''
-    }
+  const navigate = useNavigate();
+  const { addMerchant } = useMerchantAuth();
+  const [formData, setFormData] = React.useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    fullName: '',
+    email: ''
   });
 
-  const onSubmit = async (data: MerchantFormValues) => {
-    setIsLoading(true);
-    try {
-      // 1. Create auth user
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: data.contactEmail,
-        password: data.password,
-      });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
-      if (signUpError) throw signUpError;
-      
-      if (!authData.user) throw new Error('No user data returned');
-
-      // 2. Create merchant profile
-      const { error: profileError } = await supabase
-        .from('merchant_profiles')
-        .insert({
-          id: authData.user.id,
-          business_name: data.businessName,
-          business_type: data.businessType,
-          gst_number: data.gstNumber,
-          pan_number: data.panNumber,
-          contact_email: data.contactEmail,
-          contact_phone: data.contactPhone,
-          business_address: data.businessAddress
-        });
-
-      if (profileError) throw profileError;
-
-      toast.success('Registration successful! Please check your email to verify your account.');
-      form.reset();
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.username || !formData.password || !formData.fullName || !formData.email) {
+      toast.error('Please fill all required fields');
+      return;
     }
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    // Register the merchant
+    addMerchant({
+      username: formData.username,
+      password: formData.password,
+      fullName: formData.fullName,
+      email: formData.email
+    });
+    
+    // Redirect to login
+    toast.success('Registration successful. Please log in.');
+    navigate('/auth');
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Merchant Registration</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl">Register as a Merchant</CardTitle>
         <CardDescription>
-          Register your business to start accepting payments with RizzPay
+          Create an account to start accepting payments
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="businessName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Business Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your business name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="businessType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Business Type</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Retail, E-commerce, Services" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="panNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>PAN Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter PAN number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="gstNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GST Number (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter GST number if applicable" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                name="fullName"
+                placeholder="John Doe"
+                value={formData.fullName}
+                onChange={handleChange}
+                required
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="contactEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Business Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="your@business.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="contactPhone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter business contact number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="businessAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Business Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter complete business address" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Create a secure password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registering...
-                </>
-              ) : (
-                'Register Merchant Account'
-              )}
-            </Button>
-          </form>
-        </Form>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="john@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                placeholder="johndoe"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-[#0052FF]">Register</Button>
+          </div>
+        </form>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
+      <CardFooter>
+        <p className="text-sm text-center w-full text-muted-foreground">
           Already have an account?{' '}
-          <Button variant="link" className="p-0 h-auto font-normal" onClick={() => window.location.href = '/login'}>
+          <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/auth')}>
             Login here
           </Button>
         </p>

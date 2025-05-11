@@ -16,6 +16,7 @@ RizzPay is a comprehensive payment gateway solution designed specifically for th
 - Banking configuration for UPI and Bank accounts
 - Wallet functionality for fund management
 - IP and domain whitelisting for enhanced security
+- Merchant registration and onboarding
 
 ## Tech Stack
 - React with TypeScript for the frontend
@@ -49,6 +50,7 @@ The application follows a component-based architecture with:
 - Fixed Razorpay integration issues
 - Improved payment processing workflow
 - Added navigation sidebar to all pages
+- Added merchant registration and onboarding process
 
 ## Payment Methods
 - UPI (Unified Payment Interface)

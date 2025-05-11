@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -79,59 +80,39 @@ const App = () => {
 
   const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
 
-  const routes = [
-    { path: "/", element: <Index /> },
-    { path: "/auth", element: <Auth /> },
-    { path: "/register-merchant", element: <RegisterMerchant /> },
-    { path: "/dashboard", element: <Dashboard /> },
-    { path: "/transactions", element: <Transactions /> },
-    { path: "/transfers", element: <TransfersPage /> },
-    { path: "/wallet", element: <WalletPage /> },
-    { path: "/payment", element: <UpiPaymentPage /> },
-    { path: "/payment/:status", element: <UpiPaymentPage /> },
-    { path: "/link-payment", element: <UpiLinkPaymentPage /> },
-    { path: "/link-payment/:paymentId", element: <UpiLinkPaymentPage /> },
-    { path: "/plugin", element: <UpiPluginSettings /> },
-    { path: "/webhooks", element: <WebhookPage /> },
-    { path: "/webhook-payment", element: <WebhookPayment /> },
-    { path: "/webhook-setup", element: <WebhookSetup /> },
-    { path: "/settings", element: <Settings /> },
-    { path: "/kyc", element: <KycPage /> },
-    { path: "/whitelist", element: <MerchantWhitelist /> },
-    { path: "/banking", element: <BankingPage /> },
-    { path: "/reports", element: <ReportsPage /> },
-    { path: "/developer", element: <DeveloperPage /> },
-    { path: "/developer/integration", element: <DeveloperIntegration /> },
-    { path: "/merchant-onboarding", element: <MerchantOnboarding /> },
-    { path: "*", element: <NotFound /> }
-  ];
-
   return (
     <Router>
       <Toaster position="top-right" richColors />
       <Suspense fallback={<PageLoading />}>
         <Routes>
-          {routes}
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/register-merchant" element={<RegisterMerchant />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/transfers" element={<TransfersPage />} />
+          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/payment" element={<UpiPaymentPage />} />
+          <Route path="/payment/:status" element={<UpiPaymentPage />} />
+          <Route path="/link-payment" element={<UpiLinkPaymentPage />} />
+          <Route path="/link-payment/:paymentId" element={<UpiLinkPaymentPage />} />
+          <Route path="/plugin" element={<UpiPluginSettings />} />
+          <Route path="/webhooks" element={<WebhookPage />} />
+          <Route path="/webhook-payment" element={<WebhookPayment />} />
+          <Route path="/webhook-setup" element={<WebhookSetup />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/kyc" element={<KycPage />} />
+          <Route path="/whitelist" element={<MerchantWhitelist />} />
+          <Route path="/banking" element={<BankingPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/developer" element={<DeveloperPage />} />
+          <Route path="/developer/integration" element={<DeveloperIntegration />} />
+          <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </Router>
   );
 };
-
-const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useMerchantAuth();
-  
-  if (loading) {
-    return <PageLoading />;
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-});
-
-ProtectedRoute.displayName = 'ProtectedRoute';
 
 export default App;

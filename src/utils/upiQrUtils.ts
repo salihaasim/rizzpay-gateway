@@ -1,78 +1,65 @@
 
-import { createQR } from '@/utils/commonUtils';
-
 /**
- * Generates a UPI payment URL based on the UPI ID
+ * Generate a UPI URL for payment
+ * @param upiId The UPI ID to send payment to
+ * @param amount The payment amount
+ * @param description Description of the payment
+ * @returns A UPI URL string that can be used to generate a QR code
  */
-export const generateUpiUrl = (
-  upiId: string, 
-  amount?: number, 
-  description?: string
-): string => {
-  // Create UPI payment URL format
-  let upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('RizzPay')}`;
-  
-  // Add optional parameters if provided
-  if (amount && amount > 0) {
-    upiUrl += `&am=${amount}`;
-  }
-  
-  if (description) {
-    upiUrl += `&tn=${encodeURIComponent(description)}`;
-  }
-  
-  upiUrl += '&cu=INR';
-  
-  return upiUrl;
+export const generateUpiUrl = (upiId: string, amount: number, description: string = ''): string => {
+  const encodedDesc = encodeURIComponent(description);
+  return `upi://pay?pa=${upiId}&pn=${encodedDesc}&am=${amount}&cu=INR`;
 };
 
 /**
- * Generates a QR code URL for a UPI payment link
- */
-export const getUpiQrCodeUrl = (
-  upiId: string, 
-  amount?: number, 
-  description?: string
-): string => {
-  const upiUrl = generateUpiUrl(upiId, amount, description);
-  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
-};
-
-/**
- * Validates a UPI ID format
+ * Validate a UPI ID format
+ * @param upiId The UPI ID to validate
+ * @returns Boolean indicating if the UPI ID is valid
  */
 export const validateUpiId = (upiId: string): boolean => {
-  if (!upiId) return false;
-  
-  // Basic validation: must contain @ and have parts before and after it
-  const parts = upiId.split('@');
-  if (parts.length !== 2) return false;
-  if (!parts[0] || !parts[1]) return false;
-  
-  return true;
+  // Basic validation - UPI ID should contain @ symbol
+  // In production, more sophisticated validation might be needed
+  return upiId.includes('@') && upiId.length >= 3;
 };
 
 /**
- * Generate deep link for UPI apps
+ * Get display name from UPI ID
+ * @param upiId The UPI ID
+ * @returns The username part of the UPI ID
  */
-export const getUpiAppDeepLink = (
-  upiId: string,
-  amount: number,
-  description: string,
-  app: 'gpay' | 'phonepe' | 'paytm' | 'bhim' = 'gpay'
-): string => {
-  const upiUrl = generateUpiUrl(upiId, amount, description);
+export const getUpiDisplayName = (upiId: string): string => {
+  if (!upiId || !upiId.includes('@')) return upiId;
+  return upiId.split('@')[0];
+};
+
+/**
+ * Get bank name from UPI ID
+ * @param upiId The UPI ID
+ * @returns The bank part of the UPI ID or empty string if not found
+ */
+export const getUpiBankName = (upiId: string): string => {
+  if (!upiId || !upiId.includes('@')) return '';
+  const bankPart = upiId.split('@')[1];
   
-  switch (app) {
-    case 'gpay':
-      return `tez://upi/pay?pa=${encodeURIComponent(upiId)}&am=${amount}&pn=RizzPay&tn=${encodeURIComponent(description)}&cu=INR`;
-    case 'phonepe':
-      return `phonepe://${upiUrl}`;
-    case 'paytm':
-      return `paytmmp://${upiUrl}`;
-    case 'bhim':
-      return `upi://${upiUrl}`;
-    default:
-      return upiUrl;
+  // Map common UPI handles to bank names
+  const bankMap: Record<string, string> = {
+    'okaxis': 'Axis Bank',
+    'okhdfcbank': 'HDFC Bank',
+    'okicici': 'ICICI Bank',
+    'oksbi': 'State Bank of India',
+    'okbizaxis': 'Axis Bank Business',
+    'upi': 'UPI',
+    'ybl': 'PhonePe',
+    'paytm': 'Paytm',
+    'gpay': 'Google Pay'
+  };
+  
+  // Try to match known banks
+  for (const [handle, bankName] of Object.entries(bankMap)) {
+    if (bankPart.includes(handle)) {
+      return bankName;
+    }
   }
+  
+  return bankPart; // Return the raw bank part if no match
 };
