@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
@@ -68,6 +67,7 @@ const UpiPluginSettings: React.FC = () => {
     
     updateMerchantUpiSettings(currentMerchant.username, {
       upiId: formState.upiId,
+      name: currentMerchant.upiSettings?.name || currentMerchant.fullName || 'RizzPay Merchant', // Add required name property
       enabled: formState.enabled,
       allowManualVerification: formState.allowManualVerification,
       customWebhookUrl: formState.customWebhookUrl || undefined

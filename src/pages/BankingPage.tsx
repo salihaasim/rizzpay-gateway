@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +48,9 @@ const BankingPage = () => {
     updateMerchantDetails({
       upiSettings: {
         upiId,
-        name: upiName || 'RizzPay Merchant'
+        name: upiName || 'RizzPay Merchant',
+        enabled: true,  // Add required property
+        allowManualVerification: true  // Add required property
       }
     });
     

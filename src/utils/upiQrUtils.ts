@@ -63,3 +63,13 @@ export const getUpiBankName = (upiId: string): string => {
   
   return bankPart; // Return the raw bank part if no match
 };
+
+/**
+ * Generate a QR code URL for a UPI ID
+ * @param upiId The UPI ID for QR code
+ * @returns URL to a QR code image
+ */
+export const getUpiQrCodeUrl = (upiId: string): string => {
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUri)}`;
+};

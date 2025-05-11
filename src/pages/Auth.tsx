@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -62,6 +61,7 @@ const Auth = () => {
         username: formData.username,
         password: formData.password,
         fullName: formData.fullName,
+        email: `${formData.username}@rizzpay.com`, // Add default email
         role: (activeRole === 'admin' ? 'admin' : 'merchant') as 'admin' | 'merchant'
       });
       
