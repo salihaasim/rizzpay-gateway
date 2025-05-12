@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { roles, demoCredentials } from '@/components/role/roleConstants';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -72,9 +74,10 @@ const Auth = () => {
       toast.success('Registration successful! Please login with your credentials.');
     } else {
       try {
-        // Special case for rizzpay admin login
-        if (formData.username === 'rizzpay' && formData.password === 'rizzpay123') {
-          console.log("Found matching admin credentials, attempting login with rizzpay...");
+        // Special case for admin login
+        if (activeRole === 'admin') {
+          console.log("Testing credentials:", formData.username, formData.password);
+          console.log("Demo credentials:", demoCredentials.admin);
         }
         
         // Attempt login
@@ -123,8 +126,8 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="w-full py-6 border-b bg-background">
+    <div className="min-h-screen flex flex-col bg-background dark:bg-gray-900 transition-colors duration-200">
+      <header className="w-full py-6 border-b bg-background dark:bg-gray-900 dark:border-gray-800">
         <div className="container px-4 mx-auto">
           <div className="flex justify-between items-center">
             <Button variant="ghost" size="sm" onClick={handleBack}>
@@ -139,13 +142,16 @@ const Auth = () => {
                 RizzPay
               </span>
             </div>
+            <div>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 flex items-center justify-center bg-secondary/10 py-10">
+      <div className="flex-1 flex items-center justify-center bg-secondary/10 dark:bg-gray-800/20 py-10">
         <div className="w-full max-w-md px-4">
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg dark:bg-gray-800 dark:border-gray-700">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
                 {isRegister ? 'Register Account' : `${activeRole === 'admin' ? 'Admin' : 'Merchant'} Login`}
@@ -257,7 +263,7 @@ const Auth = () => {
             </CardFooter>
           </Card>
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
+          <div className="mt-4 text-center text-sm text-muted-foreground dark:text-gray-400">
             <p>Demo credentials:</p>
             {activeRole === 'admin' ? (
               <>

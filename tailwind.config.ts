@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       colors: {
-        // Update primary colors to Coinbase blue
+        // Light mode colors (default)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "#0052FF", // Coinbase primary blue

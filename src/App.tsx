@@ -30,6 +30,7 @@ import RegisterMerchant from './pages/RegisterMerchant';
 import BankingPage from './pages/BankingPage';
 import DeveloperPage from './pages/DeveloperPage';
 import MerchantOnboarding from './pages/MerchantOnboarding';
+import { ThemeProvider } from './context/ThemeContext';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -81,37 +82,55 @@ const App = () => {
   const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
 
   return (
-    <Router>
-      <Toaster position="top-right" richColors />
-      <Suspense fallback={<PageLoading />}>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/register-merchant" element={<RegisterMerchant />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/transfers" element={<TransfersPage />} />
-          <Route path="/wallet" element={<WalletPage />} />
-          <Route path="/payment" element={<UpiPaymentPage />} />
-          <Route path="/payment/:status" element={<UpiPaymentPage />} />
-          <Route path="/link-payment" element={<UpiLinkPaymentPage />} />
-          <Route path="/link-payment/:paymentId" element={<UpiLinkPaymentPage />} />
-          <Route path="/plugin" element={<UpiPluginSettings />} />
-          <Route path="/webhooks" element={<WebhookPage />} />
-          <Route path="/webhook-payment" element={<WebhookPayment />} />
-          <Route path="/webhook-setup" element={<WebhookSetup />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/kyc" element={<KycPage />} />
-          <Route path="/whitelist" element={<MerchantWhitelist />} />
-          <Route path="/banking" element={<BankingPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/developer" element={<DeveloperPage />} />
-          <Route path="/developer/integration" element={<DeveloperIntegration />} />
-          <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Toaster position="top-right" richColors />
+        <Suspense fallback={<PageLoading />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/register-merchant" element={<RegisterMerchant />} />
+            
+            {/* Dashboard routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/transfers" element={<TransfersPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/payment" element={<UpiPaymentPage />} />
+            <Route path="/payment/:status" element={<UpiPaymentPage />} />
+            <Route path="/link-payment" element={<UpiLinkPaymentPage />} />
+            <Route path="/link-payment/:paymentId" element={<UpiLinkPaymentPage />} />
+            <Route path="/plugin" element={<UpiPluginSettings />} />
+            <Route path="/webhooks" element={<WebhookPage />} />
+            <Route path="/webhook-payment" element={<WebhookPayment />} />
+            <Route path="/webhook-setup" element={<WebhookSetup />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/kyc" element={<KycPage />} />
+            <Route path="/banking" element={<BankingPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/developer" element={<DeveloperPage />} />
+            <Route path="/developer/integration" element={<DeveloperIntegration />} />
+            <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
+            <Route path="/whitelist" element={<MerchantWhitelist />} />
+            
+            {/* Admin routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/merchants" element={<AdminDashboard />} />
+            <Route path="/admin/escrow" element={<AdminDashboard />} />
+            <Route path="/admin/pricing" element={<AdminDashboard />} />
+            <Route path="/admin/transactions" element={<AdminDashboard />} />
+            <Route path="/admin/analytics" element={<AdminDashboard />} />
+            <Route path="/admin/settings" element={<AdminDashboard />} />
+            <Route path="/admin/whitelist" element={<AdminDashboard />} />
+            <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </ThemeProvider>
   );
 };
 
