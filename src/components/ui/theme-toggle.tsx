@@ -1,14 +1,11 @@
 
 import React from 'react';
 import { Sun } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
-  const { theme } = useTheme();
-  
-  // This is now just a static icon with no toggle functionality
+  // Static light mode implementation
   return (
     <TooltipProvider>
       <Tooltip>
