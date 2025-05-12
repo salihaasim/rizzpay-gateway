@@ -49,7 +49,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-gray-900 flex transition-colors duration-200">
+    <div className="min-h-screen bg-[#f8fafc] flex transition-colors duration-200">
       {/* Desktop sidebar with improved responsiveness */}
       <AdminSidebar 
         userEmail={userEmail} 

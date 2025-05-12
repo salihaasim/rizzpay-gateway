@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Sun, Moon } from 'lucide-react';
+import { Sun } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   
+  // This is now just a static icon with no toggle functionality
   return (
     <TooltipProvider>
       <Tooltip>
@@ -15,18 +16,14 @@ export function ThemeToggle() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
+            aria-label="Light mode"
+            disabled
           >
-            {theme === 'dark' ? (
-              <Sun className="h-5 w-5 transition-all" />
-            ) : (
-              <Moon className="h-5 w-5 transition-all" />
-            )}
+            <Sun className="h-5 w-5" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Toggle {theme === 'dark' ? 'light' : 'dark'} mode</p>
+          <p>Light mode</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

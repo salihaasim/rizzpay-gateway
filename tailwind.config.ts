@@ -2,7 +2,6 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -20,7 +19,6 @@ export default {
     },
     extend: {
       colors: {
-        // Light mode colors (default)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "#0052FF", // Coinbase primary blue

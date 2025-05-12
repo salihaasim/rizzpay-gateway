@@ -34,10 +34,10 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   // Show loading indicator if authentication is still being checked
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background dark:bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-background">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          <p className="text-muted-foreground dark:text-gray-400">Loading your account...</p>
+          <p className="text-muted-foreground">Loading your account...</p>
         </div>
       </div>
     );
@@ -50,7 +50,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Display responsive layout for authenticated users with sidebar
   return (
-    <div className="min-h-screen flex bg-[#f5f5f7] dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
       <DashboardSidebar 
         collapsed={sidebarCollapsed} 
         setCollapsed={setSidebarCollapsed} 
@@ -66,7 +66,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
           {children}
         </main>
         
-        <footer className="py-3 text-center text-xs text-muted-foreground dark:text-gray-400 border-t dark:border-gray-800">
+        <footer className="py-3 text-center text-xs text-muted-foreground border-t">
           <div className="max-w-screen-2xl mx-auto px-4">
             <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
             <p className="mt-1">Version 1.0.0</p>

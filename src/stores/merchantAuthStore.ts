@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { demoCredentials } from '@/components/role/roleConstants';
@@ -19,6 +18,7 @@ interface UpiSettings {
   name: string;
   enabled: boolean;
   allowManualVerification: boolean;
+  customWebhookUrl?: string; // Added missing property
 }
 
 // Interface for pricing structure
@@ -53,7 +53,7 @@ interface MerchantStore {
   updateMerchantDetails: (merchant: Partial<Merchant>) => void;
   changePassword: (username: string, currentPassword: string, newPassword: string) => boolean; // Added change password
   updateMerchantPricing: (merchantUsername: string, pricing: PricingStructure) => void; // Added update pricing
-  updateMerchantUpiSettings: (settings: UpiSettings) => void; // Added update UPI settings
+  updateMerchantUpiSettings: (settings: UpiSettings) => void; // Updated parameter type
 }
 
 export const useMerchantAuth = create<MerchantStore>()(
