@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { roles, demoCredentials } from '@/components/role/roleConstants';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -38,11 +40,11 @@ const Auth = () => {
       // Check if the user is an admin
       if (currentMerchant.role === 'admin') {
         console.log("Admin user authenticated, redirecting to admin dashboard");
-        setUserRole('admin', currentMerchant.username);
+        setUserRole('admin', currentMerchant.email);
         navigate('/admin', { replace: true });
       } else {
         console.log("Merchant user authenticated, redirecting to merchant dashboard");
-        setUserRole('merchant', currentMerchant.username || '');
+        setUserRole('merchant', currentMerchant.email || '');
         navigate('/dashboard', { replace: true });
       }
     }

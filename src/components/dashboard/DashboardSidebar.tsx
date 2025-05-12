@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -80,8 +79,8 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
       icon: <QrCode className="h-5 w-5" />
     },
     {
-      title: "Webhooks",
-      href: "/webhooks",
+      title: "Developer",
+      href: "/developer",
       icon: <Globe className="h-5 w-5" />
     },
     // Only show Whitelist for admin users
