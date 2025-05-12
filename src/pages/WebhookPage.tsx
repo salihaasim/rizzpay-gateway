@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 const WebhookPage: React.FC = () => {
   // Redirect to the new Developer Integration page
-  return <Navigate to="/developers" replace />;
+  return <Navigate to="/developer" replace />;
 };
 
 export default WebhookPage;

@@ -1,13 +1,38 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WebhookIntegration from '@/components/webhook/WebhookIntegration';
 import { useTransactionStore } from '@/stores/transactionStore';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const DeveloperPage = () => {
-  const { userEmail } = useTransactionStore();
+  const { currentMerchant } = useMerchantAuth();
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    // Simulate API key fetch or generation
+    const fetchApiKey = () => {
+      // In a real app, this would come from your backend
+      const mockApiKey = "rzp_test_" + Math.random().toString(36).substring(2, 15);
+      setApiKey(mockApiKey);
+    };
+    
+    fetchApiKey();
+  }, []);
+
+  const handleRegenerateApiKey = () => {
+    setIsGenerating(true);
+    
+    // Simulate API call to regenerate key
+    setTimeout(() => {
+      const newApiKey = "rzp_test_" + Math.random().toString(36).substring(2, 15);
+      setApiKey(newApiKey);
+      setIsGenerating(false);
+    }, 1000);
+  };
   
   return (
     <Layout>
@@ -36,7 +61,11 @@ const DeveloperPage = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <WebhookIntegration apiKey="YOUR_API_KEY" />
+                  <WebhookIntegration 
+                    apiKey={apiKey} 
+                    onRegenerateApiKey={handleRegenerateApiKey}
+                    isRegenerating={isGenerating}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
