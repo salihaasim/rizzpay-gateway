@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -18,10 +18,12 @@ import {
   Shield,
   Link as LinkIcon,
   BanknoteIcon,
-  IndianRupee
+  IndianRupee,
+  LogOut
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { toast } from 'sonner';
 
 interface DashboardSidebarProps {
   collapsed: boolean;
@@ -30,12 +32,17 @@ interface DashboardSidebarProps {
 
 const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) => {
   const { pathname } = useLocation();
-  const { currentMerchant } = useMerchantAuth();
+  const { currentMerchant, logout } = useMerchantAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const navigate = useNavigate();
   
   // Only show sidebar toggle on desktop
   const showToggle = !isMobile;
   
+  // Check if the user is an admin
+  const isAdmin = currentMerchant?.role === 'admin';
+  
+  // Filter navigation items based on role
   const navigationItems = [
     {
       title: "Dashboard",
@@ -77,17 +84,24 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
       href: "/webhooks",
       icon: <Globe className="h-5 w-5" />
     },
-    {
+    // Only show Whitelist for admin users
+    ...(isAdmin ? [{
       title: "Whitelist",
       href: "/whitelist",
       icon: <Shield className="h-5 w-5" />
-    },
+    }] : []),
     {
       title: "Settings",
       href: "/settings",
       icon: <Settings className="h-5 w-5" />
     }
   ];
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate('/', { replace: true });
+  };
 
   return (
     <div
@@ -162,6 +176,19 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
             </div>
           )}
         </div>
+        
+        {/* Logout Button */}
+        <Button 
+          variant="ghost" 
+          className={cn(
+            "w-full mt-4 text-gray-300 hover:text-white hover:bg-gray-800",
+            collapsed ? "justify-center px-0" : "justify-start"
+          )}
+          onClick={handleLogout}
+        >
+          <LogOut className="h-5 w-5" />
+          {!collapsed && <span className="ml-3">Logout</span>}
+        </Button>
       </div>
     </div>
   );
