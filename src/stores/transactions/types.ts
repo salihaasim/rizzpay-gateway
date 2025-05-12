@@ -49,6 +49,7 @@ export interface PaymentDetails {
   amountInPaise?: number;
   upiTransactionId?: string; // Used for UTR IDs
   description?: string; // Added for UPI link payments
+  customerTransactionId?: string; // Added for UPI QR payments
 }
 
 export interface Transaction {

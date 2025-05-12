@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -73,9 +72,9 @@ const Auth = () => {
       toast.success('Registration successful! Please login with your credentials.');
     } else {
       try {
-        // For debugging
+        // Special case for rizzpay admin login
         if (formData.username === 'rizzpay' && formData.password === 'rizzpay123') {
-          console.log("Found matching admin credentials, attempting login...");
+          console.log("Found matching admin credentials, attempting login with rizzpay...");
         }
         
         // Attempt login
