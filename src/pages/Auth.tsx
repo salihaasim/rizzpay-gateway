@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, LogIn, Store, Loader2, Building2 } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { useTransactionStore } from '@/stores/transactionStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { roles, demoCredentials } from '@/components/role/roleConstants';
@@ -23,7 +22,6 @@ const Auth = () => {
   });
   
   const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
-  const { setUserRole } = useTransactionStore();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -40,15 +38,13 @@ const Auth = () => {
       // Check if the user is an admin
       if (currentMerchant.role === 'admin') {
         console.log("Admin user authenticated, redirecting to admin dashboard");
-        setUserRole('admin', currentMerchant.email);
         navigate('/admin', { replace: true });
       } else {
         console.log("Merchant user authenticated, redirecting to merchant dashboard");
-        setUserRole('merchant', currentMerchant.email || '');
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [isAuthenticated, currentMerchant, navigate, setUserRole]);
+  }, [isAuthenticated, currentMerchant, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -46,8 +46,6 @@ const PageLoading = () => <PaymentPageLoading />;
 
 const App = () => {
   const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
-  const transactionStore = useTransactionStore();
-  const { setUserRole } = transactionStore || {}; 
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
@@ -56,30 +54,16 @@ const App = () => {
     
     document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
     
-    if (isAuthenticated && currentMerchant && setUserRole) {
-      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
-      setUserRole(role, currentMerchant.username);
-      console.log(`User role set to ${role} on app initialization`);
-    }
-    
+    // Move the role setting inside a component where hooks are properly initialized
     setAppReady(true);
-  }, [isAuthenticated, currentMerchant, setUserRole]);
-
-  useEffect(() => {
-    if (isAuthenticated && currentMerchant && setUserRole && transactionStore) {
-      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
-      if (transactionStore.userRole !== role) {
-        setUserRole(role, currentMerchant.username);
-        console.log(`User role updated to ${role} after authentication change`);
-      }
-    }
-  }, [isAuthenticated, currentMerchant, transactionStore, setUserRole]);
+  }, [isAuthenticated, currentMerchant]);
 
   if (!appReady || loading) {
     return <PageLoading />;
   }
 
-  const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
+  // Use currentMerchant?.role instead of relying on transactionStore here
+  const isAdmin = currentMerchant?.role === 'admin';
 
   return (
     <ThemeProvider>

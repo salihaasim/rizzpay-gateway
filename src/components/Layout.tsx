@@ -16,7 +16,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery(mediaQueries.isMobile);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile ? true : false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
   
   // Monitor authentication status for changes
   useEffect(() => {
