@@ -20,8 +20,8 @@ export const useTransactionStore = create<TransactionStore>()(
     }),
     {
       name: 'transactions-storage',
-      // Use getStorage to safely handle localStorage in SSR or tests
-      getStorage: () => ({
+      // Use storage property instead of getStorage
+      storage: {
         getItem: (name) => {
           try {
             return localStorage.getItem(name);
@@ -45,7 +45,7 @@ export const useTransactionStore = create<TransactionStore>()(
             console.warn('LocalStorage not available:', e);
           }
         },
-      })
+      }
     }
   )
 );
