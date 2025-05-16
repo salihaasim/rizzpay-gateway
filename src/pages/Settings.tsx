@@ -1,78 +1,107 @@
 
 import React, { useState } from 'react';
-import Layout from '@/components/Layout';
+import Layout from '../components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProfileEditForm from '@/components/settings/ProfileEditForm';
-import BusinessInfoForm from '@/components/settings/BusinessInfoForm';
-import SecuritySettings from '@/components/settings/SecuritySettings';
-import NotificationSettings from '@/components/settings/NotificationSettings';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
-import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import ProfileEditForm from '../components/settings/ProfileEditForm';
+import NotificationSettings from '../components/settings/NotificationSettings';
+import SecuritySettings from '../components/settings/SecuritySettings';
+import BusinessInfoForm from '../components/settings/BusinessInfoForm';
+import { useMerchantAuth } from '../stores/merchantAuthStore';
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const Settings = () => {
-  const { currentMerchant } = useMerchantAuth();
-  const isMobile = useMediaQuery(mediaQueries.isMobile);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
+  const [activeTab, setActiveTab] = useState('profile');
+  const { currentMerchant, loading } = useMerchantAuth();
+  const navigate = useNavigate();
+
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (!loading && !currentMerchant) {
+      navigate('/auth');
+    }
+  }, [currentMerchant, loading, navigate]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
 
   if (!currentMerchant) {
-    return <div>Loading...</div>;
+    return null; // Will redirect via useEffect
   }
 
   return (
     <Layout>
-      <div className="flex min-h-screen">
-        <DashboardSidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
-        <div className="flex-1 p-6">
-          <h1 className="text-3xl font-bold mb-6">Account Settings</h1>
-          
-          <Tabs defaultValue="profile" className="space-y-4">
-            <div className="border-b">
-              <TabsList className="bg-transparent -mb-px">
-                <TabsTrigger 
-                  value="profile" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-                >
-                  Profile
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="business" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-                >
-                  Business Information
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="security" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-                >
-                  Security
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="notifications" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-                >
-                  Notifications
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            
-            <TabsContent value="profile" className="space-y-4 mt-4">
-              <ProfileEditForm />
-            </TabsContent>
-            
-            <TabsContent value="business" className="space-y-4 mt-4">
-              <BusinessInfoForm />
-            </TabsContent>
-            
-            <TabsContent value="security" className="space-y-4 mt-4">
-              <SecuritySettings />
-            </TabsContent>
-            
-            <TabsContent value="notifications" className="space-y-4 mt-4">
-              <NotificationSettings />
-            </TabsContent>
-          </Tabs>
+      <div className="container py-10">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">Manage your account and preferences</p>
         </div>
+
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid grid-cols-4 gap-4 sm:w-[600px] w-full">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="business">Business Info</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Information</CardTitle>
+                <CardDescription>Update your personal information</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProfileEditForm merchant={currentMerchant} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security Settings</CardTitle>
+                <CardDescription>Manage your account security</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SecuritySettings merchant={currentMerchant} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="business">
+            <Card>
+              <CardHeader>
+                <CardTitle>Business Information</CardTitle>
+                <CardDescription>Update your business details</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BusinessInfoForm merchant={currentMerchant} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notification Preferences</CardTitle>
+                <CardDescription>Manage how you receive notifications</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <NotificationSettings merchant={currentMerchant} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );

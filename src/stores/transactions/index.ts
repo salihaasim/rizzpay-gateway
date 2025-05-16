@@ -1,52 +1,46 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { TransactionStore } from './types';
+import { TransactionState } from './types';
 import { createTransactionSlice } from './transactionSlice';
 import { createUserRoleSlice } from './userRoleSlice';
-import { createWalletSlice } from './walletStore';
 
-// Re-export types and utils for easy access
-export * from './types';
-export * from './utils';
+// Storage implementation that handles JSON parsing/stringify
+const customStorage = {
+  getItem: (name: string): string | null => {
+    try {
+      return localStorage.getItem(name);
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
+      return null;
+    }
+  },
+  setItem: (name: string, value: string) => {
+    try {
+      localStorage.setItem(name, value);
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
+    }
+  },
+  removeItem: (name: string) => {
+    try {
+      localStorage.removeItem(name);
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
+    }
+  }
+};
 
-// Create the store with appropriate initialization
-export const useTransactionStore = create<TransactionStore>()(
+// Create the store with proper persist configuration
+export const useTransactionStore = create<TransactionState>()(
   persist(
     (set, get) => ({
       ...createTransactionSlice(set, get),
       ...createUserRoleSlice(set, get),
-      ...createWalletSlice(set, get)
     }),
     {
-      name: 'transactions-storage',
-      // Use storage property instead of getStorage
-      storage: {
-        getItem: (name) => {
-          try {
-            const value = localStorage.getItem(name);
-            return value ? JSON.parse(value) : null;
-          } catch (e) {
-            // In case localStorage is not available (e.g. in a non-browser environment like SSR)
-            console.warn('LocalStorage not available:', e);
-            return null;
-          }
-        },
-        setItem: (name, value) => {
-          try {
-            localStorage.setItem(name, JSON.stringify(value));
-          } catch (e) {
-            console.warn('LocalStorage not available:', e);
-          }
-        },
-        removeItem: (name) => {
-          try {
-            localStorage.removeItem(name);
-          } catch (e) {
-            console.warn('LocalStorage not available:', e);
-          }
-        },
-      }
+      name: 'rizzpay-transaction-store',
+      storage: customStorage,
     }
   )
 );

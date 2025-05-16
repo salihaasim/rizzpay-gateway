@@ -1,11 +1,14 @@
 
-import React, { useEffect, memo, Suspense, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Index from './pages/Index';
+import React, { useEffect, memo, lazy, Suspense, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useMerchantAuth } from './stores/merchantAuthStore';
 import Layout from './components/Layout';
 import PaymentPageLoading from './components/payment/PaymentPageLoading';
+import { ThemeProvider } from './context/ThemeContext';
+
+// Import non-lazy loaded components
+import Index from './pages/Index';
 import WalletPage from './pages/WalletPage';
 import TermsAndConditions from './pages/TermsAndConditions';
 import UpiPaymentPage from './pages/UpiPaymentPage';
@@ -29,22 +32,21 @@ import RegisterMerchant from './pages/RegisterMerchant';
 import BankingPage from './pages/BankingPage';
 import DeveloperPage from './pages/DeveloperPage';
 import MerchantOnboarding from './pages/MerchantOnboarding';
-import { ThemeProvider } from './context/ThemeContext';
 import RefundPolicy from './pages/RefundPolicy';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 
 // Lazy load components that aren't needed immediately
-const Transactions = React.lazy(() => import('./pages/Transactions'));
-const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
-const WebhookSetup = React.lazy(() => import('./pages/WebhookSetup'));
-const DeveloperIntegration = React.lazy(() => import('./pages/DeveloperIntegration'));
-const Security = React.lazy(() => import('./pages/Security'));
-const Settings = React.lazy(() => import('./pages/Settings'));
-const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
-const NotFound = React.lazy(() => import('./pages/NotFound'));
-const Auth = React.lazy(() => import('./pages/Auth'));
+const Transactions = lazy(() => import('./pages/Transactions'));
+const WebhookPage = lazy(() => import('./pages/WebhookPage'));
+const WebhookSetup = lazy(() => import('./pages/WebhookSetup'));
+const DeveloperIntegration = lazy(() => import('./pages/DeveloperIntegration'));
+const Security = lazy(() => import('./pages/Security'));
+const Settings = lazy(() => import('./pages/Settings'));
+const WebhookPayment = lazy(() => import('./pages/WebhookPayment'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Auth = lazy(() => import('./pages/Auth'));
 
-const PageLoading = () => <PaymentPageLoading />;
+const PageLoading = memo(() => <PaymentPageLoading />);
 
 const App = () => {
   const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
@@ -54,9 +56,15 @@ const App = () => {
     const hostname = window.location.hostname;
     console.log("Current hostname:", hostname);
     
+    // Performance optimization - set title just once
     document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
     
-    setAppReady(true);
+    // Optimize app startup
+    const timer = setTimeout(() => {
+      setAppReady(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   if (!appReady || loading) {
@@ -72,6 +80,7 @@ const App = () => {
         <Toaster position="top-right" richColors />
         <Suspense fallback={<PageLoading />}>
           <Routes>
+            {/* Home */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/register-merchant" element={<RegisterMerchant />} />
@@ -97,6 +106,8 @@ const App = () => {
             <Route path="/developer/integration" element={<DeveloperIntegration />} />
             <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
             <Route path="/whitelist" element={<MerchantWhitelist />} />
+            
+            {/* Policy pages */}
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsAndConditions />} />
@@ -122,4 +133,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default React.memo(App);

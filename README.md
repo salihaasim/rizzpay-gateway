@@ -1,71 +1,83 @@
 
 # RizzPay Payment Gateway
 
-## Overview
-RizzPay is a comprehensive payment gateway solution designed specifically for the Indian market. It facilitates secure and efficient payment transactions through various methods including UPI, Cards, and NEFT.
+RizzPay is a comprehensive payment gateway solution for businesses in India, offering UPI, card payments, net banking, and more payment methods.
 
-## Features
-- Dashboard for transaction monitoring and management
-- UPI Payment processing with QR code generation
-- Card Payment integration with Razorpay
-- NEFT payment support
-- Customizable payment links
-- Embeddable UPI payment plugin
-- Webhook integration for automated notifications
-- Multi-language support for payment plugins (HTML, React, JavaScript, PHP)
-- Banking configuration for UPI and Bank accounts
-- Wallet functionality for fund management
-- IP and domain whitelisting for enhanced security
-- Merchant registration and onboarding
+## API Structure
 
-## Tech Stack
-- React with TypeScript for the frontend
-- Tailwind CSS for styling
-- ShadCN UI components for consistent design
-- Supabase for backend and authentication
-- Zustand for state management
-- React Router for navigation
+The project's API is organized into the following modules:
 
-## Getting Started
+```
+src/api/
+├── index.ts                # Main exports
+├── payment/                # Payment processing APIs
+│   ├── index.ts            # Payment API exports
+│   ├── phonepe.ts          # PhonePe integration
+│   ├── razorpay.ts         # Razorpay integration
+│   └── upi.ts              # UPI payment processing
+├── merchant/               # Merchant management
+│   ├── index.ts            # Merchant API exports
+│   ├── profile.ts          # Profile management
+│   ├── kyc.ts              # KYC verification
+│   └── whitelist.ts        # IP and domain whitelisting
+├── transactions/           # Transaction processing
+│   ├── index.ts            # Transaction API exports
+│   ├── fetch.ts            # Transaction retrieval
+│   ├── process.ts          # Transaction processing
+│   └── report.ts           # Reporting and analytics
+├── webhook/                # Webhook integration
+│   ├── index.ts            # Webhook API exports
+│   ├── create.ts           # Webhook creation
+│   └── verify.ts           # Webhook verification
+└── auth/                   # Authentication
+    ├── index.ts            # Auth API exports
+    ├── login.ts            # Login functionality
+    └── register.ts         # Registration functionality
+```
 
-### Prerequisites
-- Node.js 16+
-- npm or yarn
+## PhonePe Integration
 
-### Installation
-1. Clone the repository
-2. Install dependencies: `npm install` or `yarn`
-3. Start the development server: `npm run dev` or `yarn dev`
+We're integrating with PhonePe payment gateway. The implementation is in `src/api/payment/phonepe.ts`. For production use, you'll need to:
 
-## Architecture
-The application follows a component-based architecture with:
-- Pages for main views
-- Reusable UI components
-- Utility functions for common operations
-- API integrations with payment providers
+1. Register at [PhonePe for Business](https://business.phonepe.com/developer-settings/api-keys)
+2. Generate API keys and salt keys
+3. Replace the mock implementation with actual API calls
 
-## Recent Updates
-- Added Banking page for UPI and bank account configuration
-- Enhanced UPI QR plugin with multi-language support (HTML, React, JavaScript, PHP)
-- Fixed Razorpay integration issues
-- Improved payment processing workflow
-- Added navigation sidebar to all pages
-- Added merchant registration and onboarding process
+## Performance Optimizations
 
-## Payment Methods
-- UPI (Unified Payment Interface)
-- Credit/Debit Cards
-- NEFT (National Electronic Funds Transfer)
+The app includes several performance optimizations:
 
-## Security Features
-- IP whitelisting
-- Domain whitelisting for webhooks
-- Secure API key management
-- Transaction verification
+- Route-based code splitting with React.lazy
+- Memoization of heavy components
+- Optimized data fetching with caching
+- Proper state management to avoid unnecessary re-renders
+- Component-level code organization
+
+## File Structure
+
+RizzPay follows a modular file structure:
+
+- `/src/api`: API integrations and services
+- `/src/components`: Reusable UI components
+- `/src/hooks`: Custom React hooks
+- `/src/pages`: Top-level page components
+- `/src/stores`: State management
+- `/src/utils`: Helper functions and utilities
+- `/src/context`: React context providers
+
+## Available Scripts
+
+- `npm run dev`: Run development server
+- `npm run build`: Build production bundle
+- `npm run preview`: Preview production build
+- `npm run test`: Run tests
+
+## Integrated Payment Gateways
+
+- Razorpay
+- PhonePe (in progress)
+- UPI Direct
 
 ## License
-Proprietary - All rights reserved
 
----
-
-© 2025 RizzPay Payment Technologies
+© 2025 RizzPay. All rights reserved.
