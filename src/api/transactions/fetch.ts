@@ -1,7 +1,7 @@
 
 // Transaction API functions for fetching data
 import { supabase } from '@/utils/supabaseClient';
-import { Transaction } from '@/stores/transactionStore';
+import { Transaction } from '@/stores/transactions/types';
 import { toast } from 'sonner';
 
 export const fetchTransactions = async (
@@ -54,7 +54,7 @@ export const fetchTransactions = async (
     // Map to Transaction objects
     return data.map(item => ({
       id: item.id,
-      amount: parseFloat(item.amount),
+      amount: `₹${parseFloat(item.amount).toFixed(2)}`,
       date: item.date,
       customer: item.customer_name || 'Unknown',
       customerEmail: item.customer_email,
@@ -88,7 +88,7 @@ export const getTransactionById = async (
     
     return {
       id: data.id,
-      amount: parseFloat(data.amount),
+      amount: `₹${parseFloat(data.amount).toFixed(2)}`,
       date: data.date,
       customer: data.customer_name || 'Unknown',
       customerEmail: data.customer_email,

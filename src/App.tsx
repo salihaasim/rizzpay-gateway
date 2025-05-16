@@ -1,138 +1,115 @@
-
-import React, { useEffect, memo, lazy, Suspense, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'sonner';
-import { useMerchantAuth } from './stores/merchantAuthStore';
-import Layout from './components/Layout';
-import PaymentPageLoading from './components/payment/PaymentPageLoading';
-import { ThemeProvider } from './context/ThemeContext';
-
-// Import non-lazy loaded components
-import Index from './pages/Index';
-import WalletPage from './pages/WalletPage';
-import TermsAndConditions from './pages/TermsAndConditions';
-import UpiPaymentPage from './pages/UpiPaymentPage';
-import AdminMonitoring from './pages/AdminMonitoring';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminSettings from './pages/AdminSettings';
-import AdminTransactionLog from './pages/AdminTransactionLog';
-import MerchantWhitelist from './pages/MerchantWhitelist';
-import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
-import HowItWorksTechnical from './pages/HowItWorksTechnical';
+import React, { useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
+import { useTransactionStore } from './stores/transactionStore';
+import { loginUser } from './api/auth/login';
+import { registerUser } from './api/auth/register';
+import { submitKycDocuments, getKycStatus } from './api/merchant/kyc';
+import { createWebhook, verifyWebhook } from './api/webhook';
+import { processTransaction } from './api/transactions/process';
+import { addToWhitelist, getWhitelistEntries } from './api/merchant/whitelist';
+import { fetchTransactions, getTransactionById } from './api/transactions/fetch';
+import { createRazorpayOrder, processRazorpayPayment, verifyRazorpayPayment } from './utils/razorpay';
+import { processPhonePePayment } from './api/payment/phonepe';
+import { processUpiPayment } from './api/payment/upi';
 import Dashboard from './pages/Dashboard';
-import Features from './pages/Features';
-import Features2 from './pages/Features2';
-import { default as AasimoAIComponent } from './components/aasimo/AasimoAI';
-import KycPage from './pages/KycPage';
-import UpiPluginSettings from './pages/UpiPluginSettings';
-import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
-import ReportsPage from './pages/ReportsPage';
-import TransfersPage from './pages/TransfersPage';
-import RegisterMerchant from './pages/RegisterMerchant';
+import Transactions from './pages/Transactions';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
 import BankingPage from './pages/BankingPage';
-import DeveloperPage from './pages/DeveloperPage';
-import MerchantOnboarding from './pages/MerchantOnboarding';
-import RefundPolicy from './pages/RefundPolicy';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import IndiaPage from './pages/IndiaPage';
+import Webhooks from './pages/Webhooks';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminTransactions from './pages/admin/AdminTransactions';
+import AdminMerchants from './pages/admin/AdminMerchants';
+import AdminKYC from './pages/admin/AdminKYC';
+import AdminWhitelist from './pages/admin/AdminWhitelist';
+import AdminLayout from './components/admin/AdminLayout';
+import UpiPaymentPage from './pages/UpiPaymentPage';
+import WalletPage from './pages/WalletPage';
+import AdminUpiManagement from "./pages/AdminUpiManagement";
 
-// Lazy load components that aren't needed immediately
-const Transactions = lazy(() => import('./pages/Transactions'));
-const WebhookPage = lazy(() => import('./pages/WebhookPage'));
-const WebhookSetup = lazy(() => import('./pages/WebhookSetup'));
-const DeveloperIntegration = lazy(() => import('./pages/DeveloperIntegration'));
-const Security = lazy(() => import('./pages/Security'));
-const Settings = lazy(() => import('./pages/Settings'));
-const WebhookPayment = lazy(() => import('./pages/WebhookPayment'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Auth = lazy(() => import('./pages/Auth'));
-
-const PageLoading = memo(() => <PaymentPageLoading />);
-
-const App = () => {
-  const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
-  const [appReady, setAppReady] = useState(false);
+const App: React.FC = () => {
+  const { setUserRole, isAuthenticated } = useTransactionStore();
   
   useEffect(() => {
-    const hostname = window.location.hostname;
-    console.log("Current hostname:", hostname);
+    // Simulate checking authentication status and setting user role
+    const checkAuthStatus = async () => {
+      // Replace this with your actual authentication logic
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      
+      if (isLoggedIn) {
+        // Simulate fetching user role from local storage or API
+        const userRole = localStorage.getItem('userRole') || 'merchant';
+        const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
+        setUserRole(userRole as 'admin' | 'merchant', userEmail);
+      }
+    };
     
-    // Performance optimization - set title just once
-    document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
-    
-    // Optimize app startup
-    const timer = setTimeout(() => {
-      setAppReady(true);
-    }, 0);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!appReady || loading) {
-    return <PageLoading />;
-  }
-
-  // Use currentMerchant?.role instead of relying on transactionStore
-  const isAdmin = currentMerchant?.role === 'admin';
-
+    checkAuthStatus();
+  }, [setUserRole]);
+  
   return (
-    <ThemeProvider>
-      <Router>
-        <Toaster position="top-right" richColors />
-        <Suspense fallback={<PageLoading />}>
-          <Routes>
-            {/* Home */}
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/register-merchant" element={<RegisterMerchant />} />
-            
-            {/* Dashboard routes */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/transfers" element={<TransfersPage />} />
-            <Route path="/wallet" element={<WalletPage />} />
-            <Route path="/payment" element={<UpiPaymentPage />} />
-            <Route path="/payment/:status" element={<UpiPaymentPage />} />
-            <Route path="/link-payment" element={<UpiLinkPaymentPage />} />
-            <Route path="/link-payment/:paymentId" element={<UpiLinkPaymentPage />} />
-            <Route path="/plugin" element={<UpiPluginSettings />} />
-            <Route path="/webhooks" element={<WebhookPage />} />
-            <Route path="/webhook-payment" element={<WebhookPayment />} />
-            <Route path="/webhook-setup" element={<WebhookSetup />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/kyc" element={<KycPage />} />
-            <Route path="/banking" element={<BankingPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/developer" element={<DeveloperPage />} />
-            <Route path="/developer/integration" element={<DeveloperIntegration />} />
-            <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
-            <Route path="/whitelist" element={<MerchantWhitelist />} />
-            
-            {/* Policy pages */}
-            <Route path="/refund-policy" element={<RefundPolicy />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsAndConditions />} />
-            <Route path="/india" element={<IndiaPage />} />
-            
-            {/* Admin routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/merchants" element={<AdminDashboard />} />
-            <Route path="/admin/escrow" element={<AdminDashboard />} />
-            <Route path="/admin/pricing" element={<AdminDashboard />} />
-            <Route path="/admin/transactions" element={<AdminDashboard />} />
-            <Route path="/admin/analytics" element={<AdminDashboard />} />
-            <Route path="/admin/settings" element={<AdminDashboard />} />
-            <Route path="/admin/whitelist" element={<AdminDashboard />} />
-            <Route path="/admin/monitoring" element={<AdminMonitoring />} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </Router>
-    </ThemeProvider>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/upi-payment" element={<UpiPaymentPage />} />
+        
+        {/* Protected routes for authenticated users */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated() ? <Dashboard /> : <Login />
+          }
+        />
+        <Route
+          path="/transactions"
+          element={
+            isAuthenticated() ? <Transactions /> : <Login />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated() ? <Profile /> : <Login />
+          }
+        />
+        <Route
+          path="/banking"
+          element={
+            isAuthenticated() ? <BankingPage /> : <Login />
+          }
+        />
+        <Route
+          path="/webhooks"
+          element={
+            isAuthenticated() ? <Webhooks /> : <Login />
+          }
+        />
+        <Route
+          path="/wallet"
+          element={
+            isAuthenticated() ? <WalletPage /> : <Login />
+          }
+        />
+        
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="transactions" element={<AdminTransactions />} />
+          <Route path="merchants" element={<AdminMerchants />} />
+          <Route path="kyc" element={<AdminKYC />} />
+          <Route path="whitelist" element={<AdminWhitelist />} />
+          <Route path="upi-management" element={<AdminUpiManagement />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 };
 
-export default React.memo(App);
+export default App;

@@ -2,9 +2,8 @@
 // UPI Payment API functions
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { Transaction } from '@/stores/transactionStore';
-import { addTransaction } from '@/utils/transactionCreateUtils';
-import { simulatePaymentProcessing } from '@/utils/paymentProcessingUtils';
+import { Transaction } from '@/stores/transactions/types';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 export interface UpiPaymentData {
   amount: string;
@@ -30,9 +29,12 @@ export const processUpiPayment = async (paymentData: UpiPaymentData): Promise<Tr
     }
 
     // Create a transaction record
-    const transaction = addTransaction({
+    const transactionStore = useTransactionStore.getState();
+    
+    // Create transaction object
+    const transaction: Transaction = {
       id: paymentData.transactionId || `upi_${uuidv4().substring(0, 8)}`,
-      amount: amount,
+      amount: `₹${amount.toFixed(2)}`,
       customer: paymentData.name || 'Customer',
       customerEmail: paymentData.email,
       status: 'processing',
@@ -47,16 +49,28 @@ export const processUpiPayment = async (paymentData: UpiPaymentData): Promise<Tr
           message: 'UPI payment initiated'
         }
       ]
-    });
-
-    // Simulate payment processing
-    const processedTransaction = await simulatePaymentProcessing(
-      transaction.id,
-      'upi',
-      true // Force success for UPI payments
-    );
+    };
     
-    return processedTransaction;
+    // Add transaction to the store
+    transactionStore.addTransaction(transaction);
+    
+    // Simulate payment processing
+    // Update to real API call when available
+    setTimeout(() => {
+      transaction.status = 'successful';
+      transaction.processingState = 'completed';
+      transaction.processingTimeline?.push({
+        stage: 'completed',
+        timestamp: new Date().toISOString(),
+        message: 'UPI payment successful'
+      });
+      
+      transactionStore.updateTransaction(transaction.id, transaction);
+      
+      toast.success('UPI payment successful');
+    }, 2000);
+    
+    return transaction;
   } catch (error) {
     console.error('UPI payment processing error:', error);
     toast.error('Failed to process UPI payment');
