@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Index from './pages/Index';
 import { Toaster } from 'sonner';
 import { useMerchantAuth } from './stores/merchantAuthStore';
-import { useTransactionStore } from './stores/transactionStore';
+import { useTransactionStore } from './stores/transactions';
 import Layout from './components/Layout';
 import PaymentPageLoading from './components/payment/PaymentPageLoading';
 import WalletPage from './pages/WalletPage';
@@ -31,6 +31,7 @@ import BankingPage from './pages/BankingPage';
 import DeveloperPage from './pages/DeveloperPage';
 import MerchantOnboarding from './pages/MerchantOnboarding';
 import { ThemeProvider } from './context/ThemeContext';
+import RefundPolicy from './pages/RefundPolicy';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -96,6 +97,7 @@ const App = () => {
             <Route path="/developer/integration" element={<DeveloperIntegration />} />
             <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
             <Route path="/whitelist" element={<MerchantWhitelist />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />

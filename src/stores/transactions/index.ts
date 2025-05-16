@@ -24,7 +24,8 @@ export const useTransactionStore = create<TransactionStore>()(
       storage: {
         getItem: (name) => {
           try {
-            return localStorage.getItem(name);
+            const value = localStorage.getItem(name);
+            return value ? JSON.parse(value) : null;
           } catch (e) {
             // In case localStorage is not available (e.g. in a non-browser environment like SSR)
             console.warn('LocalStorage not available:', e);
@@ -33,7 +34,7 @@ export const useTransactionStore = create<TransactionStore>()(
         },
         setItem: (name, value) => {
           try {
-            localStorage.setItem(name, value);
+            localStorage.setItem(name, JSON.stringify(value));
           } catch (e) {
             console.warn('LocalStorage not available:', e);
           }
