@@ -1,7 +1,7 @@
 
 // Transaction API functions for fetching data
 import { supabase } from '@/utils/supabaseClient';
-import { Transaction } from '@/stores/transactions/types';
+import { Transaction, TransactionStatus, PaymentMethod, PaymentDetails, PaymentProcessingState } from '@/stores/transactions';
 import { toast } from 'sonner';
 
 export const fetchTransactions = async (
@@ -51,19 +51,21 @@ export const fetchTransactions = async (
     
     if (error) throw error;
     
-    // Map to Transaction objects
+    // Map to Transaction objects with proper type casting
     return data.map(item => ({
       id: item.id,
-      amount: `₹${parseFloat(item.amount).toFixed(2)}`,
+      amount: `₹${parseFloat(item.amount.toString()).toFixed(2)}`,
       date: item.date,
       customer: item.customer_name || 'Unknown',
       customerEmail: item.customer_email,
-      status: item.status,
-      paymentMethod: item.payment_method,
+      status: item.status as TransactionStatus,
+      paymentMethod: item.payment_method as PaymentMethod,
       description: item.description,
-      processingState: item.processing_state,
-      processingTimeline: item.processing_timeline,
-      paymentDetails: item.payment_details
+      processingState: item.processing_state as PaymentProcessingState,
+      processingTimeline: Array.isArray(item.processing_timeline) 
+        ? item.processing_timeline 
+        : [],
+      paymentDetails: item.payment_details as PaymentDetails
     }));
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -86,18 +88,21 @@ export const getTransactionById = async (
     
     if (!data) return null;
     
+    // Map to Transaction object with proper type casting
     return {
       id: data.id,
-      amount: `₹${parseFloat(data.amount).toFixed(2)}`,
+      amount: `₹${parseFloat(data.amount.toString()).toFixed(2)}`,
       date: data.date,
       customer: data.customer_name || 'Unknown',
       customerEmail: data.customer_email,
-      status: data.status,
-      paymentMethod: data.payment_method,
+      status: data.status as TransactionStatus,
+      paymentMethod: data.payment_method as PaymentMethod,
       description: data.description,
-      processingState: data.processing_state,
-      processingTimeline: data.processing_timeline,
-      paymentDetails: data.payment_details
+      processingState: data.processing_state as PaymentProcessingState,
+      processingTimeline: Array.isArray(data.processing_timeline) 
+        ? data.processing_timeline 
+        : [],
+      paymentDetails: data.payment_details as PaymentDetails
     };
   } catch (error) {
     console.error('Error fetching transaction by ID:', error);

@@ -1,6 +1,6 @@
 
-import { Transaction, TransactionStatus, PaymentDetails } from '@/stores/transactions/types';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { Transaction, TransactionStatus, PaymentDetails } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactions';
 import { generateTransactionId, formatDate } from './formatUtils';
 import { syncTransactionToSupabase } from './supabaseClient';
 
@@ -12,10 +12,10 @@ export const addTransaction = (transaction: Partial<Transaction>): Transaction =
     date: transaction.date || formatDate(),
     amount: transaction.amount || '₹0',
     paymentMethod: transaction.paymentMethod || 'unknown',
-    status: transaction.status || 'pending',
+    status: transaction.status || ('pending' as TransactionStatus),
     customer: transaction.customer || 'Unknown Customer',
     createdBy: transaction.createdBy || store.userEmail || undefined,
-    processingState: transaction.processingState || 'initiated',
+    processingState: transaction.processingState || ('initiated' as any),
     processingTimeline: transaction.processingTimeline || [{
       stage: 'initiated',
       timestamp: new Date().toISOString(),

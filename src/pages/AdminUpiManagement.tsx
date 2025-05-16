@@ -1,578 +1,520 @@
 
-import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  AlertCircle,
-  Smartphone,
-  QrCode,
-  BadgeCheck,
-  RefreshCw,
-  ToggleLeft,
-  ToggleRight,
-  Trash,
-  Settings,
-  Plus,
-  Edit,
-  Copy,
-  Check,
-  Search
-} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Separator } from "@/components/ui/separator";
 
-interface UpiProvider {
-  id: string;
-  name: string;
-  isActive: boolean;
-  apiKey: string;
-  merchantId: string;
-  saltKey?: string;
-  lastActive?: string;
-  transactionCount?: number;
-  successRate?: number;
-  logo: string;
-}
+const AdminUpiManagement: React.FC = () => {
+  const [newAccount, setNewAccount] = useState({
+    provider: "",
+    merchantId: "",
+    upiId: "",
+    maxDaily: "10000",
+    maxTransaction: "5000",
+    isActive: true,
+    description: ""
+  });
 
-interface UpiAccount {
-  id: string;
-  providerName: string;
-  upiId: string;
-  isActive: boolean;
-  displayName: string;
-  dailyLimit: number;
-  transactionLimit: number;
-  rotationPriority: number;
-  lastTransaction?: string;
-}
-
-const AdminUpiManagement = () => {
-  const [activeTab, setActiveTab] = useState('providers');
-  const [providers, setProviders] = useState<UpiProvider[]>([
+  // Sample UPI account data
+  const [upiAccounts, setUpiAccounts] = useState([
     {
-      id: 'phonepe',
-      name: 'PhonePe',
-      isActive: true,
-      apiKey: 'PHONEPE_API_KEY_XXXX',
-      merchantId: 'PHONEPE_MERCHANT_ID',
-      saltKey: 'SALT_KEY_XXX',
-      lastActive: '2023-05-15T10:30:00',
-      transactionCount: 2453,
-      successRate: 99.2,
-      logo: 'https://play-lh.googleusercontent.com/6iyA2zVz5PyyMjK5SIxdUhrb7oh9cYVXJ93q6DZkmx07Er1o90PXYeo6mzL4VC2Gj9s=w240-h480-rw'
+      id: 1,
+      provider: "PhonePe",
+      merchantId: "PHPE0000001",
+      upiId: "merchant@phonepe",
+      maxDaily: 50000,
+      maxTransaction: 10000,
+      status: "active",
+      balance: "₹125,450",
+      todayVolume: "₹23,450",
+      monthlyVolume: "₹450,780",
+      successRate: "98.5%",
+      lastActive: "2023-09-15T10:34:23Z"
     },
     {
-      id: 'gpay',
-      name: 'Google Pay',
-      isActive: true,
-      apiKey: 'GPAY_API_KEY_XXXX',
-      merchantId: 'GPAY_MERCHANT_ID',
-      lastActive: '2023-05-16T09:45:00',
-      transactionCount: 1876,
-      successRate: 98.7,
-      logo: 'https://play-lh.googleusercontent.com/HArtbyi53u0jnqhnnxkQnMx9dHOERNcQ2hXLgtNGtOAaUlbzXYE7XUrpYT30ov6BJ1s=w240-h480-rw'
+      id: 2,
+      provider: "Google Pay",
+      merchantId: "GPAY0000002",
+      upiId: "merchant@okaxis",
+      maxDaily: 100000,
+      maxTransaction: 25000,
+      status: "active",
+      balance: "₹240,300",
+      todayVolume: "₹15,670",
+      monthlyVolume: "₹320,450",
+      successRate: "99.2%",
+      lastActive: "2023-09-15T09:12:45Z"
     },
     {
-      id: 'paytm',
-      name: 'Paytm',
-      isActive: false,
-      apiKey: 'PAYTM_API_KEY_XXXX',
-      merchantId: 'PAYTM_MERCHANT_ID',
-      lastActive: '2023-05-10T14:22:00',
-      transactionCount: 1245,
-      successRate: 97.5,
-      logo: 'https://play-lh.googleusercontent.com/uEkLdxQQYqZWgQTwG6XhQw7koOKUb7AV1GoZ7AyMe7iv5vPDV_j6BdBc9CJUb1qTPQ=w240-h480-rw'
+      id: 3,
+      provider: "Paytm",
+      merchantId: "PYTM0000003",
+      upiId: "merchant@paytm",
+      maxDaily: 75000,
+      maxTransaction: 15000,
+      status: "inactive",
+      balance: "₹87,650",
+      todayVolume: "₹0",
+      monthlyVolume: "₹245,780",
+      successRate: "97.8%",
+      lastActive: "2023-09-12T14:22:11Z"
     }
   ]);
-  
-  const [accounts, setAccounts] = useState<UpiAccount[]>([
+
+  // Sample QR code data
+  const [qrCodes, setQrCodes] = useState([
     {
-      id: '1',
-      providerName: 'PhonePe',
-      upiId: 'merchant1@ybl',
-      isActive: true,
-      displayName: 'RizzPay Primary',
-      dailyLimit: 100000,
-      transactionLimit: 5000,
-      rotationPriority: 1,
-      lastTransaction: '2023-05-16T09:23:45'
+      id: 1,
+      name: "Store Front QR",
+      upiId: "merchant@phonepe",
+      type: "static",
+      amount: null,
+      downloads: 124,
+      scans: 542,
+      created: "2023-08-20T14:22:11Z"
     },
     {
-      id: '2',
-      providerName: 'Google Pay',
-      upiId: 'rizzpay@okaxis',
-      isActive: true,
-      displayName: 'RizzPay Business',
-      dailyLimit: 150000,
-      transactionLimit: 10000,
-      rotationPriority: 2,
-      lastTransaction: '2023-05-16T08:45:12'
+      id: 2,
+      name: "Coffee Payment QR",
+      upiId: "merchant@okaxis",
+      type: "static",
+      amount: 200,
+      downloads: 56,
+      scans: 189,
+      created: "2023-08-25T10:15:32Z"
     },
     {
-      id: '3',
-      providerName: 'Paytm',
-      upiId: 'rizzpay1@paytm',
-      isActive: false,
-      displayName: 'RizzPay Backup',
-      dailyLimit: 50000,
-      transactionLimit: 5000,
-      rotationPriority: 3,
-      lastTransaction: '2023-05-15T16:30:21'
+      id: 3,
+      name: "Donation QR",
+      upiId: "merchant@paytm",
+      type: "dynamic",
+      amount: null,
+      downloads: 78,
+      scans: 312,
+      created: "2023-09-01T09:45:18Z"
     }
   ]);
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isEditingProvider, setIsEditingProvider] = useState<string | null>(null);
-  const [isEditingAccount, setIsEditingAccount] = useState<string | null>(null);
-  const [copiedApiKey, setCopiedApiKey] = useState<string | null>(null);
-  
-  // Filter providers and accounts based on search query
-  const filteredProviders = providers.filter(provider =>
-    provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    provider.merchantId.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredAccounts = accounts.filter(account =>
-    account.upiId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    account.providerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    account.displayName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const toggleProviderStatus = (providerId: string) => {
-    setProviders(prev => 
-      prev.map(provider => 
-        provider.id === providerId
-          ? { ...provider, isActive: !provider.isActive }
-          : provider
-      )
-    );
+
+  // Handler for adding a new UPI account
+  const handleAddUpiAccount = () => {
+    if (!newAccount.provider || !newAccount.upiId || !newAccount.merchantId) {
+      toast.error("Please fill all required fields");
+      return;
+    }
     
-    const provider = providers.find(p => p.id === providerId);
-    toast.success(`${provider?.name} is now ${provider?.isActive ? 'inactive' : 'active'}`);
+    const newId = Math.max(...upiAccounts.map(a => a.id)) + 1;
+    
+    setUpiAccounts([
+      ...upiAccounts,
+      {
+        id: newId,
+        provider: newAccount.provider,
+        merchantId: newAccount.merchantId,
+        upiId: newAccount.upiId,
+        maxDaily: parseInt(newAccount.maxDaily),
+        maxTransaction: parseInt(newAccount.maxTransaction),
+        status: newAccount.isActive ? "active" : "inactive",
+        balance: "₹0",
+        todayVolume: "₹0",
+        monthlyVolume: "₹0",
+        successRate: "0%",
+        lastActive: new Date().toISOString()
+      }
+    ]);
+    
+    toast.success(`Added ${newAccount.provider} UPI account`);
+    
+    // Reset form
+    setNewAccount({
+      provider: "",
+      merchantId: "",
+      upiId: "",
+      maxDaily: "10000",
+      maxTransaction: "5000",
+      isActive: true,
+      description: ""
+    });
   };
-  
-  const toggleAccountStatus = (accountId: string) => {
-    setAccounts(prev => 
-      prev.map(account => 
-        account.id === accountId
-          ? { ...account, isActive: !account.isActive }
-          : account
-      )
-    );
-    
-    const account = accounts.find(a => a.id === accountId);
-    toast.success(`UPI ID ${account?.upiId} is now ${account?.isActive ? 'inactive' : 'active'}`);
+
+  // Handler for toggling UPI account status
+  const toggleAccountStatus = (id: number) => {
+    setUpiAccounts(upiAccounts.map(account => {
+      if (account.id === id) {
+        const newStatus = account.status === "active" ? "inactive" : "active";
+        toast.success(`UPI account ${account.upiId} set to ${newStatus}`);
+        return {
+          ...account,
+          status: newStatus
+        };
+      }
+      return account;
+    }));
   };
-  
-  const copyApiKey = (key: string) => {
-    navigator.clipboard.writeText(key);
-    setCopiedApiKey(key);
-    
-    setTimeout(() => {
-      setCopiedApiKey(null);
-    }, 2000);
-    
-    toast.success('API Key copied to clipboard');
-  };
-  
-  const refreshApiKey = (providerId: string) => {
-    const newKey = `NEW_API_KEY_${Math.random().toString(36).substring(2, 10)}`;
-    
-    setProviders(prev => 
-      prev.map(provider => 
-        provider.id === providerId
-          ? { ...provider, apiKey: newKey }
-          : provider
-      )
-    );
-    
-    toast.success('API Key refreshed successfully');
-  };
-  
+
   return (
-    <AdminLayout>
-      <div className="container py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">UPI Integrations Management</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage UPI providers, accounts, and payment gateways
-            </p>
-          </div>
-          
-          <div className="flex gap-2">
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search integrations..."
-                className="pl-8 w-64"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <Button variant="outline" onClick={() => toast.info('Refreshing UPI status...')}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh Status
-            </Button>
-          </div>
-        </div>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">UPI Management</h1>
+      
+      <Tabs defaultValue="accounts">
+        <TabsList className="mb-6">
+          <TabsTrigger value="accounts">UPI Accounts</TabsTrigger>
+          <TabsTrigger value="qr-codes">QR Codes</TabsTrigger>
+          <TabsTrigger value="settings">UPI Settings</TabsTrigger>
+        </TabsList>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full md:w-auto grid-cols-3">
-            <TabsTrigger value="providers">
-              <Settings className="h-4 w-4 mr-1" />
-              UPI Providers
-            </TabsTrigger>
-            <TabsTrigger value="accounts">
-              <Smartphone className="h-4 w-4 mr-1" />
-              UPI Accounts
-            </TabsTrigger>
-            <TabsTrigger value="qr">
-              <QrCode className="h-4 w-4 mr-1" />
-              QR Management
-            </TabsTrigger>
-          </TabsList>
-          
-          <div className="mt-4">
-            <TabsContent value="providers" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>UPI Gateway Providers</span>
-                    <Button size="sm" onClick={() => toast.info('Add provider functionality coming soon')}>
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add Provider
-                    </Button>
-                  </CardTitle>
-                  <CardDescription>
-                    Manage UPI gateway providers and their integration settings
-                  </CardDescription>
-                </CardHeader>
+        <TabsContent value="accounts">
+          <div className="grid gap-6 md:grid-cols-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>UPI Accounts</CardTitle>
+                <CardDescription>
+                  Manage UPI accounts for payment processing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="py-3 text-left">Provider</th>
+                        <th className="py-3 text-left">UPI ID</th>
+                        <th className="py-3 text-left">Daily Limit</th>
+                        <th className="py-3 text-left">Per Txn Limit</th>
+                        <th className="py-3 text-left">Balance</th>
+                        <th className="py-3 text-left">Today's Volume</th>
+                        <th className="py-3 text-left">Success Rate</th>
+                        <th className="py-3 text-left">Status</th>
+                        <th className="py-3 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {upiAccounts.map((account) => (
+                        <tr key={account.id} className="border-b hover:bg-muted/50">
+                          <td className="py-3">{account.provider}</td>
+                          <td className="py-3">{account.upiId}</td>
+                          <td className="py-3">₹{account.maxDaily.toLocaleString()}</td>
+                          <td className="py-3">₹{account.maxTransaction.toLocaleString()}</td>
+                          <td className="py-3">{account.balance}</td>
+                          <td className="py-3">{account.todayVolume}</td>
+                          <td className="py-3">{account.successRate}</td>
+                          <td className="py-3">
+                            <div className="flex items-center space-x-2">
+                              <Switch 
+                                checked={account.status === "active"} 
+                                onCheckedChange={() => toggleAccountStatus(account.id)} 
+                              />
+                              <span className={account.status === "active" ? "text-green-600" : "text-gray-500"}>
+                                {account.status}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                 
-                <CardContent className="space-y-4">
-                  {filteredProviders.map((provider) => (
-                    <div key={provider.id} className="border rounded-md p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <img 
-                            src={provider.logo} 
-                            alt={provider.name} 
-                            className="h-10 w-10 rounded-full mr-3"
-                          />
-                          <div>
-                            <h3 className="font-medium flex items-center">
-                              {provider.name}
-                              {provider.isActive && (
-                                <BadgeCheck className="h-4 w-4 text-green-500 ml-1" />
-                              )}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {provider.transactionCount?.toLocaleString()} transactions · 
-                              {provider.successRate}% success rate
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Switch 
-                            checked={provider.isActive}
-                            onCheckedChange={() => toggleProviderStatus(provider.id)}
-                          />
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setIsEditingProvider(provider.id === isEditingProvider ? null : provider.id)}
-                          >
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      {isEditingProvider === provider.id && (
-                        <div className="mt-4 border-t pt-4 grid gap-4">
-                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label htmlFor={`apiKey-${provider.id}`}>API Key</Label>
-                              <div className="flex">
-                                <Input 
-                                  id={`apiKey-${provider.id}`}
-                                  value={provider.apiKey}
-                                  readOnly
-                                  className="rounded-r-none"
-                                />
-                                <Button 
-                                  variant="outline" 
-                                  className="rounded-l-none"
-                                  onClick={() => copyApiKey(provider.apiKey)}
-                                >
-                                  {copiedApiKey === provider.apiKey ? (
-                                    <Check className="h-4 w-4" />
-                                  ) : (
-                                    <Copy className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`merchantId-${provider.id}`}>Merchant ID</Label>
-                              <Input 
-                                id={`merchantId-${provider.id}`}
-                                value={provider.merchantId}
-                                readOnly
-                              />
-                            </div>
-                          </div>
-                          
-                          {provider.saltKey && (
-                            <div className="space-y-2">
-                              <Label htmlFor={`saltKey-${provider.id}`}>Salt Key</Label>
-                              <div className="flex">
-                                <Input 
-                                  id={`saltKey-${provider.id}`}
-                                  value={provider.saltKey}
-                                  readOnly
-                                  className="rounded-r-none"
-                                />
-                                <Button 
-                                  variant="outline" 
-                                  className="rounded-l-none"
-                                  onClick={() => copyApiKey(provider.saltKey!)}
-                                >
-                                  {copiedApiKey === provider.saltKey ? (
-                                    <Check className="h-4 w-4" />
-                                  ) : (
-                                    <Copy className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                          
-                          <div className="flex justify-end gap-2 mt-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => refreshApiKey(provider.id)}
-                            >
-                              <RefreshCw className="h-4 w-4 mr-1" />
-                              Refresh API Key
-                            </Button>
-                            
-                            <Button 
-                              variant="default" 
-                              size="sm"
-                              onClick={() => {
-                                setIsEditingProvider(null);
-                                toast.success(`${provider.name} settings updated`);
-                              }}
-                            >
-                              Save Changes
-                            </Button>
-                          </div>
-                        </div>
-                      )}
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium mb-4">Add New UPI Account</h3>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="provider">Provider</Label>
+                      <Select 
+                        value={newAccount.provider}
+                        onValueChange={(value) => setNewAccount({...newAccount, provider: value})}
+                      >
+                        <SelectTrigger id="provider">
+                          <SelectValue placeholder="Select provider" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PhonePe">PhonePe</SelectItem>
+                          <SelectItem value="Google Pay">Google Pay</SelectItem>
+                          <SelectItem value="Paytm">Paytm</SelectItem>
+                          <SelectItem value="BHIM">BHIM</SelectItem>
+                          <SelectItem value="Amazon Pay">Amazon Pay</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  ))}
-                  
-                  {filteredProviders.length === 0 && (
-                    <div className="text-center py-8">
-                      <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <h3 className="mt-2 font-medium">No providers found</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Try adjusting your search query
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="accounts" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>UPI Accounts</span>
-                    <Button size="sm" onClick={() => toast.info('Add account functionality coming soon')}>
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add Account
-                    </Button>
-                  </CardTitle>
-                  <CardDescription>
-                    Manage UPI accounts used for payments and collections
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  {filteredAccounts.map((account) => (
-                    <div key={account.id} className="border rounded-md p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-medium flex items-center">
-                            {account.displayName}
-                            {account.isActive && (
-                              <BadgeCheck className="h-4 w-4 text-green-500 ml-1" />
-                            )}
-                          </h3>
-                          <p className="text-sm">
-                            <span className="font-mono">{account.upiId}</span>
-                            <span className="text-muted-foreground ml-2">({account.providerName})</span>
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Switch 
-                            checked={account.isActive}
-                            onCheckedChange={() => toggleAccountStatus(account.id)}
-                          />
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setIsEditingAccount(account.id === isEditingAccount ? null : account.id)}
-                          >
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      {isEditingAccount === account.id && (
-                        <div className="mt-4 border-t pt-4 grid gap-4">
-                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label htmlFor={`displayName-${account.id}`}>Display Name</Label>
-                              <Input 
-                                id={`displayName-${account.id}`}
-                                value={account.displayName}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`providerName-${account.id}`}>Provider</Label>
-                              <Input 
-                                id={`providerName-${account.id}`}
-                                value={account.providerName}
-                                readOnly
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label htmlFor={`transactionLimit-${account.id}`}>Transaction Limit (₹)</Label>
-                              <Input 
-                                id={`transactionLimit-${account.id}`}
-                                type="number"
-                                value={account.transactionLimit}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`dailyLimit-${account.id}`}>Daily Limit (₹)</Label>
-                              <Input 
-                                id={`dailyLimit-${account.id}`}
-                                type="number"
-                                value={account.dailyLimit}
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor={`rotationPriority-${account.id}`}>Rotation Priority</Label>
-                            <Input 
-                              id={`rotationPriority-${account.id}`}
-                              type="number"
-                              value={account.rotationPriority}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                              Lower numbers have higher priority in the rotation
-                            </p>
-                          </div>
-                          
-                          <div className="flex justify-end gap-2 mt-2">
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => {
-                                toast.error(`This would delete the UPI account ${account.upiId}`);
-                              }}
-                            >
-                              <Trash className="h-4 w-4 mr-1" />
-                              Delete Account
-                            </Button>
-                            
-                            <Button 
-                              variant="default" 
-                              size="sm"
-                              onClick={() => {
-                                setIsEditingAccount(null);
-                                toast.success(`UPI Account ${account.upiId} updated`);
-                              }}
-                            >
-                              Save Changes
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  
-                  {filteredAccounts.length === 0 && (
-                    <div className="text-center py-8">
-                      <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <h3 className="mt-2 font-medium">No accounts found</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Try adjusting your search query
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="qr" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>QR Code Management</CardTitle>
-                  <CardDescription>
-                    Manage and configure static and dynamic QR codes for payments
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="text-center py-12">
-                    <QrCode className="mx-auto h-12 w-12 text-muted-foreground" />
-                    <h3 className="mt-3 font-medium">QR Management</h3>
-                    <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                      QR Code management functionality is coming soon. You'll be able to create, 
-                      manage and track static and dynamic QR codes for payments.
-                    </p>
                     
-                    <Button variant="outline" className="mt-4">
-                      Get notified when available
-                    </Button>
+                    <div>
+                      <Label htmlFor="merchant-id">Merchant ID</Label>
+                      <Input 
+                        id="merchant-id" 
+                        placeholder="Enter merchant ID"
+                        value={newAccount.merchantId}
+                        onChange={(e) => setNewAccount({...newAccount, merchantId: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="upi-id">UPI ID</Label>
+                      <Input 
+                        id="upi-id" 
+                        placeholder="merchant@provider"
+                        value={newAccount.upiId}
+                        onChange={(e) => setNewAccount({...newAccount, upiId: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="max-daily">Daily Limit (₹)</Label>
+                      <Input 
+                        id="max-daily" 
+                        type="number" 
+                        placeholder="10000"
+                        value={newAccount.maxDaily}
+                        onChange={(e) => setNewAccount({...newAccount, maxDaily: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="max-transaction">Per Transaction Limit (₹)</Label>
+                      <Input 
+                        id="max-transaction" 
+                        type="number" 
+                        placeholder="5000"
+                        value={newAccount.maxTransaction}
+                        onChange={(e) => setNewAccount({...newAccount, maxTransaction: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 pt-6">
+                      <Switch 
+                        id="is-active" 
+                        checked={newAccount.isActive} 
+                        onCheckedChange={(checked) => setNewAccount({...newAccount, isActive: checked})}
+                      />
+                      <Label htmlFor="is-active">Account Active</Label>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  
+                  <div className="mt-4">
+                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Textarea 
+                      id="description" 
+                      placeholder="Add notes about this UPI account"
+                      value={newAccount.description}
+                      onChange={(e) => setNewAccount({...newAccount, description: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="mt-6">
+                    <Button onClick={handleAddUpiAccount}>Add UPI Account</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </Tabs>
-      </div>
-    </AdminLayout>
+        </TabsContent>
+        
+        <TabsContent value="qr-codes">
+          <Card>
+            <CardHeader>
+              <CardTitle>QR Code Management</CardTitle>
+              <CardDescription>
+                Manage UPI QR codes for in-person payments
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-3 text-left">QR Name</th>
+                      <th className="py-3 text-left">UPI ID</th>
+                      <th className="py-3 text-left">Type</th>
+                      <th className="py-3 text-left">Amount</th>
+                      <th className="py-3 text-left">Downloads</th>
+                      <th className="py-3 text-left">Scans</th>
+                      <th className="py-3 text-left">Created</th>
+                      <th className="py-3 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {qrCodes.map((qr) => (
+                      <tr key={qr.id} className="border-b hover:bg-muted/50">
+                        <td className="py-3">{qr.name}</td>
+                        <td className="py-3">{qr.upiId}</td>
+                        <td className="py-3">{qr.type}</td>
+                        <td className="py-3">{qr.amount ? `₹${qr.amount}` : "Variable"}</td>
+                        <td className="py-3">{qr.downloads}</td>
+                        <td className="py-3">{qr.scans}</td>
+                        <td className="py-3">{new Date(qr.created).toLocaleDateString()}</td>
+                        <td className="py-3">
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">View</Button>
+                            <Button variant="ghost" size="sm">Download</Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="mt-8">
+                <h3 className="text-lg font-medium mb-4">Generate New QR Code</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="qr-name">QR Name</Label>
+                    <Input id="qr-name" placeholder="e.g., Store Front QR" />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="qr-upi">UPI ID</Label>
+                    <Select defaultValue={upiAccounts[0]?.upiId || ""}>
+                      <SelectTrigger id="qr-upi">
+                        <SelectValue placeholder="Select UPI ID" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {upiAccounts.map((account) => (
+                          <SelectItem key={account.id} value={account.upiId}>
+                            {account.upiId} ({account.provider})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="qr-type">QR Type</Label>
+                    <Select defaultValue="static">
+                      <SelectTrigger id="qr-type">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="static">Static (Fixed UPI ID)</SelectItem>
+                        <SelectItem value="dynamic">Dynamic (Can update later)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="qr-amount">Amount (Optional)</Label>
+                    <Input id="qr-amount" type="number" placeholder="Leave empty for variable amount" />
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <Button>Generate QR Code</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>UPI Settings</CardTitle>
+              <CardDescription>
+                Configure global UPI settings and preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Account Rotation</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="rotation-enable">Enable Account Rotation</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Automatically rotate between UPI accounts to balance transaction load
+                        </p>
+                      </div>
+                      <Switch id="rotation-enable" defaultChecked />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="rotation-method">Rotation Method</Label>
+                      <Select defaultValue="round-robin">
+                        <SelectTrigger id="rotation-method">
+                          <SelectValue placeholder="Select method" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="round-robin">Round Robin</SelectItem>
+                          <SelectItem value="least-used">Least Used First</SelectItem>
+                          <SelectItem value="weighted">Weighted Distribution</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Fallback Strategy</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="fallback-enable">Enable Automatic Fallback</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Automatically switch to backup UPI provider if primary fails
+                        </p>
+                      </div>
+                      <Switch id="fallback-enable" defaultChecked />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="max-attempts">Maximum Fallback Attempts</Label>
+                      <Select defaultValue="3">
+                        <SelectTrigger id="max-attempts">
+                          <SelectValue placeholder="Select number" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1 attempt</SelectItem>
+                          <SelectItem value="2">2 attempts</SelectItem>
+                          <SelectItem value="3">3 attempts</SelectItem>
+                          <SelectItem value="5">5 attempts</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Notifications</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="notify-downtime">Notify on Provider Downtime</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Send notifications when a UPI provider experiences downtime
+                        </p>
+                      </div>
+                      <Switch id="notify-downtime" defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="notify-limit">Notify on Limit Reached</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Send notifications when account approaches daily transaction limit
+                        </p>
+                      </div>
+                      <Switch id="notify-limit" defaultChecked />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="pt-4">
+                  <Button>Save Settings</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

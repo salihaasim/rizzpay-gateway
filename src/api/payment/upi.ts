@@ -2,8 +2,8 @@
 // UPI Payment API functions
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { Transaction } from '@/stores/transactions/types';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { Transaction, TransactionStatus, PaymentProcessingState } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactions';
 
 export interface UpiPaymentData {
   amount: string;
@@ -31,17 +31,17 @@ export const processUpiPayment = async (paymentData: UpiPaymentData): Promise<Tr
     // Create a transaction record
     const transactionStore = useTransactionStore.getState();
     
-    // Create transaction object
+    // Create transaction object with proper types
     const transaction: Transaction = {
       id: paymentData.transactionId || `upi_${uuidv4().substring(0, 8)}`,
       amount: `₹${amount.toFixed(2)}`,
       customer: paymentData.name || 'Customer',
       customerEmail: paymentData.email,
-      status: 'processing',
+      status: 'processing' as TransactionStatus,
       paymentMethod: 'upi',
       date: new Date().toISOString(),
       description: `UPI payment to ${paymentData.upiId}`,
-      processingState: 'initiated',
+      processingState: 'initiated' as PaymentProcessingState,
       processingTimeline: [
         {
           stage: 'initiated',
@@ -57,15 +57,21 @@ export const processUpiPayment = async (paymentData: UpiPaymentData): Promise<Tr
     // Simulate payment processing
     // Update to real API call when available
     setTimeout(() => {
-      transaction.status = 'successful';
-      transaction.processingState = 'completed';
-      transaction.processingTimeline?.push({
-        stage: 'completed',
-        timestamp: new Date().toISOString(),
-        message: 'UPI payment successful'
-      });
+      const updatedTransaction = {
+        ...transaction,
+        status: 'successful' as TransactionStatus,
+        processingState: 'completed' as PaymentProcessingState,
+      };
       
-      transactionStore.updateTransaction(transaction.id, transaction);
+      if (updatedTransaction.processingTimeline) {
+        updatedTransaction.processingTimeline.push({
+          stage: 'completed',
+          timestamp: new Date().toISOString(),
+          message: 'UPI payment successful'
+        });
+      }
+      
+      transactionStore.updateTransaction(transaction.id, updatedTransaction);
       
       toast.success('UPI payment successful');
     }, 2000);

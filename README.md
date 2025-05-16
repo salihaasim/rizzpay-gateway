@@ -22,11 +22,13 @@ The API is organized in a modular structure for better maintainability:
 src/api/
 ├── auth/
 │   ├── login.ts
-│   └── register.ts
+│   ├── register.ts
+│   └── index.ts
 ├── merchant/
 │   ├── kyc.ts
 │   ├── profile.ts
-│   └── whitelist.ts
+│   ├── whitelist.ts
+│   └── index.ts
 ├── payment/
 │   ├── index.ts
 │   ├── phonepe.ts
@@ -70,6 +72,29 @@ RizzPay offers a comprehensive API for developers to integrate payment solutions
 - SDKs for easy integration
 - Comprehensive documentation
 
+## Pages Structure
+
+```
+src/pages/
+├── Dashboard.tsx              # Main merchant dashboard
+├── Transactions.tsx           # Transaction history and management
+├── Login.tsx                  # User login page
+├── Register.tsx               # User registration page
+├── Profile.tsx                # User profile management
+├── BankingPage.tsx            # Banking services and management
+├── Webhooks.tsx               # Webhook configuration
+├── UpiPaymentPage.tsx         # UPI payment processing
+├── WalletPage.tsx             # Wallet management
+├── IndiaPage.tsx              # India-specific information
+└── admin/                     # Admin section
+    ├── AdminDashboard.tsx     # Admin dashboard
+    ├── AdminTransactions.tsx  # Admin transaction management
+    ├── AdminMerchants.tsx     # Merchant management
+    ├── AdminKYC.tsx           # KYC verification
+    ├── AdminWhitelist.tsx     # Whitelist management
+    └── AdminUpiManagement.tsx # UPI provider management
+```
+
 ## Getting Started
 
 1. Clone the repository
@@ -80,3 +105,4 @@ RizzPay offers a comprehensive API for developers to integrate payment solutions
 ## License
 
 This project is proprietary software.
+

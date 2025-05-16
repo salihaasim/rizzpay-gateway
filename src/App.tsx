@@ -1,21 +1,11 @@
+
 import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
 } from 'react-router-dom';
-import { useTransactionStore } from './stores/transactionStore';
-import { loginUser } from './api/auth/login';
-import { registerUser } from './api/auth/register';
-import { submitKycDocuments, getKycStatus } from './api/merchant/kyc';
-import { createWebhook, verifyWebhook } from './api/webhook';
-import { processTransaction } from './api/transactions/process';
-import { addToWhitelist, getWhitelistEntries } from './api/merchant/whitelist';
-import { fetchTransactions, getTransactionById } from './api/transactions/fetch';
-import { createRazorpayOrder, processRazorpayPayment, verifyRazorpayPayment } from './utils/razorpay';
-import { processPhonePePayment } from './api/payment/phonepe';
-import { processUpiPayment } from './api/payment/upi';
+import { useTransactionStore } from './stores/transactions';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Login from './pages/Login';
@@ -31,10 +21,11 @@ import AdminWhitelist from './pages/admin/AdminWhitelist';
 import AdminLayout from './components/admin/AdminLayout';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
-import AdminUpiManagement from "./pages/AdminUpiManagement";
+import AdminUpiManagement from './pages/AdminUpiManagement';
+import IndiaPage from './pages/IndiaPage';
 
 const App: React.FC = () => {
-  const { setUserRole, isAuthenticated } = useTransactionStore();
+  const { setUserRole } = useTransactionStore();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -59,42 +50,43 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upi-payment" element={<UpiPaymentPage />} />
+        <Route path="/india" element={<IndiaPage />} />
         
         {/* Protected routes for authenticated users */}
         <Route
           path="/"
           element={
-            isAuthenticated() ? <Dashboard /> : <Login />
+            <Dashboard />
           }
         />
         <Route
           path="/transactions"
           element={
-            isAuthenticated() ? <Transactions /> : <Login />
+            <Transactions />
           }
         />
         <Route
           path="/profile"
           element={
-            isAuthenticated() ? <Profile /> : <Login />
+            <Profile />
           }
         />
         <Route
           path="/banking"
           element={
-            isAuthenticated() ? <BankingPage /> : <Login />
+            <BankingPage />
           }
         />
         <Route
           path="/webhooks"
           element={
-            isAuthenticated() ? <Webhooks /> : <Login />
+            <Webhooks />
           }
         />
         <Route
           path="/wallet"
           element={
-            isAuthenticated() ? <WalletPage /> : <Login />
+            <WalletPage />
           }
         />
         
