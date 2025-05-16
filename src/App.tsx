@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Index from './pages/Index';
 import { Toaster } from 'sonner';
 import { useMerchantAuth } from './stores/merchantAuthStore';
-import { useTransactionStore } from './stores/transactions';
 import Layout from './components/Layout';
 import PaymentPageLoading from './components/payment/PaymentPageLoading';
 import WalletPage from './pages/WalletPage';
@@ -32,7 +31,9 @@ import DeveloperPage from './pages/DeveloperPage';
 import MerchantOnboarding from './pages/MerchantOnboarding';
 import { ThemeProvider } from './context/ThemeContext';
 import RefundPolicy from './pages/RefundPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
+// Lazy load components that aren't needed immediately
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
 const WebhookSetup = React.lazy(() => import('./pages/WebhookSetup'));
@@ -55,15 +56,14 @@ const App = () => {
     
     document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
     
-    // Move the role setting inside a component where hooks are properly initialized
     setAppReady(true);
-  }, [isAuthenticated, currentMerchant]);
+  }, []);
 
   if (!appReady || loading) {
     return <PageLoading />;
   }
 
-  // Use currentMerchant?.role instead of relying on transactionStore here
+  // Use currentMerchant?.role instead of relying on transactionStore
   const isAdmin = currentMerchant?.role === 'admin';
 
   return (
@@ -98,6 +98,8 @@ const App = () => {
             <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
             <Route path="/whitelist" element={<MerchantWhitelist />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />
