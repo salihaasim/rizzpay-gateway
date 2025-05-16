@@ -94,6 +94,42 @@ const RefundPolicy = () => {
 
         <Card className="mb-8">
           <CardHeader>
+            <CardTitle>Platform Service Fee Refunds</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              For merchants using RizzPay's platform services, the following refund policies apply to subscription and service fees:
+            </p>
+            
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Monthly Subscription Plans</h3>
+              <p>
+                Monthly subscription fees are non-refundable once the billing cycle has begun. If you cancel your subscription, you will continue to have access to the service until the end of your current billing period.
+              </p>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Annual Subscription Plans</h3>
+              <p>
+                For annual subscription plans, you may request a prorated refund within 30 days of your subscription renewal. The refund amount will be calculated based on the unused portion of your subscription period.
+              </p>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Setup and Integration Fees</h3>
+              <p>
+                One-time setup and integration fees are non-refundable once the integration process has begun. However, if RizzPay fails to deliver the integration services as specified in your contract, you may be eligible for a full or partial refund at our discretion.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
             <CardTitle>How to Request a Refund</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

@@ -7,9 +7,10 @@ import { createUserRoleSlice } from './userRoleSlice';
 
 // Storage implementation that handles JSON parsing/stringify
 const customStorage = {
-  getItem: (name: string): string | null => {
+  getItem: (name: string) => {
     try {
-      return localStorage.getItem(name);
+      const value = localStorage.getItem(name);
+      return value;
     } catch (error) {
       console.warn('LocalStorage not available:', error);
       return null;

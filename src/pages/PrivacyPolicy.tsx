@@ -123,6 +123,67 @@ const PrivacyPolicy = () => {
           </CardContent>
         </Card>
 
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Data Sharing and Third Parties</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              We may share your information with third parties in the following circumstances:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li><strong>Service Providers</strong>: Companies that provide services on our behalf, such as payment processing, data analysis, and customer support</li>
+              <li><strong>Financial Partners</strong>: Banks and payment networks that facilitate your transactions</li>
+              <li><strong>Legal Requirements</strong>: When required by law, regulation, or legal process</li>
+              <li><strong>Business Transfers</strong>: If RizzPay is involved in a merger, acquisition, or sale of assets</li>
+              <li><strong>With Your Consent</strong>: When you have explicitly agreed to the sharing of your information</li>
+            </ul>
+            <p className="mt-4">
+              We require all third parties to respect the security of your personal data and to treat it in accordance with applicable laws.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Your Privacy Rights</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>Depending on your location, you may have the right to:</p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Access personal information we hold about you</li>
+              <li>Correct inaccurate personal information</li>
+              <li>Delete your personal information</li>
+              <li>Object to or restrict processing of your personal information</li>
+              <li>Data portability (receiving your data in a structured, commonly used format)</li>
+              <li>Withdraw consent where processing is based on consent</li>
+            </ul>
+            <p className="mt-4">
+              To exercise these rights, please contact our Data Protection Officer using the information provided below.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Cookies and Tracking Technologies</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              RizzPay uses cookies and similar tracking technologies to enhance your experience on our platform. These technologies help us:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Remember your preferences and settings</li>
+              <li>Understand how you interact with our services</li>
+              <li>Detect and prevent fraud</li>
+              <li>Analyze and improve our platform</li>
+            </ul>
+            <p className="mt-4">
+              You can manage cookie preferences through your browser settings. However, disabling certain cookies may limit your ability to use some features of our platform.
+            </p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Contact Information</CardTitle>

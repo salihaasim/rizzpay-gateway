@@ -25,6 +25,9 @@ const Footer = () => {
             <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Privacy Policy
             </Link>
+            <Link to="/india" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              India
+            </Link>
             <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Contact Us
             </a>

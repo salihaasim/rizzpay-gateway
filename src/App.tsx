@@ -34,6 +34,7 @@ import DeveloperPage from './pages/DeveloperPage';
 import MerchantOnboarding from './pages/MerchantOnboarding';
 import RefundPolicy from './pages/RefundPolicy';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import IndiaPage from './pages/IndiaPage';
 
 // Lazy load components that aren't needed immediately
 const Transactions = lazy(() => import('./pages/Transactions'));
@@ -111,6 +112,7 @@ const App = () => {
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/india" element={<IndiaPage />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />
