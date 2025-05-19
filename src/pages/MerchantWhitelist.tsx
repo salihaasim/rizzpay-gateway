@@ -5,24 +5,22 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { WhitelistInfo } from '@/components/admin/whitelist/WhitelistInfo';
 import { WhitelistTabs } from '@/components/admin/whitelist/WhitelistTabs';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
 
 const MerchantWhitelist = () => {
   const { currentMerchant } = useMerchantAuth();
-  const { userRole } = useTransactionStore();
   const navigate = useNavigate();
   
-  // Fix comparison: Check if the current user is an admin
+  // Check if the current user is an admin
   useEffect(() => {
-    if (currentMerchant?.role !== 'admin' && userRole !== 'admin') {
+    if (currentMerchant && currentMerchant.role !== 'admin') {
       toast.error('Access denied. Admin privileges required.');
       navigate('/dashboard', { replace: true });
     }
-  }, [currentMerchant, userRole, navigate]);
+  }, [currentMerchant, navigate]);
 
   // Only render if admin
-  if (currentMerchant?.role !== 'admin' && userRole !== 'admin') {
+  if (currentMerchant?.role !== 'admin') {
     return null;
   }
 

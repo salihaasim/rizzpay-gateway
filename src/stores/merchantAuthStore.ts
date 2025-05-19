@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { demoCredentials } from '@/components/role/roleConstants';
@@ -84,7 +83,7 @@ export const useMerchantAuth = create<MerchantStore>()(
           apiKey: 'rizz_api_key_demo_merchant'
         }
       ],
-      loading: false, // Fixed loading default to ensure page renders correctly
+      loading: true,
       
       login: (username, password) => {
         console.log("Attempting login with:", username, password);
@@ -200,16 +199,6 @@ export const useMerchantAuth = create<MerchantStore>()(
               : merchant
           )
         }));
-        
-        // Also update current merchant if applicable
-        if (get().currentMerchant?.username === merchantUsername) {
-          set(state => ({
-            currentMerchant: { 
-              ...state.currentMerchant!, 
-              pricing 
-            }
-          }));
-        }
       },
       
       // Add update UPI settings functionality

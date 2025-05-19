@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Transaction } from '@/stores/transactions/types';
+import { Transaction } from '@/stores/transactionStore';
 import { getStatusIndicatorClass } from './TransactionUtils';
 import PaymentProcessingFlow from './PaymentProcessingFlow';
 import { Separator } from '@/components/ui/separator';
@@ -139,12 +139,12 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, on
           </DialogHeader>
           <div className="space-y-4 mt-2">
             {transaction.paymentDetails && Object.entries(transaction.paymentDetails).map(([key, value]) => (
-              value !== null && value !== undefined && (
+              value && (
                 <div key={key} className="flex justify-between py-2 border-b border-gray-100">
                   <span className="text-sm text-muted-foreground capitalize">
                     {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                   </span>
-                  <span className="font-medium">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                  <span className="font-medium">{value}</span>
                 </div>
               )
             ))}
