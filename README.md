@@ -22,12 +22,14 @@ RizzPay is a comprehensive payment gateway solution designed for businesses oper
 - **Wallet Integration**: Added complete wallet functionality with deposits, withdrawals and transfers
 - **Transaction Timeline Support**: Added structured timeline support for transaction processing states
 - **Centralized Types**: Created proper type exports for better code organization
+- **Code Refactoring**: Refactored Auth page into smaller components for better maintainability
 
 ## Developer Notes
 
 ### Project Structure
 
 - `/src/components` - Reusable UI components
+- `/src/components/auth` - Authentication components
 - `/src/pages` - Main application pages
 - `/src/api` - API integration services
 - `/src/utils` - Utility functions and helpers
@@ -66,3 +68,4 @@ The application can be deployed to any hosting service that supports React appli
 ## License
 
 Proprietary - All rights reserved
+

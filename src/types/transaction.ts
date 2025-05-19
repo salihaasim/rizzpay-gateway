@@ -1,6 +1,6 @@
 
 // Export all transaction types from the correct location
-export { 
+export type { 
   Transaction, 
   TransactionStatus, 
   PaymentMethod, 
