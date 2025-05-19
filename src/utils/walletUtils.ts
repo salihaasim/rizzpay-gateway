@@ -64,7 +64,6 @@ export const simulateWalletProcessing = async (
 };
 
 export const calculateWalletFee = (amount: number): number => {
-  // Simple fee calculation: 1.5% with min fee of ₹5 and max of ₹100
-  const fee = amount * 0.015;
-  return Math.max(5, Math.min(fee, 100));
+  // Update fee calculation to flat 1% fee
+  return amount * 0.01;
 };

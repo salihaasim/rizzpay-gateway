@@ -1,3 +1,4 @@
+
 import { TransactionState, WalletTransaction, WalletSlice } from './types';
 
 export const createWalletSlice = (
@@ -14,15 +15,15 @@ export const createWalletSlice = (
       
       // Update balance based on transaction type
       if (transaction.type === 'payment' || transaction.type === 'withdrawal') {
-        // 1% transaction fee for all outgoing transactions
+        // 1% transaction fee for all outgoing transactions (updated from prior 1.5%)
         const fee = transaction.amount * 0.01; 
         newBalance -= (transaction.amount + fee);
       } else if (transaction.type === 'transfer_out') {
-        // 1% transaction fee for transfers out
+        // 1% transaction fee for transfers out (updated from prior 1.5%)
         const fee = transaction.amount * 0.01;
         newBalance -= (transaction.amount + fee);
-      } else if (transaction.type === 'transfer_in' || transaction.type === 'refund') {
-        // No fee for incoming transfers or refunds
+      } else if (transaction.type === 'transfer_in' || transaction.type === 'refund' || transaction.type === 'deposit') {
+        // No fee for incoming transfers, refunds or deposits
         newBalance += transaction.amount;
       }
       
@@ -135,8 +136,5 @@ export const createWalletSlice = (
     // Add outgoing transaction to wallet
     state.addWalletTransaction(outgoingTransaction);
     return true;
-  },
-  
-  // Update the README file to document the changes
-  
+  }
 });

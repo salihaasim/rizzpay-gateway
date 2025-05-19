@@ -1,20 +1,32 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, Print } from 'lucide-react';
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import Footer from '@/components/landing/Footer';
+import { Button } from "@/components/ui/button";
 
 const RefundPolicy = () => {
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <LandingNavbar />
       
       <div className="container px-4 mx-auto py-12 flex-grow">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border p-8">
-          <div className="flex items-center mb-6">
-            <FileText className="h-6 w-6 mr-2 text-primary" />
-            <h1 className="text-3xl font-bold">Refund Policy</h1>
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+            <div className="flex items-center mb-4 md:mb-0">
+              <FileText className="h-6 w-6 mr-2 text-primary" />
+              <h1 className="text-3xl font-bold">Refund Policy</h1>
+            </div>
+            
+            <Button variant="outline" size="sm" onClick={handlePrint} className="flex items-center">
+              <Print className="h-4 w-4 mr-2" />
+              Print
+            </Button>
           </div>
           
           <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8">

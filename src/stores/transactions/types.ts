@@ -1,3 +1,4 @@
+
 // Transaction related types
 export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
 export type UserRole = 'admin' | 'merchant' | null;
@@ -17,7 +18,18 @@ export type PaymentProcessingState =
   | 'merchant_credited'
   | 'completed';
 
-export type WalletTransactionType = 'deposit' | 'withdrawal' | 'payment' | 'transfer';
+export type WalletTransactionType = 'payment' | 'withdrawal' | 'transfer_out' | 'transfer_in' | 'refund' | 'deposit';
+
+export interface WalletTransaction {
+  id: string;
+  type: WalletTransactionType;
+  amount: number;
+  fee?: number;
+  recipient?: string;
+  description?: string;
+  timestamp: string;
+  status: 'completed' | 'pending' | 'processing' | 'failed';
+}
 
 export interface PaymentDetails {
   cardNumber?: string;
@@ -79,6 +91,16 @@ export interface Wallet {
   transactions: string[]; // Array of transaction IDs
 }
 
+// Add the WalletSlice interface to define the wallet-related state and actions
+export interface WalletSlice {
+  walletBalance: number;
+  walletTransactions: WalletTransaction[];
+  addWalletTransaction: (transaction: WalletTransaction) => void;
+  processWalletPayment: (amount: number, recipient: string, description?: string) => boolean;
+  processWalletWithdrawal: (amount: number, bankAccount: string, description?: string) => boolean;
+  processWalletTransfer: (amount: number, recipient: string, description?: string) => boolean;
+}
+
 export interface TransactionState {
   transactions: Transaction[];
   userRole: UserRole;
@@ -96,6 +118,13 @@ export interface TransactionState {
   withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
   // New methods for merchant transfers
   transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
+  // Wallet properties
+  walletBalance: number;
+  walletTransactions: WalletTransaction[];
+  addWalletTransaction: (transaction: WalletTransaction) => void;
+  processWalletPayment: (amount: number, recipient: string, description?: string) => boolean;
+  processWalletWithdrawal: (amount: number, bankAccount: string, description?: string) => boolean;
+  processWalletTransfer: (amount: number, recipient: string, description?: string) => boolean;
 }
 
 export interface TransactionStore extends TransactionState {

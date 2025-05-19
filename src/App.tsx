@@ -1,3 +1,4 @@
+
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
