@@ -57,7 +57,6 @@ const MerchantPricingControl = () => {
   const handleSave = () => {
     if (selectedMerchant) {
       updateMerchantPricing(selectedMerchant, pricingForm);
-      toast.success(`Pricing updated for ${selectedMerchant}`);
       setEditOpen(false);
       setSelectedMerchant(null);
     }

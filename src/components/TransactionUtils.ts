@@ -7,13 +7,10 @@ export {
 } from '@/utils/formatUtils';
 
 export { 
-  getStatusDescription,
-  getProcessingStateDescription,
+  getStatusIndicatorClass, 
+  getPaymentStateLabel,
   getRandomProcessor,
-  getRandomDeclineReason,
-  // These were missing and causing errors
-  getStatusIndicatorClass,
-  getPaymentStateLabel
+  getRandomDeclineReason
 } from '@/utils/statusUtils';
 
 export { 
@@ -25,11 +22,7 @@ export { delay } from '@/utils/commonUtils';
 
 export { simulatePaymentProcessing } from '@/utils/paymentProcessingUtils';
 
-// This was missing and causing errors
-export { 
-  updateTransactionFromWebhook,
-  processWebhookTransaction
-} from '@/utils/webhookUtils';
+export { updateTransactionFromWebhook } from '@/utils/webhookUtils';
 
 export { addTransaction } from '@/utils/transactionCreateUtils';
 
@@ -49,3 +42,4 @@ export {
   processRazorpayPayment,
   verifyRazorpayPayment
 } from '@/utils/razorpay';
+

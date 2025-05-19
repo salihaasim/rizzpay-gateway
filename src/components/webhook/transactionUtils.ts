@@ -1,7 +1,7 @@
 
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
-import type { Transaction, TransactionStatus, PaymentMethod } from '@/stores/transactions/types';
+import type { Transaction, TransactionStatus } from '@/stores/transactionStore';
 import { syncTransactionToSupabase } from '@/utils/supabaseClient';
 
 // Function to handle webhook payment completion
@@ -26,7 +26,7 @@ export const completeWebhookPayment = async (transactionId: string, status: 'suc
         date: new Date().toISOString(),
         amount: `₹${parseFloat(paymentData.amount).toFixed(2)}`,
         rawAmount: parseFloat(paymentData.amount),
-        paymentMethod: 'webhook' as PaymentMethod,
+        paymentMethod: 'webhook',
         status: 'successful' as TransactionStatus, // Explicitly cast to TransactionStatus
         customer: paymentData.customerEmail || paymentData.customerName,
         createdBy: paymentData.merchantEmail,
@@ -53,7 +53,11 @@ export const completeWebhookPayment = async (transactionId: string, status: 'suc
       // Add funds to merchant wallet
       if (paymentData.merchantEmail) {
         try {
-          store.depositToWallet(paymentData.merchantEmail, parseFloat(paymentData.amount));
+          store.depositToWallet(
+            paymentData.merchantEmail, 
+            parseFloat(paymentData.amount),
+            'webhook'
+          );
         } catch (error) {
           console.error('Failed to deposit to merchant wallet:', error);
           // Continue anyway, as the transaction is still successful

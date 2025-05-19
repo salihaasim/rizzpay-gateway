@@ -1,72 +1,47 @@
 
-// This file contains the main transaction store implementation
 import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'sonner';
-import { Transaction, TransactionStatus, PaymentMethod, TransactionState, UserRole, Wallet, PaymentProcessingState } from './types';
-import { createTransactionSlice, TransactionSlice } from './transactionSlice';
-import { createUserRoleSlice, UserRoleSlice } from './userRoleSlice';
-import { createWalletSlice, WalletSlice } from './walletStore';
+import { persist } from 'zustand/middleware';
+import { TransactionState } from './types';
+import { createTransactionSlice } from './transactionSlice';
+import { createUserRoleSlice } from './userRoleSlice';
 
-// Create the store
-export const useTransactionStore = create<TransactionState>((set, get) => {
-  // Create slices
-  const transactionSlice = createTransactionSlice(set, get);
-  const userRoleSlice = createUserRoleSlice(set, get);
-  const walletSlice = createWalletSlice(set, get);
-  
-  return {
-    // Spread transaction slice
-    ...transactionSlice,
-    
-    // Spread user role slice
-    ...userRoleSlice,
-    
-    // Spread wallet slice
-    ...walletSlice,
-    
-    // Additional utility functions
-    getSuccessfulTransactions: () => {
-      return get().transactions.filter(
-        (transaction) => transaction.status === 'successful'
-      );
-    },
-    
-    getPendingTransactions: () => {
-      return get().transactions.filter(
-        (transaction) => transaction.status === 'pending'
-      );
-    },
-    
-    getFailedTransactions: () => {
-      return get().transactions.filter(
-        (transaction) => transaction.status === 'failed'
-      );
-    },
-    
-    getRefundedTransactions: () => {
-      return get().transactions.filter(
-        (transaction) => transaction.status === 'refunded'
-      );
-    },
-    
-    removeTransaction: (id) => {
-      set((state) => ({
-        transactions: state.transactions.filter((transaction) => transaction.id !== id),
-      }));
+// Storage implementation that handles JSON parsing/stringify
+const customStorage = {
+  getItem: (name: string) => {
+    try {
+      const value = localStorage.getItem(name);
+      return value;
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
+      return null;
     }
-  };
-});
-
-// Export types for use in other modules
-export type { 
-  UserRole, 
-  TransactionStatus, 
-  PaymentMethod,
-  Transaction,
-  Wallet,
-  PaymentProcessingState
+  },
+  setItem: (name: string, value: string) => {
+    try {
+      localStorage.setItem(name, value);
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
+    }
+  },
+  removeItem: (name: string) => {
+    try {
+      localStorage.removeItem(name);
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
+    }
+  }
 };
 
-// Export from ./types to make them available
-export * from './types';
+// Create the store with proper persist configuration
+export const useTransactionStore = create<TransactionState>()(
+  persist(
+    (set, get) => ({
+      ...createTransactionSlice(set, get),
+      ...createUserRoleSlice(set, get),
+    }),
+    {
+      name: 'rizzpay-transaction-store',
+      storage: customStorage,
+    }
+  )
+);

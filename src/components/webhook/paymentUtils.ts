@@ -116,25 +116,30 @@ export const processDirectPaymentCallback = async (
     const { 
       payment_id, 
       transaction_id,
-      status
+      status,
+      customer_name,
+      customer_email,
+      amount
     } = callbackData;
     
-    if (!transaction_id) {
-      console.error('Missing transaction_id in callback data');
-      return false;
+    // Translate status to our internal status
+    let internalStatus: 'success' | 'failure' = 'failure';
+    if (status === 'completed' || status === 'success' || status.toLowerCase() === 'approved') {
+      internalStatus = 'success';
     }
     
-    // Prepare webhook data
-    const webhookData = {
-      payment_id,
-      status: status === 'completed' || status === 'success' ? 'successful' : 'failed',
-      processingState: status === 'completed' || status === 'success' ? 'completed' : 'failed'
-    };
-    
     // Update transaction
-    const result = updateTransactionFromWebhook(transaction_id, webhookData);
-    return result !== null;
-    
+    return await updateTransactionFromWebhook(
+      transaction_id, 
+      internalStatus,
+      payment_id,
+      {
+        buyerName: customer_name,
+        buyerEmail: customer_email,
+        paidAmount: amount,
+        paymentMethod: paymentMethod
+      }
+    );
   } catch (error) {
     console.error(`Error processing ${paymentMethod} payment callback:`, error);
     return false;

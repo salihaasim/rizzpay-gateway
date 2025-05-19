@@ -11,9 +11,6 @@ interface TransactionFiltersProps {
   setFilter: (filter: string) => void;
   sortBy: string;
   setSortBy: (sortBy: string) => void;
-  activeTab?: string;
-  setActiveTab?: (tab: string) => void;
-  count?: number;
 }
 
 const TransactionFilters: React.FC<TransactionFiltersProps> = ({
@@ -22,21 +19,8 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   filter,
   setFilter,
   sortBy,
-  setSortBy,
-  activeTab,
-  setActiveTab,
-  count
+  setSortBy
 }) => {
-  // Use either filter/setFilter or activeTab/setActiveTab depending on what's provided
-  const currentFilter = activeTab || filter;
-  const handleFilterChange = (value: string) => {
-    if (setActiveTab) {
-      setActiveTab(value);
-    } else if (setFilter) {
-      setFilter(value);
-    }
-  };
-
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="relative w-full md:w-[280px]">
@@ -55,7 +39,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
           <span className="text-sm mr-2">Filter:</span>
         </div>
         
-        <Select value={currentFilter} onValueChange={handleFilterChange}>
+        <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Filter by" />
           </SelectTrigger>

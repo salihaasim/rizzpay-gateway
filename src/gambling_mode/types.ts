@@ -1,6 +1,5 @@
 
-import { Transaction } from '@/stores/transactions/types';
-import { PaymentDetails } from '@/types/payment';
+import { Transaction, PaymentDetails } from '@/stores/transactions/types';
 
 export interface GamblingModeContext {
   merchantId: string;
