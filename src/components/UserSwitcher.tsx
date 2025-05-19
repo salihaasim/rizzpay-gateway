@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useProfileStore, Merchant } from '@/stores/profileStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { 
@@ -154,16 +154,14 @@ const UserSwitcher = () => {
         </DropdownMenuContent>
       </DropdownMenu>
       
-      {registerOpen && (
-        <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Register New User</DialogTitle>
-            </DialogHeader>
-            <UserRegistrationForm onRegister={handleRegisterUser} />
-          </DialogContent>
-        </Dialog>
-      )}
+      <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Register New User</DialogTitle>
+          </DialogHeader>
+          <UserRegistrationForm onRegister={handleRegisterUser} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

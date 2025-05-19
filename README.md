@@ -7,18 +7,16 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
-- Fixed dialog component nesting issues in AdminMobileMenuTrigger, UserSwitcher, and WhitelistForm
-- Enhanced user login experience for admin users
+- Fixed DialogPortal and DialogTrigger nesting issues in AdminMobileMenuTrigger, UserSwitcher, and WhitelistForm
+- Corrected admin access control and login flow for admin users
+- Enhanced dialog component usage throughout the application
+- Improved Sheet component implementation in the mobile menu
+- Fixed WhitelistForm to properly handle dialog state
 - Updated Terms and Conditions page with modern tabbed interface
 - Redesigned Refund Policy page with improved user experience
 - Added print functionality to policy pages
-- Improved UI of Terms and Conditions page
 - Updated all contact information to rizzpay1@gmail.com and +91-9080186106
 - Changed address to "RizzPay Headquarters, Chennai, India"
-- Removed India page from navigation
-- Saved India page content as text file
-- Set default pricing to 1% transaction fee
-- Improved admin settings and user settings page functionality
 
 ## Key Features
 
