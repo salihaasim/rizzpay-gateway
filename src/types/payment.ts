@@ -15,4 +15,13 @@ export interface PaymentDetails {
   buyerEmail?: string;
   buyerName?: string;
   paymentMethod?: 'upi' | 'card' | 'bank_transfer' | 'wallet';
+  cardLast4?: string;
+  cardNetwork?: string;
+  bankAccount?: string;
+  bankIfsc?: string;
+  walletId?: string;
+  paymentGateway?: string;
+  gatewayTransactionId?: string;
+  gatewayResponse?: Record<string, any>;
+  recipientEmail?: string;
 }

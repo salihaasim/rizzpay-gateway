@@ -17,7 +17,7 @@ const UpiTransactionActions: React.FC<UpiTransactionActionsProps> = ({ transacti
     if (transaction) {
       updateTransaction(transactionId, {
         status: 'successful',
-        detailedStatus: 'Manually verified by merchant',
+        detailedStatus: 'Manually verified by merchant'
       });
       toast.success('Transaction verified successfully');
     }
@@ -28,7 +28,7 @@ const UpiTransactionActions: React.FC<UpiTransactionActionsProps> = ({ transacti
     if (transaction) {
       updateTransaction(transactionId, {
         status: 'failed',
-        detailedStatus: 'Rejected during manual verification',
+        detailedStatus: 'Rejected during manual verification'
       });
       toast.error('Transaction rejected');
     }

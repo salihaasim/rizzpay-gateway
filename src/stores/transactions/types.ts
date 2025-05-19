@@ -39,6 +39,16 @@ export type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet' | 'neft' | 
 
 export type UserRole = 'admin' | 'merchant';
 
+export interface Wallet {
+  id?: string;
+  balance: number;
+  transactions: string[];
+  owner?: string;
+  currency?: string;
+}
+
+export type WalletTransactionType = 'deposit' | 'withdrawal' | 'transfer' | 'payment';
+
 export interface TransactionState {
   transactions: Transaction[];
   addTransaction: (transaction: Transaction) => void;
@@ -55,10 +65,11 @@ export interface TransactionState {
   getPendingTransactions: () => Transaction[];
   getFailedTransactions: () => Transaction[];
   getRefundedTransactions: () => Transaction[];
-  wallets: Record<string, number>;
+  wallets: Record<string, Wallet>;
   initializeWallet: (walletId: string, initialBalance?: number) => void;
   getWalletBalance: (walletId: string) => number;
   depositToWallet: (walletId: string, amount: number) => boolean;
   withdrawFromWallet: (walletId: string, amount: number) => boolean;
   transferBetweenWallets: (fromWalletId: string, toWalletId: string, amount: number) => boolean;
+  transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
 }

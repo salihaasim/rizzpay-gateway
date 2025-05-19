@@ -12,7 +12,8 @@ export interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
-  const { userRole, resetUserRole } = useTransactionStore();
+  const { userRole, userEmail, resetUserRole } = useTransactionStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   
   // Check if user is admin, if not redirect to login
   React.useEffect(() => {
@@ -28,6 +29,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     localStorage.removeItem('userEmail');
     navigate('/login');
   };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
   
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -41,7 +46,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </main>
       </div>
       
-      <AdminMobileMenu />
+      <AdminMobileMenu 
+        userEmail={userEmail}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        handleLogout={handleLogout}
+        isActive={isActive}
+      />
     </div>
   );
 };

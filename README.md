@@ -1,109 +1,60 @@
 
 # RizzPay Payment Gateway
 
-RizzPay is a modern payment gateway solution that offers a variety of payment options including UPI, cards, net banking, and more.
+RizzPay is a modern payment gateway solution designed for Indian businesses, offering a seamless payment experience with support for UPI, cards, net banking, and wallet payments.
 
 ## Features
 
-- Multiple payment methods support (UPI, Cards, Net Banking, NEFT)
-- Seamless checkout experience
-- Admin dashboard for analytics and transaction management
-- Merchant onboarding and KYC
-- Webhook integration for real-time notifications
-- UPI management with multiple provider support
-- Wallet system with P2P transfers
-- API access for developers
-- Refund policy and transaction management
+- **Multiple Payment Methods**: Support for UPI, credit/debit cards, net banking, and wallet payments
+- **Admin Dashboard**: Comprehensive admin interface for monitoring transactions and managing merchants
+- **Merchant Dashboard**: User-friendly interface for merchants to track their payments
+- **Wallet System**: Built-in wallet functionality for users
+- **Transaction Management**: Complete transaction lifecycle management
+- **Mobile Responsive**: Optimized for all devices including desktops, tablets, and mobile phones
 
-## API Structure
+## Tech Stack
 
-The API is organized in a modular structure for better maintainability:
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **State Management**: Zustand
+- **UI Components**: Shadcn UI
+- **Form Validation**: Zod, React Hook Form
+- **Data Visualization**: Recharts
 
-```
-src/api/
-├── auth/
-│   ├── login.ts
-│   ├── register.ts
-│   └── index.ts
-├── merchant/
-│   ├── kyc.ts
-│   ├── profile.ts
-│   ├── whitelist.ts
-│   └── index.ts
-├── payment/
-│   ├── index.ts
-│   ├── phonepe.ts
-│   ├── razorpay.ts
-│   └── upi.ts
-├── transactions/
-│   ├── fetch.ts
-│   ├── index.ts
-│   ├── process.ts
-│   └── report.ts
-└── webhook/
-    ├── create.ts
-    ├── index.ts
-    └── verify.ts
-```
+## Components
 
-## Admin Features
+- **Payment Processing**: Comprehensive payment flow with multiple payment methods
+- **Transaction Tracking**: Real-time transaction status updates
+- **Admin Panel**: Tools for transaction monitoring, merchant management, and system configuration
+- **Merchant Dashboard**: Analytics, transaction history, and payment management
+- **UPI Integration**: Direct UPI payment handling and QR code generation
 
-- **Dashboard**: Comprehensive overview of platform metrics
-- **Transaction Management**: View, filter, and manage transactions
-- **UPI Management**: Configure UPI providers, accounts, and QR codes
-- **Merchant Management**: Onboard and manage merchants
-- **KYC Verification**: Verify merchant identity documents
-- **Whitelist Management**: Manage IP and domain whitelisting
+## Performance Optimizations
 
-## UPI Management
-
-The platform supports multiple UPI providers and accounts:
-
-- Configure provider integrations (PhonePe, Google Pay, Paytm)
-- Manage UPI accounts with rotation capabilities
-- Set transaction limits and priorities
-- Generate and manage QR codes for payments
-
-## Developer API
-
-RizzPay offers a comprehensive API for developers to integrate payment solutions:
-
-- REST API for payment processing
-- Webhook notifications for payment events
-- SDKs for easy integration
-- Comprehensive documentation
-
-## Pages Structure
-
-```
-src/pages/
-├── Dashboard.tsx              # Main merchant dashboard
-├── Transactions.tsx           # Transaction history and management
-├── Login.tsx                  # User login page
-├── Register.tsx               # User registration page
-├── Profile.tsx                # User profile management
-├── BankingPage.tsx            # Banking services and management
-├── Webhooks.tsx               # Webhook configuration
-├── UpiPaymentPage.tsx         # UPI payment processing
-├── WalletPage.tsx             # Wallet management
-├── IndiaPage.tsx              # India-specific information
-├── RefundPolicy.tsx           # Refund policy information
-└── admin/                     # Admin section
-    ├── AdminDashboard.tsx     # Admin dashboard
-    ├── AdminTransactions.tsx  # Admin transaction management
-    ├── AdminMerchants.tsx     # Merchant management
-    ├── AdminKYC.tsx           # KYC verification
-    ├── AdminWhitelist.tsx     # Whitelist management
-    └── AdminUpiManagement.tsx # UPI provider management
-```
+- **Code Splitting**: Optimized bundle size with efficient code splitting
+- **Lazy Loading**: Components loaded on-demand for faster initial load times
+- **Type Safety**: Comprehensive TypeScript types to ensure code reliability
+- **Memoization**: React.memo for performance-critical components
+- **Responsive Design**: Tailored experience for all device sizes
 
 ## Getting Started
 
 1. Clone the repository
 2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Start the development server: `npm run dev`
+3. Start the development server: `npm run dev`
+
+## Documentation
+
+For detailed documentation on RizzPay API and integration guides, please refer to the [documentation](./rizzpay%20documentations/).
+
+## Troubleshooting
+
+If you encounter any issues with the payment gateway, please check the following:
+
+1. Ensure all API credentials are correctly configured
+2. Verify network connectivity for API calls
+3. Check browser console for any JavaScript errors
+4. Validate transaction parameters before submission
 
 ## License
 
-This project is proprietary software.
+© 2025 RizzPay Payment Technologies. All rights reserved.

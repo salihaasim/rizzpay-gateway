@@ -1,7 +1,8 @@
 
 // Transaction API functions for fetching data
 import { supabase } from '@/utils/supabaseClient';
-import { Transaction, TransactionStatus, PaymentMethod, PaymentDetails, PaymentProcessingState, TransactionTimelineItem } from '@/stores/transactions/types';
+import { Transaction, TransactionStatus, PaymentMethod, PaymentProcessingState, TransactionTimelineItem } from '@/stores/transactions/types';
+import { PaymentDetails } from '@/types/payment';
 import { toast } from 'sonner';
 
 export const fetchTransactions = async (

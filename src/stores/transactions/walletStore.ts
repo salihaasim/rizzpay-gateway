@@ -1,13 +1,14 @@
 
-import { Transaction, Wallet, WalletTransactionType, TransactionState } from './types';
+import { Transaction, Wallet, TransactionState } from './types';
 import { generateTransactionId } from './utils';
+import { PaymentMethod } from './types';
 
 export interface WalletSlice {
   wallets: Record<string, Wallet>;
   initializeWallet: (email: string) => void;
   getWalletBalance: (email: string) => number;
-  depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
-  withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
+  depositToWallet: (email: string, amount: number, paymentMethod: PaymentMethod) => string;
+  withdrawFromWallet: (email: string, amount: number, paymentMethod: PaymentMethod) => string;
   transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
 }
 
@@ -55,6 +56,7 @@ export const createWalletSlice = (
       createdBy: email,
       walletTransactionType: 'deposit',
       description: 'Deposit to wallet',
+      processingState: 'completed'
     };
     
     // Update wallet
@@ -101,6 +103,7 @@ export const createWalletSlice = (
       createdBy: email,
       walletTransactionType: 'withdrawal',
       description: 'Withdrawal from wallet',
+      processingState: 'completed'
     };
     
     // Update wallet
