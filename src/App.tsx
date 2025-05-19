@@ -32,6 +32,7 @@ import GlobalFooter from './components/GlobalFooter';
 import Settings from './pages/Settings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 import UpiPluginPage from './pages/UpiPluginPage';
+import TransfersPage from './pages/TransfersPage';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -53,7 +54,7 @@ const PublicLayout = () => (
 );
 
 const App: React.FC = () => {
-  const { setUserRole, isAuthenticated } = useTransactionStore();
+  const { setUserRole, isAuthenticated, userRole } = useTransactionStore();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -71,6 +72,12 @@ const App: React.FC = () => {
     
     checkAuthStatus();
   }, [setUserRole]);
+  
+  // Fix for automatically redirecting to admin
+  const shouldRedirectToAdmin = (path: string) => {
+    // Only redirect to admin if explicitly on /admin route and user is admin
+    return path.startsWith('/admin') && userRole === 'admin';
+  };
   
   return (
     <Router>
@@ -123,10 +130,16 @@ const App: React.FC = () => {
             path="/upi-plugin"
             element={isAuthenticated() ? <UpiPluginPage /> : <Navigate to="/login" replace />}
           />
+          <Route
+            path="/transfers"
+            element={isAuthenticated() ? <TransfersPage /> : <Navigate to="/login" replace />}
+          />
         </Route>
         
         {/* Admin routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={
+          userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" replace />
+        }>
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="merchants" element={<AdminMerchants />} />
