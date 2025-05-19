@@ -19,6 +19,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 - Enhanced dialog component usage throughout the application
 - Improved Sheet component implementation in the mobile menu
 - Fixed WhitelistForm to properly handle dialog state
+- Added Merchant KYC page for document submission and verification
 - Updated Terms and Conditions page with modern tabbed interface
 - Redesigned Refund Policy page with improved user experience
 - Added print functionality to policy pages
@@ -34,6 +35,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 - Secure wallet operations
 - Detailed refund policy documentation
 - Clear terms and conditions
+- Merchant KYC verification system
 
 ## Development Guidelines
 
