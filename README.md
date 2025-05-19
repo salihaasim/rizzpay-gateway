@@ -7,7 +7,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
-- Fixed Dialog nesting issues in AdminMobileMenuTrigger component
+- Fixed DialogPortal nesting issues in AdminMobileMenuTrigger component
 - Fixed dialog nesting issue in WalletPage component
 - Fixed missing sidebar in merchant dashboard pages
 - Fixed TypeScript errors in whitelist tables related to missing 'open' prop
