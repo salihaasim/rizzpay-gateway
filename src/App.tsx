@@ -27,6 +27,10 @@ import IndiaPage from './pages/IndiaPage';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 
+interface AdminLayoutProps {
+  children: React.ReactNode;
+}
+
 const App: React.FC = () => {
   const { setUserRole } = useTransactionStore();
   

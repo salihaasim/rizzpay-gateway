@@ -10,6 +10,7 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { roles, demoCredentials } from '@/components/role/roleConstants';
+import { useTransactionStore } from '@/stores/transactions';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -22,6 +23,7 @@ const Auth = () => {
   });
   
   const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
+  const { setUserRole } = useTransactionStore();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -78,7 +80,11 @@ const Auth = () => {
         // Attempt login
         const success = login(formData.username, formData.password);
         
-        if (!success) {
+        if (success) {
+          // Setup user role in transaction store
+          const role = currentMerchant?.role || 'merchant';
+          setUserRole(role as 'admin' | 'merchant', formData.username);
+        } else {
           setLoading(false);
           toast.error('Invalid credentials. Please check your username and password.');
         }

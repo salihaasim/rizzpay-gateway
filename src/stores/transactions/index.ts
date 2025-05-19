@@ -1,13 +1,14 @@
 
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { TransactionState, Transaction, PaymentMethod } from './types';
-import { generateRandomTransaction } from './utils';
-import { createTransactionSlice } from './transactionSlice';
-import { createUserRoleSlice } from './userRoleSlice';
+import { TransactionState, Transaction, UserRole, Wallet } from './types';
 
-// Initial state
-const initialState: Partial<TransactionState> = {
+// Helper function to generate a unique ID
+const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
+// Initialize the transaction store with default values
+export const useTransactionStore = create<TransactionState>((set, get) => ({
   transactions: [],
   filteredTransactions: [],
   filters: {
@@ -15,212 +16,360 @@ const initialState: Partial<TransactionState> = {
     paymentMethod: null,
     dateRange: {
       from: null,
-      to: null
+      to: null,
     },
-    searchQuery: ''
+    searchQuery: '',
   },
   wallets: {},
   activeWallet: null,
   userRole: null,
   userEmail: null,
   isLoading: false,
-  error: null
-};
+  error: null,
 
-// Create the store with middleware
-export const useTransactionStore = create<TransactionState>()(
-  devtools(
-    (set, get) => ({
-      ...initialState as TransactionState,
+  // Add a new transaction to the store
+  addTransaction: (transaction: Transaction) => {
+    set((state) => ({
+      transactions: [transaction, ...state.transactions],
+      filteredTransactions: [transaction, ...state.filteredTransactions],
+    }));
+  },
+
+  // Update an existing transaction
+  updateTransaction: (id: string, updates: Partial<Transaction>) => {
+    set((state) => {
+      const updatedTransactions = state.transactions.map((transaction) =>
+        transaction.id === id ? { ...transaction, ...updates } : transaction
+      );
       
-      // Add a new transaction
-      addTransaction: (transaction) => {
-        set((state) => ({
-          transactions: [transaction, ...state.transactions]
-        }));
-      },
+      const updatedFilteredTransactions = state.filteredTransactions.map((transaction) =>
+        transaction.id === id ? { ...transaction, ...updates } : transaction
+      );
       
-      // Update an existing transaction
-      updateTransaction: (id, updates) => {
-        set((state) => ({
-          transactions: state.transactions.map(t => 
-            t.id === id ? { ...t, ...updates } : t
-          )
-        }));
-      },
+      return {
+        transactions: updatedTransactions,
+        filteredTransactions: updatedFilteredTransactions,
+      };
+    });
+  },
+
+  // Set all transactions
+  setTransactions: (transactions: Transaction[]) => {
+    set(() => ({
+      transactions,
+      filteredTransactions: transactions,
+    }));
+  },
+
+  // Update filters and apply them to transactions
+  setFilters: (filters) => {
+    set((state) => {
+      const newFilters = { ...state.filters, ...filters };
       
-      // Set all transactions
-      setTransactions: (transactions) => {
-        set({
-          transactions,
-          filteredTransactions: transactions
-        });
-      },
+      // Apply filters to transactions
+      let filtered = [...state.transactions];
       
-      // Set filters
-      setFilters: (filters) => {
-        set((state) => {
-          const newFilters = {
-            ...state.filters,
-            ...filters
-          };
-          
-          // Apply filters
-          let filtered = [...state.transactions];
-          
-          if (newFilters.status) {
-            filtered = filtered.filter(t => t.status === newFilters.status);
-          }
-          
-          if (newFilters.paymentMethod) {
-            filtered = filtered.filter(t => t.paymentMethod === newFilters.paymentMethod as PaymentMethod);
-          }
-          
-          if (newFilters.dateRange.from) {
-            filtered = filtered.filter(t => new Date(t.date) >= newFilters.dateRange.from!);
-          }
-          
-          if (newFilters.dateRange.to) {
-            filtered = filtered.filter(t => new Date(t.date) <= newFilters.dateRange.to!);
-          }
-          
-          if (newFilters.searchQuery) {
-            const query = newFilters.searchQuery.toLowerCase();
-            filtered = filtered.filter(t => 
-              t.id.toLowerCase().includes(query) ||
-              t.customer.toLowerCase().includes(query) ||
-              (t.customerEmail && t.customerEmail.toLowerCase().includes(query)) ||
-              t.amount.includes(query)
-            );
-          }
-          
-          return {
-            filters: newFilters,
-            filteredTransactions: filtered
-          };
-        });
-      },
-      
-      // Reset filters
-      resetFilters: () => {
-        set((state) => ({
-          filters: {
-            status: null,
-            paymentMethod: null,
-            dateRange: {
-              from: null,
-              to: null
-            },
-            searchQuery: ''
-          },
-          filteredTransactions: state.transactions
-        }));
-      },
-      
-      // Set user role
-      setUserRole: (role, email) => set({ 
-        userRole: role,
-        userEmail: email 
-      }),
-  
-      // Clear user data
-      clearUserData: () => set({ 
-        userRole: null,
-        userEmail: null 
-      }),
-  
-      // Reset user role to null
-      resetUserRole: () => {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('userEmail');
-        set({ 
-          userRole: null,
-          userEmail: null 
-        });
-      },
-  
-      // Check if user is authenticated
-      isAuthenticated: () => {
-        const state = get();
-        return state.userEmail !== null && state.userRole !== null;
-      },
-      
-      // Transfer funds between wallets
-      transferFunds: (fromWalletId, toWalletId, amount, description) => {
-        const state = get();
-        const fromWallet = state.wallets[fromWalletId];
-        const toWallet = state.wallets[toWalletId];
-        
-        if (!fromWallet || !toWallet) {
-          return false;
-        }
-        
-        if (fromWallet.balance < amount) {
-          return false;
-        }
-        
-        const transferDate = new Date().toISOString();
-        const transferId = `T-${Math.random().toString(36).substring(2, 10)}`;
-        
-        const debitTransaction: Transaction = {
-          id: `${transferId}-D`,
-          date: transferDate,
-          amount: `-₹${amount.toFixed(2)}`,
-          customer: `Transfer to ${toWallet.owner}`,
-          status: 'successful',
-          paymentMethod: 'wallet',
-          description: description || 'Wallet transfer',
-          paymentDetails: {}
-        };
-        
-        const creditTransaction: Transaction = {
-          id: `${transferId}-C`,
-          date: transferDate,
-          amount: `₹${amount.toFixed(2)}`,
-          customer: `Transfer from ${fromWallet.owner}`,
-          status: 'successful',
-          paymentMethod: 'wallet',
-          description: description || 'Wallet transfer',
-          paymentDetails: {}
-        };
-        
-        set((state) => ({
-          wallets: {
-            ...state.wallets,
-            [fromWalletId]: {
-              ...fromWallet,
-              balance: fromWallet.balance - amount,
-              transactions: [debitTransaction, ...fromWallet.transactions]
-            },
-            [toWalletId]: {
-              ...toWallet,
-              balance: toWallet.balance + amount,
-              transactions: [creditTransaction, ...toWallet.transactions]
-            }
-          }
-        }));
-        
-        return true;
+      if (newFilters.status) {
+        filtered = filtered.filter((t) => t.status === newFilters.status);
       }
-    }),
-    { name: 'transaction-store' }
-  )
-);
+      
+      if (newFilters.paymentMethod) {
+        filtered = filtered.filter((t) => t.paymentMethod === newFilters.paymentMethod);
+      }
+      
+      if (newFilters.dateRange.from) {
+        filtered = filtered.filter(
+          (t) => new Date(t.date) >= (newFilters.dateRange.from as Date)
+        );
+      }
+      
+      if (newFilters.dateRange.to) {
+        filtered = filtered.filter(
+          (t) => new Date(t.date) <= (newFilters.dateRange.to as Date)
+        );
+      }
+      
+      if (newFilters.searchQuery) {
+        const query = newFilters.searchQuery.toLowerCase();
+        filtered = filtered.filter(
+          (t) =>
+            t.customer.toLowerCase().includes(query) ||
+            t.id.toLowerCase().includes(query) ||
+            (t.description && t.description.toLowerCase().includes(query))
+        );
+      }
+      
+      return {
+        filters: newFilters,
+        filteredTransactions: filtered,
+      };
+    });
+  },
 
-// Add some initial transactions for testing
-const initializeStore = () => {
-  const { addTransaction } = useTransactionStore.getState();
+  // Reset filters to default values
+  resetFilters: () => {
+    set((state) => ({
+      filters: {
+        status: null,
+        paymentMethod: null,
+        dateRange: {
+          from: null,
+          to: null,
+        },
+        searchQuery: '',
+      },
+      filteredTransactions: state.transactions,
+    }));
+  },
+
+  // Set the current user's role
+  setUserRole: (role, email) => {
+    set({ userRole: role, userEmail: email });
+    
+    if (role && email) {
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      // Initialize wallet for the user if it doesn't exist
+      const store = get();
+      store.initializeWallet(email);
+    }
+  },
+
+  // Clear user data when logging out
+  clearUserData: () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('isLoggedIn');
+    set({ userRole: null, userEmail: null });
+  },
+
+  // Reset user role (used for logout)
+  resetUserRole: () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('isLoggedIn');
+    set({ userRole: null, userEmail: null, activeWallet: null });
+  },
+
+  // Check if the user is authenticated
+  isAuthenticated: () => {
+    const state = get();
+    return !!state.userRole && !!state.userEmail;
+  },
+
+  // Initialize a wallet for a user
+  initializeWallet: (owner: string) => {
+    set((state) => {
+      if (state.wallets[owner]) {
+        // Wallet already exists for this user
+        return state;
+      }
+      
+      // Create a new wallet for the user
+      return {
+        wallets: {
+          ...state.wallets,
+          [owner]: {
+            id: generateId(),
+            owner,
+            balance: 0,
+            transactions: []
+          }
+        },
+        activeWallet: state.activeWallet || owner,
+      };
+    });
+  },
   
-  // Generate 20 random transactions
-  for (let i = 0; i < 20; i++) {
-    addTransaction(generateRandomTransaction());
+  // Add funds to a wallet
+  depositToWallet: (owner: string, amount: number, description: string, paymentDetails = {}) => {
+    const state = get();
+    
+    // Initialize wallet if it doesn't exist
+    if (!state.wallets[owner]) {
+      state.initializeWallet(owner);
+    }
+    
+    const transactionId = generateId();
+    const now = new Date();
+    
+    // Create the transaction
+    const transaction: Transaction = {
+      id: transactionId,
+      date: now.toISOString(),
+      amount: `₹${amount.toFixed(2)}`,
+      rawAmount: amount,
+      customer: owner,
+      status: 'successful',
+      paymentMethod: 'wallet',
+      walletTransactionType: 'deposit',
+      createdBy: owner,
+      paymentDetails: {
+        ...paymentDetails,
+        walletId: state.wallets[owner].id,
+      }
+    };
+    
+    // Add the transaction to the list
+    state.addTransaction(transaction);
+    
+    // Update wallet balance
+    set((state) => ({
+      wallets: {
+        ...state.wallets,
+        [owner]: {
+          ...state.wallets[owner],
+          balance: state.wallets[owner].balance + amount,
+          transactions: [transaction, ...state.wallets[owner].transactions]
+        }
+      }
+    }));
+    
+    return transactionId;
+  },
+  
+  // Withdraw funds from a wallet
+  withdrawFromWallet: (owner: string, amount: number, description: string) => {
+    const state = get();
+    
+    // Check if wallet exists
+    if (!state.wallets[owner]) {
+      console.error(`Wallet does not exist for ${owner}`);
+      return false;
+    }
+    
+    // Check if sufficient funds
+    if (state.wallets[owner].balance < amount) {
+      console.error('Insufficient funds');
+      return false;
+    }
+    
+    const transactionId = generateId();
+    const now = new Date();
+    
+    // Create the transaction
+    const transaction: Transaction = {
+      id: transactionId,
+      date: now.toISOString(),
+      amount: `₹${amount.toFixed(2)}`,
+      rawAmount: amount,
+      customer: owner,
+      status: 'successful',
+      paymentMethod: 'wallet',
+      walletTransactionType: 'withdrawal',
+      createdBy: owner,
+      paymentDetails: {
+        walletId: state.wallets[owner].id,
+      }
+    };
+    
+    // Add the transaction
+    state.addTransaction(transaction);
+    
+    // Update wallet balance
+    set((state) => ({
+      wallets: {
+        ...state.wallets,
+        [owner]: {
+          ...state.wallets[owner],
+          balance: state.wallets[owner].balance - amount,
+          transactions: [transaction, ...state.wallets[owner].transactions]
+        }
+      }
+    }));
+    
+    return true;
+  },
+  
+  // Get the balance for a specific wallet
+  getWalletBalance: (owner: string) => {
+    const state = get();
+    if (!state.wallets[owner]) {
+      state.initializeWallet(owner);
+      return 0;
+    }
+    return state.wallets[owner].balance;
+  },
+  
+  // Transfer funds between wallets
+  transferFunds: (fromWalletId: string, toWalletId: string, amount: number, description: string) => {
+    const state = get();
+    
+    if (!state.wallets[fromWalletId]) {
+      console.error(`Source wallet ${fromWalletId} does not exist`);
+      return false;
+    }
+    
+    if (!state.wallets[toWalletId]) {
+      console.error(`Destination wallet ${toWalletId} does not exist`);
+      return false;
+    }
+    
+    if (state.wallets[fromWalletId].balance < amount) {
+      console.error('Insufficient funds for transfer');
+      return false;
+    }
+    
+    const transactionId = generateId();
+    const now = new Date();
+    
+    // Create the outgoing transaction
+    const outgoingTx: Transaction = {
+      id: `${transactionId}-out`,
+      date: now.toISOString(),
+      amount: `₹${amount.toFixed(2)}`,
+      rawAmount: amount,
+      customer: toWalletId, // The recipient
+      status: 'successful',
+      paymentMethod: 'wallet',
+      walletTransactionType: 'transfer_out',
+      description: description || `Transfer to ${toWalletId}`,
+      createdBy: fromWalletId,
+      paymentDetails: {
+        walletId: state.wallets[fromWalletId].id,
+      }
+    };
+    
+    // Create the incoming transaction
+    const incomingTx: Transaction = {
+      id: `${transactionId}-in`,
+      date: now.toISOString(),
+      amount: `₹${amount.toFixed(2)}`,
+      rawAmount: amount,
+      customer: fromWalletId, // The sender
+      status: 'successful',
+      paymentMethod: 'wallet',
+      walletTransactionType: 'transfer_in',
+      description: description || `Transfer from ${fromWalletId}`,
+      createdBy: fromWalletId,
+      paymentDetails: {
+        walletId: state.wallets[toWalletId].id,
+      }
+    };
+    
+    // Add transactions
+    state.addTransaction(outgoingTx);
+    state.addTransaction(incomingTx);
+    
+    // Update wallet balances
+    set((state) => ({
+      wallets: {
+        ...state.wallets,
+        [fromWalletId]: {
+          ...state.wallets[fromWalletId],
+          balance: state.wallets[fromWalletId].balance - amount,
+          transactions: [outgoingTx, ...state.wallets[fromWalletId].transactions]
+        },
+        [toWalletId]: {
+          ...state.wallets[toWalletId],
+          balance: state.wallets[toWalletId].balance + amount,
+          transactions: [incomingTx, ...state.wallets[toWalletId].transactions]
+        }
+      }
+    }));
+    
+    return true;
   }
-};
-
-// Run initialization if needed (for demo/testing)
-if (process.env.NODE_ENV === 'development' && useTransactionStore.getState().transactions.length === 0) {
-  initializeStore();
-}
-
-export * from './types';
+}));

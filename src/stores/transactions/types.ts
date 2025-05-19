@@ -3,7 +3,7 @@ export type UserRole = 'admin' | 'merchant' | null;
 
 export type TransactionStatus = 'pending' | 'processing' | 'successful' | 'failed' | 'refunded' | 'settled' | 'declined';
 
-export type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet' | 'neft' | 'instamojo_card' | 'instamojo_neft';
+export type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet' | 'neft' | 'instamojo_card' | 'instamojo_neft' | 'upi_manual';
 
 export type PaymentProcessingState = 
   'initiated' | 
@@ -33,12 +33,14 @@ export interface PaymentDetails {
   routingDetails?: any;
   processingDetails?: any;
   internalNotes?: any;
+  description?: string;
   
   // Card payment details
   cardLast4?: string;
   cardNetwork?: string;
   authorizationCode?: string;
   declineReason?: string;
+  cardHolderName?: string;
   
   // UPI payment details
   upiId?: string;
@@ -64,10 +66,13 @@ export interface PaymentDetails {
   customerTransactionId?: string;
 }
 
+export type WalletTransactionType = 'deposit' | 'withdrawal' | 'transfer_in' | 'transfer_out' | 'payment' | 'refund';
+
 export interface Transaction {
   id: string;
   date: string;
   amount: string;
+  rawAmount?: number;
   customer: string;
   customerEmail?: string;
   status: TransactionStatus;
@@ -77,6 +82,8 @@ export interface Transaction {
   processingState?: PaymentProcessingState;
   processingTimeline?: ProcessingTimelineItem[];
   paymentDetails: PaymentDetails;
+  walletTransactionType?: WalletTransactionType;
+  createdBy?: string;
 }
 
 export interface Wallet {
@@ -116,4 +123,10 @@ export interface TransactionState {
   resetUserRole: () => void;
   isAuthenticated: () => boolean;
   transferFunds: (fromWalletId: string, toWalletId: string, amount: number, description: string) => boolean;
+  
+  // Wallet methods
+  initializeWallet: (owner: string) => void;
+  depositToWallet: (owner: string, amount: number, description: string, paymentDetails?: Partial<PaymentDetails>) => string;
+  withdrawFromWallet: (owner: string, amount: number, description: string) => boolean;
+  getWalletBalance: (owner: string) => number;
 }

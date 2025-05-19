@@ -12,13 +12,14 @@ RizzPay is a comprehensive payment gateway solution designed for businesses oper
 - **Admin Controls**: Complete oversight of platform operations, merchant management, and KYC verification
 - **Analytics**: Detailed insights into transaction patterns and business performance
 - **Webhooks**: Real-time integration capabilities for merchants
+- **Wallet System**: Built-in wallet functionality for managing funds
 
 ## Recent Updates
 
-- **Fixed TypeScript Errors**: Resolved multiple type definitions to ensure type safety across the application
+- **Authentication System**: Enhanced login/registration flow for merchants and admins with role-based access
+- **Fixed TypeScript Errors**: Resolved type definitions to ensure type safety across the application
 - **Enhanced Payment Processing**: Fixed payment processing flow and transaction status tracking
-- **Streamlined Navigation**: Removed duplicate home routes for better user experience
-- **Improved Authentication Flow**: Fixed authentication system with proper user role handling
+- **Wallet Integration**: Added complete wallet functionality with deposits, withdrawals and transfers
 - **Transaction Timeline Support**: Added structured timeline support for transaction processing states
 
 ## Developer Notes
@@ -41,6 +42,14 @@ The project uses a comprehensive TypeScript type system to ensure consistency ac
 - `TransactionStatus` - Defines all possible transaction states
 - `PaymentProcessingState` - Defines the detailed processing stages of a transaction
 - `ProcessingTimelineItem` - Structures the timeline of transaction processing events
+- `Wallet` - Represents user wallet with balance and transaction history
+
+## Authentication
+
+The application supports both merchant and admin roles with separate authentication flows. Demo credentials:
+
+- **Admin**: Username: rizzpay, Password: rizzpay123
+- **Merchant**: Username: merchant, Password: password
 
 ## Getting Started
 
