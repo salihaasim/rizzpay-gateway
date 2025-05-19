@@ -1,13 +1,5 @@
-
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="4" y="12" width="40" height="24" rx="4" fill="#0052FF" />
-  <rect x="4" y="12" width="20" height="24" rx="4" fill="#0045DB" />
-  <line x1="4" y1="20" x2="44" y2="20" stroke="white" stroke-width="2" />
-  <circle cx="36" cy="28" r="4" fill="white" />
-  <g className="coin-animation">
-    <circle cx="16" cy="28" r="6" fill="#FFFFFF" opacity="0.9">
-      <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
-    </circle>
-    <path d="M16 24v8M13 26h6" stroke="#0045DB" strokeWidth="1.5" strokeLinecap="round" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" rx="12" fill="#0052FF"/>
+  <path d="M7 12L10 15L17 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

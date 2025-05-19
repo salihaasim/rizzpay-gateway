@@ -15,9 +15,8 @@ import { Separator } from '@/components/ui/separator';
 import { Toggle } from '@/components/ui/toggle';
 import { Check, Copy, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { v4 as uuidv4 } from 'uuid';
-import { PaymentMethod } from '@/stores/transactions/types';
 
 interface UpiLinkPaymentProps {
   amount: number;
@@ -80,7 +79,7 @@ const UpiLinkPayment: React.FC<UpiLinkPaymentProps> = ({
     addTransaction({
       id: reference,
       amount: amount.toString(),
-      paymentMethod: 'upi_manual' as PaymentMethod,
+      paymentMethod: 'upi_manual',
       status: 'pending',
       customer: 'Link Payment',
       date: new Date().toISOString(),
@@ -88,7 +87,8 @@ const UpiLinkPayment: React.FC<UpiLinkPaymentProps> = ({
       detailedStatus: 'Awaiting manual verification',
       paymentDetails: {
         upiId,
-        upiTransactionId: utrId,
+        upiTransactionId: utrId, // Using upiTransactionId instead of utrId to match the type
+        description
       }
     });
     

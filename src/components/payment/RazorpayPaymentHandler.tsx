@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle2 } from 'lucide-react';
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { simulateWalletProcessing } from '@/utils/walletUtils';
 import { toast } from 'sonner';
 import { generateTransactionId } from '@/utils/formatUtils';
-import { PaymentMethod } from '@/stores/transactions/types';
 
 interface RazorpayPaymentHandlerProps {
   paymentData: any;
@@ -48,7 +47,6 @@ const RazorpayPaymentHandler: React.FC<RazorpayPaymentHandlerProps> = ({
           userEmail, 
           amount, 
           'withdrawal', 
-          'wallet' as PaymentMethod,
           `Payment for ${paymentData.transactionId || 'order'}`
         );
         

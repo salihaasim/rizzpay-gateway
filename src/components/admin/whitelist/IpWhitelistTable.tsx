@@ -1,43 +1,33 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2, Edit2, RefreshCw } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { supabase } from '@/lib/api/supabase';
+  Table, TableBody, TableCell, TableHead, 
+  TableHeader, TableRow 
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { format } from 'date-fns';
+import { Plus, Edit, Trash } from "lucide-react";
+import { supabase } from "@/lib/api/supabase";
+import { toast } from "sonner";
+import type { IpWhitelistEntry } from './types';
 import { WhitelistForm } from './WhitelistForm';
-import type { IpWhitelistEntry, Merchant } from './types';
 
 export const IpWhitelistTable = () => {
   const [entries, setEntries] = useState<IpWhitelistEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedEntry, setSelectedEntry] = useState<IpWhitelistEntry | null>(null);
-  const [merchants, setMerchants] = useState<Record<string, Merchant>>({});
   const [showForm, setShowForm] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [entryToDelete, setEntryToDelete] = useState<IpWhitelistEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<IpWhitelistEntry | null>(null);
 
-  // Fetch IP whitelist entries and merchants
-  useEffect(() => {
-    fetchIpWhitelistEntries();
-    fetchMerchants();
-  }, []);
-
-  const fetchIpWhitelistEntries = async () => {
+  const fetchEntries = async () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
         .from('ip_whitelist')
-        .select('*')
+        .select(`
+          *,
+          merchant:merchants(business_name)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -50,187 +40,125 @@ export const IpWhitelistTable = () => {
     }
   };
 
-  const fetchMerchants = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('merchants')
-        .select('id, name, business_name');
+  useEffect(() => {
+    fetchEntries();
+  }, []);
 
-      if (error) throw error;
-
-      const merchantsMap: Record<string, Merchant> = {};
-      (data || []).forEach((merchant: Merchant) => {
-        merchantsMap[merchant.id] = merchant;
-      });
-
-      setMerchants(merchantsMap);
-    } catch (error) {
-      console.error('Error fetching merchants:', error);
-    }
-  };
-
-  const handleAdd = () => {
-    setSelectedEntry(null);
+  const handleAddEdit = (entry?: IpWhitelistEntry) => {
+    setSelectedEntry(entry || null);
     setShowForm(true);
   };
 
-  const handleEdit = (entry: IpWhitelistEntry) => {
-    setSelectedEntry(entry);
-    setShowForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setSelectedEntry(null);
-  };
-
-  const handleFormSubmit = async () => {
-    handleCloseForm();
-    await fetchIpWhitelistEntries();
-  };
-
-  const handleDelete = (entry: IpWhitelistEntry) => {
-    setEntryToDelete(entry);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!entryToDelete) return;
-
+  const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
         .from('ip_whitelist')
         .delete()
-        .eq('id', entryToDelete.id);
+        .eq('id', id);
 
       if (error) throw error;
       
       toast.success('IP address removed from whitelist');
-      fetchIpWhitelistEntries();
+      fetchEntries();
     } catch (error) {
-      toast.error('Failed to delete entry');
+      toast.error('Failed to remove IP address');
       console.error('Error deleting IP whitelist entry:', error);
-    } finally {
-      setDeleteDialogOpen(false);
-      setEntryToDelete(null);
     }
   };
 
-  const getMerchantName = (merchantId: string) => {
-    const merchant = merchants[merchantId];
-    if (!merchant) return 'Unknown merchant';
-    return merchant.business_name || merchant.name || 'Unnamed merchant';
-  };
+  if (isLoading) {
+    return <div className="flex items-center justify-center p-6">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-2 text-sm text-muted-foreground">Loading whitelist entries...</p>
+      </div>
+    </div>;
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">IP Addresses</h3>
-        <div className="flex space-x-2">
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">IP Whitelist Management</h3>
+        <Button onClick={() => handleAddEdit()}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add IP Address
+        </Button>
+      </div>
+
+      {entries.length === 0 ? (
+        <div className="text-center py-8 border rounded-md bg-muted/20">
+          <p className="text-muted-foreground">No IP addresses whitelisted yet.</p>
           <Button 
-            size="sm" 
-            variant="outline"
-            onClick={fetchIpWhitelistEntries}
-            disabled={isLoading}
+            variant="link" 
+            onClick={() => handleAddEdit()}
+            className="mt-2"
           >
-            <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-          <Button 
-            size="sm"
-            onClick={handleAdd}
-          >
-            <PlusCircle className="h-4 w-4 mr-1" />
-            Add IP
+            Add your first IP whitelist entry
           </Button>
         </div>
-      </div>
-      
-      <div className="border rounded-md">
+      ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[180px]">IP Address</TableHead>
+              <TableHead>IP Address</TableHead>
               <TableHead>Merchant</TableHead>
-              <TableHead className="w-[100px]">Status</TableHead>
-              <TableHead className="text-right w-[100px]">Actions</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Added On</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-4">
-                  Loading entries...
+            {entries.map((entry) => (
+              <TableRow key={entry.id}>
+                <TableCell className="font-mono">{entry.ip_address}</TableCell>
+                <TableCell>{entry.merchant?.business_name || 'Unknown'}</TableCell>
+                <TableCell>
+                  <Badge variant={entry.status === 'active' ? 'default' : 'secondary'}>
+                    {entry.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {format(new Date(entry.created_at), 'yyyy-MM-dd HH:mm')}
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleAddEdit(entry)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleDelete(entry.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
-            ) : entries.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-4">
-                  No IP addresses in whitelist
-                </TableCell>
-              </TableRow>
-            ) : (
-              entries.map((entry) => (
-                <TableRow key={entry.id}>
-                  <TableCell className="font-mono">{entry.ip_address}</TableCell>
-                  <TableCell>{getMerchantName(entry.merchant_id)}</TableCell>
-                  <TableCell>
-                    <Badge variant={entry.status === 'active' ? 'outline' : 'secondary'}>
-                      {entry.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleEdit(entry)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleDelete(entry)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
-      </div>
+      )}
 
-      {/* Form dialog - Fixed missing 'open' prop */}
       {showForm && (
         <WhitelistForm
           type="ip"
           entry={selectedEntry}
-          onClose={handleCloseForm}
-          onSubmit={handleFormSubmit}
-          open={showForm}
+          onClose={() => {
+            setShowForm(false);
+            setSelectedEntry(null);
+          }}
+          onSubmit={() => {
+            setShowForm(false);
+            setSelectedEntry(null);
+            fetchEntries();
+          }}
         />
       )}
-
-      {/* Delete confirmation dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Removal</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove this IP address from the whitelist?
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
