@@ -15,6 +15,8 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 - Improved navigation between login page and home page
 - Fixed wallet transaction display issues
 - Improved site navigation with global footer
+- Fixed merchant settings pages on both merchant and admin sides
+- Updated default pricing to 1% transaction fee 
 
 ## Key Features
 
@@ -56,4 +58,3 @@ For more detailed information about the system, refer to the documentation in th
 
 - Email: rizzpay1@gmail.com
 - Phone: +91-9080186106
-

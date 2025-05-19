@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
@@ -12,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UpiPluginCode from '@/components/upi/UpiPluginCode';
 import UpiQrPopup from '@/components/upi/UpiQrPopup';
 import UpiPaymentLinkGenerator from '@/components/upi/UpiPaymentLinkGenerator';
-import { QrCode, Wallet, Link as LinkIcon } from 'lucide-react';
+import { QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UpiPluginSettings: React.FC = () => {
@@ -193,7 +194,7 @@ const UpiPluginSettings: React.FC = () => {
       {isTestPopupOpen && (
         <UpiQrPopup 
           amount={parseFloat(testAmount)} 
-          merchantName={currentMerchant?.fullName}
+          merchantName={currentMerchant?.fullName || 'RizzPay Merchant'}
           isOpen={isTestPopupOpen}
           setIsOpen={setIsTestPopupOpen}
           onSuccess={(txnId) => toast.success(`Test transaction created: ${txnId}`)}
