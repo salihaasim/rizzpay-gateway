@@ -1,29 +1,50 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { TransactionStatus } from '@/stores/transactionStore';
+import { cn } from '@/lib/utils';
+import { TransactionStatus } from '@/stores/transactions/types';
 
 interface TransactionStatusBadgeProps {
-  status: TransactionStatus;
+  status: TransactionStatus | string;
+  className?: string;
 }
 
-const TransactionStatusBadge: React.FC<TransactionStatusBadgeProps> = ({ status }) => {
-  switch (status) {
-    case 'successful':
-      return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Successful</Badge>;
-    case 'processing':
-      return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200">Processing</Badge>;
-    case 'pending':
-      return <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200">Pending</Badge>;
-    case 'failed':
-      return <Badge variant="outline" className="bg-rose-500/10 text-rose-600 border-rose-200">Failed</Badge>;
-    case 'declined':
-      return <Badge variant="outline" className="bg-rose-500/10 text-rose-600 border-rose-200">Declined</Badge>;
-    case 'settled':
-      return <Badge variant="outline" className="bg-indigo-500/10 text-indigo-600 border-indigo-200">Settled</Badge>;
-    default:
-      return <Badge variant="outline">{status}</Badge>;
+const TransactionStatusBadge: React.FC<TransactionStatusBadgeProps> = ({
+  status,
+  className
+}) => {
+  let badgeVariant: "default" | "secondary" | "destructive" | "outline" = "outline";
+  let badgeText: string = status.toString().charAt(0).toUpperCase() + status.toString().slice(1);
+  
+  if (status === 'successful' || status === 'settled') {
+    badgeVariant = "default";
+    badgeText = status === 'successful' ? 'Successful' : 'Settled';
+  } else if (status === 'failed' || status === 'declined') {
+    badgeVariant = "destructive";
+    badgeText = status === 'failed' ? 'Failed' : 'Declined';
+  } else if (status === 'pending' || status === 'processing') {
+    badgeVariant = "secondary";
+    badgeText = status === 'pending' ? 'Pending' : 'Processing';
+  } else if (status === 'refunded') {
+    badgeVariant = "outline";
+    badgeText = 'Refunded';
   }
+  
+  return (
+    <Badge 
+      variant={badgeVariant} 
+      className={cn(
+        status === 'successful' || status === 'settled' ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" : "",
+        status === 'pending' ? "bg-amber-100 text-amber-700 hover:bg-amber-100" : "",
+        status === 'processing' ? "bg-blue-100 text-blue-700 hover:bg-blue-100" : "",
+        status === 'refunded' ? "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200" : "",
+        status === 'failed' || status === 'declined' ? "bg-rose-100 text-rose-700 hover:bg-rose-100" : "",
+        className
+      )}
+    >
+      {badgeText}
+    </Badge>
+  );
 };
 
 export default TransactionStatusBadge;

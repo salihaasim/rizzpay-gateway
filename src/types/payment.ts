@@ -5,6 +5,14 @@ export interface PaymentDetails {
   cardExpiry?: string;
   cardCvv?: string;
   bankReferenceId?: string;
-  customerTransactionId?: string; // Added to fix the TS2353 error
+  customerTransactionId?: string;
+  upiTransactionId?: string;
+  razorpay_payment_id?: string;
+  authorizationCode?: string;
+  declineReason?: string;
+  processor?: string;
+  cardHolderName?: string;
+  buyerEmail?: string;
+  buyerName?: string;
   paymentMethod?: 'upi' | 'card' | 'bank_transfer' | 'wallet';
 }

@@ -13,6 +13,7 @@ RizzPay is a modern payment gateway solution that offers a variety of payment op
 - UPI management with multiple provider support
 - Wallet system with P2P transfers
 - API access for developers
+- Refund policy and transaction management
 
 ## API Structure
 
@@ -86,6 +87,7 @@ src/pages/
 ├── UpiPaymentPage.tsx         # UPI payment processing
 ├── WalletPage.tsx             # Wallet management
 ├── IndiaPage.tsx              # India-specific information
+├── RefundPolicy.tsx           # Refund policy information
 └── admin/                     # Admin section
     ├── AdminDashboard.tsx     # Admin dashboard
     ├── AdminTransactions.tsx  # Admin transaction management
@@ -105,4 +107,3 @@ src/pages/
 ## License
 
 This project is proprietary software.
-

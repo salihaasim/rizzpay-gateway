@@ -23,9 +23,10 @@ import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
+import RefundPolicy from './pages/RefundPolicy';
 
 const App: React.FC = () => {
-  const { setUserRole } = useTransactionStore();
+  const { setUserRole, isAuthenticated } = useTransactionStore();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -51,43 +52,32 @@ const App: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/upi-payment" element={<UpiPaymentPage />} />
         <Route path="/india" element={<IndiaPage />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
         
         {/* Protected routes for authenticated users */}
         <Route
           path="/"
-          element={
-            <Dashboard />
-          }
+          element={isAuthenticated() ? <Dashboard /> : <Login />}
         />
         <Route
           path="/transactions"
-          element={
-            <Transactions />
-          }
+          element={isAuthenticated() ? <Transactions /> : <Login />}
         />
         <Route
           path="/profile"
-          element={
-            <Profile />
-          }
+          element={isAuthenticated() ? <Profile /> : <Login />}
         />
         <Route
           path="/banking"
-          element={
-            <BankingPage />
-          }
+          element={isAuthenticated() ? <BankingPage /> : <Login />}
         />
         <Route
           path="/webhooks"
-          element={
-            <Webhooks />
-          }
+          element={isAuthenticated() ? <Webhooks /> : <Login />}
         />
         <Route
           path="/wallet"
-          element={
-            <WalletPage />
-          }
+          element={isAuthenticated() ? <WalletPage /> : <Login />}
         />
         
         {/* Admin routes */}
