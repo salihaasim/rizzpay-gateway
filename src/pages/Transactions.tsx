@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTransactionStore } from '@/stores/transactions';
 import TransactionStatusBadge from '@/components/wallet/TransactionStatusBadge';
-import Layout from '@/components/Layout';
 import { Helmet } from 'react-helmet';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +15,7 @@ import TransactionFilters from '@/components/transactions/TransactionFilters';
 import TransactionTabsContent from '@/components/transactions/TransactionTabsContent';
 import TransactionHeader from '@/components/transactions/TransactionHeader';
 import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
+import Layout from '@/components/Layout';
 
 const Transactions = () => {
   const { transactions } = useTransactionStore();
@@ -162,11 +162,12 @@ const Transactions = () => {
                     isUpiView={showUpiTransactions}
                     onSelectTransaction={handleSelectTransaction}
                   />
-                </CardContent>
-              </Card>
-            </div>
+                </Tabs>
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </div>
     </Layout>
   );
 };

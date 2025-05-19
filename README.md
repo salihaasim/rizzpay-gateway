@@ -1,64 +1,47 @@
 
-# RizzPay - Payment Gateway and Wallet System
+# RizzPay Payment Platform
 
-RizzPay is a comprehensive payment processing platform designed for secure, efficient, and scalable payment management. It provides a full suite of tools for handling transactions, managing wallets, and integrating with various payment methods.
+## Overview
 
-## Core Features
-
-- **Multi-payment Method Support**: UPI, cards, net banking, and wallet transfers
-- **Transaction Dashboard**: Comprehensive view of all transaction activities
-- **Wallet Management**: Secure digital wallet for holding and transferring funds
-- **Merchant Integration**: APIs and tools for business integration
-- **Webhook Support**: Real-time payment notifications and callbacks
-- **Admin Controls**: Advanced management for platform administrators
-
-## Technical Architecture
-
-- **Frontend**: React with TypeScript
-- **UI Components**: shadcn/ui components with Tailwind CSS
-- **State Management**: Zustand for global state
-- **Data Persistence**: Supabase for backend storage
-- **Performance Optimizations**: Code splitting, lazy loading, and memoization
+RizzPay is a comprehensive payment processing platform designed to facilitate various types of financial transactions including card payments, UPI transfers, wallet management, and bank transfers.
 
 ## Recent Updates
 
-- Fixed TypeScript type definitions for improved stability
-- Improved transaction filtering and search capabilities
-- Enhanced UPI transaction handling with dedicated view
-- Optimized code structure for better performance
-- Added comprehensive payment detail types
+- Fixed issues in the Transactions page UI
+- Implemented missing utility functions for status indicators and payment state labels
+- Added webhook transaction update functionality
+- Optimized transaction filtering and sorting
 
-## Performance Optimizations
+## Key Features
 
-- **Lazy Loading**: Components are loaded only when needed
-- **Code Splitting**: Bundle splitting for faster initial load
-- **Memoization**: Prevents unnecessary re-renders
-- **Efficient State Management**: Optimized Zustand store implementation
+- Multi-method payment processing
+- Comprehensive transaction management
+- UPI transaction handling
+- Real-time webhook notifications
+- Secure wallet operations
 
-## Security Features
+## Development Guidelines
 
-- End-to-end encryption for sensitive data
-- Secure authentication and authorization
-- Data validation and sanitization
-- Transaction verification systems
+- Use TypeScript for type safety
+- Follow component-based architecture
+- Implement clean code practices
+- Document new features and changes
 
 ## Getting Started
 
 1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Start the development server: `npm run dev`
+2. Install dependencies with `npm install`
+3. Start the development server with `npm run dev`
+4. Access the application at `http://localhost:5173`
+
+## Project Structure
+
+- `/src/components` - UI components
+- `/src/hooks` - Custom React hooks
+- `/src/pages` - Application pages
+- `/src/stores` - State management
+- `/src/utils` - Utility functions
 
 ## Documentation
 
-Additional documentation is available in the `rizzpay documentations` directory:
-
-- Payment Processing Flow
-- Database Architecture
-- Color Themes and UI Guidelines
-- Dark Mode Implementation
-- API Reference
-
-## License
-
-This project is proprietary and confidential. Unauthorized use, copying, or distribution is prohibited.
+For more detailed information about the system, refer to the documentation in the `rizzpay documentations` directory.
