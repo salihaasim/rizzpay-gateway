@@ -1,32 +1,32 @@
 
 import { useMemo } from 'react';
-import { Transaction } from '@/stores/transactionStore';
+import { Transaction } from '@/stores/transactions';
 
 export const useFilteredTransactions = (
   transactions: Transaction[],
-  filter: string,
+  activeTab: string,
   searchTerm: string
 ): Transaction[] => {
-  // First filter by status (if specified)
-  const statusFiltered = useMemo(() => {
-    if (filter === 'all') return transactions;
-    return transactions.filter(t => t.status === filter);
-  }, [transactions, filter]);
-  
-  // Then apply search term filtering
-  const filteredTransactions = useMemo(() => {
-    if (!searchTerm) return statusFiltered;
+  return useMemo(() => {
+    // First filter by active tab
+    let filtered = transactions;
+    if (activeTab !== 'all') {
+      filtered = transactions.filter(transaction => transaction.status === activeTab);
+    }
     
-    const searchLower = searchTerm.toLowerCase();
-    return statusFiltered.filter(t => 
-      t.id.toLowerCase().includes(searchLower) || 
-      t.customer.toLowerCase().includes(searchLower) ||
-      t.amount.toLowerCase().includes(searchLower) ||
-      t.paymentMethod.toLowerCase().includes(searchLower) ||
-      (t.description && t.description.toLowerCase().includes(searchLower)) ||
-      (t.customerEmail && t.customerEmail.toLowerCase().includes(searchLower))
-    );
-  }, [statusFiltered, searchTerm]);
-  
-  return filteredTransactions;
+    // Then filter by search term if provided
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        transaction =>
+          transaction.id.toLowerCase().includes(search) ||
+          transaction.customer.toLowerCase().includes(search) ||
+          transaction.amount.toLowerCase().includes(search) ||
+          transaction.status.toLowerCase().includes(search) ||
+          transaction.paymentMethod.toLowerCase().includes(search)
+      );
+    }
+    
+    return filtered;
+  }, [transactions, activeTab, searchTerm]);
 };

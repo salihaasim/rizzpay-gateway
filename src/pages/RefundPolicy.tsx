@@ -31,112 +31,166 @@ const RefundPolicy: React.FC = () => {
           
           <h1 className="text-3xl font-bold tracking-tight">Refund Policy</h1>
           <p className="text-muted-foreground mt-2">
-            Last updated: May 19, 2025
+            Version: 1.0, Effective Date: May 19, 2025
           </p>
         </div>
         
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
-            <CardDescription>
-              This Refund Policy outlines the terms and conditions for refunds on RizzPay transactions.
-            </CardDescription>
+            <CardTitle>1. Introduction</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              At RizzPay, we strive to ensure complete satisfaction with our payment services. This Refund Policy explains the circumstances under which refunds may be processed and the procedures to follow when requesting a refund.
+              This Refund Policy defines the conditions and procedures under which RizzPay ("we," "our," or "us") 
+              handles refund requests from merchants and integrated partners using our digital payment infrastructure. 
+              RizzPay operates as a technical service provider facilitating UPI and bank-based payments. We do not 
+              directly handle end-user refunds. Refunds initiated by a merchant are governed by their own refund terms.
             </p>
           </CardContent>
         </Card>
         
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Refund Eligibility</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="font-medium">Eligible for Refund:</h3>
-              <ul className="list-disc pl-6 space-y-1">
-                <li>Unauthorized transactions that have been verified as fraudulent</li>
-                <li>Double-charged transactions for the same purchase</li>
-                <li>Services or products not received but payment was processed</li>
-                <li>Technical errors resulting in incorrect transaction amount</li>
-              </ul>
-            </div>
-            
-            <Separator className="my-4" />
-            
-            <div className="space-y-2">
-              <h3 className="font-medium">Not Eligible for Refund:</h3>
-              <ul className="list-disc pl-6 space-y-1">
-                <li>Completed service transactions where the service was delivered as described</li>
-                <li>Requests made after 30 days from the transaction date</li>
-                <li>Transactions disputed after product/service was received and accepted</li>
-                <li>Purchase of digital content that has been accessed, downloaded, or streamed</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Refund Process</CardTitle>
+            <CardTitle>2. Eligibility for Refund</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              To request a refund, please follow these steps:
+              Refunds through RizzPay may be initiated under the following circumstances:
             </p>
-            
-            <ol className="list-decimal pl-6 space-y-2">
-              <li>Log into your RizzPay account</li>
-              <li>Navigate to the "Transactions" section</li>
-              <li>Locate the transaction in question</li>
-              <li>Select "Request Refund" and follow the prompts</li>
-              <li>Provide the necessary information to support your refund request</li>
-            </ol>
-            
-            <p className="text-sm text-muted-foreground mt-4">
-              All refund requests are reviewed within 2-3 business days. You will be notified via email once a decision has been made.
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Refund Timeframe</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>
-              Once a refund is approved, it typically takes:
-            </p>
-            <ul className="list-disc pl-6 space-y-1 mt-2">
-              <li><span className="font-medium">Credit/Debit Cards:</span> 5-10 business days</li>
-              <li><span className="font-medium">Bank Transfers:</span> 3-5 business days</li>
-              <li><span className="font-medium">E-wallets:</span> 1-2 business days</li>
-              <li><span className="font-medium">UPI Transactions:</span> 1-3 business days</li>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>
+                <span className="font-medium">Duplicate Payments:</span> A transaction was processed more than once due to technical or manual error.
+              </li>
+              <li>
+                <span className="font-medium">Failed Transaction with Debit:</span> The transaction failed but funds were debited from the payer's account.
+              </li>
+              <li>
+                <span className="font-medium">Technical Malfunction:</span> Infrastructure or API-level issues from RizzPay's side caused unintended settlement or routing.
+              </li>
+              <li>
+                <span className="font-medium">Confirmed Fraud:</span> A transaction is found to be fraudulent following investigation or regulatory inquiry.
+              </li>
             </ul>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Contact Us</CardTitle>
+            <CardTitle>3. Refund Request Procedure</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <p>
-              If you have any questions about our Refund Policy, please contact our customer support:
+              To initiate a refund request, the merchant must:
             </p>
-            <div className="mt-3 space-y-1">
-              <p><span className="font-medium">Email:</span> support@rizzpay.co.in</p>
-              <p><span className="font-medium">Phone:</span> +91 1800-123-4567</p>
-              <p><span className="font-medium">Hours:</span> Monday to Friday, 9:00 AM to 6:00 PM IST</p>
-            </div>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Submit a refund request via email (support@rizzpay.co.in) or merchant dashboard.</li>
+              <li>Include the following:
+                <ul className="list-circle pl-6 mt-2 space-y-1">
+                  <li>RizzPay Transaction ID</li>
+                  <li>Merchant Order/Reference ID</li>
+                  <li>Reason for Refund</li>
+                  <li>Supporting Documentation (user complaints, screenshots, logs)</li>
+                </ul>
+              </li>
+            </ul>
+            
+            <p className="font-medium mt-4">Internal Review:</p>
+            <p>RizzPay will review the request within 2–5 business days and may request additional clarification.</p>
+            
+            <p className="font-medium mt-4">Decision Outcome:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><span className="font-medium">Approved:</span> Refund processed to the payer's original account via UPI or IMPS/NEFT.</li>
+              <li><span className="font-medium">Declined:</span> Merchant receives written justification for denial.</li>
+            </ul>
           </CardContent>
         </Card>
         
-        <div className="text-center text-xs text-muted-foreground mt-12">
-          <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
-        </div>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>4. Refund Timelines</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ul className="list-disc pl-6 space-y-2">
+              <li>UPI-based refunds: 1–3 business days after approval</li>
+              <li>Bank refunds (NEFT/IMPS): 2–5 business days</li>
+              <li>Delays beyond 5 days may occur due to banking holidays, regulatory holds, or recipient bank policies.</li>
+            </ul>
+          </CardContent>
+        </Card>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>5. Merchant Obligations</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Maintain adequate balances in settlement or escrow accounts to fund approved refunds.</li>
+              <li>Ensure refund requests are initiated within 30 calendar days of the original transaction.</li>
+              <li>RizzPay remains neutral in customer disputes unless compelled by law or regulatory order.</li>
+            </ul>
+          </CardContent>
+        </Card>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>6. Non-Refundable Scenarios</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              RizzPay will not facilitate refunds in the following cases:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Legitimate, merchant-initiated orders with successful transaction logs.</li>
+              <li>Transactions where the user explicitly consented and verified payment.</li>
+              <li>Complaints based solely on user dissatisfaction or buyer's remorse.</li>
+              <li>Transactions processed through third-party gateways or off-RizzPay infrastructure.</li>
+            </ul>
+          </CardContent>
+        </Card>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>7. Chargebacks & Compliance Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ul className="list-disc pl-6 space-y-2">
+              <li>RizzPay may withhold settlements or reverse funds upon receipt of chargebacks or regulatory orders (RBI, NPCI).</li>
+              <li>Investigations may incur fees or penalties as per our merchant agreement.</li>
+            </ul>
+          </CardContent>
+        </Card>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>8. Policy Modifications</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>
+              This policy may be amended to align with regulatory changes, platform updates, or internal risk assessments. 
+              Major revisions will be communicated at least 7 days in advance.
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>9. Contact Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              For refund-related support:
+            </p>
+            <div className="space-y-1">
+              <p><span className="font-medium">Email:</span> support@rizzpay.co.in</p>
+              <p><span className="font-medium">Phone:</span> +91 1800-123-4567</p>
+              <p><span className="font-medium">Registered Address:</span> RizzPay HQ, Mumbai, India</p>
+            </div>
+            
+            <p className="mt-4 text-muted-foreground">
+              This document is binding upon all merchants operating through RizzPay's infrastructure.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </>
   );

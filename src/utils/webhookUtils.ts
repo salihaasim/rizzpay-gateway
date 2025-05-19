@@ -16,7 +16,7 @@ const fetchTransactionById = (id: string): Transaction | null => {
     processingState: 'initiated',
     customer: 'Test Customer',
     paymentMethod: 'card',
-    webhookData: {}
+    webhookData: {} // Ensure this property exists
   } as Transaction;
 };
 

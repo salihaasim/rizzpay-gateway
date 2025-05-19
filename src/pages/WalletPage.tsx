@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wallet from '@/components/Wallet';
 import { useMobile } from '@/hooks/use-mobile';
+import { Transaction } from '@/stores/transactions';
 
 const WalletPage = () => {
   const { transactions, userEmail } = useTransactionStore();
@@ -34,10 +35,19 @@ const WalletPage = () => {
   const [activeTab, setActiveTab] = useState<string>('transactions');
   const isMobile = useMobile();
   
-  const { walletTransactions, filteredTransactions } = useFilteredTransactions(
-    transactions,
-    userEmail,
-    transactionFilter
+  // Get wallet-related transactions
+  const walletTransactions = useMemo(() => {
+    if (!userEmail) return [];
+    return transactions.filter(t => 
+      t.walletTransactionType && (t.customer === userEmail || t.createdBy === userEmail)
+    );
+  }, [transactions, userEmail]);
+  
+  // Get filtered transactions based on filter
+  const filteredTransactions = useFilteredTransactions(
+    walletTransactions,
+    transactionFilter,
+    ''
   );
   
   const handleViewTransaction = (id: string) => {
