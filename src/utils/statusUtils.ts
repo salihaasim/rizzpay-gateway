@@ -1,56 +1,47 @@
 
-import { PaymentProcessingState, TransactionStatus } from '@/stores/transactionStore';
+import { PaymentProcessingState } from '@/stores/transactions/types';
 
-export const getStatusIndicatorClass = (status: TransactionStatus) => {
+// Dictionary for mapping processing states to display text
+export const processingStateDisplay: Record<PaymentProcessingState, string> = {
+  'initiated': 'Payment Initiated',
+  'gateway_processing': 'Gateway Processing',
+  'processor_routing': 'Processor Routing',
+  'card_network_processing': 'Card Network Processing',
+  'bank_authorization': 'Bank Authorization',
+  'authorization_decision': 'Authorization Decision',
+  'declined': 'Payment Declined',
+  'settlement_recording': 'Settlement Recording',
+  'settlement_initiated': 'Settlement Initiated',
+  'settlement_processing': 'Settlement Processing',
+  'funds_transferred': 'Funds Transferred',
+  'merchant_credited': 'Merchant Credited',
+  'completed': 'Completed',
+  'failed': 'Failed',
+  'processing': 'Processing'
+};
+
+// Function to get display text for a processing state
+export const getProcessingStateDisplay = (state: PaymentProcessingState): string => {
+  return processingStateDisplay[state] || state;
+};
+
+// Status badge color mapping
+export const getStatusColor = (status: string): string => {
   switch (status) {
     case 'successful':
-      return 'bg-emerald-500';
+    case 'completed':
+      return 'bg-emerald-100 text-emerald-800';
     case 'pending':
-      return 'bg-amber-500';
     case 'processing':
-      return 'bg-blue-500';
-    case 'settled':
-      return 'bg-indigo-500';
+      return 'bg-amber-100 text-amber-800';
     case 'failed':
     case 'declined':
-      return 'bg-rose-500';
+      return 'bg-rose-100 text-rose-800';
+    case 'refunded':
+      return 'bg-blue-100 text-blue-800';
+    case 'settled':
+      return 'bg-violet-100 text-violet-800';
     default:
-      return 'bg-slate-500';
+      return 'bg-gray-100 text-gray-800';
   }
-};
-
-export const getPaymentStateLabel = (state: PaymentProcessingState) => {
-  const stateLabels: Record<PaymentProcessingState, string> = {
-    initiated: 'Payment Initiated',
-    gateway_processing: 'Payment Gateway',
-    processor_routing: 'Payment Processor',
-    card_network_processing: 'Card Network',
-    bank_authorization: 'Bank Authorization',
-    authorization_decision: 'Authorization',
-    declined: 'Payment Declined',
-    settlement_recording: 'Settlement Recording',
-    settlement_initiated: 'Settlement Initiated',
-    settlement_processing: 'Settlement Process',
-    funds_transferred: 'Funds Transfer',
-    merchant_credited: 'Merchant Payment',
-    completed: 'Completed'
-  };
-  
-  return stateLabels[state] || state;
-};
-
-export const getRandomProcessor = () => {
-  const processors = ['PayU', 'Razorpay', 'CCAvenue', 'Stripe', 'PayPal', 'RizzPay', 'Instamojo'];
-  return processors[Math.floor(Math.random() * processors.length)];
-};
-
-export const getRandomDeclineReason = () => {
-  const reasons = [
-    'Insufficient funds',
-    'Card expired',
-    'Transaction limit exceeded',
-    'Invalid card details',
-    'Bank declined transaction'
-  ];
-  return reasons[Math.floor(Math.random() * reasons.length)];
 };

@@ -15,10 +15,11 @@ RizzPay is a comprehensive payment gateway solution designed for businesses oper
 
 ## Recent Updates
 
+- **Fixed Authentication Route**: Added proper Auth route in the application
+- **Type System Improvements**: Fixed TypeScript type issues across the application
+- **Admin Layout Fix**: Resolved issues with admin layout and navigation
 - **Fixed TypeScript Type Definitions**: Resolved type compatibility issues across the codebase
 - **Enhanced Payment Details Interface**: Unified the PaymentDetails interface to support all payment methods
-- **Fixed Home Page Routing**: Ensured proper navigation to the home page
-- **Light Theme Implementation**: Standardized the application on a light theme for consistency
 
 ## Developer Notes
 
@@ -54,3 +55,4 @@ The application can be deployed to any hosting service that supports React appli
 ## License
 
 Proprietary - All rights reserved
+

@@ -1,4 +1,3 @@
-
 // This file contains the main transaction store implementation
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
@@ -45,6 +44,10 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
   
   clearUserData: () => {
     set({ transactions: [], userRole: null, userEmail: null });
+  },
+  
+  isAuthenticated: () => {
+    return get().userEmail !== null && get().userRole !== null;
   },
   
   addTransaction: (transaction) => {

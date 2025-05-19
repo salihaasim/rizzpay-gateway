@@ -36,6 +36,6 @@ export const createUserRoleSlice = (
   
   isAuthenticated: () => {
     const state = get();
-    return state.userEmail !== null;
+    return state.userEmail !== null && state.userRole !== null;
   }
 });

@@ -25,6 +25,7 @@ import WalletPage from './pages/WalletPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
 import Index from './pages/Index';
+import Auth from './pages/Auth';
 
 const App: React.FC = () => {
   const { setUserRole } = useTransactionStore();
@@ -56,6 +57,7 @@ const App: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/upi-payment" element={<UpiPaymentPage />} />
         <Route path="/india" element={<IndiaPage />} />
+        <Route path="/auth" element={<Auth />} />
         
         {/* Protected routes for authenticated users */}
         <Route path="/dashboard" element={<Dashboard />} />
@@ -66,14 +68,24 @@ const App: React.FC = () => {
         <Route path="/wallet" element={<WalletPage />} />
         
         {/* Admin routes - pass children to AdminLayout */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="transactions" element={<AdminTransactions />} />
-          <Route path="merchants" element={<AdminMerchants />} />
-          <Route path="kyc" element={<AdminKYC />} />
-          <Route path="whitelist" element={<AdminWhitelist />} />
-          <Route path="upi-management" element={<AdminUpiManagement />} />
-        </Route>
+        <Route path="/admin" element={<AdminLayout>
+          <AdminDashboard />
+        </AdminLayout>} />
+        <Route path="/admin/transactions" element={<AdminLayout>
+          <AdminTransactions />
+        </AdminLayout>} />
+        <Route path="/admin/merchants" element={<AdminLayout>
+          <AdminMerchants />
+        </AdminLayout>} />
+        <Route path="/admin/kyc" element={<AdminLayout>
+          <AdminKYC />
+        </AdminLayout>} />
+        <Route path="/admin/whitelist" element={<AdminLayout>
+          <AdminWhitelist />
+        </AdminLayout>} />
+        <Route path="/admin/upi-management" element={<AdminLayout>
+          <AdminUpiManagement />
+        </AdminLayout>} />
       </Routes>
     </Router>
   );

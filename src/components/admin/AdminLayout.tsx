@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Sheet } from '@/components/ui/sheet';
@@ -23,7 +23,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { userRole, userEmail, resetUserRole } = useTransactionStore();
+  const { userRole, userEmail, resetUserRole, isAuthenticated } = useTransactionStore();
   const { logout: merchantLogout, currentMerchant } = useMerchantAuth();
   
   // Redirect if not admin
