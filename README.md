@@ -7,9 +7,10 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
-- Fixed "DialogPortal must be used within Dialog" errors in multiple components
-- Fixed TypeScript errors in Navbar.tsx and MerchantKYC.tsx
-- Replaced FileUpload icon with Upload icon in MerchantKYC page
+- Fixed `DialogPortal must be used within Dialog` errors in AdminMobileMenuTrigger component
+- Fixed TypeScript errors in Navbar.tsx related to user state management
+- Improved Sheet component implementation in AdminMobileMenuTrigger
+- Enhanced UserSwitcher component with proper state management
 - Fixed dialog nesting issues in WhitelistForm, UserSwitcher, and other components
 - Added proper state handling in UserSwitcher component
 - Implemented proper form handling in dialog components
@@ -68,4 +69,3 @@ For more detailed information about the system, refer to the documentation in th
 - Email: rizzpay1@gmail.com
 - Phone: +91-9080186106
 - Address: RizzPay Headquarters, Chennai, India
-

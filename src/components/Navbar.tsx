@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -28,7 +29,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const { userEmail, userRole, setUserRole, setUserEmail } = useTransactionStore();
+  const { userEmail, userRole } = useTransactionStore();
 
   // Create default selectedUser state for UserSwitcher
   const [selectedUser, setSelectedUser] = useState<{ email: string; role: string }>({
@@ -62,8 +63,8 @@ const Navbar = () => {
   // Handle user selection from UserSwitcher
   const handleSelectUser = (email: string, role: string) => {
     setSelectedUser({ email, role });
-    setUserEmail(email);
-    setUserRole(role);
+    // We need to use the store's actions to update the user info
+    // This will be handled by UserSwitcher component
   };
 
   const navItems = [

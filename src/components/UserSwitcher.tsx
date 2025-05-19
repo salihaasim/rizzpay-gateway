@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 interface UserSwitcherProps {
   onSelectUser: (email: string, role: string) => void;
@@ -25,6 +26,7 @@ interface UserSwitcherProps {
 const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser }) => {
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { setUserEmail, setUserRole } = useTransactionStore();
 
   // Demo users for testing
   const demoUsers = [
@@ -32,6 +34,18 @@ const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser 
     { email: 'admin@rizzpay.com', role: 'admin' },
     { email: 'user@example.com', role: 'user' },
   ];
+
+  const handleSelectUser = (email: string, role: string) => {
+    onSelectUser(email, role);
+    
+    // Update user in store
+    setUserEmail(email);
+    setUserRole(role);
+    
+    // Close popover and dialog
+    setOpen(false);
+    setDialogOpen(false);
+  };
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -71,11 +85,7 @@ const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser 
                   {demoUsers.map((user) => (
                     <CommandItem
                       key={user.email}
-                      onSelect={() => {
-                        onSelectUser(user.email, user.role);
-                        setOpen(false);
-                        setDialogOpen(false);
-                      }}
+                      onSelect={() => handleSelectUser(user.email, user.role)}
                       className="text-sm"
                     >
                       <User className="mr-2 h-4 w-4" />
