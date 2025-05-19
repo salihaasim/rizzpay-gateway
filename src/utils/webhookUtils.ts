@@ -1,8 +1,13 @@
 
 import { Transaction, useTransactionStore } from '@/stores/transactions';
 
+// Extended Transaction type to include webhookData
+type ExtendedTransaction = Transaction & {
+  webhookData?: any;
+};
+
 // Renamed the local function to avoid name conflict with import
-const fetchTransactionById = (id: string): Transaction | null => {
+const fetchTransactionById = (id: string): ExtendedTransaction | null => {
   // In a real implementation, this would get the transaction from a store
   console.log(`Fetching transaction with ID: ${id}`);
   
@@ -17,7 +22,7 @@ const fetchTransactionById = (id: string): Transaction | null => {
     customer: 'Test Customer',
     paymentMethod: 'card',
     webhookData: {} // Ensure this property exists
-  } as Transaction;
+  } as ExtendedTransaction;
 };
 
 export const updateTransactionFromWebhook = (transactionId: string, webhookData: any) => {

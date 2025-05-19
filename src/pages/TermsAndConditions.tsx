@@ -127,8 +127,8 @@ const TermsAndConditions: React.FC = () => {
             <h2 className="text-2xl font-bold mb-4">9. Contact Information</h2>
             <p>For questions about these Terms, please contact us at:</p>
             <ul className="list-disc pl-6 space-y-2 mt-4">
-              <li>Email: support@rizzpay.co.in</li>
-              <li>Phone: +91-9876543210</li>
+              <li>Email: rizzpay1@gmail.com</li>
+              <li>Phone: +91-9080186106</li>
               <li>Address: RizzPay Headquarters, Mumbai, India</li>
             </ul>
           </section>

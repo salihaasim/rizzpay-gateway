@@ -14,7 +14,6 @@ const Index = () => {
         <FeaturesSection />
       </div>
       <RoleSectionWrapper />
-      {/* Removed Footer from here as it's now handled by GlobalFooter in App.tsx */}
     </div>
   );
 };
