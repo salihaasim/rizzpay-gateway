@@ -126,7 +126,7 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

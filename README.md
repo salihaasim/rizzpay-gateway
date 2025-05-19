@@ -7,16 +7,16 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
-- Fixed TypeScript error in webhook utilities
-- Updated contact information throughout the application
-- Restored original UI for Terms and Conditions page
-- Fixed duplicate footer issue in the landing page
-- Removed dark theme toggle from Login page
-- Improved navigation between login page and home page
-- Fixed wallet transaction display issues
-- Improved site navigation with global footer
-- Fixed merchant settings pages on both merchant and admin sides
-- Updated default pricing to 1% transaction fee 
+- Fixed dialog component nesting issues
+- Resolved merchant settings page issues
+- Improved UI of Terms and Conditions page
+- Updated all contact information to rizzpay1@gmail.com and +91-9080186106
+- Changed address to "RizzPay Headquarters, Chennai, India"
+- Removed India page from navigation
+- Saved India page content as text file
+- Set default pricing to 1% transaction fee
+- Fixed dialog nesting issues in AdminMobileMenuTrigger, UpiQrPopup, AddMerchantDialog, KycDocumentViewer, and WhitelistForm
+- Improved admin settings and user settings page functionality
 
 ## Key Features
 
@@ -58,3 +58,4 @@ For more detailed information about the system, refer to the documentation in th
 
 - Email: rizzpay1@gmail.com
 - Phone: +91-9080186106
+- Address: RizzPay Headquarters, Chennai, India
