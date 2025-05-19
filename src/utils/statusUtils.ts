@@ -45,3 +45,48 @@ export const getStatusColor = (status: string): string => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
+// Function to get status indicator CSS class
+export const getStatusIndicatorClass = (status: string): string => {
+  switch (status) {
+    case 'successful':
+      return 'bg-green-500';
+    case 'pending':
+    case 'processing':
+      return 'bg-yellow-500';
+    case 'failed':
+    case 'declined':
+      return 'bg-red-500';
+    case 'refunded':
+      return 'bg-blue-500';
+    case 'settled':
+      return 'bg-purple-500';
+    default:
+      return 'bg-gray-400';
+  }
+};
+
+// Function to get payment state label
+export const getPaymentStateLabel = (state: string): string => {
+  return processingStateDisplay[state as PaymentProcessingState] || state;
+};
+
+// Get random processor for payment simulation
+export const getRandomProcessor = (): string => {
+  const processors = ['RuPay', 'Visa', 'Mastercard', 'HDFC Gateway', 'ICICI Gateway'];
+  return processors[Math.floor(Math.random() * processors.length)];
+};
+
+// Get random decline reason for declined transactions
+export const getRandomDeclineReason = (): string => {
+  const reasons = [
+    'Insufficient funds', 
+    'Card expired', 
+    'Invalid card number', 
+    'Transaction declined by bank',
+    'Risk management flag',
+    'Unusual activity detected',
+    'Card limit exceeded'
+  ];
+  return reasons[Math.floor(Math.random() * reasons.length)];
+};

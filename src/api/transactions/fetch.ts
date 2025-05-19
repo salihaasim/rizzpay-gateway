@@ -1,7 +1,7 @@
 
 // Transaction API functions for fetching data
 import { supabase } from '@/utils/supabaseClient';
-import { Transaction, TransactionStatus, PaymentMethod, PaymentDetails, PaymentProcessingState } from '@/stores/transactions';
+import { Transaction, TransactionStatus, PaymentMethod, PaymentDetails, PaymentProcessingState, ProcessingTimelineItem } from '@/stores/transactions/types';
 import { toast } from 'sonner';
 
 export const fetchTransactions = async (
@@ -63,7 +63,11 @@ export const fetchTransactions = async (
       description: item.description,
       processingState: item.processing_state as PaymentProcessingState,
       processingTimeline: Array.isArray(item.processing_timeline) 
-        ? item.processing_timeline 
+        ? item.processing_timeline.map((timeline: any) => ({
+            stage: timeline.stage || '',
+            timestamp: timeline.timestamp || '',
+            message: timeline.message || ''
+          })) 
         : [],
       paymentDetails: item.payment_details as PaymentDetails
     }));
@@ -100,7 +104,11 @@ export const getTransactionById = async (
       description: data.description,
       processingState: data.processing_state as PaymentProcessingState,
       processingTimeline: Array.isArray(data.processing_timeline) 
-        ? data.processing_timeline 
+        ? data.processing_timeline.map((timeline: any) => ({
+            stage: timeline.stage || '',
+            timestamp: timeline.timestamp || '',
+            message: timeline.message || ''
+          })) 
         : [],
       paymentDetails: data.payment_details as PaymentDetails
     };

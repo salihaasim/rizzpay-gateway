@@ -67,25 +67,37 @@ const App: React.FC = () => {
         <Route path="/webhooks" element={<Webhooks />} />
         <Route path="/wallet" element={<WalletPage />} />
         
-        {/* Admin routes - pass children to AdminLayout */}
-        <Route path="/admin" element={<AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>} />
-        <Route path="/admin/transactions" element={<AdminLayout>
-          <AdminTransactions />
-        </AdminLayout>} />
-        <Route path="/admin/merchants" element={<AdminLayout>
-          <AdminMerchants />
-        </AdminLayout>} />
-        <Route path="/admin/kyc" element={<AdminLayout>
-          <AdminKYC />
-        </AdminLayout>} />
-        <Route path="/admin/whitelist" element={<AdminLayout>
-          <AdminWhitelist />
-        </AdminLayout>} />
-        <Route path="/admin/upi-management" element={<AdminLayout>
-          <AdminUpiManagement />
-        </AdminLayout>} />
+        {/* Admin routes with AdminLayout */}
+        <Route path="/admin" element={
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        } />
+        <Route path="/admin/transactions" element={
+          <AdminLayout>
+            <AdminTransactions />
+          </AdminLayout>
+        } />
+        <Route path="/admin/merchants" element={
+          <AdminLayout>
+            <AdminMerchants />
+          </AdminLayout>
+        } />
+        <Route path="/admin/kyc" element={
+          <AdminLayout>
+            <AdminKYC />
+          </AdminLayout>
+        } />
+        <Route path="/admin/whitelist" element={
+          <AdminLayout>
+            <AdminWhitelist />
+          </AdminLayout>
+        } />
+        <Route path="/admin/upi-management" element={
+          <AdminLayout>
+            <AdminUpiManagement />
+          </AdminLayout>
+        } />
       </Routes>
     </Router>
   );

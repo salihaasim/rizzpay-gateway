@@ -15,11 +15,11 @@ RizzPay is a comprehensive payment gateway solution designed for businesses oper
 
 ## Recent Updates
 
-- **Fixed Authentication Route**: Added proper Auth route in the application
-- **Type System Improvements**: Fixed TypeScript type issues across the application
-- **Admin Layout Fix**: Resolved issues with admin layout and navigation
-- **Fixed TypeScript Type Definitions**: Resolved type compatibility issues across the codebase
-- **Enhanced Payment Details Interface**: Unified the PaymentDetails interface to support all payment methods
+- **Fixed TypeScript Errors**: Resolved multiple type definitions to ensure type safety across the application
+- **Enhanced Payment Processing**: Fixed payment processing flow and transaction status tracking
+- **Streamlined Navigation**: Removed duplicate home routes for better user experience
+- **Improved Authentication Flow**: Fixed authentication system with proper user role handling
+- **Transaction Timeline Support**: Added structured timeline support for transaction processing states
 
 ## Developer Notes
 
@@ -40,6 +40,7 @@ The project uses a comprehensive TypeScript type system to ensure consistency ac
 - `PaymentDetails` - Contains payment method-specific details
 - `TransactionStatus` - Defines all possible transaction states
 - `PaymentProcessingState` - Defines the detailed processing stages of a transaction
+- `ProcessingTimelineItem` - Structures the timeline of transaction processing events
 
 ## Getting Started
 
@@ -55,4 +56,3 @@ The application can be deployed to any hosting service that supports React appli
 ## License
 
 Proprietary - All rights reserved
-
