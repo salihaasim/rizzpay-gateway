@@ -151,6 +151,61 @@ export const WhitelistForm: React.FC<WhitelistFormProps> = ({
     }
   };
   
+  // The form content that will go inside the Dialog
+  const formContent = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="value">
+          {type === 'ip' ? 'IP Address' : 'Domain Name'}
+        </Label>
+        <Input
+          id="value"
+          placeholder={type === 'ip' ? '192.168.1.1' : 'example.com'}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="merchant">Merchant</Label>
+        <Select value={merchantId} onValueChange={setMerchantId}>
+          <SelectTrigger id="merchant">
+            <SelectValue placeholder="Select a merchant" />
+          </SelectTrigger>
+          <SelectContent>
+            {merchants.map((merchant) => (
+              <SelectItem key={merchant.id} value={merchant.id}>
+                {merchant.business_name || merchant.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger id="status">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Saving...' : entry ? 'Update' : 'Add'}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+  
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -159,58 +214,7 @@ export const WhitelistForm: React.FC<WhitelistFormProps> = ({
             {entry ? 'Edit' : 'Add'} {type === 'ip' ? 'IP Address' : 'Webhook Domain'}
           </DialogTitle>
         </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="value">
-              {type === 'ip' ? 'IP Address' : 'Domain Name'}
-            </Label>
-            <Input
-              id="value"
-              placeholder={type === 'ip' ? '192.168.1.1' : 'example.com'}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="merchant">Merchant</Label>
-            <Select value={merchantId} onValueChange={setMerchantId}>
-              <SelectTrigger id="merchant">
-                <SelectValue placeholder="Select a merchant" />
-              </SelectTrigger>
-              <SelectContent>
-                {merchants.map((merchant) => (
-                  <SelectItem key={merchant.id} value={merchant.id}>
-                    {merchant.business_name || merchant.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : entry ? 'Update' : 'Add'}
-            </Button>
-          </DialogFooter>
-        </form>
+        {formContent}
       </DialogContent>
     </Dialog>
   );

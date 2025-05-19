@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Check, ChevronsUpDown, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -35,13 +35,16 @@ const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser 
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="relative h-8 w-full justify-between md:w-40">
-          <User className="mr-2 h-4 w-4" />
-          <span className="truncate">{selectedUser.email}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </DialogTrigger>
+      <Button 
+        onClick={() => setDialogOpen(true)} 
+        variant="outline" 
+        className="relative h-8 w-full justify-between md:w-40"
+      >
+        <User className="mr-2 h-4 w-4" />
+        <span className="truncate">{selectedUser.email}</span>
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+      
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Switch User</DialogTitle>

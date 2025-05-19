@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FileUpload } from 'lucide-react';
+import { Upload } from 'lucide-react'; // Changed from FileUpload to Upload
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactionStore';
 import Layout from '@/components/Layout';
@@ -148,7 +148,7 @@ const MerchantKYC: React.FC = () => {
                         className="w-full mt-2"
                         onClick={() => handleFileUpload('GST Certificate')}
                       >
-                        <FileUpload className="h-4 w-4 mr-2" /> Upload
+                        <Upload className="h-4 w-4 mr-2" /> Upload
                       </Button>
                     </div>
                     
@@ -160,7 +160,7 @@ const MerchantKYC: React.FC = () => {
                         className="w-full mt-2"
                         onClick={() => handleFileUpload('PAN Card')}
                       >
-                        <FileUpload className="h-4 w-4 mr-2" /> Upload
+                        <Upload className="h-4 w-4 mr-2" /> Upload
                       </Button>
                     </div>
                     
@@ -172,7 +172,7 @@ const MerchantKYC: React.FC = () => {
                         className="w-full mt-2"
                         onClick={() => handleFileUpload('Aadhaar Card')}
                       >
-                        <FileUpload className="h-4 w-4 mr-2" /> Upload
+                        <Upload className="h-4 w-4 mr-2" /> Upload
                       </Button>
                     </div>
                   </div>
