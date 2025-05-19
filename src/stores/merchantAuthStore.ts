@@ -18,7 +18,7 @@ interface UpiSettings {
   name: string;
   enabled: boolean;
   allowManualVerification: boolean;
-  customWebhookUrl?: string; // Added missing property
+  customWebhookUrl?: string;
 }
 
 // Interface for pricing structure
@@ -34,11 +34,11 @@ interface Merchant {
   fullName: string;
   email?: string;
   role?: 'admin' | 'merchant';
-  id?: string; // Added ID for KYC and other operations
-  upiSettings?: UpiSettings; // Added UPI settings
-  bankAccounts?: BankAccount[]; // Added bank accounts
-  pricing?: PricingStructure; // Added pricing structure
-  apiKey?: string; // Added API key
+  id?: string;
+  upiSettings?: UpiSettings;
+  bankAccounts?: BankAccount[];
+  pricing?: PricingStructure;
+  apiKey?: string;
 }
 
 interface MerchantStore {
@@ -51,9 +51,9 @@ interface MerchantStore {
   logout: () => void;
   addMerchant: (merchant: Merchant) => void;
   updateMerchantDetails: (merchant: Partial<Merchant>) => void;
-  changePassword: (username: string, currentPassword: string, newPassword: string) => boolean; // Added change password
-  updateMerchantPricing: (merchantUsername: string, pricing: PricingStructure) => void; // Added update pricing
-  updateMerchantUpiSettings: (settings: UpiSettings) => void; // Updated parameter type
+  changePassword: (username: string, currentPassword: string, newPassword: string) => boolean;
+  updateMerchantPricing: (merchantUsername: string, pricing: PricingStructure) => void;
+  updateMerchantUpiSettings: (settings: UpiSettings) => void;
 }
 
 export const useMerchantAuth = create<MerchantStore>()(
@@ -83,7 +83,7 @@ export const useMerchantAuth = create<MerchantStore>()(
           apiKey: 'rizz_api_key_demo_merchant'
         }
       ],
-      loading: false, // Fixed loading default to ensure page renders correctly
+      loading: false,
       
       login: (username, password) => {
         console.log("Attempting login with:", username, password);
@@ -167,7 +167,6 @@ export const useMerchantAuth = create<MerchantStore>()(
         }));
       },
       
-      // Add change password functionality
       changePassword: (username, currentPassword, newPassword) => {
         // Verify current password
         const merchant = get().merchants.find(
@@ -195,7 +194,6 @@ export const useMerchantAuth = create<MerchantStore>()(
         return true;
       },
       
-      // Add update merchant pricing functionality
       updateMerchantPricing: (merchantUsername, pricing) => {
         set(state => ({
           merchants: state.merchants.map(merchant => 
@@ -216,7 +214,6 @@ export const useMerchantAuth = create<MerchantStore>()(
         }
       },
       
-      // Add update UPI settings functionality
       updateMerchantUpiSettings: (settings) => {
         if (!get().isAuthenticated || !get().currentMerchant) return;
         

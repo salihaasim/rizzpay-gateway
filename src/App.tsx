@@ -5,9 +5,11 @@ import {
   Route,
   Routes,
   Navigate,
-  Outlet
+  Outlet,
+  useNavigate
 } from 'react-router-dom';
 import { useTransactionStore } from './stores/transactions';
+import { useMerchantAuth } from './stores/merchantAuthStore';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
@@ -34,6 +36,7 @@ import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 import UpiPluginPage from './pages/UpiPluginPage';
 import TransfersPage from './pages/TransfersPage';
 import DeveloperPage from './pages/DeveloperPage';
+import Auth from './pages/Auth';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -53,6 +56,34 @@ const PublicLayout = () => (
     </div>
   </div>
 );
+
+// Authentication guard for merchant routes
+const MerchantRouteGuard = ({ element }) => {
+  const { isAuthenticated } = useMerchantAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+  
+  return isAuthenticated ? element : null;
+};
+
+// Authentication guard for admin routes
+const AdminRouteGuard = ({ element }) => {
+  const { currentMerchant } = useMerchantAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!currentMerchant || currentMerchant.role !== 'admin') {
+      navigate('/auth', { replace: true });
+    }
+  }, [currentMerchant, navigate]);
+  
+  return currentMerchant?.role === 'admin' ? element : null;
+};
 
 const App: React.FC = () => {
   const { setUserRole, isAuthenticated, userRole, resetUserRole } = useTransactionStore();
@@ -82,64 +113,37 @@ const App: React.FC = () => {
           <Route path="/" element={<Index />} />
         </Route>
         
-        {/* Public routes without footer */}
+        {/* Auth routes */}
         <Route element={<PublicLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
+          <Route path="/register" element={<Navigate to="/auth" replace />} />
+          
+          {/* Public pages without authentication */}
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
           <Route path="/upi-link-payment" element={<UpiLinkPaymentPage />} />
           <Route path="/link-payment" element={<Navigate to="/upi-link-payment" />} />
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
-          
-          {/* Protected routes for authenticated users */}
-          <Route
-            path="/dashboard"
-            element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/transactions"
-            element={isAuthenticated() ? <Transactions /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/profile"
-            element={isAuthenticated() ? <Profile /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/settings"
-            element={isAuthenticated() ? <Settings /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/banking"
-            element={isAuthenticated() ? <BankingPage /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/webhooks"
-            element={isAuthenticated() ? <Webhooks /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/wallet"
-            element={isAuthenticated() ? <WalletPage /> : <Navigate to="/login" replace />}
-          />
-          <Route 
-            path="/upi-plugin"
-            element={isAuthenticated() ? <UpiPluginPage /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/transfers"
-            element={isAuthenticated() ? <TransfersPage /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/developer"
-            element={isAuthenticated() ? <DeveloperPage /> : <Navigate to="/login" replace />}
-          />
         </Route>
         
-        {/* Admin routes - only render AdminLayout if user is admin, otherwise redirect to home */}
-        <Route path="/admin/*" element={
-          userRole === 'admin' ? <AdminLayout /> : <Navigate to="/" replace />
-        }>
+        {/* Merchant routes */}
+        <Route element={<PublicLayout />}>
+          <Route path="/dashboard" element={<MerchantRouteGuard element={<Dashboard />} />} />
+          <Route path="/transactions" element={<MerchantRouteGuard element={<Transactions />} />} />
+          <Route path="/profile" element={<MerchantRouteGuard element={<Profile />} />} />
+          <Route path="/settings" element={<MerchantRouteGuard element={<Settings />} />} />
+          <Route path="/banking" element={<MerchantRouteGuard element={<BankingPage />} />} />
+          <Route path="/webhooks" element={<MerchantRouteGuard element={<Webhooks />} />} />
+          <Route path="/wallet" element={<MerchantRouteGuard element={<WalletPage />} />} />
+          <Route path="/upi-plugin" element={<MerchantRouteGuard element={<UpiPluginPage />} />} />
+          <Route path="/transfers" element={<MerchantRouteGuard element={<TransfersPage />} />} />
+          <Route path="/developer" element={<MerchantRouteGuard element={<DeveloperPage />} />} />
+        </Route>
+        
+        {/* Admin routes with layout */}
+        <Route path="/admin" element={<AdminRouteGuard element={<AdminLayout />} />}>
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="merchants" element={<AdminMerchants />} />

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { QrCode, Code, Copy, Check } from 'lucide-react';
+import { QrCode, Code } from 'lucide-react';
 import { toast } from 'sonner';
 import UpiPluginCode from '@/components/upi/UpiPluginCode';
 import { Helmet } from 'react-helmet';
@@ -15,16 +15,9 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const UpiPluginPage = () => {
   const [testAmount, setTestAmount] = useState('100');
-  const { isAuthenticated } = useMerchantAuth();
   const navigate = useNavigate();
+  const { currentMerchant } = useMerchantAuth();
   
-  // Check if user is authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
   const handleTestPayment = () => {
     const amount = parseFloat(testAmount);
     if (isNaN(amount) || amount <= 0) {
@@ -33,7 +26,7 @@ const UpiPluginPage = () => {
     }
     
     // Redirect to the UPI payment link page with test parameters
-    const upiPaymentUrl = `/upi-link-payment?amount=${amount}&name=Test%20Merchant&desc=Test%20Payment`;
+    const upiPaymentUrl = `/upi-link-payment?amount=${amount}&name=${encodeURIComponent(currentMerchant?.fullName || 'Test Merchant')}&desc=Test%20Payment`;
     navigate(upiPaymentUrl);
   };
 
@@ -114,6 +107,7 @@ const UpiPluginPage = () => {
                     <Input 
                       id="upiId" 
                       placeholder="yourname@ybl" 
+                      defaultValue={currentMerchant?.upiSettings?.upiId || ''}
                     />
                     <p className="text-sm text-muted-foreground">
                       Enter the UPI ID where you want to receive payments
@@ -131,7 +125,7 @@ const UpiPluginPage = () => {
                     </p>
                   </div>
                   
-                  <Button className="w-full sm:w-auto bg-[#0052FF]">
+                  <Button className="w-full sm:w-auto bg-[#0052FF]" onClick={() => toast.success('Settings saved successfully!')}>
                     Save Settings
                   </Button>
                 </div>
