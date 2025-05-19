@@ -55,7 +55,7 @@ const PublicLayout = () => (
 );
 
 const App: React.FC = () => {
-  const { setUserRole, isAuthenticated, userRole } = useTransactionStore();
+  const { setUserRole, isAuthenticated, userRole, resetUserRole } = useTransactionStore();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -136,9 +136,9 @@ const App: React.FC = () => {
           />
         </Route>
         
-        {/* Admin routes - only redirect to admin if explicitly on admin path AND user is admin */}
-        <Route path="/admin" element={
-          userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" replace />
+        {/* Admin routes - only render AdminLayout if user is admin, otherwise redirect to home */}
+        <Route path="/admin/*" element={
+          userRole === 'admin' ? <AdminLayout /> : <Navigate to="/" replace />
         }>
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />

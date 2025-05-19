@@ -43,9 +43,9 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     );
   }
 
-  // If not authenticated, redirect to auth page with current location for back navigation
+  // If not authenticated, redirect to home page
   if (!isAuthenticated) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   // Display responsive layout for authenticated users with sidebar

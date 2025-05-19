@@ -41,6 +41,14 @@ Demo credentials:
 - Admin: username: `rizzpay`, password: `rizzpay123`
 - Merchant: username: `merchant`, password: `password`
 
+## Navigation
+
+- **Home Page**: Landing page with footer (accessible to all users)
+- **Dashboard**: Protected merchant dashboard (requires login)
+- **Admin Dashboard**: Only accessible to admin users
+- **Logout**: Redirects all users back to the home page
+- **UPI Plugin**: Merchant-only feature for UPI payment integration
+
 ## Admin Features
 
 The admin dashboard includes:
@@ -71,6 +79,7 @@ Merchants have access to:
   - **Deposits & Withdrawals**: Manage wallet funds
   - **Transfers**: Send money to other merchants
 - **Payment Tools**: Access specialized payment processing tools
+- **UPI Plugin**: Integrate UPI payments into your website
 - **Developer Integration**: API keys and webhooks for platform integration
 - **Services**: Additional merchant services and features
 - **Settings**: Configure account settings and preferences
@@ -84,6 +93,7 @@ RizzPay provides comprehensive payment capabilities:
   - **Website Integration**: Generate embed code for websites
   - **Customizable**: Add payment descriptions and branding
 - **Payment Links**: Generate and share payment links with customers
+- **UPI Link Payment**: Create shareable payment links with UPI integration
 - **Direct UPI Integration**: Connect directly with popular UPI apps
 - **Real-time Notifications**: Get instant payment confirmations
 - **Customizable Payment Pages**: Branded payment experience for customers
@@ -105,15 +115,17 @@ RizzPay includes comprehensive monitoring dashboards for all aspects of the syst
 - **Performance Analytics**: Track detailed performance metrics
 - **Incident Management**: Track and resolve system incidents
 
-## Special Features
+## Recent Updates
 
-### Aasimo AI Assistant
-
-RizzPay includes a specialized AI assistant named Aasimo AI that provides strategic insights and feature suggestions. This tool is accessible via a special URL and is designed to help the development team optimize the payment platform.
-
-- **Access**: Visit `/aasimo-ai` to interact with the AI assistant
-- **Purpose**: Get ideas for new features and improvements to the payment gateway
-- **Availability**: This feature is not linked from admin or merchant dashboards
+- **Fixed Page Navigation**: Fixed home page redirection and prevented auto-redirect to admin
+- **Logout Redirects**: Updated logout function to redirect users to the home page
+- **UPI Plugin Fix**: Fixed UPI plugin page for merchant users
+- **Navigation Improvements**: Enhanced navigation with React Router for smoother experience
+- **Footer Placement**: Ensured footer only appears on the home/landing page
+- **Admin Routes**: Fixed admin routes to only be accessible by admin users
+- **UPI Link Payment**: Enhanced UPI link payment with better navigation
+- **React Router Integration**: Updated components to use React Router's navigate for better UX
+- **Authentication Checks**: Added proper authentication checks throughout the application
 
 ## Legal Documents
 
@@ -122,35 +134,6 @@ RizzPay provides comprehensive legal documentation:
 - **Terms & Conditions**: Detailed terms of service
 - **Refund Policy**: Clear guidelines on refunds and cancellations
 - **Privacy Policy**: Information on data collection and usage
-
-## Recent Updates
-
-- **Fixed Routing**: Added missing routes for Developer page, UPI Plugin, and UPI Link Payment
-- **Redirect Fix**: Added redirect from /link-payment to /upi-link-payment
-- **Updated Page Layout**: Global footer now appears only on the homepage for cleaner merchant interface
-- **Navigation Fix**: Fixed issues with automatic admin redirection
-- **Link Payment**: Enhanced UPI link payment functionality
-- **Added Privacy Policy**: Added comprehensive privacy policy page
-- **Added Refund Policy**: Added detailed refund policy documentation
-- **Footer Update**: Added links to all legal documents in the footer
-- **Performance Improvements**: Optimized component loading and rendering
-- **UI Redesign**: Updated dashboard layout to match simplified mockup design
-- **Current Balance**: Added prominent current balance card on dashboard
-- **Pay-In/Pay-Out Metrics**: Enhanced pay-in and pay-out tracking with success rates
-- **Transaction Overview**: Added visual charts for transaction monitoring
-- **Improved Navigation**: Updated sidebar with comprehensive navigation options
-- **Recent Pay-Ins**: Added dedicated section for recent transactions
-- **Transaction Mode**: Added visualization for payment distribution by method
-- **Brand Updates**: Updated branding to RizzPay throughout the application
-- **Logo Redesign**: Implemented new professional logo with improved color scheme
-- **UI Improvement**: Fixed layout issues in navbar and dashboard components
-- **Chart Size Adjustment**: Reduced analytics chart height for better display
-- **Layout Spacing**: Optimized content spacing and container widths
-- **Responsive Fixes**: Improved mobile experience with better spacing
-- **Graph Improvements**: Enhanced revenue graph to show actual transaction data
-- **Payment Button Updates**: Updated payment buttons to use consistent RizzPay branding
-- **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
-- **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
 
 ## Documentation
 
@@ -162,4 +145,3 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Privacy Policy](/privacy-policy)
 - [Refund Policy](/refund-policy)
 - [Terms & Conditions](/terms)
-

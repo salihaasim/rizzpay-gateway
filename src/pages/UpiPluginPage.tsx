@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,9 +11,19 @@ import { QrCode, Code, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import UpiPluginCode from '@/components/upi/UpiPluginCode';
 import { Helmet } from 'react-helmet';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const UpiPluginPage = () => {
   const [testAmount, setTestAmount] = useState('100');
+  const { isAuthenticated } = useMerchantAuth();
+  const navigate = useNavigate();
+  
+  // Check if user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleTestPayment = () => {
     const amount = parseFloat(testAmount);
@@ -23,7 +34,7 @@ const UpiPluginPage = () => {
     
     // Redirect to the UPI payment link page with test parameters
     const upiPaymentUrl = `/upi-link-payment?amount=${amount}&name=Test%20Merchant&desc=Test%20Payment`;
-    window.location.href = upiPaymentUrl;
+    navigate(upiPaymentUrl);
   };
 
   return (
