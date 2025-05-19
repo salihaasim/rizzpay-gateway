@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Transaction, TransactionStatus } from '@/stores/transactions/types';
 import { useTransactionStore } from '@/stores/transactions';
 import { generateTransactionId } from '@/utils/formatUtils';
+import { PaymentDetails } from '@/types/payment';
 
 // Function to process a webhook transaction
 export const processWebhookTransaction = async (data: any): Promise<boolean> => {
@@ -76,4 +77,38 @@ export const createWebhookSubscription = async (
 ): Promise<string> => {
   // In a real implementation, this would register the webhook URL with the payment service
   return `sub_${uuidv4()}`;
+};
+
+// Update transaction from webhook
+export const updateTransactionFromWebhook = async (
+  transactionId: string,
+  status: 'success' | 'failure',
+  paymentId?: string,
+  paymentDetails?: Partial<PaymentDetails>
+): Promise<boolean> => {
+  try {
+    const store = useTransactionStore.getState();
+    const transaction = store.getTransactionById(transactionId);
+    
+    if (!transaction) {
+      console.error(`Transaction ${transactionId} not found`);
+      return false;
+    }
+    
+    // Update transaction status
+    store.updateTransaction(transactionId, {
+      status: status === 'success' ? 'successful' : 'failed',
+      processingState: status === 'success' ? 'completed' : 'failed',
+      paymentDetails: {
+        ...(transaction.paymentDetails || {}),
+        ...(paymentDetails || {}),
+        gatewayTransactionId: paymentId || transaction.paymentDetails?.gatewayTransactionId,
+      }
+    });
+    
+    return true;
+  } catch (error) {
+    console.error(`Error updating transaction ${transactionId}:`, error);
+    return false;
+  }
 };

@@ -7,7 +7,7 @@ import { Helmet } from 'react-helmet';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { TabsContent, TabsList, Tab, Tabs } from '@/components/ui/tabs';
+import { TabsContent, TabsList, TabsTrigger, Tabs } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useFilteredTransactions } from '@/hooks/useFilteredTransactions';
@@ -22,6 +22,8 @@ const Transactions = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [showUpiTransactions, setShowUpiTransactions] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [filter, setFilter] = useState('all');
   
   // Get filtered transactions based on active tab and search term
   const filteredTransactions = useFilteredTransactions(transactions, activeTab, searchTerm);
@@ -56,6 +58,34 @@ const Transactions = () => {
       : 0;
   };
   
+  // Handle sorting transactions
+  const sortedTransactions = React.useMemo(() => {
+    const displayTransactions = showUpiTransactions ? upiTransactions : filteredTransactions;
+    
+    return [...displayTransactions].sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      } else if (sortBy === 'amount') {
+        const amountA = a.rawAmount || parseFloat(a.amount.replace(/[^\d.-]/g, '')) || 0;
+        const amountB = b.rawAmount || parseFloat(b.amount.replace(/[^\d.-]/g, '')) || 0;
+        return amountB - amountA;
+      } else if (sortBy === 'customer') {
+        return a.customer.localeCompare(b.customer);
+      }
+      return 0;
+    });
+  }, [filteredTransactions, upiTransactions, showUpiTransactions, sortBy]);
+
+  const handleExportTransactions = () => {
+    // Implementation for exporting transactions
+    console.log('Export transactions');
+  };
+  
+  const handleSelectTransaction = (id: string) => {
+    // Implementation for selecting a transaction
+    console.log('Selected transaction:', id);
+  };
+  
   return (
     <Layout>
       <Helmet>
@@ -68,6 +98,7 @@ const Transactions = () => {
           transactionCount={filteredTransactions.length}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          exportAllTransactions={handleExportTransactions}
         />
         
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-12">
@@ -78,11 +109,21 @@ const Transactions = () => {
               calculatePercentage={calculatePercentage}
             />
             
-            <TransactionFilters 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              count={filteredTransactions.length}
-            />
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Filters</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TransactionFilters 
+                  searchQuery={searchTerm}
+                  setSearchQuery={setSearchTerm}
+                  filter={filter}
+                  setFilter={setFilter}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                />
+              </CardContent>
+            </Card>
           </div>
           
           <div className="md:col-span-9">
@@ -97,23 +138,35 @@ const Transactions = () => {
                   </div>
                   
                   <UpiTransactionToggle 
-                    isUpiView={showUpiTransactions}
-                    setIsUpiView={setShowUpiTransactions}
+                    isUpiView={false}
+                    setIsUpiView={() => {}}
                     totalUpiTransactions={upiTransactions.length}
+                    showUpiTransactions={showUpiTransactions}
+                    setShowUpiTransactions={setShowUpiTransactions}
                   />
                 </div>
               </CardHeader>
               
               <CardContent>
-                <TransactionTabsContent 
-                  transactions={showUpiTransactions ? upiTransactions : filteredTransactions}
-                  isUpiView={showUpiTransactions}
-                />
-              </CardContent>
-            </Card>
+                <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="successful">Successful</TabsTrigger>
+                    <TabsTrigger value="processing">Processing</TabsTrigger>
+                    <TabsTrigger value="pending">Pending</TabsTrigger>
+                    <TabsTrigger value="failed">Failed</TabsTrigger>
+                  </TabsList>
+                  
+                  <TransactionTabsContent 
+                    transactions={sortedTransactions}
+                    isUpiView={showUpiTransactions}
+                    onSelectTransaction={handleSelectTransaction}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </div>
     </Layout>
   );
 };

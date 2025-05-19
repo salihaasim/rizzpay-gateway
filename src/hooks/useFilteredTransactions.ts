@@ -4,20 +4,29 @@ import { Transaction } from '@/stores/transactionStore';
 
 export const useFilteredTransactions = (
   transactions: Transaction[],
-  userEmail: string | null,
-  filter: string
-) => {
-  // Filter wallet transactions
-  const walletTransactions = useMemo(() => {
-    if (!userEmail) return [];
-    return transactions.filter(t => t.walletTransactionType && t.customer === userEmail);
-  }, [transactions, userEmail]);
+  filter: string,
+  searchTerm: string
+): Transaction[] => {
+  // First filter by status (if specified)
+  const statusFiltered = useMemo(() => {
+    if (filter === 'all') return transactions;
+    return transactions.filter(t => t.status === filter);
+  }, [transactions, filter]);
   
-  // Apply additional filtering
+  // Then apply search term filtering
   const filteredTransactions = useMemo(() => {
-    if (filter === 'all') return walletTransactions;
-    return walletTransactions.filter(t => t.walletTransactionType === filter);
-  }, [walletTransactions, filter]);
+    if (!searchTerm) return statusFiltered;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return statusFiltered.filter(t => 
+      t.id.toLowerCase().includes(searchLower) || 
+      t.customer.toLowerCase().includes(searchLower) ||
+      t.amount.toLowerCase().includes(searchLower) ||
+      t.paymentMethod.toLowerCase().includes(searchLower) ||
+      (t.description && t.description.toLowerCase().includes(searchLower)) ||
+      (t.customerEmail && t.customerEmail.toLowerCase().includes(searchLower))
+    );
+  }, [statusFiltered, searchTerm]);
   
-  return { walletTransactions, filteredTransactions };
+  return filteredTransactions;
 };

@@ -1,67 +1,64 @@
 
-# RizzPay - Modern Payment Solution
+# RizzPay - Payment Gateway and Wallet System
 
-RizzPay is a comprehensive payment processing platform designed to handle various payment methods including UPI, card payments, net banking, and wallet transactions.
+RizzPay is a comprehensive payment processing platform designed for secure, efficient, and scalable payment management. It provides a full suite of tools for handling transactions, managing wallets, and integrating with various payment methods.
 
-## Features
+## Core Features
 
-- **Multiple Payment Methods**: Support for UPI, cards, net banking and wallets
-- **Admin Dashboard**: Complete transaction monitoring and management
-- **Merchant Onboarding**: Easy integration for merchants
-- **Real-time Analytics**: Track payment success rates and volumes
-- **Wallet System**: Built-in digital wallet functionality
-- **Responsive Design**: Works perfectly on mobile, tablet and desktop
+- **Multi-payment Method Support**: UPI, cards, net banking, and wallet transfers
+- **Transaction Dashboard**: Comprehensive view of all transaction activities
+- **Wallet Management**: Secure digital wallet for holding and transferring funds
+- **Merchant Integration**: APIs and tools for business integration
+- **Webhook Support**: Real-time payment notifications and callbacks
+- **Admin Controls**: Advanced management for platform administrators
 
 ## Technical Architecture
 
 - **Frontend**: React with TypeScript
-- **State Management**: Zustand for global state management
-- **UI Components**: ShadCN UI components with Tailwind CSS
-- **Charts and Analytics**: Recharts for data visualization
-- **Optimized Performance**: Lazy-loading and code splitting
+- **UI Components**: shadcn/ui components with Tailwind CSS
+- **State Management**: Zustand for global state
+- **Data Persistence**: Supabase for backend storage
+- **Performance Optimizations**: Code splitting, lazy loading, and memoization
 
 ## Recent Updates
 
-- **TypeScript Improvements**: Fixed type definitions and interfaces for better type safety
-- **Performance Optimizations**: Added debounce, throttle, and memoization utilities
-- **Theme Support**: Improved dark/light theme functionality
-- **Cross-Device Compatibility**: Enhanced responsive design for all screen sizes
-- **UPI Payment Integration**: Streamlined UPI payment workflow
+- Fixed TypeScript type definitions for improved stability
+- Improved transaction filtering and search capabilities
+- Enhanced UPI transaction handling with dedicated view
+- Optimized code structure for better performance
+- Added comprehensive payment detail types
 
-## Setup Instructions
+## Performance Optimizations
+
+- **Lazy Loading**: Components are loaded only when needed
+- **Code Splitting**: Bundle splitting for faster initial load
+- **Memoization**: Prevents unnecessary re-renders
+- **Efficient State Management**: Optimized Zustand store implementation
+
+## Security Features
+
+- End-to-end encryption for sensitive data
+- Secure authentication and authorization
+- Data validation and sanitization
+- Transaction verification systems
+
+## Getting Started
 
 1. Clone the repository
-2. Install dependencies with `npm install`
-3. Run the development server with `npm run dev`
+2. Install dependencies: `npm install`
+3. Set up environment variables
+4. Start the development server: `npm run dev`
 
-## Payment Flow
+## Documentation
 
-The application implements a robust payment flow with the following stages:
-- Payment initiation
-- Gateway processing
-- Processor routing
-- Authorization decision
-- Transaction completion
+Additional documentation is available in the `rizzpay documentations` directory:
 
-## Wallet System
-
-The integrated wallet system allows users to:
-- Deposit funds
-- Withdraw funds
-- Transfer between wallets
-- Track transaction history
-
-## Optimization Features
-
-- Responsive design for all device sizes
-- Image optimization for faster loading
-- Code splitting for improved performance
-- Type safety throughout the codebase
-- Error handling and validation
-- Debounced and throttled functions for performance
-- Component preloading for smoother user experience
-- Cached API responses to reduce network requests
+- Payment Processing Flow
+- Database Architecture
+- Color Themes and UI Guidelines
+- Dark Mode Implementation
+- API Reference
 
 ## License
 
-© 2025 RizzPay. All rights reserved.
+This project is proprietary and confidential. Unauthorized use, copying, or distribution is prohibited.

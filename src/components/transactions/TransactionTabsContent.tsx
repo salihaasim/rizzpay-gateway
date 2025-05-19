@@ -6,22 +6,31 @@ import { Transaction } from '@/stores/transactionStore';
 
 interface TransactionTabsContentProps {
   transactions: Transaction[];
-  filteredTransactions: Transaction[];
-  onSelectTransaction: (id: string) => void;
+  filteredTransactions?: Transaction[];
+  isUpiView?: boolean;
+  onSelectTransaction?: (id: string) => void;
 }
 
 const TransactionTabsContent: React.FC<TransactionTabsContentProps> = ({
   transactions,
   filteredTransactions,
+  isUpiView,
   onSelectTransaction
 }) => {
+  const displayTransactions = filteredTransactions || transactions;
+  const handleSelect = (id: string) => {
+    if (onSelectTransaction) {
+      onSelectTransaction(id);
+    }
+  };
+
   return (
     <>
       <TabsContent value="all" className="mt-6">
         <div className="space-y-4">
-          {filteredTransactions.length > 0 ? (
-            filteredTransactions.map((transaction) => (
-              <div key={transaction.id} onClick={() => onSelectTransaction(transaction.id)} className="cursor-pointer">
+          {displayTransactions.length > 0 ? (
+            displayTransactions.map((transaction) => (
+              <div key={transaction.id} onClick={() => handleSelect(transaction.id)} className="cursor-pointer">
                 <TransactionCard {...transaction} />
               </div>
             ))
@@ -35,8 +44,8 @@ const TransactionTabsContent: React.FC<TransactionTabsContentProps> = ({
       
       <TabsContent value="successful" className="mt-6">
         <div className="space-y-4">
-          {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (
-            <div key={transaction.id} onClick={() => onSelectTransaction(transaction.id)} className="cursor-pointer">
+          {displayTransactions.filter(t => t.status === 'successful').map((transaction) => (
+            <div key={transaction.id} onClick={() => handleSelect(transaction.id)} className="cursor-pointer">
               <TransactionCard {...transaction} />
             </div>
           ))}
@@ -45,8 +54,8 @@ const TransactionTabsContent: React.FC<TransactionTabsContentProps> = ({
       
       <TabsContent value="processing" className="mt-6">
         <div className="space-y-4">
-          {filteredTransactions.filter(t => t.status === 'processing').map((transaction) => (
-            <div key={transaction.id} onClick={() => onSelectTransaction(transaction.id)} className="cursor-pointer">
+          {displayTransactions.filter(t => t.status === 'processing').map((transaction) => (
+            <div key={transaction.id} onClick={() => handleSelect(transaction.id)} className="cursor-pointer">
               <TransactionCard {...transaction} />
             </div>
           ))}
@@ -55,8 +64,8 @@ const TransactionTabsContent: React.FC<TransactionTabsContentProps> = ({
       
       <TabsContent value="pending" className="mt-6">
         <div className="space-y-4">
-          {filteredTransactions.filter(t => t.status === 'pending').map((transaction) => (
-            <div key={transaction.id} onClick={() => onSelectTransaction(transaction.id)} className="cursor-pointer">
+          {displayTransactions.filter(t => t.status === 'pending').map((transaction) => (
+            <div key={transaction.id} onClick={() => handleSelect(transaction.id)} className="cursor-pointer">
               <TransactionCard {...transaction} />
             </div>
           ))}
@@ -65,8 +74,8 @@ const TransactionTabsContent: React.FC<TransactionTabsContentProps> = ({
       
       <TabsContent value="failed" className="mt-6">
         <div className="space-y-4">
-          {filteredTransactions.filter(t => t.status === 'failed').map((transaction) => (
-            <div key={transaction.id} onClick={() => onSelectTransaction(transaction.id)} className="cursor-pointer">
+          {displayTransactions.filter(t => t.status === 'failed').map((transaction) => (
+            <div key={transaction.id} onClick={() => handleSelect(transaction.id)} className="cursor-pointer">
               <TransactionCard {...transaction} />
             </div>
           ))}
