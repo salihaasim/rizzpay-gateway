@@ -117,7 +117,7 @@ const TermsAndConditions: React.FC = () => {
             <p>
               These Terms shall be governed by and construed in accordance with the laws of India, without regard to 
               its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive 
-              jurisdiction of the courts in Mumbai, India.
+              jurisdiction of the courts in Chennai, India.
             </p>
           </section>
           
@@ -129,7 +129,7 @@ const TermsAndConditions: React.FC = () => {
             <ul className="list-disc pl-6 space-y-2 mt-4">
               <li>Email: rizzpay1@gmail.com</li>
               <li>Phone: +91-9080186106</li>
-              <li>Address: RizzPay Headquarters, Mumbai, India</li>
+              <li>Address: RizzPay Headquarters, Chennai, India</li>
             </ul>
           </section>
           

@@ -63,12 +63,6 @@ const RefundPolicy: React.FC = () => {
                   <strong className="text-primary/90">Technical Malfunction:</strong> Infrastructure or API-level issues from RizzPay's side caused unintended settlement or routing.
                 </div>
               </li>
-              <li className="flex items-start">
-                <span className="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-2 flex-shrink-0"></span>
-                <div>
-                  <strong className="text-primary/90">Confirmed Fraud:</strong> A transaction is found to be fraudulent following investigation or regulatory inquiry.
-                </div>
-              </li>
             </ul>
           </section>
           
@@ -78,7 +72,7 @@ const RefundPolicy: React.FC = () => {
             <h2 className="text-2xl font-bold mb-4 text-primary/90">3. Refund Request Procedure</h2>
             <p>To initiate a refund request, the merchant must:</p>
             <ul className="list-disc pl-6 space-y-2 mt-4">
-              <li>Submit a refund request via email (support@rizzpay.co.in) or merchant dashboard.</li>
+              <li>Submit a refund request via email (rizzpay1@gmail.com) or merchant dashboard.</li>
               <li>Include the following:
                 <ul className="list-disc pl-6 mt-2">
                   <li>RizzPay Transaction ID</li>
@@ -183,15 +177,15 @@ const RefundPolicy: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-muted p-4 rounded-md text-center">
                 <p className="font-medium">Email</p>
-                <p className="text-primary">support@rizzpay.co.in</p>
+                <p className="text-primary">rizzpay1@gmail.com</p>
               </div>
               <div className="bg-muted p-4 rounded-md text-center">
                 <p className="font-medium">Phone</p>
-                <p className="text-primary">+91-9876543210</p>
+                <p className="text-primary">+91-9080186106</p>
               </div>
               <div className="bg-muted p-4 rounded-md text-center">
                 <p className="font-medium">Address</p>
-                <p className="text-primary">RizzPay HQ, Mumbai, India</p>
+                <p className="text-primary">RizzPay HQ, Chennai, India</p>
               </div>
             </div>
           </section>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { FileText, Flag } from "lucide-react";
+import { FileText } from "lucide-react";
 import logoSvg from '../../assets/logo.svg';
 
 const LandingNavbar = () => {
@@ -27,10 +27,6 @@ const LandingNavbar = () => {
             <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors flex items-center">
               <FileText className="h-4 w-4 mr-1" />
               Terms & Conditions
-            </Link>
-            <Link to="/india" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors flex items-center">
-              <Flag className="h-4 w-4 mr-1" />
-              India
             </Link>
           </nav>
           
