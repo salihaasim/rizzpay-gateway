@@ -1,107 +1,92 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowUpCircle, ArrowDownCircle, CreditCard } from 'lucide-react';
-import { Transaction } from '@/stores/transactionStore';
-import TransactionStatusBadge from '@/components/wallet/TransactionStatusBadge';
-import { Button } from '@/components/ui/button';
+import { ArrowDown, ArrowUp, RefreshCw, CreditCard, Wallet } from 'lucide-react';
+import { format } from 'date-fns';
+import { Transaction } from '@/stores/transactions/types';
 
 interface TransactionListItemProps {
   transaction: Transaction;
-  userEmail: string;
-  onViewDetails: (id: string) => void;
+  showStatus?: boolean;
 }
 
 const TransactionListItem: React.FC<TransactionListItemProps> = ({
   transaction,
-  userEmail,
-  onViewDetails
+  showStatus = false
 }) => {
-  const getTransactionTypeIcon = (type: string) => {
-    switch (type) {
-      case 'deposit':
-        return <ArrowUpCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500" />;
-      case 'withdrawal':
-        return <ArrowDownCircle className="h-4 w-4 sm:h-5 sm:w-5 text-rose-500" />;
-      case 'transfer':
-        return <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />;
-      default:
-        return <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />;
+  const getTransactionIcon = () => {
+    if (transaction.walletTransactionType === 'deposit') {
+      return <ArrowDown className="h-4 w-4 text-green-500" />;
+    } else if (transaction.walletTransactionType === 'withdrawal') {
+      return <ArrowUp className="h-4 w-4 text-red-500" />;
+    } else if (transaction.walletTransactionType === 'transfer_in' || transaction.walletTransactionType === 'transfer_out') {
+      return <RefreshCw className="h-4 w-4 text-blue-500" />;
+    } else if (transaction.paymentMethod === 'card') {
+      return <CreditCard className="h-4 w-4 text-purple-500" />;
+    } else {
+      return <Wallet className="h-4 w-4 text-primary" />;
     }
   };
 
-  const getTransactionTypeName = (type: string) => {
-    switch (type) {
-      case 'deposit':
-        return 'Deposit';
-      case 'withdrawal':
-        return 'Withdrawal';
-      case 'transfer':
-        return userEmail === transaction.customer
-          ? 'Received Transfer'
-          : 'Sent Transfer';
-      default:
-        return 'Transaction';
+  const getTransactionTitle = () => {
+    if (transaction.walletTransactionType === 'deposit') {
+      return 'Deposit to Wallet';
+    } else if (transaction.walletTransactionType === 'withdrawal') {
+      return 'Withdrawal from Wallet';
+    } else if (transaction.walletTransactionType === 'transfer_in') {
+      return 'Transfer Received';
+    } else if (transaction.walletTransactionType === 'transfer_out') {
+      return 'Transfer Sent';
+    } else {
+      return transaction.description || 'Payment';
+    }
+  };
+
+  const getAmountColor = () => {
+    if (transaction.walletTransactionType === 'deposit' || transaction.walletTransactionType === 'transfer_in') {
+      return 'text-green-600';
+    } else if (transaction.walletTransactionType === 'withdrawal' || transaction.walletTransactionType === 'transfer_out') {
+      return 'text-red-600';
+    } else {
+      return '';
+    }
+  };
+
+  const getAmountPrefix = () => {
+    if (transaction.walletTransactionType === 'deposit' || transaction.walletTransactionType === 'transfer_in') {
+      return '+';
+    } else if (transaction.walletTransactionType === 'withdrawal' || transaction.walletTransactionType === 'transfer_out') {
+      return '-';
+    } else {
+      return '';
     }
   };
 
   return (
-    <Card className="mb-3 sm:mb-4 border-0 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex items-center justify-between flex-wrap gap-2 sm:flex-nowrap">
-          <div className="flex items-center">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 sm:mr-3">
-              {getTransactionTypeIcon(transaction.walletTransactionType || '')}
-            </div>
-            <div>
-              <p className="text-sm sm:text-base font-medium">
-                {getTransactionTypeName(transaction.walletTransactionType || '')}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {new Date(transaction.date).toLocaleString()}
-              </p>
-            </div>
-          </div>
-          <div className="text-right ml-auto">
-            <div className="flex items-center space-x-2">
-              <p className={`text-sm sm:text-base font-semibold ${
-                transaction.walletTransactionType === 'deposit' || 
-                (transaction.walletTransactionType === 'transfer' && transaction.customer === userEmail)
-                  ? 'text-emerald-500' 
-                  : 'text-rose-500'
-              }`}>
-                {transaction.walletTransactionType === 'deposit' || 
-                 (transaction.walletTransactionType === 'transfer' && transaction.customer === userEmail) 
-                  ? '+' : '-'}{transaction.amount}
-              </p>
-              <TransactionStatusBadge status={transaction.status} />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              ID: {transaction.id}
-            </p>
-          </div>
+    <div className="flex items-center justify-between p-4">
+      <div className="flex items-center">
+        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+          {getTransactionIcon()}
         </div>
-        
-        {transaction.description && (
-          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-muted/50 rounded-md text-xs sm:text-sm">
-            {transaction.description}
+        <div>
+          <div className="font-medium text-sm">{getTransactionTitle()}</div>
+          <div className="text-xs text-muted-foreground">
+            {format(new Date(transaction.date), 'MMM d, yyyy • h:mm a')}
           </div>
-        )}
-        
-        {transaction.processingState && (
-          <div className="mt-2 sm:mt-3 flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onViewDetails(transaction.id)}
-              className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
-            >
-              View Details
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          {showStatus && (
+            <div className={`text-xs mt-1 ${
+              transaction.status === 'successful' ? 'text-green-600' : 
+              transaction.status === 'failed' ? 'text-red-600' : 
+              transaction.status === 'pending' ? 'text-amber-600' : ''
+            }`}>
+              {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className={`font-medium ${getAmountColor()}`}>
+        {getAmountPrefix()}{transaction.amount}
+      </div>
+    </div>
   );
 };
 

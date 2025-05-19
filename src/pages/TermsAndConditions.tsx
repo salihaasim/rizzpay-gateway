@@ -1,199 +1,163 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { ChevronLeft, Download, Pin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShieldCheck, ArrowLeft, Printer, CreditCard, Shield, AlertTriangle } from 'lucide-react';
+import { Helmet } from 'react-helmet';
 
-const TermsAndConditions: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('general');
+const TermsAndConditions = () => {
+  const [isViewingPrintable, setIsViewingPrintable] = useState(false);
+  
+  const togglePrintableView = () => {
+    setIsViewingPrintable(!isViewingPrintable);
+  };
+  
+  const printDocument = () => {
+    window.print();
+  };
+  
+  const downloadPdf = () => {
+    // In a real application, this would generate and download a PDF
+    alert('PDF download functionality would be implemented here');
+  };
   
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <Helmet>
         <title>Terms and Conditions | RizzPay</title>
       </Helmet>
       
-      <div className="container max-w-5xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <Link to="/" className="text-primary hover:underline flex items-center gap-2">
-            <ArrowLeft size={18} />
-            <span>Back to Home</span>
-          </Link>
-          
-          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-            <Printer className="h-4 w-4" />
-            Print
-          </Button>
-        </div>
-        
-        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Terms and Conditions</h1>
-        
-        <div className="mb-8 p-6 bg-card rounded-lg border shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="mt-1">
-              <ShieldCheck className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold mb-2">Secure Payment Processing</h2>
-              <p className="text-muted-foreground">
-                RizzPay provides secure, reliable payment processing services for merchants and customers. Our platform adheres to the
-                highest security standards in the industry.
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <Tabs 
-          value={activeTab} 
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-4 mb-8">
-            <TabsTrigger value="general" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span>General</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              <span>Payments</span>
-            </TabsTrigger>
-            <TabsTrigger value="privacy" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span>Privacy</span>
-            </TabsTrigger>
-            <TabsTrigger value="prohibited" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              <span>Prohibited</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="general" className="space-y-8">
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">1. Acceptance of Terms</h2>
-              <p>
-                By accessing or using RizzPay's services, you agree to be bound by these Terms and Conditions. 
-                If you do not agree to these terms, please do not use our services.
-              </p>
-              
-              <h2 className="text-xl font-semibold">2. Description of Services</h2>
-              <p>
-                RizzPay provides digital payment processing services that enable merchants to accept payments from 
-                their customers through various payment methods including UPI, bank transfers, and other electronic 
-                payment systems. Our services include payment processing, transaction management, and settlement services.
-              </p>
-              
-              <h2 className="text-xl font-semibold">3. Account Registration</h2>
-              <p>
-                To use RizzPay services, merchants must register for an account and provide accurate, complete, and 
-                up-to-date information. You are responsible for maintaining the confidentiality of your account credentials 
-                and for all activities that occur under your account.
-              </p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="payments" className="space-y-8">
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-xl font-semibold">Payment</h2>
-                <ul className="list-none space-y-4 mt-4">
-                  <li className="flex items-start gap-3">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>By using RizzPay, you authorize us to facilitate the processing of payments on your behalf.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>We may charge fees for the use of our services, which will be clearly communicated to you. You are responsible for paying all applicable fees associated with your use of the services.</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="bg-blue-50 dark:bg-blue-950/20 p-6 rounded-lg">
-                <div className="flex items-start gap-4">
-                  <div className="bg-blue-100 dark:bg-blue-900/40 p-2 rounded-md">
-                    <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">Secure Payment Processing</h3>
-                    <p className="text-sm text-muted-foreground">Our payment processing complies with PCI DSS standards to ensure your payment data is always secure.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h2 className="text-xl font-semibold">4. Fees and Payments</h2>
-                <p className="mt-2">
-                  Merchants agree to pay all fees associated with the services as outlined in their service agreement. 
-                  RizzPay reserves the right to change its fee structure with appropriate notice. All fees are non-refundable 
-                  except as required by law or as specifically provided in these terms.
-                </p>
+      <div className={`min-h-screen bg-background ${isViewingPrintable ? 'p-8' : 'py-8'}`}>
+        {!isViewingPrintable && (
+          <header className="container mx-auto px-4 mb-8">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="text-primary hover:text-primary/90 flex items-center">
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Back to Home
+              </Link>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="sm" onClick={togglePrintableView}>
+                  <Pin className="h-4 w-4 mr-2" />
+                  Printable Version
+                </Button>
+                <Button variant="outline" size="sm" onClick={downloadPdf}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="privacy" className="space-y-8">
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Privacy Policy</h2>
-              <p>
-                Your privacy is important to us. Our Privacy Policy, which is incorporated into these Terms by reference, 
-                explains how we collect, use, and protect your personal information. By using our services, 
-                you consent to our collection and use of personal information as described in our Privacy Policy.
-              </p>
-              
-              <h2 className="text-xl font-semibold">Data Security</h2>
-              <p>
-                We implement appropriate technical and organizational measures to protect your personal data against 
-                unauthorized or unlawful processing, accidental loss, destruction, or damage. However, no method of 
-                transmission over the Internet or method of electronic storage is 100% secure.
-              </p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="prohibited" className="space-y-8">
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">5. Prohibited Activities</h2>
-              <p>
-                When using RizzPay services, you agree not to:
-              </p>
-              <ul className="list-disc pl-6 space-y-2 mt-4">
-                <li>Use the services for any illegal purpose or in violation of any local, state, national, or international law</li>
-                <li>Violate or encourage others to violate the rights of third parties, including intellectual property rights</li>
-                <li>Process transactions for businesses or activities not disclosed during account registration</li>
-                <li>Use the services to process payments for restricted businesses without prior approval</li>
-                <li>Attempt to bypass or circumvent any security measures implemented by RizzPay</li>
+          </header>
+        )}
+        
+        <main className={`container mx-auto ${isViewingPrintable ? '' : 'px-4'} max-w-3xl`}>
+          <article className="prose prose-slate dark:prose-invert max-w-none">
+            <h1 className="mb-6 text-3xl font-bold">RizzPay Privacy Policy</h1>
+            <p className="text-muted-foreground mb-8">Effective Date: May 15, 2025</p>
+            
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">1. Introduction</h2>
+              <p>This Privacy Policy describes how RizzPay ("we," "our," or "us") collects, uses, discloses, and safeguards the personal and transactional data of merchants, partners, and users interacting with our payment infrastructure.</p>
+            </section>
+            
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">2. Information We Collect</h2>
+              <p>We may collect the following categories of information:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>Personal Identification Details: Name, email address, phone number, and identity documents (PAN, Aadhaar, GSTIN, etc.)</li>
+                <li>Business Information: Merchant business details, registration certificates, and bank account information</li>
+                <li>Transactional Data: Payment history, UPI IDs, transaction values, timestamps, device metadata, and IP address</li>
+                <li>Usage Data: Browser information, device logs, and activity on our dashboard or API endpoints</li>
               </ul>
-            </div>
+            </section>
             
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Third-Party Links/Offers</h2>
-              <p>
-                RizzPay may contain links to third-party websites or services. These links are provided for your convenience. We do 
-                not endorse or assume any responsibility for the content, accuracy, or privacy practices of third-party websites. Use 
-                third-party websites at your own risk.
-              </p>
-            </div>
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">3. How We Use Your Information</h2>
+              <p>We use collected data to:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>Verify merchant identity and comply with KYC/AML requirements</li>
+                <li>Process, reconcile, and settle payments securely</li>
+                <li>Provide merchant support and operational notifications</li>
+                <li>Detect fraud, enforce compliance, and mitigate risks</li>
+                <li>Improve our platform, analytics, and user experience</li>
+              </ul>
+            </section>
             
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Our Partners</h2>
-              <p>
-                We may collaborate with third-party service providers or partners to enhance our services. However, we are not 
-                responsible for the acts or omissions of our partners. Any interactions or transactions with our partners are solely 
-                between you and the partners.
-              </p>
-            </div>
-          </TabsContent>
-        </Tabs>
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">4. Data Sharing & Disclosure</h2>
+              <p>We do not sell your data. However, data may be shared with:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>Banking Partners & Payment Networks: For transaction processing and settlement</li>
+                <li>Regulatory Authorities: If required by law or regulatory mandate (e.g., RBI, NPCI, FIU-IND)</li>
+                <li>Third-Party Service Providers: For KYC verification, fraud detection, and cloud hosting—all under strict confidentiality agreements</li>
+              </ul>
+            </section>
+            
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">5. Data Retention</h2>
+              <p>We retain personal and transactional data as long as necessary to:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>Comply with legal, tax, and regulatory obligations</li>
+                <li>Resolve disputes and enforce our agreements</li>
+                <li>Provide ongoing services and customer support</li>
+              </ul>
+            </section>
+            
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">6. Data Security</h2>
+              <p>We implement strong technical and organizational safeguards to protect your data, including:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>AES-256 encryption of sensitive information</li>
+                <li>Role-based access control and audit logging</li>
+                <li>Secure APIs and TLS protocols</li>
+              </ul>
+              <p className="mt-2">However, no system is 100% secure. Users are responsible for protecting their own account credentials.</p>
+            </section>
+            
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">7. Your Rights</h2>
+              <p>As a user, you have the right to:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>Access the data we hold about you</li>
+                <li>Request correction or deletion of incorrect data</li>
+                <li>Withdraw consent where applicable</li>
+                <li>Lodge a complaint with a data protection authority, if applicable</li>
+              </ul>
+              <p className="mt-2">Requests can be made by emailing us at rizzpay1@gmail.com.</p>
+            </section>
+            
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">8. Policy Updates</h2>
+              <p>This Privacy Policy may be updated periodically. Merchants will be notified of any material changes via email or dashboard notices. Continued use of services constitutes acceptance of the updated policy.</p>
+            </section>
+            
+            <section>
+              <h2 className="text-xl font-semibold mb-4">9. Contact Information</h2>
+              <p>If you have questions or concerns regarding this policy, contact us at:</p>
+              <ul className="list-disc list-inside mt-2">
+                <li>Email: rizzpay1@gmail.com</li>
+                <li>Phone: +91-9080186106</li>
+                <li>Address: RizzPay Headquarters, Chennai, India</li>
+              </ul>
+              <p className="mt-4">This policy is binding upon all users, merchants, and partners engaging with the RizzPay platform.</p>
+            </section>
+          </article>
+        </main>
         
-        <div className="mt-10 p-5 border-t">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
-            <p className="mt-2">For questions about these Terms, please contact us at: <span className="text-primary">rizzpay1@gmail.com</span></p>
-            <p>Phone: +91-9080186106 | Address: RizzPay Headquarters, Chennai, India</p>
+        {isViewingPrintable && (
+          <div className="fixed bottom-4 right-4 z-50 print:hidden">
+            <div className="flex gap-2">
+              <Button onClick={printDocument}>
+                <Pin className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+              <Button variant="outline" onClick={togglePrintableView}>
+                Exit Print View
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 

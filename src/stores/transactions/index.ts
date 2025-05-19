@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Transaction, TransactionStatus, PaymentMethod, TransactionState, UserRole, Wallet, PaymentProcessingState } from './types';
 import { createTransactionSlice, TransactionSlice } from './transactionSlice';
 import { createUserRoleSlice, UserRoleSlice } from './userRoleSlice';
-import { createWalletSlice, WalletSlice } from './walletStore';
+import { createWalletSlice } from './walletStore';
 
 // Create the store
 export const useTransactionStore = create<TransactionState>((set, get) => {

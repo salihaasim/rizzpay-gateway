@@ -29,8 +29,18 @@ import IndiaPage from './pages/IndiaPage';
 import RefundPolicy from './pages/RefundPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import GlobalFooter from './components/GlobalFooter';
+import Settings from './pages/Settings';
+import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 
 const PublicLayout = () => (
+  <div className="min-h-screen flex flex-col">
+    <div className="flex-grow">
+      <Outlet />
+    </div>
+  </div>
+);
+
+const HomePageLayout = () => (
   <div className="min-h-screen flex flex-col">
     <div className="flex-grow">
       <Outlet />
@@ -62,12 +72,17 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Public routes wrapped in PublicLayout */}
-        <Route element={<PublicLayout />}>
+        {/* Home page route with footer */}
+        <Route element={<HomePageLayout />}>
           <Route path="/" element={<Index />} />
+        </Route>
+        
+        {/* Public routes without footer */}
+        <Route element={<PublicLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
+          <Route path="/upi-link-payment" element={<UpiLinkPaymentPage />} />
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
@@ -84,6 +99,10 @@ const App: React.FC = () => {
           <Route
             path="/profile"
             element={isAuthenticated() ? <Profile /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/settings"
+            element={isAuthenticated() ? <Settings /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/banking"
