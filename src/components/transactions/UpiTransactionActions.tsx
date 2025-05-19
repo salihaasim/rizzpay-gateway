@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 import { toast } from 'sonner';
 
 interface UpiTransactionActionsProps {
@@ -10,22 +10,28 @@ interface UpiTransactionActionsProps {
 }
 
 const UpiTransactionActions: React.FC<UpiTransactionActionsProps> = ({ transactionId }) => {
-  const { updateTransaction } = useTransactionStore();
+  const { updateTransaction, getTransactionById } = useTransactionStore();
   
   const handleVerify = () => {
-    updateTransaction(transactionId, {
-      status: 'successful',
-      detailedStatus: 'Manually verified by merchant',
-    });
-    toast.success('Transaction verified successfully');
+    const transaction = getTransactionById(transactionId);
+    if (transaction) {
+      updateTransaction(transactionId, {
+        status: 'successful',
+        detailedStatus: 'Manually verified by merchant'
+      });
+      toast.success('Transaction verified successfully');
+    }
   };
   
   const handleReject = () => {
-    updateTransaction(transactionId, {
-      status: 'failed',
-      detailedStatus: 'Rejected during manual verification',
-    });
-    toast.error('Transaction rejected');
+    const transaction = getTransactionById(transactionId);
+    if (transaction) {
+      updateTransaction(transactionId, {
+        status: 'failed',
+        detailedStatus: 'Rejected during manual verification'
+      });
+      toast.error('Transaction rejected');
+    }
   };
   
   return (

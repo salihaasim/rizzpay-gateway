@@ -4,10 +4,11 @@ import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { IndianRupee } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 import { safeSupabaseTable } from '@/utils/supabaseClient';
 import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
 import UpiPaymentSuccess from '@/components/payment/UpiPaymentSuccess';
+import { PaymentMethod } from '@/stores/transactions/types';
 
 const UpiPaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -63,7 +64,7 @@ const UpiPaymentPage = () => {
         date,
         amount: `₹${parseFloat(amount).toFixed(2)}`,
         rawAmount: parseFloat(amount),
-        paymentMethod: 'upi',
+        paymentMethod: 'upi' as PaymentMethod,
         status: 'successful',
         customer: customerName,
         processingState: 'completed',
@@ -71,7 +72,6 @@ const UpiPaymentPage = () => {
           upiId,
           buyerName: customerName,
           buyerEmail: customerEmail,
-          paidAmount: amount,
         },
         description,
       });

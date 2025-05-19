@@ -1,6 +1,7 @@
 
 import { toast } from 'sonner';
-import { Transaction, PaymentDetails } from '@/stores/transactionStore';
+import { Transaction } from '@/stores/transactions/types';
+import { PaymentDetails } from '@/types/payment';
 
 // Simulate payment processing without actual Razorpay integration
 export const processRazorpayPayment = async (
@@ -56,4 +57,3 @@ export const processRazorpayPayment = async (
     return null;
   }
 };
-

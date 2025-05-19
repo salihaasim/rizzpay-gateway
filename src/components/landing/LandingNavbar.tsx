@@ -28,10 +28,6 @@ const LandingNavbar = () => {
               <FileText className="h-4 w-4 mr-1" />
               Terms & Conditions
             </Link>
-            <Link to="/refund-policy" className="text-sm font-medium text-muted-foreground hover:text-[#0052FF] transition-colors flex items-center">
-              <FileText className="h-4 w-4 mr-1" />
-              Refund Policy
-            </Link>
           </nav>
           
           <Link to="/auth">

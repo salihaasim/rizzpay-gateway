@@ -1,71 +1,63 @@
 
-# RizzPay Payment Gateway
+# RizzPay Payment Platform
 
 ## Overview
-RizzPay is a comprehensive payment gateway solution designed specifically for the Indian market. It facilitates secure and efficient payment transactions through various methods including UPI, Cards, and NEFT.
 
-## Features
-- Dashboard for transaction monitoring and management
-- UPI Payment processing with QR code generation
-- Card Payment integration with Razorpay
-- NEFT payment support
-- Customizable payment links
-- Embeddable UPI payment plugin
-- Webhook integration for automated notifications
-- Multi-language support for payment plugins (HTML, React, JavaScript, PHP)
-- Banking configuration for UPI and Bank accounts
-- Wallet functionality for fund management
-- IP and domain whitelisting for enhanced security
-- Merchant registration and onboarding
+RizzPay is a comprehensive payment processing platform designed to facilitate various types of financial transactions including card payments, UPI transfers, wallet management, and bank transfers.
 
-## Tech Stack
-- React with TypeScript for the frontend
-- Tailwind CSS for styling
-- ShadCN UI components for consistent design
-- Supabase for backend and authentication
-- Zustand for state management
-- React Router for navigation
+## Recent Updates
+
+- Fixed dialog component nesting issues in AdminMobileMenuTrigger, UserSwitcher, and WhitelistForm
+- Enhanced user login experience for admin users
+- Updated Terms and Conditions page with modern tabbed interface
+- Redesigned Refund Policy page with improved user experience
+- Added print functionality to policy pages
+- Improved UI of Terms and Conditions page
+- Updated all contact information to rizzpay1@gmail.com and +91-9080186106
+- Changed address to "RizzPay Headquarters, Chennai, India"
+- Removed India page from navigation
+- Saved India page content as text file
+- Set default pricing to 1% transaction fee
+- Improved admin settings and user settings page functionality
+
+## Key Features
+
+- Multi-method payment processing
+- Comprehensive transaction management
+- UPI transaction handling
+- Real-time webhook notifications
+- Secure wallet operations
+- Detailed refund policy documentation
+- Clear terms and conditions
+
+## Development Guidelines
+
+- Use TypeScript for type safety
+- Follow component-based architecture
+- Implement clean code practices
+- Document new features and changes
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 16+
-- npm or yarn
-
-### Installation
 1. Clone the repository
-2. Install dependencies: `npm install` or `yarn`
-3. Start the development server: `npm run dev` or `yarn dev`
+2. Install dependencies with `npm install`
+3. Start the development server with `npm run dev`
+4. Access the application at `http://localhost:5173`
 
-## Architecture
-The application follows a component-based architecture with:
-- Pages for main views
-- Reusable UI components
-- Utility functions for common operations
-- API integrations with payment providers
+## Project Structure
 
-## Recent Updates
-- Added Banking page for UPI and bank account configuration
-- Enhanced UPI QR plugin with multi-language support (HTML, React, JavaScript, PHP)
-- Fixed Razorpay integration issues
-- Improved payment processing workflow
-- Added navigation sidebar to all pages
-- Added merchant registration and onboarding process
+- `/src/components` - UI components
+- `/src/hooks` - Custom React hooks
+- `/src/pages` - Application pages
+- `/src/stores` - State management
+- `/src/utils` - Utility functions
 
-## Payment Methods
-- UPI (Unified Payment Interface)
-- Credit/Debit Cards
-- NEFT (National Electronic Funds Transfer)
+## Documentation
 
-## Security Features
-- IP whitelisting
-- Domain whitelisting for webhooks
-- Secure API key management
-- Transaction verification
+For more detailed information about the system, refer to the documentation in the `rizzpay documentations` directory.
 
-## License
-Proprietary - All rights reserved
+## Contact Information
 
----
-
-© 2025 RizzPay Payment Technologies
+- Email: rizzpay1@gmail.com
+- Phone: +91-9080186106
+- Address: RizzPay Headquarters, Chennai, India

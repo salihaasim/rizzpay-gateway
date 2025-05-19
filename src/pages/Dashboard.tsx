@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import Layout from '@/components/Layout';
@@ -25,17 +24,19 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import UpiQrPopup from '@/components/upi/UpiQrPopup';
 import { createRazorpayOrder, loadRazorpayScript } from '@/utils/razorpay';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const Dashboard = () => {
-  const { userRole, userEmail } = useTransactionStore();
-  const [activeTab, setActiveTab] = useState(userRole === 'admin' ? 'admin' : 'merchant');
+  const { currentMerchant } = useMerchantAuth();
+  const transactionStore = useTransactionStore();
+  const [activeTab, setActiveTab] = useState(currentMerchant?.role === 'admin' ? 'admin' : 'merchant');
   const navigate = useNavigate();
   
   // Simplified merchant name - just use the email without GROUP suffix
   const merchantName = useMemo(() => {
-    if (!userEmail) return "MERCHANT";
-    return userEmail.split('@')[0].toUpperCase();
-  }, [userEmail]);
+    if (!currentMerchant?.email) return "MERCHANT";
+    return currentMerchant.email.split('@')[0].toUpperCase();
+  }, [currentMerchant?.email]);
 
   // Payment method state
   const [paymentMethod, setPaymentMethod] = useState('card');
@@ -55,6 +56,17 @@ const Dashboard = () => {
   
   // UPI states
   const [upiProvider, setUpiProvider] = useState('gpay');
+  
+  // Only access userRole and userEmail from the store after component mounts
+  const [userRole, setUserRole] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  
+  useEffect(() => {
+    if (transactionStore) {
+      setUserRole(transactionStore.userRole || (currentMerchant?.role === 'admin' ? 'admin' : 'merchant'));
+      setUserEmail(transactionStore.userEmail || currentMerchant?.email || '');
+    }
+  }, [transactionStore, currentMerchant]);
   
   const toggleFavorite = (id: string) => {
     setBankAccounts(accounts => 
@@ -175,7 +187,7 @@ const Dashboard = () => {
       <div className="container max-w-7xl mx-auto px-4 py-6">
         <DashboardHeader 
           merchantName={merchantName}
-          userRole={userRole}
+          userRole={userRole || (currentMerchant?.role === 'admin' ? 'admin' : 'merchant')}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />

@@ -36,14 +36,6 @@ Demo credentials:
 - Admin: username: `rizzpay`, password: `rizzpay123`
 - Merchant: username: `merchant`, password: `password`
 
-## Pricing Structure
-
-RizzPay employs a simple, transparent pricing model:
-
-- **Standard Fee**: 1% flat fee for all transactions (both incoming and outgoing)
-- **No Hidden Charges**: No setup fees, monthly fees, or other hidden costs
-- **Volume Discounts**: Available for merchants with high transaction volumes
-
 ## Admin Features
 
 The admin dashboard includes:
@@ -53,7 +45,7 @@ The admin dashboard includes:
 - **Transaction Logs**: View and export transaction history to Excel
 - **Merchant Whitelist**: Manage trusted merchants with special access
 - **Bank API Integration**: Connect with banking APIs for seamless transactions
-- **Pricing Control**: Set default pricing (unified 1% fee for all transactions)
+- **Pricing Control**: Set default pricing (payment in: 1%, payment out: 1%)
 - **System Monitoring**: Comprehensive monitoring dashboards for all aspects of the system
 
 ## Merchant Features
@@ -91,14 +83,6 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Customizable Payment Pages**: Branded payment experience for customers
 - **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
 
-## Legal Documents and Policies
-
-RizzPay provides comprehensive legal documents to ensure transparency and compliance:
-
-- **Terms and Conditions**: Detailed terms governing the use of the platform
-- **Refund Policy**: Clear guidelines on refund eligibility and process
-- **Privacy Policy**: Information on how user data is collected and used
-
 ## System Monitoring
 
 RizzPay includes comprehensive monitoring dashboards for all aspects of the system:
@@ -125,10 +109,20 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 - **Purpose**: Get ideas for new features and improvements to the payment gateway
 - **Availability**: This feature is not linked from admin or merchant dashboards
 
+## Legal Documents
+
+RizzPay provides comprehensive legal documentation:
+
+- **Terms & Conditions**: Detailed terms of service
+- **Refund Policy**: Clear guidelines on refunds and cancellations
+- **Privacy Policy**: Information on data collection and usage
+
 ## Recent Updates
 
-- **Unified Pricing**: Simplified fee structure with a flat 1% fee for all transactions
-- **Legal Docs**: Added comprehensive Terms & Conditions and Refund Policy pages
+- **Added Privacy Policy**: Added comprehensive privacy policy page
+- **Added Refund Policy**: Added detailed refund policy documentation
+- **Footer Update**: Added links to all legal documents in the footer
+- **Performance Improvements**: Optimized component loading and rendering
 - **UI Redesign**: Updated dashboard layout to match simplified mockup design
 - **Current Balance**: Added prominent current balance card on dashboard
 - **Pay-In/Pay-Out Metrics**: Enhanced pay-in and pay-out tracking with success rates
@@ -157,6 +151,7 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
-- [Terms and Conditions](/terms)
-- [Refund Policy](/refund-policy)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
+- [Privacy Policy](/privacy-policy)
+- [Refund Policy](/refund-policy)
+- [Terms & Conditions](/terms)

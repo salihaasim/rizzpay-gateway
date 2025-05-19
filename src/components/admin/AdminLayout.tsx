@@ -1,89 +1,58 @@
 
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { Sheet } from '@/components/ui/sheet';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
-
-// Import refactored components
+import React from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useTransactionStore } from '@/stores/transactions';
 import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
 import AdminMobileMenu from './layout/AdminMobileMenu';
-import AdminMobileMenuTrigger from './layout/AdminMobileMenuTrigger';
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
+export interface AdminLayoutProps {
+  children?: React.ReactNode;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userRole, userEmail, resetUserRole } = useTransactionStore();
-  const { logout: merchantLogout } = useMerchantAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   
-  // Redirect if not admin
-  useEffect(() => {
+  // Check if user is admin, if not redirect to login
+  React.useEffect(() => {
     if (userRole !== 'admin') {
-      navigate('/dashboard');
+      navigate('/login');
     }
   }, [userRole, navigate]);
+  
+  const handleLogout = () => {
+    resetUserRole();
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    navigate('/login');
+  };
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
-
-  const handleLogout = () => {
-    resetUserRole();
-    merchantLogout(); // Ensure we also log out from merchant auth
-    toast.success('Logged out successfully');
-    navigate('/', { replace: true }); // Redirect to home page
-  };
-
-  if (userRole !== 'admin') {
-    return null;
-  }
-
+  
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex">
-      {/* Desktop sidebar with improved responsiveness */}
-      <AdminSidebar 
-        userEmail={userEmail} 
-        collapsed={collapsed} 
-        setCollapsed={setCollapsed} 
-        handleLogout={handleLogout}
-      />
-
-      {/* Mobile-optimized main content */}
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <main className={cn(
-          "flex-1 min-h-screen transition-all duration-300",
-          collapsed ? "lg:ml-20" : "lg:ml-[280px]",
-          "px-2 sm:px-4 md:px-6" // Improved responsive padding
-        )}>
-          <AdminHeader 
-            userEmail={userEmail} 
-            handleLogout={handleLogout} 
-          />
-          
-          <div className="p-2 sm:p-4 md:p-6 lg:p-8">
-            {children}
-          </div>
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+      <AdminSidebar />
+      
+      <div className="flex flex-col flex-1">
+        <AdminHeader onLogout={handleLogout} />
+        
+        <main className="flex-1 p-4 md:p-6 overflow-auto">
+          {children ? children : <Outlet />}
         </main>
-        
-        <AdminMobileMenuTrigger setMobileMenuOpen={setMobileMenuOpen} />
-        
-        <AdminMobileMenu 
-          userEmail={userEmail}
-          mobileMenuOpen={mobileMenuOpen}
-          setMobileMenuOpen={setMobileMenuOpen}
-          handleLogout={handleLogout}
-          isActive={isActive}
-        />
-      </Sheet>
+      </div>
+      
+      <AdminMobileMenu 
+        userEmail={userEmail}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        handleLogout={handleLogout}
+        isActive={isActive}
+      />
     </div>
   );
 };

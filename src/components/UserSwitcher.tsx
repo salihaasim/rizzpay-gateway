@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { User, LogOut, UserPlus, Users } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import UserRegistrationForm from './UserRegistrationForm';
@@ -154,14 +154,16 @@ const UserSwitcher = () => {
         </DropdownMenuContent>
       </DropdownMenu>
       
-      <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Register New User</DialogTitle>
-          </DialogHeader>
-          <UserRegistrationForm onRegister={handleRegisterUser} />
-        </DialogContent>
-      </Dialog>
+      {registerOpen && (
+        <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Register New User</DialogTitle>
+            </DialogHeader>
+            <UserRegistrationForm onRegister={handleRegisterUser} />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };

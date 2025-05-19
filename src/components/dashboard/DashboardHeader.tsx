@@ -1,40 +1,43 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Building2, UserCog } from 'lucide-react';
 
 interface DashboardHeaderProps {
   merchantName: string;
   userRole: string;
   activeTab: string;
-  onTabChange: (value: string) => void;
+  onTabChange: (tab: string) => void;
 }
 
-const DashboardHeader = ({
-  merchantName,
-  userRole,
-  activeTab,
-  onTabChange
+const DashboardHeader = ({ 
+  merchantName, 
+  userRole, 
+  activeTab, 
+  onTabChange 
 }: DashboardHeaderProps) => {
   return (
-    <div className="page-header mb-6">
-      <h1 className="text-2xl font-bold mb-1">Welcome, {merchantName}</h1>
-      <p className="text-muted-foreground">Here's your payment overview</p>
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Welcome, {merchantName}</h1>
+        <p className="text-muted-foreground">
+          Your {userRole === 'admin' ? 'admin' : 'merchant'} dashboard and overview.
+        </p>
+      </div>
       
       {userRole === 'admin' && (
-        <div className="mt-4">
-          <Tabs 
-            defaultValue="admin" 
-            value={activeTab}
-            onValueChange={onTabChange}
-            className="w-[180px]"
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="admin">Admin</TabsTrigger>
-              <TabsTrigger value="merchant">Merchant</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        <Tabs value={activeTab} onValueChange={onTabChange}>
+          <TabsList>
+            <TabsTrigger value="admin">
+              <UserCog className="mr-2 h-4 w-4" />
+              Admin View
+            </TabsTrigger>
+            <TabsTrigger value="merchant">
+              <Building2 className="mr-2 h-4 w-4" />
+              Merchant View
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       )}
     </div>
   );
