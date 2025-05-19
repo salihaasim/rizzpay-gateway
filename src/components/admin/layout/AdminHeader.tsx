@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { LogOut, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import AdminMobileMenuTrigger from './AdminMobileMenuTrigger';

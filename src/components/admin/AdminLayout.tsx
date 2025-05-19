@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/transactionStore';
 import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
 import AdminMobileMenu from './layout/AdminMobileMenu';
@@ -39,10 +39,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <AdminSidebar />
       
       <div className="flex flex-col flex-1">
-        <AdminHeader onLogout={handleLogout} />
+        <AdminHeader onLogout={handleLogout} setMobileMenuOpen={setMobileMenuOpen} />
         
         <main className="flex-1 p-4 md:p-6 overflow-auto">
-          {children ? children : <Outlet />}
+          {children || <Outlet />}
         </main>
       </div>
       

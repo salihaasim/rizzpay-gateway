@@ -7,7 +7,7 @@ import {
   Navigate,
   Outlet
 } from 'react-router-dom';
-import { useTransactionStore } from './stores/transactions';
+import { useTransactionStore } from './stores/transactionStore';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
@@ -16,7 +16,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import BankingPage from './pages/BankingPage';
 import Webhooks from './pages/Webhooks';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import AdminTransactions from './pages/admin/AdminTransactions';
 import AdminMerchants from './pages/admin/AdminMerchants';
 import AdminKYC from './pages/admin/AdminKYC';
@@ -29,6 +29,7 @@ import IndiaPage from './pages/IndiaPage';
 import RefundPolicy from './pages/RefundPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import GlobalFooter from './components/GlobalFooter';
+import Auth from './pages/Auth';
 
 const PublicLayout = () => (
   <div className="min-h-screen flex flex-col">
@@ -40,7 +41,7 @@ const PublicLayout = () => (
 );
 
 const App: React.FC = () => {
-  const { setUserRole, isAuthenticated } = useTransactionStore();
+  const { setUserRole, userRole, isAuthenticated } = useTransactionStore();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -67,6 +68,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
@@ -99,8 +101,11 @@ const App: React.FC = () => {
           />
         </Route>
         
-        {/* Admin routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* Admin routes - Only accessible if user is admin */}
+        <Route 
+          path="/admin" 
+          element={userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" replace />}
+        >
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="merchants" element={<AdminMerchants />} />
