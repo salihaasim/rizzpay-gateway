@@ -109,16 +109,10 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 - **Purpose**: Get ideas for new features and improvements to the payment gateway
 - **Availability**: This feature is not linked from admin or merchant dashboards
 
-## Legal Documents
-
-RizzPay provides comprehensive legal documentation:
-
-- **Terms & Conditions**: Detailed terms of service
-- **Refund Policy**: Clear guidelines on refunds and cancellations
-- **Privacy Policy**: Information on data collection and usage
-
 ## Recent Updates
 
+- **Fixed Home Page Routing**: Fixed issue with home page routing to ensure proper navigation
+- **Light Theme Only**: Simplified theming to light mode only for consistency
 - **Added Privacy Policy**: Added comprehensive privacy policy page
 - **Added Refund Policy**: Added detailed refund policy documentation
 - **Footer Update**: Added links to all legal documents in the footer
@@ -140,6 +134,14 @@ RizzPay provides comprehensive legal documentation:
 - **Payment Button Updates**: Updated payment buttons to use consistent RizzPay branding
 - **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
 - **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
+
+## Legal Documents
+
+RizzPay provides comprehensive legal documentation:
+
+- **Terms & Conditions**: Detailed terms of service
+- **Refund Policy**: Clear guidelines on refunds and cancellations
+- **Privacy Policy**: Information on data collection and usage
 
 ## Server Requirements
 

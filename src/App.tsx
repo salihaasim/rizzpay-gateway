@@ -4,6 +4,7 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
+  Navigate
 } from 'react-router-dom';
 import { useTransactionStore } from './stores/transactions';
 import Dashboard from './pages/Dashboard';
@@ -23,6 +24,7 @@ import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
+import Index from './pages/Index';
 
 const App: React.FC = () => {
   const { setUserRole } = useTransactionStore();
@@ -47,48 +49,21 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
+        {/* Public landing page */}
+        <Route path="/" element={<Index />} />
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upi-payment" element={<UpiPaymentPage />} />
         <Route path="/india" element={<IndiaPage />} />
         
         {/* Protected routes for authenticated users */}
-        <Route
-          path="/"
-          element={
-            <Dashboard />
-          }
-        />
-        <Route
-          path="/transactions"
-          element={
-            <Transactions />
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <Profile />
-          }
-        />
-        <Route
-          path="/banking"
-          element={
-            <BankingPage />
-          }
-        />
-        <Route
-          path="/webhooks"
-          element={
-            <Webhooks />
-          }
-        />
-        <Route
-          path="/wallet"
-          element={
-            <WalletPage />
-          }
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/transactions" element={<Transactions />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/banking" element={<BankingPage />} />
+        <Route path="/webhooks" element={<Webhooks />} />
+        <Route path="/wallet" element={<WalletPage />} />
         
         {/* Admin routes */}
         <Route path="/admin" element={<AdminLayout />}>
