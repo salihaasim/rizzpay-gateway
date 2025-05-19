@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -106,11 +105,11 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
   return (
     <div
       className={cn(
-        "flex flex-col fixed inset-y-0 z-50 h-full bg-[#111827] dark:bg-gray-900 text-white transition-all duration-300",
+        "flex flex-col fixed inset-y-0 z-50 h-full bg-[#111827] text-white transition-all duration-300",
         collapsed ? "w-20" : "w-[280px]"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <Link to="/dashboard" className="flex items-center space-x-3">
           {!collapsed && (
             <>
@@ -124,7 +123,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
           <Button
             variant="ghost"
             size="icon"
-            className="ml-auto h-8 w-8 text-muted-foreground hover:bg-gray-800 dark:hover:bg-gray-700"
+            className="ml-auto h-8 w-8 text-muted-foreground hover:bg-gray-800"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? (
@@ -143,8 +142,8 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
               key={index}
               to={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
-                pathname === item.href && "bg-gray-800 dark:bg-gray-700 text-white"
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800",
+                pathname === item.href && "bg-gray-800 text-white"
               )}
             >
               {item.icon}
@@ -154,7 +153,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
         </nav>
       </ScrollArea>
 
-      <div className="mt-auto border-t border-gray-800 dark:border-gray-700 p-4">
+      <div className="mt-auto border-t border-gray-800 p-4">
         <div className={cn("flex items-center", collapsed ? "justify-center" : "space-x-3")}>
           <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
             {currentMerchant?.fullName ? (
@@ -181,7 +180,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full mt-4 text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
+            "w-full mt-4 text-gray-300 hover:text-white hover:bg-gray-800",
             collapsed ? "justify-center px-0" : "justify-start"
           )}
           onClick={handleLogout}

@@ -1,177 +1,195 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import {
+  BarChart3,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Home,
+  LogOut,
+  Settings,
+  Users,
+  Shield,
+  MonitorSmartphone,
+  MessageSquare,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTransactionStore } from '@/stores/transactions';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
-interface AdminSidebarProps {
-  userEmail: string | null;
+interface SidebarProps {
+  userEmail: string;
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   handleLogout: () => void;
 }
 
-const AdminSidebar = ({
+const AdminSidebar: React.FC<SidebarProps> = ({
   userEmail,
   collapsed,
   setCollapsed,
-  handleLogout
-}: AdminSidebarProps) => {
+  handleLogout,
+}) => {
   const location = useLocation();
-  const { isAuthenticated } = useTransactionStore();
 
   const isActive = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    return location.pathname === path;
   };
 
+  const sidebarItems = [
+    {
+      name: 'Dashboard',
+      path: '/admin',
+      icon: <Home className="h-5 w-5" />,
+    },
+    {
+      name: 'Merchants',
+      path: '/admin/merchants',
+      icon: <Users className="h-5 w-5" />,
+    },
+    {
+      name: 'Escrow',
+      path: '/admin/escrow',
+      icon: <DollarSign className="h-5 w-5" />,
+    },
+    {
+      name: 'Pricing',
+      path: '/admin/pricing',
+      icon: <CreditCard className="h-5 w-5" />,
+    },
+    {
+      name: 'Whitelist',
+      path: '/admin/whitelist',
+      icon: <Shield className="h-5 w-5" />,
+    },
+    {
+      name: 'Monitoring',
+      path: '/admin/monitoring',
+      icon: <MonitorSmartphone className="h-5 w-5" />,
+    },
+    {
+      name: 'Transactions',
+      path: '/admin/transactions',
+      icon: <FileText className="h-5 w-5" />,
+    },
+    {
+      name: 'Analytics',
+      path: '/admin/analytics',
+      icon: <BarChart3 className="h-5 w-5" />,
+    },
+    {
+      name: 'Settings',
+      path: '/admin/settings',
+      icon: <Settings className="h-5 w-5" />,
+    },
+  ];
+
   return (
-    <div className={cn(
-      "h-screen fixed left-0 top-0 bottom-0 z-40 bg-white border-r border-gray-200 transition-all duration-300",
-      collapsed ? "w-20" : "w-[280px]"
-    )}>
-      <div className="flex h-16 items-center border-b px-4 justify-between">
-        <div className="flex items-center gap-2">
+    <TooltipProvider delayDuration={0}>
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
+          collapsed ? "w-20" : "w-[280px]",
+          "lg:z-10"
+        )}
+      >
+        <div className="flex h-16 items-center justify-between px-2 md:px-4">
           {!collapsed && (
-            <Link to="/admin" className="flex items-center gap-2">
-              <span className="font-bold text-xl">RizzPay</span>
-              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Admin</span>
+            <Link to="/" className="flex items-center">
+              <h1 className="text-xl font-bold text-primary">RizzPay</h1>
+              <Badge variant="outline" className="ml-2 text-xs">
+                Admin
+              </Badge>
             </Link>
           )}
-          {collapsed && (
-            <Link to="/admin" className="flex items-center justify-center">
-              <span className="font-bold text-xl">R</span>
-            </Link>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex"
-        >
-          {collapsed ? (
-            <span>→</span>
-          ) : (
-            <span>←</span>
-          )}
-        </Button>
-      </div>
-
-      <div className="flex flex-col h-[calc(100vh-4rem)] justify-between">
-        <nav className="px-3 py-4">
-          <ul className="space-y-1">
-            <li>
-              <Link
-                to="/admin"
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md",
-                  isActive("/admin") && !isActive("/admin/transactions") && !isActive("/admin/merchants") && !isActive("/admin/kyc") && !isActive("/admin/whitelist") && !isActive("/admin/upi-management")
-                    ? "bg-blue-50 text-blue-700"
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <span className="mr-3">📊</span>
-                {!collapsed && <span>Dashboard</span>}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/transactions"
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md",
-                  isActive("/admin/transactions")
-                    ? "bg-blue-50 text-blue-700"
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <span className="mr-3">💳</span>
-                {!collapsed && <span>Transactions</span>}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/merchants"
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md",
-                  isActive("/admin/merchants")
-                    ? "bg-blue-50 text-blue-700"
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <span className="mr-3">🏪</span>
-                {!collapsed && <span>Merchants</span>}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/kyc"
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md",
-                  isActive("/admin/kyc")
-                    ? "bg-blue-50 text-blue-700"
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <span className="mr-3">🔍</span>
-                {!collapsed && <span>KYC Verification</span>}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/whitelist"
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md",
-                  isActive("/admin/whitelist")
-                    ? "bg-blue-50 text-blue-700"
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <span className="mr-3">✅</span>
-                {!collapsed && <span>Whitelist</span>}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/upi-management"
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md",
-                  isActive("/admin/upi-management")
-                    ? "bg-blue-50 text-blue-700"
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <span className="mr-3">💸</span>
-                {!collapsed && <span>UPI Management</span>}
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="p-3 mt-auto border-t">
-          <div className="flex items-center mb-4">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-3">
-              {userEmail ? userEmail.substring(0, 1).toUpperCase() : 'A'}
-            </div>
-            {!collapsed && (
-              <div>
-                <p className="font-medium text-sm">{userEmail || 'Admin'}</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
-            )}
-          </div>
           <Button
-            variant="outline"
-            size={collapsed ? "icon" : "default"}
-            className={cn("w-full justify-center", !collapsed && "justify-start")}
-            onClick={handleLogout}
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className={cn("rounded-full", collapsed && "mx-auto")}
+            aria-label={collapsed ? "Expand menu" : "Collapse menu"}
           >
-            <span className="mr-2">🚪</span>
-            {!collapsed && <span>Logout</span>}
+            <ChevronLeft
+              className={cn(
+                "h-5 w-5 transition-transform",
+                collapsed && "rotate-180"
+              )}
+            />
           </Button>
         </div>
+        
+        <div className="flex-1 overflow-auto py-2 md:py-4">
+          <div className="space-y-1 px-1 md:px-3">
+            {sidebarItems.map((item) => (
+              <Tooltip key={item.path} delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Link to={item.path} tabIndex={0}>
+                    <Button
+                      variant={isActive(item.path) ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start touch-manipulation",
+                        collapsed && "h-12 w-12 p-0 justify-center",
+                        "rounded-lg sm:rounded-md"
+                      )}
+                    >
+                      {item.icon}
+                      {!collapsed && (
+                        <span className="ml-3">{item.name}</span>
+                      )}
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                {collapsed && (
+                  <TooltipContent side="right">
+                    {item.name}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            ))}
+          </div>
+        </div>
+        
+        <div className="p-2 md:p-3 mt-auto">
+          <Separator className="my-2" />
+          {!collapsed && (
+            <div className="mb-2 px-2 md:px-4">
+              <p className="text-sm text-muted-foreground truncate">
+                {userEmail}
+              </p>
+            </div>
+          )}
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 touch-manipulation",
+                  collapsed && "h-12 w-12 p-0 justify-center"
+                )}
+                onClick={handleLogout}
+                aria-label="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+                {!collapsed && <span className="ml-3">Logout</span>}
+              </Button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">Logout</TooltipContent>
+            )}
+          </Tooltip>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
+
+import { Badge } from '@/components/ui/badge';
+import { ChevronLeft } from 'lucide-react';
 
 export default AdminSidebar;

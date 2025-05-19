@@ -55,16 +55,25 @@ const UpiPluginSettings: React.FC = () => {
   };
   
   const handleSaveSettings = () => {
-    if (currentMerchant) {
-      updateMerchantUpiSettings({
-        upiId: formState.upiId,
-        name: currentMerchant.upiSettings?.name || currentMerchant.fullName || 'RizzPay Merchant', // Add required name property
-        enabled: formState.enabled,
-        allowManualVerification: formState.allowManualVerification,
-        customWebhookUrl: formState.customWebhookUrl || undefined
-      });
-      toast.success("UPI settings updated successfully");
+    if (!currentMerchant) {
+      toast.error('You must be logged in to save settings');
+      return;
     }
+    
+    if (!formState.upiId.includes('@')) {
+      toast.error('Please enter a valid UPI ID with @ symbol');
+      return;
+    }
+    
+    updateMerchantUpiSettings(currentMerchant.username, {
+      upiId: formState.upiId,
+      name: currentMerchant.upiSettings?.name || currentMerchant.fullName || 'RizzPay Merchant', // Add required name property
+      enabled: formState.enabled,
+      allowManualVerification: formState.allowManualVerification,
+      customWebhookUrl: formState.customWebhookUrl || undefined
+    });
+    
+    toast.success('UPI settings saved successfully');
   };
   
   const handleTestPopup = () => {

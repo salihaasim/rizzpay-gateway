@@ -5,7 +5,6 @@ import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,7 +15,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery(mediaQueries.isMobile);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile ? true : false);
   
   // Monitor authentication status for changes
   useEffect(() => {
@@ -50,7 +49,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Display responsive layout for authenticated users with sidebar
   return (
-    <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
+    <div className="min-h-screen flex bg-[#f5f5f7]">
       <DashboardSidebar 
         collapsed={sidebarCollapsed} 
         setCollapsed={setSidebarCollapsed} 
@@ -60,9 +59,6 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
         sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]"
       }`}>
         <main className="p-4 sm:p-6">
-          <div className="absolute top-4 right-4 z-50">
-            <ThemeToggle />
-          </div>
           {children}
         </main>
         

@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useTransactionStore } from '@/stores/transactions';
+import { Check, X } from 'lucide-react';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { toast } from 'sonner';
 
 interface UpiTransactionActionsProps {
@@ -9,52 +10,43 @@ interface UpiTransactionActionsProps {
 }
 
 const UpiTransactionActions: React.FC<UpiTransactionActionsProps> = ({ transactionId }) => {
-  const { updateTransaction, transactions } = useTransactionStore();
-  const transaction = transactions.find(t => t.id === transactionId);
+  const { updateTransaction } = useTransactionStore();
   
-  if (!transaction) return null;
-
-  const handleAccept = () => {
+  const handleVerify = () => {
     updateTransaction(transactionId, {
       status: 'successful',
-      detailedStatus: 'Transaction manually approved by admin'
+      detailedStatus: 'Manually verified by merchant',
     });
-    toast.success('Transaction has been approved');
+    toast.success('Transaction verified successfully');
   };
-
-  const handleDecline = () => {
+  
+  const handleReject = () => {
     updateTransaction(transactionId, {
       status: 'failed',
-      detailedStatus: 'Transaction manually declined by admin'
+      detailedStatus: 'Rejected during manual verification',
     });
-    toast.error('Transaction has been declined');
+    toast.error('Transaction rejected');
   };
-
-  if (transaction.status !== 'pending') {
-    return (
-      <div className="text-gray-500 text-xs">
-        {transaction.status === 'successful' ? 'Approved' : 'Declined'}
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="flex items-center space-x-2">
-      <Button
-        variant="outline"
-        size="sm"
-        className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
-        onClick={handleAccept}
+    <div className="flex gap-2">
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={handleVerify}
+        className="text-emerald-500 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600"
       >
-        Accept
+        <Check className="h-4 w-4 mr-1" />
+        Verify
       </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        className="bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200"
-        onClick={handleDecline}
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={handleReject}
+        className="text-rose-500 border-rose-200 hover:bg-rose-50 hover:text-rose-600"
       >
-        Decline
+        <X className="h-4 w-4 mr-1" />
+        Reject
       </Button>
     </div>
   );

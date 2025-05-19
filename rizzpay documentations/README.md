@@ -111,12 +111,6 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 
 ## Recent Updates
 
-- **Fixed Home Page Routing**: Fixed issue with home page routing to ensure proper navigation
-- **Light Theme Only**: Simplified theming to light mode only for consistency
-- **Added Privacy Policy**: Added comprehensive privacy policy page
-- **Added Refund Policy**: Added detailed refund policy documentation
-- **Footer Update**: Added links to all legal documents in the footer
-- **Performance Improvements**: Optimized component loading and rendering
 - **UI Redesign**: Updated dashboard layout to match simplified mockup design
 - **Current Balance**: Added prominent current balance card on dashboard
 - **Pay-In/Pay-Out Metrics**: Enhanced pay-in and pay-out tracking with success rates
@@ -135,14 +129,6 @@ RizzPay includes a specialized AI assistant named Aasimo AI that provides strate
 - **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
 - **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
 
-## Legal Documents
-
-RizzPay provides comprehensive legal documentation:
-
-- **Terms & Conditions**: Detailed terms of service
-- **Refund Policy**: Clear guidelines on refunds and cancellations
-- **Privacy Policy**: Information on data collection and usage
-
 ## Server Requirements
 
 See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.
@@ -154,6 +140,4 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
-- [Privacy Policy](/privacy-policy)
-- [Refund Policy](/refund-policy)
-- [Terms & Conditions](/terms)
+

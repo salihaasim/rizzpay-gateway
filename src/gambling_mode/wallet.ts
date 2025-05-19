@@ -1,96 +1,101 @@
 
-export const createWallet = async (userId: string, initialBalance = 0) => {
-  try {
-    // Simulation code for wallet creation
-    return {
-      id: generateWalletId(),
-      owner: userId,
-      balance: initialBalance,
-      createdAt: new Date().toISOString()
-    };
-  } catch (error) {
-    console.error('Error creating wallet:', error);
-    return null;
-  }
-};
+/**
+ * RizzPay Gambling Mode - Wallet Module
+ * Handles internal wallet credit/debit logic for gambling transactions
+ */
 
-export const depositToWallet = async (
-  walletId: string,
+import { Transaction, WalletTransactionType } from '@/stores/transactions/types';
+import { useTransactionStore } from '@/stores/transactions';
+import { delay } from '@/utils/commonUtils';
+import { GamblingPaymentDetails } from './types';
+
+/**
+ * Process gambling deposit with enhanced anonymity
+ */
+export const processGamblingDeposit = async (
+  userEmail: string,
   amount: number,
-  method: string,
-  reference: string
-) => {
-  try {
-    // Simulation code for wallet deposit
-    const transaction = {
-      id: generateTransactionId(),
-      walletId,
-      type: 'deposit',
-      amount,
-      method,
-      reference,
-      timestamp: new Date().toISOString(),
-      status: 'completed'
-    };
-    
-    return transaction;
-  } catch (error) {
-    console.error('Error depositing to wallet:', error);
-    return null;
+  description: string = 'Entertainment Services'
+): Promise<string> => {
+  const store = useTransactionStore.getState();
+  
+  // Create obfuscated transaction record
+  const transactionId = store.depositToWallet(userEmail, amount, 'wallet');
+  
+  // Get the transaction and update it with gambling mode flags
+  const transaction = store.transactions.find(t => t.id === transactionId);
+  
+  if (!transaction) {
+    throw new Error('Transaction creation failed');
   }
+  
+  // Update transaction with obfuscated description and metadata
+  store.updateTransaction(transactionId, {
+    description: description,
+    paymentDetails: {
+      ...(transaction.paymentDetails || {}),
+      isGamblingTransaction: true,
+      obfuscated: true,
+      routedVia: 'entertainment-gateway'
+    } as GamblingPaymentDetails
+  });
+  
+  return transactionId;
 };
 
-export const withdrawFromWallet = async (
-  walletId: string,
+/**
+ * Process gambling withdrawal with enhanced privacy
+ */
+export const processGamblingWithdrawal = async (
+  userEmail: string,
   amount: number,
-  address: string,
-  reference: string
-) => {
-  try {
-    // Simulation code for wallet withdrawal
-    const transaction = {
-      id: generateTransactionId(),
-      walletId,
-      type: 'withdrawal',
-      amount,
-      address,
-      reference,
-      timestamp: new Date().toISOString(),
-      status: 'processing' // Usually withdrawals need to be processed
-    };
-    
-    return transaction;
-  } catch (error) {
-    console.error('Error withdrawing from wallet:', error);
-    return null;
+  description: string = 'Entertainment Services Withdrawal'
+): Promise<string> => {
+  const store = useTransactionStore.getState();
+  
+  // Check for sufficient balance
+  const currentBalance = store.getWalletBalance(userEmail);
+  if (currentBalance < amount) {
+    throw new Error('Insufficient balance for withdrawal');
   }
+  
+  // Create withdrawal with obfuscated description
+  const transactionId = store.withdrawFromWallet(userEmail, amount, 'wallet');
+  
+  // Update transaction with gambling mode flags
+  store.updateTransaction(transactionId, {
+    description: description,
+    paymentDetails: {
+      isGamblingTransaction: true,
+      obfuscated: true,
+      routedVia: 'entertainment-payout'
+    } as GamblingPaymentDetails
+  });
+  
+  return transactionId;
 };
 
-export const getWalletBalance = async (walletId: string): Promise<number> => {
-  try {
-    // Simulation code for getting wallet balance
-    return 1000; // Default balance for testing
-  } catch (error) {
-    console.error('Error getting wallet balance:', error);
-    return 0;
-  }
+/**
+ * Get gambling transaction history with filtered sensitive information
+ */
+export const getFilteredGamblingTransactions = (userEmail: string): Transaction[] => {
+  const store = useTransactionStore.getState();
+  const allTransactions = store.transactions;
+  
+  // Filter transactions related to this user
+  const userTransactions = allTransactions.filter(t => 
+    (t.customer === userEmail || t.createdBy === userEmail) &&
+    (t.paymentDetails as GamblingPaymentDetails)?.isGamblingTransaction === true
+  );
+  
+  // Return filtered transactions with sensitive data removed
+  return userTransactions.map(t => ({
+    ...t,
+    paymentDetails: {
+      ...(t.paymentDetails || {}),
+      routingDetails: undefined,
+      processingDetails: undefined,
+      internalNotes: undefined
+    }
+  }));
 };
-
-export const checkWalletExists = async (userId: string): Promise<string> => {
-  try {
-    // Simulation code to check if wallet exists
-    return generateWalletId(); // Return a wallet ID if exists
-  } catch (error) {
-    console.error('Error checking wallet:', error);
-    return '';
-  }
-};
-
-// Helper functions
-function generateWalletId(): string {
-  return `wallet_${Math.random().toString(36).substring(2, 15)}`;
-}
-
-function generateTransactionId(): string {
-  return `tx_${Math.random().toString(36).substring(2, 15)}`;
-}
