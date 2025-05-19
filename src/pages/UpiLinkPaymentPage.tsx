@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
 import { Helmet } from 'react-helmet';
 
-// Simplify the UPI payment page to fix loading issues
 const UpiLinkPaymentPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

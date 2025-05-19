@@ -73,12 +73,6 @@ const App: React.FC = () => {
     checkAuthStatus();
   }, [setUserRole]);
   
-  // Fix for automatically redirecting to admin
-  const shouldRedirectToAdmin = (path: string) => {
-    // Only redirect to admin if explicitly on /admin route and user is admin
-    return path.startsWith('/admin') && userRole === 'admin';
-  };
-  
   return (
     <Router>
       <Routes>
@@ -136,7 +130,7 @@ const App: React.FC = () => {
           />
         </Route>
         
-        {/* Admin routes */}
+        {/* Admin routes - only redirect to admin if path explicitly starts with /admin and user is admin */}
         <Route path="/admin" element={
           userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" replace />
         }>
