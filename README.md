@@ -7,6 +7,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
+- Fixed Dialog nesting issues in AdminMobileMenuTrigger component
 - Fixed DialogPortal and DialogTrigger nesting issues in AdminMobileMenuTrigger, UserSwitcher, and WhitelistForm
 - Corrected TypeScript errors in whitelist components
 - Removed demo credentials from login page for better security
@@ -63,4 +64,3 @@ For more detailed information about the system, refer to the documentation in th
 - Email: rizzpay1@gmail.com
 - Phone: +91-9080186106
 - Address: RizzPay Headquarters, Chennai, India
-
