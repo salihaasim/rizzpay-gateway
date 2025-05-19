@@ -1,149 +1,151 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { IndianRupee } from 'lucide-react';
-import { toast } from 'sonner';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { safeSupabaseTable } from '@/utils/supabaseClient';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useTransactionStore } from '@/stores/transactions';
 import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
-import UpiPaymentSuccess from '@/components/payment/UpiPaymentSuccess';
+import UpiQrCodeDisplay from '@/components/payment/UpiQrCodeDisplay';
+import PaymentSuccess from '@/components/payment/PaymentSuccess';
+import PaymentPageLoading from '@/components/payment/PaymentPageLoading';
+import PaymentPageError from '@/components/payment/PaymentPageError';
+import { generateTransactionId } from '@/stores/transactions/utils';
+import { toast } from 'sonner';
+import { PaymentDetails } from '@/stores/transactions/types';
 
-const UpiPaymentPage = () => {
-  const [searchParams] = useSearchParams();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [upiUrl, setUpiUrl] = useState('');
-  const [linkCopied, setLinkCopied] = useState(false);
+const UpiPaymentPage: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [showQr, setShowQr] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
+  const [error, setError] = useState('');
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
   const { addTransaction } = useTransactionStore();
   
-  // Get payment details from URL parameters
-  const amount = searchParams.get('amount') || '0';
-  const customerName = searchParams.get('name') || 'Customer';
-  const customerEmail = searchParams.get('email') || '';
-  const description = searchParams.get('desc') || 'Payment via RizzPay';
-  const upiId = searchParams.get('upi') || 'merchant@rizzpay';
-  const linkId = searchParams.get('id') || 'unknown';
+  const location = useLocation();
+  const navigate = useNavigate();
   
   useEffect(() => {
-    // Create UPI payment URL and QR code
-    if (upiId && amount) {
-      const upiPaymentUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent('RizzPay')}&am=${amount}&cu=INR&tn=${encodeURIComponent(description)}`;
-      
-      setUpiUrl(upiPaymentUrl);
-      
-      // Generate QR code URL using a third-party service
-      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPaymentUrl)}`;
-      setQrCodeUrl(qrCodeApiUrl);
+    // Parse URL parameters
+    const params = new URLSearchParams(location.search);
+    const amount = params.get('amount');
+    const orderId = params.get('order_id') || generateTransactionId();
+    const merchantId = params.get('merchant_id') || 'demo_merchant';
+    const callbackUrl = params.get('callback_url');
+    const customerName = params.get('customer_name') || 'Guest';
+    const customerEmail = params.get('customer_email') || 'guest@example.com';
+    
+    if (!amount) {
+      setError('Missing required payment parameters');
+      setIsLoading(false);
+      return;
     }
-  }, [upiId, amount, description]);
-  
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setLinkCopied(true);
-    toast.success('UPI ID copied to clipboard!');
     
-    setTimeout(() => {
-      setLinkCopied(false);
-    }, 3000);
-  };
-  
-  const handlePaymentSuccess = async () => {
-    setLoading(true);
-    
-    try {
-      // Create a transaction record
-      const transactionId = `upipay_${Math.random().toString(36).substring(2, 12)}`;
-      const date = new Date().toISOString();
-      
-      // Create transaction in store
-      addTransaction({
-        id: transactionId,
-        date,
-        amount: `₹${parseFloat(amount).toFixed(2)}`,
-        rawAmount: parseFloat(amount),
-        paymentMethod: 'upi',
-        status: 'successful',
-        customer: customerName,
-        processingState: 'completed',
-        paymentDetails: {
-          upiId,
-          buyerName: customerName,
-          buyerEmail: customerEmail,
-          paidAmount: amount,
-        },
-        description,
-      });
-      
-      // Try to update the payment link status in Supabase using the safe method
-      try {
-        await safeSupabaseTable('payment_links')
-          .update({ status: 'paid', paid_at: new Date().toISOString() })
-          .eq('id', linkId);
-      } catch (error) {
-        console.error('Error updating payment link status:', error);
-        // Continue anyway since we've created the transaction
-      }
-      
-      setSuccess(true);
-      setLoading(false);
-      
-      toast.success('Payment confirmed!', {
-        description: 'Your transaction was completed successfully'
-      });
-    } catch (error) {
-      console.error('Error recording payment:', error);
-      setLoading(false);
-      toast.error('Error recording payment. Please try again.');
-    }
-  };
-  
-  const openUpiApp = () => {
-    // Try to open the UPI app
-    window.location.href = upiUrl;
-    
-    // Show guidance toast
-    toast.info('Opening UPI app...', {
-      description: 'If the app doesn\'t open, try copying the UPI ID manually'
+    // Set transaction data
+    setPaymentData({
+      amount: amount,
+      orderId: orderId,
+      merchantId: merchantId,
+      callbackUrl: callbackUrl,
+      customerName: customerName,
+      customerEmail: customerEmail,
+      createdAt: new Date().toISOString()
     });
+    
+    setTransactionId(orderId);
+    setIsLoading(false);
+  }, [location]);
+  
+  const handlePaymentSuccess = (upiId: string) => {
+    if (!transactionId || !paymentData) return;
+    
+    // Create a successful transaction
+    const transaction = {
+      id: transactionId,
+      date: new Date().toISOString(),
+      amount: `₹${paymentData.amount}`,
+      rawAmount: parseFloat(paymentData.amount),
+      customer: paymentData.customerName,
+      customerEmail: paymentData.customerEmail,
+      status: 'successful',
+      paymentMethod: 'upi',
+      description: `UPI Payment for order ${paymentData.orderId}`,
+      detailedStatus: 'Payment completed',
+      paymentDetails: {
+        upiId: upiId,
+        buyerName: paymentData.customerName,
+        buyerEmail: paymentData.customerEmail,
+        amountInPaise: parseFloat(paymentData.amount) * 100,
+        gateway: 'UPI Direct'
+      } as PaymentDetails
+    };
+    
+    // Add to transaction store
+    addTransaction(transaction);
+    
+    // Show success state
+    setIsPaid(true);
+    
+    toast.success('Payment Successful!', {
+      description: `₹${paymentData.amount} paid via UPI`,
+    });
+    
+    // Handle callback if provided
+    if (paymentData.callbackUrl) {
+      // In production, you would redirect or send a webhook
+      console.log('Callback URL:', paymentData.callbackUrl);
+    }
   };
+  
+  if (isLoading) {
+    return <PaymentPageLoading />;
+  }
+  
+  if (error) {
+    return <PaymentPageError error={error} />;
+  }
+  
+  if (isPaid) {
+    return <PaymentSuccess transactionId={transactionId} amount={paymentData?.amount} />;
+  }
   
   return (
-    <div className="container max-w-md mx-auto p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <IndianRupee className="h-5 w-5 mr-2 text-primary" />
-            RizzPay UPI Payment
-          </CardTitle>
-          <CardDescription>
-            Secure UPI payment via RizzPay
-          </CardDescription>
+    <div className="container mx-auto px-4 py-8 max-w-md">
+      <Card className="border shadow-lg">
+        <CardHeader className="border-b bg-muted/50">
+          <CardTitle className="text-center text-xl">UPI Payment</CardTitle>
         </CardHeader>
-        
-        <CardContent className="space-y-6">
-          {success ? (
-            <UpiPaymentSuccess amount={amount} />
-          ) : (
-            <UpiPaymentForm 
-              amount={amount}
-              description={description}
-              upiId={upiId}
-              qrCodeUrl={qrCodeUrl}
-              openUpiApp={openUpiApp}
-              handlePaymentSuccess={handlePaymentSuccess}
-              loading={loading}
-              linkCopied={linkCopied}
-              copyToClipboard={copyToClipboard}
+        <CardContent className="p-6">
+          {showQr ? (
+            <UpiQrCodeDisplay 
+              amount={paymentData.amount} 
+              transactionId={transactionId || ''}
+              onSuccess={handlePaymentSuccess}
+              onCancel={() => setShowQr(false)}
             />
+          ) : (
+            <>
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold">₹{paymentData?.amount}</h2>
+                <p className="text-muted-foreground">Pay using any UPI app</p>
+              </div>
+              
+              <UpiPaymentForm
+                onSubmit={(upiId) => handlePaymentSuccess(upiId)}
+                onShowQr={() => setShowQr(true)}
+              />
+              
+              <div className="mt-6 flex justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate(-1)}
+                >
+                  Cancel Payment
+                </Button>
+              </div>
+            </>
           )}
         </CardContent>
-        
-        {!success && (
-          <CardFooter className="flex justify-center">
-          </CardFooter>
-        )}
       </Card>
     </div>
   );

@@ -1,13 +1,13 @@
 
-import { Transaction, Wallet, WalletTransactionType, TransactionState } from './types';
+import { Transaction, Wallet, WalletTransactionType, TransactionState, PaymentMethod } from './types';
 import { generateTransactionId } from './utils';
 
 export interface WalletSlice {
   wallets: Record<string, Wallet>;
   initializeWallet: (email: string) => void;
   getWalletBalance: (email: string) => number;
-  depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
-  withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
+  depositToWallet: (email: string, amount: number, paymentMethod: PaymentMethod) => string;
+  withdrawFromWallet: (email: string, amount: number, paymentMethod: PaymentMethod) => string;
   transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
 }
 
@@ -24,8 +24,9 @@ export const createWalletSlice = (
         wallets: {
           ...state.wallets,
           [email]: {
+            id: generateTransactionId(),
+            owner: email,
             balance: 0,
-            currency: '₹',
             transactions: []
           }
         }
@@ -49,17 +50,23 @@ export const createWalletSlice = (
       date,
       amount: `₹${amount.toFixed(2)}`,
       rawAmount: amount,
-      paymentMethod,
+      paymentMethod: paymentMethod,
       status: 'successful',
       customer: email,
       createdBy: email,
       walletTransactionType: 'deposit',
       description: 'Deposit to wallet',
+      paymentDetails: {}
     };
     
     // Update wallet
     set((state) => {
-      const userWallet = state.wallets[email] || { balance: 0, currency: '₹', transactions: [] };
+      const userWallet = state.wallets[email] || { 
+        id: generateTransactionId(), 
+        owner: email, 
+        balance: 0, 
+        transactions: [] 
+      };
       
       return {
         transactions: [transaction, ...state.transactions],
@@ -68,7 +75,7 @@ export const createWalletSlice = (
           [email]: {
             ...userWallet,
             balance: userWallet.balance + amount,
-            transactions: [transactionId, ...userWallet.transactions],
+            transactions: [transaction, ...userWallet.transactions],
           }
         }
       };
@@ -95,17 +102,23 @@ export const createWalletSlice = (
       date,
       amount: `₹${amount.toFixed(2)}`,
       rawAmount: amount,
-      paymentMethod,
+      paymentMethod: paymentMethod,
       status: 'successful',
       customer: email,
       createdBy: email,
       walletTransactionType: 'withdrawal',
       description: 'Withdrawal from wallet',
+      paymentDetails: {}
     };
     
     // Update wallet
     set((state) => {
-      const userWallet = state.wallets[email] || { balance: 0, currency: '₹', transactions: [] };
+      const userWallet = state.wallets[email] || { 
+        id: generateTransactionId(), 
+        owner: email, 
+        balance: 0, 
+        transactions: [] 
+      };
       
       return {
         transactions: [transaction, ...state.transactions],
@@ -114,7 +127,7 @@ export const createWalletSlice = (
           [email]: {
             ...userWallet,
             balance: userWallet.balance - amount,
-            transactions: [transactionId, ...userWallet.transactions],
+            transactions: [transaction, ...userWallet.transactions],
           }
         }
       };
@@ -150,17 +163,27 @@ export const createWalletSlice = (
       status: 'successful',
       customer: toEmail,
       createdBy: fromEmail,
-      walletTransactionType: 'transfer',
+      walletTransactionType: 'transfer_in',
       description,
       paymentDetails: {
-        recipientEmail: toEmail,
+        buyerEmail: toEmail
       }
     };
     
     // Update both wallets
     set((state) => {
-      const senderWallet = state.wallets[fromEmail] || { balance: 0, currency: '₹', transactions: [] };
-      const recipientWallet = state.wallets[toEmail] || { balance: 0, currency: '₹', transactions: [] };
+      const senderWallet = state.wallets[fromEmail] || { 
+        id: generateTransactionId(), 
+        owner: fromEmail, 
+        balance: 0, 
+        transactions: [] 
+      };
+      const recipientWallet = state.wallets[toEmail] || { 
+        id: generateTransactionId(), 
+        owner: toEmail, 
+        balance: 0, 
+        transactions: [] 
+      };
       
       return {
         transactions: [transaction, ...state.transactions],
@@ -169,12 +192,12 @@ export const createWalletSlice = (
           [fromEmail]: {
             ...senderWallet,
             balance: senderWallet.balance - amount,
-            transactions: [transactionId, ...senderWallet.transactions],
+            transactions: [transaction, ...senderWallet.transactions],
           },
           [toEmail]: {
             ...recipientWallet,
             balance: recipientWallet.balance + amount,
-            transactions: [transactionId, ...recipientWallet.transactions],
+            transactions: [transaction, ...recipientWallet.transactions],
           }
         }
       };
