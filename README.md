@@ -15,7 +15,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 - Removed India page from navigation
 - Saved India page content as text file
 - Set default pricing to 1% transaction fee
-- Fixed dialog nesting issues in AdminMobileMenuTrigger, UpiQrPopup, AddMerchantDialog, KycDocumentViewer, and WhitelistForm
+- Fixed dialog nesting issues in AdminMobileMenuTrigger, UserSwitcher, and WhitelistForm
 - Improved admin settings and user settings page functionality
 
 ## Key Features

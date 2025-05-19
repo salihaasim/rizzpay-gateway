@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useProfileStore, Merchant } from '@/stores/profileStore';
 import { useTransactionStore } from '@/stores/transactionStore';
