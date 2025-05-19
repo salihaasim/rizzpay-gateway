@@ -1,185 +1,142 @@
-
-import { Transaction, Wallet, WalletTransactionType, TransactionState } from './types';
-import { generateTransactionId } from './utils';
-
-export interface WalletSlice {
-  wallets: Record<string, Wallet>;
-  initializeWallet: (email: string) => void;
-  getWalletBalance: (email: string) => number;
-  depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
-  withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
-  transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
-}
+import { TransactionState, WalletTransaction, WalletSlice } from './types';
 
 export const createWalletSlice = (
   set: (fn: (state: TransactionState) => Partial<TransactionState>) => void,
   get: () => TransactionState
 ): WalletSlice => ({
-  wallets: {},
+  walletBalance: 10000, // Default wallet balance for demo
+  walletTransactions: [],
   
-  initializeWallet: (email) => {
-    const state = get();
-    if (!state.wallets[email]) {
-      set((state) => ({
-        wallets: {
-          ...state.wallets,
-          [email]: {
-            balance: 0,
-            currency: '₹',
-            transactions: []
-          }
-        }
-      }));
-    }
-  },
-  
-  getWalletBalance: (email) => {
-    const state = get();
-    return state.wallets[email]?.balance || 0;
-  },
-  
-  depositToWallet: (email, amount, paymentMethod) => {
-    const state = get();
-    const transactionId = generateTransactionId();
-    const date = new Date().toISOString();
-    
-    // Create transaction
-    const transaction: Transaction = {
-      id: transactionId,
-      date,
-      amount: `₹${amount.toFixed(2)}`,
-      rawAmount: amount,
-      paymentMethod,
-      status: 'successful',
-      customer: email,
-      createdBy: email,
-      walletTransactionType: 'deposit',
-      description: 'Deposit to wallet',
-    };
-    
-    // Update wallet
+  // Add a transaction to the wallet
+  addWalletTransaction: (transaction) => {
     set((state) => {
-      const userWallet = state.wallets[email] || { balance: 0, currency: '₹', transactions: [] };
+      let newBalance = state.walletBalance;
       
-      return {
-        transactions: [transaction, ...state.transactions],
-        wallets: {
-          ...state.wallets,
-          [email]: {
-            ...userWallet,
-            balance: userWallet.balance + amount,
-            transactions: [transactionId, ...userWallet.transactions],
-          }
-        }
-      };
-    });
-    
-    return transactionId;
-  },
-  
-  withdrawFromWallet: (email, amount, paymentMethod) => {
-    const state = get();
-    const currentBalance = state.wallets[email]?.balance || 0;
-    
-    // Check if sufficient balance
-    if (currentBalance < amount) {
-      throw new Error("Insufficient balance");
-    }
-    
-    const transactionId = generateTransactionId();
-    const date = new Date().toISOString();
-    
-    // Create transaction
-    const transaction: Transaction = {
-      id: transactionId,
-      date,
-      amount: `₹${amount.toFixed(2)}`,
-      rawAmount: amount,
-      paymentMethod,
-      status: 'successful',
-      customer: email,
-      createdBy: email,
-      walletTransactionType: 'withdrawal',
-      description: 'Withdrawal from wallet',
-    };
-    
-    // Update wallet
-    set((state) => {
-      const userWallet = state.wallets[email] || { balance: 0, currency: '₹', transactions: [] };
-      
-      return {
-        transactions: [transaction, ...state.transactions],
-        wallets: {
-          ...state.wallets,
-          [email]: {
-            ...userWallet,
-            balance: userWallet.balance - amount,
-            transactions: [transactionId, ...userWallet.transactions],
-          }
-        }
-      };
-    });
-    
-    return transactionId;
-  },
-  
-  transferFunds: (fromEmail, toEmail, amount, description = 'Fund transfer') => {
-    const state = get();
-    const senderBalance = state.wallets[fromEmail]?.balance || 0;
-    
-    // Check if sufficient balance
-    if (senderBalance < amount) {
-      throw new Error("Insufficient balance for transfer");
-    }
-    
-    // Ensure recipient wallet exists
-    if (!state.wallets[toEmail]) {
-      throw new Error("Recipient wallet does not exist");
-    }
-    
-    const transactionId = generateTransactionId();
-    const date = new Date().toISOString();
-    
-    // Create transaction
-    const transaction: Transaction = {
-      id: transactionId,
-      date,
-      amount: `₹${amount.toFixed(2)}`,
-      rawAmount: amount,
-      paymentMethod: 'wallet',
-      status: 'successful',
-      customer: toEmail,
-      createdBy: fromEmail,
-      walletTransactionType: 'transfer',
-      description,
-      paymentDetails: {
-        recipientEmail: toEmail,
+      // Update balance based on transaction type
+      if (transaction.type === 'payment' || transaction.type === 'withdrawal') {
+        // 1% transaction fee for all outgoing transactions
+        const fee = transaction.amount * 0.01; 
+        newBalance -= (transaction.amount + fee);
+      } else if (transaction.type === 'transfer_out') {
+        // 1% transaction fee for transfers out
+        const fee = transaction.amount * 0.01;
+        newBalance -= (transaction.amount + fee);
+      } else if (transaction.type === 'transfer_in' || transaction.type === 'refund') {
+        // No fee for incoming transfers or refunds
+        newBalance += transaction.amount;
       }
-    };
-    
-    // Update both wallets
-    set((state) => {
-      const senderWallet = state.wallets[fromEmail] || { balance: 0, currency: '₹', transactions: [] };
-      const recipientWallet = state.wallets[toEmail] || { balance: 0, currency: '₹', transactions: [] };
       
+      // Return updated state
       return {
-        transactions: [transaction, ...state.transactions],
-        wallets: {
-          ...state.wallets,
-          [fromEmail]: {
-            ...senderWallet,
-            balance: senderWallet.balance - amount,
-            transactions: [transactionId, ...senderWallet.transactions],
-          },
-          [toEmail]: {
-            ...recipientWallet,
-            balance: recipientWallet.balance + amount,
-            transactions: [transactionId, ...recipientWallet.transactions],
-          }
-        }
+        walletTransactions: [transaction, ...state.walletTransactions],
+        walletBalance: parseFloat(newBalance.toFixed(2))
       };
     });
+  },
+  
+  // Process a payment from the wallet
+  processWalletPayment: (amount, recipient, description) => {
+    const state = get();
     
-    return transactionId;
-  }
+    // Calculate fee (1% of transaction amount)
+    const fee = amount * 0.01;
+    const totalAmount = amount + fee;
+    
+    // Check if sufficient balance
+    if (state.walletBalance < totalAmount) {
+      console.error('Insufficient wallet balance');
+      return false;
+    }
+    
+    // Create new transaction
+    const transaction: WalletTransaction = {
+      id: `wt-${Date.now()}`,
+      type: 'payment',
+      amount: amount,
+      fee: fee,
+      recipient: recipient,
+      description: description || 'Payment',
+      timestamp: new Date().toISOString(),
+      status: 'completed'
+    };
+    
+    // Add transaction to wallet
+    state.addWalletTransaction(transaction);
+    return true;
+  },
+  
+  // Process a withdrawal from the wallet
+  processWalletWithdrawal: (amount, bankAccount, description) => {
+    const state = get();
+    
+    // Calculate fee (1% of withdrawal amount)
+    const fee = amount * 0.01;
+    const totalAmount = amount + fee;
+    
+    // Check if sufficient balance
+    if (state.walletBalance < totalAmount) {
+      console.error('Insufficient wallet balance');
+      return false;
+    }
+    
+    // Create new transaction
+    const transaction: WalletTransaction = {
+      id: `wt-${Date.now()}`,
+      type: 'withdrawal',
+      amount: amount,
+      fee: fee,
+      recipient: bankAccount,
+      description: description || 'Withdrawal to bank account',
+      timestamp: new Date().toISOString(),
+      status: 'processing' // Initially set as processing
+    };
+    
+    // Add transaction to wallet
+    state.addWalletTransaction(transaction);
+    
+    // Simulate processing completion after 3 seconds
+    setTimeout(() => {
+      set((state) => ({
+        walletTransactions: state.walletTransactions.map(t => 
+          t.id === transaction.id ? { ...t, status: 'completed' } : t
+        )
+      }));
+    }, 3000);
+    
+    return true;
+  },
+  
+  // Process a wallet transfer
+  processWalletTransfer: (amount, recipient, description) => {
+    const state = get();
+    
+    // Calculate fee (1% of transfer amount)
+    const fee = amount * 0.01;
+    const totalAmount = amount + fee;
+    
+    // Check if sufficient balance
+    if (state.walletBalance < totalAmount) {
+      console.error('Insufficient wallet balance');
+      return false;
+    }
+    
+    // Create outgoing transaction
+    const outgoingTransaction: WalletTransaction = {
+      id: `wt-out-${Date.now()}`,
+      type: 'transfer_out',
+      amount: amount,
+      fee: fee,
+      recipient: recipient,
+      description: description || 'Transfer to merchant',
+      timestamp: new Date().toISOString(),
+      status: 'completed'
+    };
+    
+    // Add outgoing transaction to wallet
+    state.addWalletTransaction(outgoingTransaction);
+    return true;
+  },
+  
+  // Update the README file to document the changes
+  
 });

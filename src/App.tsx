@@ -1,4 +1,3 @@
-
 import React, { useEffect, memo, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -9,6 +8,7 @@ import Layout from './components/Layout';
 import PaymentPageLoading from './components/payment/PaymentPageLoading';
 import WalletPage from './pages/WalletPage';
 import TermsAndConditions from './pages/TermsAndConditions';
+import RefundPolicy from './pages/RefundPolicy';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import AdminMonitoring from './pages/AdminMonitoring';
 import AdminDashboard from './pages/AdminDashboard';
@@ -108,6 +108,8 @@ const App = () => {
           <Route path="/developer" element={<DeveloperPage />} />
           <Route path="/developer/integration" element={<DeveloperIntegration />} />
           <Route path="/merchant-onboarding" element={<MerchantOnboarding />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

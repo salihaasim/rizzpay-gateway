@@ -61,9 +61,9 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           email: 'merchant@rizzpay.com',
           role: 'merchant',
           pricing: {
-            transactionFee: 1.0, // Updated to 1.0% as requested
-            fixedFee: 5,
-            monthlyFee: 499
+            transactionFee: 1.0, // Updated to 1.0% as per requirement
+            fixedFee: 0, // Removed fixed fee
+            monthlyFee: 0 // Removed monthly fee
           },
           upiSettings: {
             upiId: 'demo.merchant@rizzpay',
@@ -100,11 +100,11 @@ export const useMerchantAuth = create<MerchantAuthState>()(
         const merchantWithRole = {
           ...merchant,
           role: merchant.role || 'merchant',
-          // Set default pricing for new merchants if not specified
+          // Set default pricing for new merchants with 1% fee and no other fees
           pricing: merchant.pricing || {
-            transactionFee: 1.0, // Default 1.0% transaction fee
-            fixedFee: 5,
-            monthlyFee: 499
+            transactionFee: 1.0, // Update to 1.0% transaction fee
+            fixedFee: 0,
+            monthlyFee: 0
           },
           // Set default UPI settings
           upiSettings: merchant.upiSettings || {

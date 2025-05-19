@@ -1,681 +1,161 @@
 
 import React from 'react';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Shield, FileText, CreditCard, Check, AlertTriangle, HelpCircle } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, FileText } from 'lucide-react';
+import LandingNavbar from '@/components/landing/LandingNavbar';
+import Footer from '@/components/landing/Footer';
 
 const TermsAndConditions = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container px-4 py-10 mx-auto max-w-4xl">
-        <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+    <div className="min-h-screen flex flex-col">
+      <LandingNavbar />
+      
+      <div className="container px-4 mx-auto py-12 flex-grow">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border p-8">
+          <div className="flex items-center mb-6">
+            <FileText className="h-6 w-6 mr-2 text-primary" />
+            <h1 className="text-3xl font-bold">Terms and Conditions</h1>
+          </div>
+          
+          <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8">
+            <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Home
           </Link>
-        </div>
-      
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Terms and Conditions</h1>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Print
-          </Button>
-        </div>
-        
-        <Card className="mb-6 bg-coinbase/5 border-coinbase/20">
-          <CardContent className="pt-6">
-            <div className="flex items-start space-x-4">
-              <div className="bg-coinbase/10 p-3 rounded-full">
-                <Shield className="h-6 w-6 text-coinbase" />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium mb-1">Secure Payment Processing</h3>
-                <p className="text-sm text-muted-foreground">
-                  RizzPay provides secure, reliable payment processing services for merchants and customers. 
-                  Our platform adheres to the highest security standards in the industry.
-                </p>
-              </div>
+          
+          <div className="prose prose-blue max-w-none">
+            <h2 className="text-xl font-semibold mb-4 mt-6">1. Acceptance of Terms</h2>
+            <p className="text-muted-foreground mb-4">
+              By accessing or using RizzPay's payment gateway services, you agree to be bound by these Terms and Conditions and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this service.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">2. Service Description</h2>
+            <p className="text-muted-foreground mb-4">
+              RizzPay provides a secure payment gateway that enables merchants to accept digital payments through various methods including UPI, credit/debit cards, net banking, and other electronic payment systems. Our services include:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">Payment processing and gateway services</li>
+              <li className="mb-2">Merchant onboarding and verification</li>
+              <li className="mb-2">Transaction management and reporting</li>
+              <li className="mb-2">Settlement and disbursement services</li>
+              <li className="mb-2">Anti-fraud protection and risk management</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">3. Pricing and Fees</h2>
+            <p className="text-muted-foreground mb-4">
+              RizzPay charges a standard fee of 1% per transaction for all payment processing services. This fee structure includes:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">1% of transaction value for all incoming payments</li>
+              <li className="mb-2">1% of transaction value for all outgoing payments or withdrawals</li>
+              <li className="mb-2">No hidden charges or monthly maintenance fees</li>
+              <li className="mb-2">Volume discounts may be negotiated for high-volume merchants</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">4. Account Registration</h2>
+            <p className="text-muted-foreground mb-4">
+              To use RizzPay services, merchants must register and create an account. During registration, you agree to:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">Provide accurate, current, and complete information</li>
+              <li className="mb-2">Maintain and update your information as needed</li>
+              <li className="mb-2">Ensure the security of your account credentials</li>
+              <li className="mb-2">Accept responsibility for all activities under your account</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">5. Compliance Requirements</h2>
+            <p className="text-muted-foreground mb-4">
+              Merchants using RizzPay services must comply with:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">All applicable laws and regulations including KYC and AML requirements</li>
+              <li className="mb-2">Payment Card Industry Data Security Standards (PCI DSS)</li>
+              <li className="mb-2">Reserve Bank of India guidelines for payment processors</li>
+              <li className="mb-2">RizzPay's acceptable use policies</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">6. Prohibited Activities</h2>
+            <p className="text-muted-foreground mb-4">
+              The following activities are strictly prohibited when using RizzPay services:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">Processing payments for illegal goods or services</li>
+              <li className="mb-2">Money laundering or financing of terrorist activities</li>
+              <li className="mb-2">Fraudulent transactions or misrepresentation of products/services</li>
+              <li className="mb-2">Violating intellectual property rights</li>
+              <li className="mb-2">Processing transactions for high-risk industries without proper disclosure and approval</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">7. Data Privacy and Security</h2>
+            <p className="text-muted-foreground mb-4">
+              RizzPay is committed to protecting user data and maintaining the security of our payment system:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">We implement industry-standard security measures including encryption</li>
+              <li className="mb-2">User data is collected and processed in accordance with our Privacy Policy</li>
+              <li className="mb-2">Merchants are required to maintain their own appropriate data security measures</li>
+              <li className="mb-2">Any security breaches must be reported immediately to our security team</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">8. Service Availability and Support</h2>
+            <p className="text-muted-foreground mb-4">
+              While we strive to maintain high service availability:
+            </p>
+            <ul className="list-disc pl-5 mb-4 text-muted-foreground">
+              <li className="mb-2">RizzPay does not guarantee uninterrupted service availability</li>
+              <li className="mb-2">We provide technical support during business hours</li>
+              <li className="mb-2">Scheduled maintenance will be communicated in advance when possible</li>
+              <li className="mb-2">Service level agreements may be available for enterprise customers</li>
+            </ul>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">9. Intellectual Property</h2>
+            <p className="text-muted-foreground mb-4">
+              All content, features, and functionality of the RizzPay service are owned by RizzPay and protected by international copyright, trademark, and other intellectual property laws.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">10. Limitation of Liability</h2>
+            <p className="text-muted-foreground mb-4">
+              To the maximum extent permitted by law, RizzPay shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the service.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">11. Indemnification</h2>
+            <p className="text-muted-foreground mb-4">
+              You agree to indemnify and hold harmless RizzPay and its officers, directors, employees, and agents from any claims, damages, liabilities, costs, or expenses arising from your use of the service or violation of these terms.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">12. Termination</h2>
+            <p className="text-muted-foreground mb-4">
+              RizzPay reserves the right to terminate or suspend your account and access to services at our sole discretion, without notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties, or for any other reason.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">13. Changes to Terms</h2>
+            <p className="text-muted-foreground mb-4">
+              We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting to our website. Your continued use of RizzPay services after any changes indicates your acceptance of the modified terms.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">14. Governing Law</h2>
+            <p className="text-muted-foreground mb-4">
+              These terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions.
+            </p>
+            
+            <h2 className="text-xl font-semibold mb-4 mt-6">15. Contact Information</h2>
+            <p className="text-muted-foreground mb-4">
+              For questions about these Terms and Conditions, please contact us at:
+            </p>
+            <p className="text-muted-foreground mb-4">
+              Email: legal@rizzpay.com<br />
+              Address: RizzPay Technologies Pvt. Ltd., Mumbai, India
+            </p>
+            
+            <div className="mt-8 pt-6 border-t">
+              <p className="text-sm text-muted-foreground">
+                Last updated: May 19, 2025
+              </p>
             </div>
-          </CardContent>
-        </Card>
-        
-        <Tabs defaultValue="general" className="mb-6">
-          <TabsList className="grid grid-cols-4 mb-6">
-            <TabsTrigger value="general" className="flex items-center gap-1">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">General</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="flex items-center gap-1">
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">Payments</span>
-            </TabsTrigger>
-            <TabsTrigger value="privacy" className="flex items-center gap-1">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Privacy</span>
-            </TabsTrigger>
-            <TabsTrigger value="prohibited" className="flex items-center gap-1">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="hidden sm:inline">Prohibited</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="general">
-            <ScrollArea className="h-[65vh] rounded-md border p-6 bg-card">
-              <div className="space-y-6">
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-coinbase" />
-                    Introduction to Terms & Conditions
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Welcome to RizzPay. These Terms and Conditions govern your use of our website and services. 
-                    By accessing or using our website and services, you agree to be bound by these Terms and Conditions. 
-                    If you do not agree with any part of these terms, please refrain from using our website and services.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-coinbase" />
-                    Proprietary Rights
-                  </h2>
-                  <p className="text-muted-foreground">
-                    All content, logos, trademarks, and intellectual property displayed on the RizzPay website 
-                    are the property of RizzPay or its licensors. You are prohibited from using, copying, 
-                    reproducing, modifying, or distributing any of the proprietary content without prior 
-                    written permission from RizzPay.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Usage of the Website and Use of Services by the User
-                  </h2>
-                  <div className="space-y-2 text-muted-foreground">
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>You are responsible for providing accurate and up-to-date information during the registration process.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>You agree not to use the RizzPay website and services for any illegal or unauthorized purposes.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>You are solely responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>You agree to comply with all applicable laws, regulations, and card association rules while using our services.</p>
-                    </div>
-                  </div>
-                </section>
-                
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2 text-coinbase" />
-                    Payment
-                  </h2>
-                  <div className="space-y-2 text-muted-foreground">
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>By using RizzPay, you authorize us to facilitate the processing of payments on your behalf.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>We may charge fees for the use of our services, which will be clearly communicated to you. You are responsible for paying all applicable fees associated with your use of the services.</p>
-                    </div>
-                  </div>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-coinbase" />
-                    Privacy Policy
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Your use of RizzPay is subject to our Privacy Policy, which outlines how we collect, use, and protect your personal information. 
-                    By using our website and services, you agree to our Privacy Policy.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Third-Party Links/Offers
-                  </h2>
-                  <p className="text-muted-foreground">
-                    RizzPay may contain links to third-party websites or services. These links are provided for your convenience. 
-                    We do not endorse or assume any responsibility for the content, accuracy, or privacy practices of third-party websites. 
-                    Use third-party websites at your own risk.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Our Partners
-                  </h2>
-                  <p className="text-muted-foreground">
-                    We may collaborate with third-party service providers or partners to enhance our services. 
-                    However, we are not responsible for the acts or omissions of our partners. 
-                    Any interactions or transactions with our partners are solely between you and the partner.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Disclaimer of Warranty
-                  </h2>
-                  <p className="text-muted-foreground">
-                    RizzPay provides its services "as is" and makes no warranties or representations regarding the accuracy, 
-                    reliability, or completeness of the information or services provided. We disclaim all warranties, 
-                    whether express or implied, including but not limited to warranties of merchantability, 
-                    fitness for a particular purpose, and non-infringement.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Limitation of Liability
-                  </h2>
-                  <p className="text-muted-foreground">
-                    In no event shall RizzPay be liable for any direct, indirect, incidental, special, consequential, 
-                    or punitive damages arising out of or in connection with your use of the website or services. 
-                    This limitation applies to any damages caused by errors, omissions, interruptions, delays, viruses, 
-                    loss of data, or any other performance failure.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-coinbase" />
-                    Indemnity
-                  </h2>
-                  <p className="text-muted-foreground">
-                    You agree to indemnify and hold harmless RizzPay, its affiliates, partners, employees, 
-                    and agents from any claims, liabilities, damages, losses, costs, or expenses (including attorney fees) 
-                    arising out of or related to your use of the website or services, violation of these Terms and Conditions, 
-                    or infringement of any rights of a third party.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Prohibited Products and Services
-                  </h2>
-                  <p className="text-muted-foreground mb-2">
-                    The use of RizzPay's services for certain products or services may be prohibited or restricted by law, 
-                    card network rules, or RizzPay's policies. Users are responsible for ensuring that their use of the 
-                    payment gateway services complies with all applicable laws and regulations. RizzPay reserves the right 
-                    to refuse or restrict services for any product or service that violates these restrictions.
-                  </p>
-                  <p className="text-muted-foreground mb-2">
-                    Users agree not to use RizzPay's services for the following prohibited activities:
-                  </p>
-                  <div className="space-y-1 text-muted-foreground">
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Illegal or fraudulent activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Sale or promotion of counterfeit or unauthorized goods.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Adult content or services.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Gambling, betting, or lottery activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Weapons, firearms, or ammunition.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Drugs, narcotics, or substances regulated by law.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Hate speech, discriminatory content, or illegal propaganda.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Any activity that violates applicable laws, regulations, or card network rules.</p>
-                    </div>
-                  </div>
-                </section>
-              </div>
-            </ScrollArea>
-          </TabsContent>
-          
-          <TabsContent value="payments">
-            <ScrollArea className="h-[65vh] rounded-md border p-6 bg-card">
-              <div className="space-y-6">
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2 text-coinbase" />
-                    Payment
-                  </h2>
-                  <div className="space-y-2 text-muted-foreground">
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>By using RizzPay, you authorize us to facilitate the processing of payments on your behalf.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>We may charge fees for the use of our services, which will be clearly communicated to you. You are responsible for paying all applicable fees associated with your use of the services.</p>
-                    </div>
-                  </div>
-                </section>
-                  
-                <Card className="bg-blue-50 border-blue-100">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-blue-100 p-3 rounded-full">
-                        <CreditCard className="h-6 w-6 text-blue-500" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-medium mb-1">Secure Payment Processing</h3>
-                        <p className="text-sm text-blue-700">
-                          Our payment processing complies with PCI DSS standards to ensure your payment data is always secure.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                  
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Third-Party Links/Offers
-                  </h2>
-                  <p className="text-muted-foreground">
-                    RizzPay may contain links to third-party websites or services. These links are provided for your convenience. 
-                    We do not endorse or assume any responsibility for the content, accuracy, or privacy practices of third-party websites. 
-                    Use third-party websites at your own risk.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Our Partners
-                  </h2>
-                  <p className="text-muted-foreground">
-                    We may collaborate with third-party service providers or partners to enhance our services. 
-                    However, we are not responsible for the acts or omissions of our partners. 
-                    Any interactions or transactions with our partners are solely between you and the partner.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Disclaimer of Warranty
-                  </h2>
-                  <p className="text-muted-foreground">
-                    RizzPay provides its services "as is" and makes no warranties or representations regarding the accuracy, 
-                    reliability, or completeness of the information or services provided. We disclaim all warranties, 
-                    whether express or implied, including but not limited to warranties of merchantability, 
-                    fitness for a particular purpose, and non-infringement.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Limitation of Liability
-                  </h2>
-                  <p className="text-muted-foreground">
-                    In no event shall RizzPay be liable for any direct, indirect, incidental, special, consequential, 
-                    or punitive damages arising out of or in connection with your use of the website or services. 
-                    This limitation applies to any damages caused by errors, omissions, interruptions, delays, viruses, 
-                    loss of data, or any other performance failure.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-coinbase" />
-                    Indemnity
-                  </h2>
-                  <p className="text-muted-foreground">
-                    You agree to indemnify and hold harmless RizzPay, its affiliates, partners, employees, 
-                    and agents from any claims, liabilities, damages, losses, costs, or expenses (including attorney fees) 
-                    arising out of or related to your use of the website or services, violation of these Terms and Conditions, 
-                    or infringement of any rights of a third party.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Prohibited Products and Services
-                  </h2>
-                  <p className="text-muted-foreground mb-2">
-                    The use of RizzPay's services for certain products or services may be prohibited or restricted by law, 
-                    card network rules, or RizzPay's policies. Users are responsible for ensuring that their use of the 
-                    payment gateway services complies with all applicable laws and regulations. RizzPay reserves the right 
-                    to refuse or restrict services for any product or service that violates these restrictions.
-                  </p>
-                  <p className="text-muted-foreground mb-2">
-                    Users agree not to use RizzPay's services for the following prohibited activities:
-                  </p>
-                  <div className="space-y-1 text-muted-foreground">
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Illegal or fraudulent activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Sale or promotion of counterfeit or unauthorized goods.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Adult content or services.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Gambling, betting, or lottery activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Weapons, firearms, or ammunition.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Drugs, narcotics, or substances regulated by law.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Hate speech, discriminatory content, or illegal propaganda.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Any activity that violates applicable laws, regulations, or card network rules.</p>
-                    </div>
-                  </div>
-                </section>
-              </div>
-            </ScrollArea>
-          </TabsContent>
-          
-          <TabsContent value="privacy">
-            <ScrollArea className="h-[65vh] rounded-md border p-6 bg-card">
-              <div className="space-y-6">
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-coinbase" />
-                    Privacy Policy
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Your use of RizzPay is subject to our Privacy Policy, which outlines how we collect, use, and protect your personal information. 
-                    By using our website and services, you agree to our Privacy Policy.
-                  </p>
-                </section>
-                  
-                <Card className="bg-green-50 border-green-100">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-green-100 p-3 rounded-full">
-                        <Shield className="h-6 w-6 text-green-500" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-medium mb-1">Your Data Security Matters</h3>
-                        <p className="text-sm text-green-700">
-                          We employ industry-standard encryption and security measures to protect your personal and payment information.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                  
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Third-Party Links/Offers
-                  </h2>
-                  <p className="text-muted-foreground">
-                    RizzPay may contain links to third-party websites or services. These links are provided for your convenience. 
-                    We do not endorse or assume any responsibility for the content, accuracy, or privacy practices of third-party websites. 
-                    Use third-party websites at your own risk.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <HelpCircle className="h-5 w-5 mr-2 text-coinbase" />
-                    Our Partners
-                  </h2>
-                  <p className="text-muted-foreground">
-                    We may collaborate with third-party service providers or partners to enhance our services. 
-                    However, we are not responsible for the acts or omissions of our partners. 
-                    Any interactions or transactions with our partners are solely between you and the partner.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Disclaimer of Warranty
-                  </h2>
-                  <p className="text-muted-foreground">
-                    RizzPay provides its services "as is" and makes no warranties or representations regarding the accuracy, 
-                    reliability, or completeness of the information or services provided. We disclaim all warranties, 
-                    whether express or implied, including but not limited to warranties of merchantability, 
-                    fitness for a particular purpose, and non-infringement.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Limitation of Liability
-                  </h2>
-                  <p className="text-muted-foreground">
-                    In no event shall RizzPay be liable for any direct, indirect, incidental, special, consequential, 
-                    or punitive damages arising out of or in connection with your use of the website or services. 
-                    This limitation applies to any damages caused by errors, omissions, interruptions, delays, viruses, 
-                    loss of data, or any other performance failure.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-coinbase" />
-                    Indemnity
-                  </h2>
-                  <p className="text-muted-foreground">
-                    You agree to indemnify and hold harmless RizzPay, its affiliates, partners, employees, 
-                    and agents from any claims, liabilities, damages, losses, costs, or expenses (including attorney fees) 
-                    arising out of or related to your use of the website or services, violation of these Terms and Conditions, 
-                    or infringement of any rights of a third party.
-                  </p>
-                </section>
-
-                <Separator />
-
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-coinbase" />
-                    Prohibited Products and Services
-                  </h2>
-                  <p className="text-muted-foreground mb-2">
-                    The use of RizzPay's services for certain products or services may be prohibited or restricted by law, 
-                    card network rules, or RizzPay's policies. Users are responsible for ensuring that their use of the 
-                    payment gateway services complies with all applicable laws and regulations. RizzPay reserves the right 
-                    to refuse or restrict services for any product or service that violates these restrictions.
-                  </p>
-                  <p className="text-muted-foreground mb-2">
-                    Users agree not to use RizzPay's services for the following prohibited activities:
-                  </p>
-                  <div className="space-y-1 text-muted-foreground">
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Illegal or fraudulent activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Sale or promotion of counterfeit or unauthorized goods.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Adult content or services.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Gambling, betting, or lottery activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Weapons, firearms, or ammunition.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Drugs, narcotics, or substances regulated by law.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Hate speech, discriminatory content, or illegal propaganda.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Any activity that violates applicable laws, regulations, or card network rules.</p>
-                    </div>
-                  </div>
-                </section>
-              </div>
-            </ScrollArea>
-          </TabsContent>
-          
-          <TabsContent value="prohibited">
-            <ScrollArea className="h-[65vh] rounded-md border p-6 bg-card">
-              <div className="space-y-6">
-                <section>
-                  <h2 className="text-xl font-semibold mb-3 flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-amber-500" />
-                    Prohibited Products and Services
-                  </h2>
-                  <p className="text-muted-foreground mb-2">
-                    The use of RizzPay's services for certain products or services may be prohibited or restricted by law, 
-                    card network rules, or RizzPay's policies. Users are responsible for ensuring that their use of the 
-                    payment gateway services complies with all applicable laws and regulations. RizzPay reserves the right 
-                    to refuse or restrict services for any product or service that violates these restrictions.
-                  </p>
-                  <p className="text-muted-foreground mb-2">
-                    Users agree not to use RizzPay's services for the following prohibited activities:
-                  </p>
-                  <div className="space-y-1 text-muted-foreground">
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Illegal or fraudulent activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Sale or promotion of counterfeit or unauthorized goods.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Adult content or services.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Gambling, betting, or lottery activities.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Weapons, firearms, or ammunition.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Drugs, narcotics, or substances regulated by law.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Hate speech, discriminatory content, or illegal propaganda.</p>
-                    </div>
-                    <div className="flex items-start">
-                      <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                      <p>Any activity that violates applicable laws, regulations, or card network rules.</p>
-                    </div>
-                  </div>
-                </section>
-                  
-                <Card className="bg-amber-50 border-amber-100">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-amber-100 p-3 rounded-full">
-                        <AlertTriangle className="h-6 w-6 text-amber-500" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-medium mb-1">Legal Compliance Required</h3>
-                        <p className="text-sm text-amber-700">
-                          All merchants must comply with local and international laws regarding financial services and money transmission.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
