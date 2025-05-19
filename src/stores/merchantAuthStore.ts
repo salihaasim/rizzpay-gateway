@@ -106,6 +106,7 @@ export const useMerchantAuth = create<MerchantStore>()(
             },
             loading: false
           });
+          console.log("Merchant auth login successful");
           return true;
         }
         

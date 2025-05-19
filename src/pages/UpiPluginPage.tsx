@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,15 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 const UpiPluginPage = () => {
   const [testAmount, setTestAmount] = useState('100');
   const navigate = useNavigate();
-  const { currentMerchant } = useMerchantAuth();
+  const { currentMerchant, isAuthenticated } = useMerchantAuth();
+  
+  // Check authentication
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error('Please login to access this page');
+      navigate('/auth', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
   
   const handleTestPayment = () => {
     const amount = parseFloat(testAmount);
@@ -29,6 +37,11 @@ const UpiPluginPage = () => {
     const upiPaymentUrl = `/upi-link-payment?amount=${amount}&name=${encodeURIComponent(currentMerchant?.fullName || 'Test Merchant')}&desc=Test%20Payment`;
     navigate(upiPaymentUrl);
   };
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <Layout>

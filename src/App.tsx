@@ -6,7 +6,8 @@ import {
   Routes,
   Navigate,
   Outlet,
-  useNavigate
+  useNavigate,
+  useLocation
 } from 'react-router-dom';
 import { useTransactionStore } from './stores/transactions';
 import { useMerchantAuth } from './stores/merchantAuthStore';
@@ -37,6 +38,7 @@ import UpiPluginPage from './pages/UpiPluginPage';
 import TransfersPage from './pages/TransfersPage';
 import DeveloperPage from './pages/DeveloperPage';
 import Auth from './pages/Auth';
+import { toast } from 'sonner';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -61,6 +63,7 @@ const PublicLayout = () => (
 const MerchantRouteGuard = ({ element }) => {
   const { isAuthenticated } = useMerchantAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
     if (!isAuthenticated) {
@@ -75,12 +78,16 @@ const MerchantRouteGuard = ({ element }) => {
 const AdminRouteGuard = ({ element }) => {
   const { currentMerchant } = useMerchantAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
+    // Check if user is not authenticated or not an admin
     if (!currentMerchant || currentMerchant.role !== 'admin') {
+      toast.error('Access denied. Admin privileges required.');
       navigate('/auth', { replace: true });
+      return;
     }
-  }, [currentMerchant, navigate]);
+  }, [currentMerchant, navigate, location]);
   
   return currentMerchant?.role === 'admin' ? element : null;
 };
@@ -104,6 +111,15 @@ const App: React.FC = () => {
     
     checkAuthStatus();
   }, [setUserRole]);
+
+  // Debug info
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.info('Domain:', window.location.hostname);
+      console.info('Path:', window.location.pathname);
+      console.info('Full URL:', window.location.href);
+    }
+  }, []);
   
   return (
     <Router>
@@ -142,7 +158,7 @@ const App: React.FC = () => {
           <Route path="/developer" element={<MerchantRouteGuard element={<DeveloperPage />} />} />
         </Route>
         
-        {/* Admin routes with layout */}
+        {/* Admin routes */}
         <Route path="/admin" element={<AdminRouteGuard element={<AdminLayout />} />}>
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />

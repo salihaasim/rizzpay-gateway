@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useTransactionStore } from '@/stores/transactions';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
-import AdminMobileMenu from './layout/AdminMobileMenu';
+import { toast } from 'sonner';
 
 export interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -12,31 +12,33 @@ export interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
-  const { userRole, userEmail, resetUserRole } = useTransactionStore();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const { currentMerchant, logout } = useMerchantAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Check if user is admin, if not redirect to login
   React.useEffect(() => {
-    if (userRole !== 'admin') {
-      navigate('/login');
+    if (!currentMerchant || currentMerchant.role !== 'admin') {
+      toast.error('Access denied. Admin privileges required.');
+      navigate('/auth', { replace: true });
     }
-  }, [userRole, navigate]);
+  }, [currentMerchant, navigate]);
   
   const handleLogout = () => {
-    resetUserRole();
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userEmail');
-    navigate('/login');
+    logout();
+    // The logout function in merchantAuthStore already handles redirection
   };
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  // If not admin, don't render anything
+  if (currentMerchant?.role !== 'admin') {
+    return null;
+  }
   
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      <AdminSidebar />
+      <AdminSidebar 
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
+      />
       
       <div className="flex flex-col flex-1">
         <AdminHeader onLogout={handleLogout} />
@@ -45,14 +47,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           {children ? children : <Outlet />}
         </main>
       </div>
-      
-      <AdminMobileMenu 
-        userEmail={userEmail}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        handleLogout={handleLogout}
-        isActive={isActive}
-      />
     </div>
   );
 };
