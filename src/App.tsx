@@ -50,9 +50,9 @@ const App: React.FC = () => {
       const isLoggedIn = localStorage.getItem('isLoggedIn');
       
       if (isLoggedIn) {
-        const userRole = localStorage.getItem('userRole') || 'merchant';
+        const storedUserRole = localStorage.getItem('userRole') || 'merchant';
         const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
-        setUserRole(userRole as 'admin' | 'merchant', userEmail);
+        setUserRole(storedUserRole as 'admin' | 'merchant', userEmail);
       }
     };
     

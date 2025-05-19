@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 
 interface ThemeContextType {
   theme: 'light';
@@ -12,14 +12,14 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Only light theme is supported now
+  // Only light theme is supported
   const theme = 'light';
   const setTheme = () => {
     // No-op function since we only support light theme
   };
   
   // Apply theme to document
-  React.useEffect(() => {
+  useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('dark');
     root.classList.add('light');
