@@ -9,6 +9,7 @@ export type PaymentProcessingState =
   | 'gateway_processing' 
   | 'processor_routing' 
   | 'authorization_decision' 
+  | 'card_network_processing'
   | 'declined';
 
 export interface TransactionTimelineItem {
@@ -35,7 +36,7 @@ export interface Transaction {
   rawAmount?: number;
 }
 
-export type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet' | 'neft' | 'unknown' | 'webhook' | 'upi_manual' | 'simulated';
+export type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet' | 'neft' | 'unknown' | 'webhook' | 'upi_manual' | 'simulated' | string;
 
 export type UserRole = 'admin' | 'merchant';
 

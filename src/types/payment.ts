@@ -25,4 +25,8 @@ export interface PaymentDetails {
   gatewayTransactionId?: string;
   gatewayResponse?: Record<string, any>;
   recipientEmail?: string;
+  recipientName?: string;
+  description?: string;
+  paidAmount?: string;
+  card_network_processing?: string;
 }

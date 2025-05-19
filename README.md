@@ -20,6 +20,14 @@ RizzPay is a comprehensive payment processing platform designed to handle variou
 - **Charts and Analytics**: Recharts for data visualization
 - **Optimized Performance**: Lazy-loading and code splitting
 
+## Recent Updates
+
+- **TypeScript Improvements**: Fixed type definitions and interfaces for better type safety
+- **Performance Optimizations**: Added debounce, throttle, and memoization utilities
+- **Theme Support**: Improved dark/light theme functionality
+- **Cross-Device Compatibility**: Enhanced responsive design for all screen sizes
+- **UPI Payment Integration**: Streamlined UPI payment workflow
+
 ## Setup Instructions
 
 1. Clone the repository
@@ -50,6 +58,9 @@ The integrated wallet system allows users to:
 - Code splitting for improved performance
 - Type safety throughout the codebase
 - Error handling and validation
+- Debounced and throttled functions for performance
+- Component preloading for smoother user experience
+- Cached API responses to reduce network requests
 
 ## License
 

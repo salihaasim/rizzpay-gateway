@@ -24,8 +24,9 @@ export const calculateWalletFee = (
 export const simulateWalletProcessing = async (
   email: string,
   amount: number,
-  transactionType: 'deposit' | 'withdrawal',
-  paymentMethod: PaymentMethod = 'wallet'
+  transactionType: 'deposit' | 'withdrawal' | 'transfer',
+  paymentMethod: PaymentMethod,
+  description?: string
 ): Promise<string> => {
   const store = useTransactionStore.getState();
   
@@ -39,10 +40,16 @@ export const simulateWalletProcessing = async (
     if (transactionType === 'deposit') {
       transactionId = store.depositToWallet(email, amount, paymentMethod);
       return transactionId;
-    } else {
+    } else if (transactionType === 'withdrawal') {
       transactionId = store.withdrawFromWallet(email, amount, paymentMethod);
       return transactionId;
+    } else if (transactionType === 'transfer' && description) {
+      // The description parameter is used to pass the recipient email
+      const recipientEmail = description;
+      return store.transferFunds(email, recipientEmail, amount);
     }
+    
+    throw new Error(`Unsupported transaction type: ${transactionType}`);
   } catch (error) {
     console.error(`Wallet ${transactionType} failed:`, error);
     throw new Error(`Failed to process ${transactionType}: ${(error as Error).message}`);

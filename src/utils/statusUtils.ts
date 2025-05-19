@@ -1,56 +1,51 @@
 
-import { PaymentProcessingState, TransactionStatus } from '@/stores/transactionStore';
+import { TransactionStatus, PaymentProcessingState } from '@/stores/transactions/types';
 
-export const getStatusIndicatorClass = (status: TransactionStatus) => {
-  switch (status) {
-    case 'successful':
-      return 'bg-emerald-500';
-    case 'pending':
-      return 'bg-amber-500';
-    case 'processing':
-      return 'bg-blue-500';
-    case 'settled':
-      return 'bg-indigo-500';
-    case 'failed':
-    case 'declined':
-      return 'bg-rose-500';
-    default:
-      return 'bg-slate-500';
-  }
-};
-
-export const getPaymentStateLabel = (state: PaymentProcessingState) => {
-  const stateLabels: Record<PaymentProcessingState, string> = {
-    initiated: 'Payment Initiated',
-    gateway_processing: 'Payment Gateway',
-    processor_routing: 'Payment Processor',
-    card_network_processing: 'Card Network',
-    bank_authorization: 'Bank Authorization',
-    authorization_decision: 'Authorization',
-    declined: 'Payment Declined',
-    settlement_recording: 'Settlement Recording',
-    settlement_initiated: 'Settlement Initiated',
-    settlement_processing: 'Settlement Process',
-    funds_transferred: 'Funds Transfer',
-    merchant_credited: 'Merchant Payment',
-    completed: 'Completed'
+// Get human-readable status descriptions
+export const getStatusDescription = (status: TransactionStatus): string => {
+  const statusMessages: Record<TransactionStatus, string> = {
+    'pending': 'Payment is being processed',
+    'successful': 'Payment completed successfully',
+    'failed': 'Payment attempt was unsuccessful',
+    'processing': 'Payment is currently being processed',
+    'refunded': 'Payment was refunded',
+    'settled': 'Payment has been settled',
+    'declined': 'Payment was declined'
   };
   
-  return stateLabels[state] || state;
+  return statusMessages[status] || 'Unknown status';
 };
 
-export const getRandomProcessor = () => {
-  const processors = ['PayU', 'Razorpay', 'CCAvenue', 'Stripe', 'PayPal', 'RizzPay', 'Instamojo'];
+// Get a human-readable processing state description
+export const getProcessingStateDescription = (state: PaymentProcessingState): string => {
+  const stateMessages: Record<string, string> = {
+    'initiated': 'Payment has been initiated',
+    'gateway_processing': 'Payment is being processed by the payment gateway',
+    'processor_routing': 'Transaction is being routed to the payment processor',
+    'authorization_decision': 'Awaiting authorization decision',
+    'completed': 'Payment processing completed',
+    'failed': 'Payment processing failed',
+    'declined': 'Payment was declined by the issuer',
+    'card_network_processing': 'Processing through card network'
+  };
+  
+  return stateMessages[state] || 'Unknown processing state';
+};
+
+// Get a random processor name for simulation
+export const getRandomProcessor = (): string => {
+  const processors = ['HDFC Bank', 'ICICI Processing', 'SBI Payments', 'Axis Gateway', 'Yes Bank'];
   return processors[Math.floor(Math.random() * processors.length)];
 };
 
-export const getRandomDeclineReason = () => {
+// Get a random decline reason for simulation
+export const getRandomDeclineReason = (): string => {
   const reasons = [
-    'Insufficient funds',
+    'Insufficient funds', 
     'Card expired',
-    'Transaction limit exceeded',
-    'Invalid card details',
-    'Bank declined transaction'
+    'Suspicious activity detected',
+    'Payment limit exceeded',
+    'Card blocked by issuer'
   ];
   return reasons[Math.floor(Math.random() * reasons.length)];
 };
