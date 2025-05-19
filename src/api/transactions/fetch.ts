@@ -1,8 +1,7 @@
 
 // Transaction API functions for fetching data
 import { supabase } from '@/utils/supabaseClient';
-import { Transaction, TransactionStatus, PaymentMethod, PaymentProcessingState, TransactionTimelineItem } from '@/stores/transactions/types';
-import { PaymentDetails } from '@/types/payment';
+import { Transaction, TransactionStatus, PaymentMethod, PaymentDetails, PaymentProcessingState } from '@/stores/transactions';
 import { toast } from 'sonner';
 
 export const fetchTransactions = async (
@@ -53,31 +52,21 @@ export const fetchTransactions = async (
     if (error) throw error;
     
     // Map to Transaction objects with proper type casting
-    return data.map(item => {
-      // Format timeline items properly to match the expected type
-      const processingTimeline: TransactionTimelineItem[] = Array.isArray(item.processing_timeline) 
-        ? item.processing_timeline.map((tl: any) => ({
-            stage: tl.stage || '',
-            timestamp: tl.timestamp || new Date().toISOString(),
-            message: tl.message || ''
-          }))
-        : [];
-      
-      return {
-        id: item.id,
-        amount: `₹${parseFloat(item.amount.toString()).toFixed(2)}`,
-        date: item.date,
-        customer: item.customer_name || 'Unknown',
-        customerEmail: item.customer_email,
-        status: item.status as TransactionStatus,
-        paymentMethod: item.payment_method as PaymentMethod,
-        description: item.description,
-        processingState: item.processing_state as PaymentProcessingState,
-        processingTimeline: processingTimeline,
-        paymentDetails: item.payment_details as PaymentDetails,
-        rawAmount: parseFloat(item.amount.toString())
-      };
-    });
+    return data.map(item => ({
+      id: item.id,
+      amount: `₹${parseFloat(item.amount.toString()).toFixed(2)}`,
+      date: item.date,
+      customer: item.customer_name || 'Unknown',
+      customerEmail: item.customer_email,
+      status: item.status as TransactionStatus,
+      paymentMethod: item.payment_method as PaymentMethod,
+      description: item.description,
+      processingState: item.processing_state as PaymentProcessingState,
+      processingTimeline: Array.isArray(item.processing_timeline) 
+        ? item.processing_timeline 
+        : [],
+      paymentDetails: item.payment_details as PaymentDetails
+    }));
   } catch (error) {
     console.error('Error fetching transactions:', error);
     toast.error('Failed to fetch transactions');
@@ -99,15 +88,6 @@ export const getTransactionById = async (
     
     if (!data) return null;
     
-    // Format timeline items properly
-    const processingTimeline: TransactionTimelineItem[] = Array.isArray(data.processing_timeline) 
-      ? data.processing_timeline.map((tl: any) => ({
-          stage: tl.stage || '',
-          timestamp: tl.timestamp || new Date().toISOString(),
-          message: tl.message || ''
-        }))
-      : [];
-    
     // Map to Transaction object with proper type casting
     return {
       id: data.id,
@@ -119,9 +99,10 @@ export const getTransactionById = async (
       paymentMethod: data.payment_method as PaymentMethod,
       description: data.description,
       processingState: data.processing_state as PaymentProcessingState,
-      processingTimeline: processingTimeline,
-      paymentDetails: data.payment_details as PaymentDetails,
-      rawAmount: parseFloat(data.amount.toString())
+      processingTimeline: Array.isArray(data.processing_timeline) 
+        ? data.processing_timeline 
+        : [],
+      paymentDetails: data.payment_details as PaymentDetails
     };
   } catch (error) {
     console.error('Error fetching transaction by ID:', error);

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +11,6 @@ import BusinessInfoForm from '../components/settings/BusinessInfoForm';
 import { useMerchantAuth } from '../stores/merchantAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { Helmet } from 'react-helmet';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -19,7 +18,7 @@ const Settings = () => {
   const navigate = useNavigate();
 
   // Redirect to login if not authenticated
-  useEffect(() => {
+  React.useEffect(() => {
     if (!loading && !currentMerchant) {
       navigate('/auth');
     }
@@ -41,9 +40,6 @@ const Settings = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>Settings | RizzPay</title>
-      </Helmet>
       <div className="container py-10">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">Settings</h1>

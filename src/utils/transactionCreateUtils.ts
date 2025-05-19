@@ -1,9 +1,8 @@
 
-import { Transaction, TransactionStatus } from '@/stores/transactions/types';
+import { Transaction, TransactionStatus, PaymentDetails } from '@/stores/transactions';
 import { useTransactionStore } from '@/stores/transactions';
 import { generateTransactionId, formatDate } from './formatUtils';
 import { syncTransactionToSupabase } from './supabaseClient';
-import { PaymentDetails } from '@/types/payment';
 
 export const addTransaction = (transaction: Partial<Transaction>): Transaction => {
   const store = useTransactionStore.getState();

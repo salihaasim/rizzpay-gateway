@@ -1,87 +1,56 @@
-export const getStatusDescription = (status: string): string => {
+
+import { PaymentProcessingState, TransactionStatus } from '@/stores/transactionStore';
+
+export const getStatusIndicatorClass = (status: TransactionStatus) => {
   switch (status) {
     case 'successful':
-      return 'Payment was successful.';
-    case 'processing':
-      return 'Payment is currently being processed.';
+      return 'bg-emerald-500';
     case 'pending':
-      return 'Payment is pending confirmation.';
+      return 'bg-amber-500';
+    case 'processing':
+      return 'bg-blue-500';
+    case 'settled':
+      return 'bg-indigo-500';
     case 'failed':
-      return 'Payment failed.';
-    case 'refunded':
-      return 'Payment has been refunded.';
+    case 'declined':
+      return 'bg-rose-500';
     default:
-      return 'Unknown payment status.';
+      return 'bg-slate-500';
   }
 };
 
-export const getProcessingStateDescription = (state: string): string => {
-  switch (state) {
-    case 'initiated':
-      return 'Payment process has been initiated.';
-    case 'authorized':
-      return 'Payment has been authorized.';
-    case 'captured':
-      return 'Payment has been captured.';
-    case 'failed':
-      return 'Payment processing failed.';
-    default:
-      return 'Unknown processing state.';
-  }
+export const getPaymentStateLabel = (state: PaymentProcessingState) => {
+  const stateLabels: Record<PaymentProcessingState, string> = {
+    initiated: 'Payment Initiated',
+    gateway_processing: 'Payment Gateway',
+    processor_routing: 'Payment Processor',
+    card_network_processing: 'Card Network',
+    bank_authorization: 'Bank Authorization',
+    authorization_decision: 'Authorization',
+    declined: 'Payment Declined',
+    settlement_recording: 'Settlement Recording',
+    settlement_initiated: 'Settlement Initiated',
+    settlement_processing: 'Settlement Process',
+    funds_transferred: 'Funds Transfer',
+    merchant_credited: 'Merchant Payment',
+    completed: 'Completed'
+  };
+  
+  return stateLabels[state] || state;
 };
 
-export const getRandomProcessor = (): string => {
-  const processors = ['Stripe', 'PayPal', 'Razorpay', 'PayU'];
+export const getRandomProcessor = () => {
+  const processors = ['PayU', 'Razorpay', 'CCAvenue', 'Stripe', 'PayPal', 'RizzPay', 'Instamojo'];
   return processors[Math.floor(Math.random() * processors.length)];
 };
 
-export const getRandomDeclineReason = (): string => {
+export const getRandomDeclineReason = () => {
   const reasons = [
     'Insufficient funds',
     'Card expired',
-    'Invalid CVV',
-    'Transaction declined by bank',
-    'Payment gateway error'
+    'Transaction limit exceeded',
+    'Invalid card details',
+    'Bank declined transaction'
   ];
   return reasons[Math.floor(Math.random() * reasons.length)];
-};
-
-// Add the missing getStatusIndicatorClass function
-export const getStatusIndicatorClass = (status: string): string => {
-  switch (status) {
-    case 'successful':
-      return 'bg-green-500';
-    case 'processing':
-      return 'bg-blue-500';
-    case 'pending':
-      return 'bg-yellow-500';
-    case 'failed':
-      return 'bg-red-500';
-    case 'refunded':
-      return 'bg-purple-500';
-    default:
-      return 'bg-gray-500';
-  }
-};
-
-// Add the missing getPaymentStateLabel function
-export const getPaymentStateLabel = (state: string): string => {
-  switch (state) {
-    case 'initiated':
-      return 'Payment Initiated';
-    case 'processing':
-      return 'Processing Payment';
-    case 'authorized':
-      return 'Payment Authorized';
-    case 'completed':
-      return 'Payment Completed';
-    case 'failed':
-      return 'Payment Failed';
-    case 'declined':
-      return 'Payment Declined';
-    case 'refunded':
-      return 'Payment Refunded';
-    default:
-      return 'Unknown State';
-  }
 };

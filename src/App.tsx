@@ -4,11 +4,8 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Navigate,
-  Outlet
 } from 'react-router-dom';
 import { useTransactionStore } from './stores/transactions';
-import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Login from './pages/Login';
@@ -26,21 +23,9 @@ import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
-import RefundPolicy from './pages/RefundPolicy';
-import TermsAndConditions from './pages/TermsAndConditions';
-import GlobalFooter from './components/GlobalFooter';
-
-const PublicLayout = () => (
-  <div className="min-h-screen flex flex-col">
-    <div className="flex-grow">
-      <Outlet />
-    </div>
-    <GlobalFooter />
-  </div>
-);
 
 const App: React.FC = () => {
-  const { setUserRole, isAuthenticated } = useTransactionStore();
+  const { setUserRole } = useTransactionStore();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -62,42 +47,48 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Public routes wrapped in PublicLayout */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/upi-payment" element={<UpiPaymentPage />} />
-          <Route path="/india" element={<IndiaPage />} />
-          <Route path="/refund-policy" element={<RefundPolicy />} />
-          <Route path="/terms" element={<TermsAndConditions />} />
-          
-          {/* Protected routes for authenticated users */}
-          <Route
-            path="/dashboard"
-            element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/transactions"
-            element={isAuthenticated() ? <Transactions /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/profile"
-            element={isAuthenticated() ? <Profile /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/banking"
-            element={isAuthenticated() ? <BankingPage /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/webhooks"
-            element={isAuthenticated() ? <Webhooks /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/wallet"
-            element={isAuthenticated() ? <WalletPage /> : <Navigate to="/login" replace />}
-          />
-        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/upi-payment" element={<UpiPaymentPage />} />
+        <Route path="/india" element={<IndiaPage />} />
+        
+        {/* Protected routes for authenticated users */}
+        <Route
+          path="/"
+          element={
+            <Dashboard />
+          }
+        />
+        <Route
+          path="/transactions"
+          element={
+            <Transactions />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Profile />
+          }
+        />
+        <Route
+          path="/banking"
+          element={
+            <BankingPage />
+          }
+        />
+        <Route
+          path="/webhooks"
+          element={
+            <Webhooks />
+          }
+        />
+        <Route
+          path="/wallet"
+          element={
+            <WalletPage />
+          }
+        />
         
         {/* Admin routes */}
         <Route path="/admin" element={<AdminLayout />}>
