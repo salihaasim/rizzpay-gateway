@@ -8,25 +8,20 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 ## Recent Updates
 
 - Fixed routing issues that were causing automatic redirection to admin page
-- Resolved `DialogPortal must be used within Dialog` errors in mobile menu components
+- Removed dark mode theme to improve performance and consistency
 - Fixed Sheet component implementation in AdminMobileMenuTrigger and AdminMobileMenu
+- Resolved `DialogPortal must be used within Dialog` errors in mobile menu components
 - Corrected prop types in AdminHeader for mobile menu handling
 - Fixed TypeScript errors in UserSwitcher.tsx related to user state management
 - Enhanced UserSwitcher component with proper state management
-- Fixed dialog nesting issues in WhitelistForm, UserSwitcher, and other components
-- Added proper state handling in UserSwitcher component
-- Implemented proper form handling in dialog components
+- Added MerchantKYC page to main routing
+- Improved page navigation flow to prevent unauthorized redirection
 - Fixed merchant sidebar visibility issues
-- Fixed missing sidebar in merchant dashboard pages
 - Fixed TypeScript errors in whitelist tables related to missing 'open' prop
 - Fixed DialogPortal and DialogTrigger nesting issues
 - Corrected TypeScript errors in whitelist components
-- Added dedicated admin credentials file in src/admin folder
 - Enhanced dialog component usage throughout the application
 - Improved Sheet component implementation in the mobile menu
-- Fixed WhitelistForm to properly handle dialog state
-- Added Merchant KYC page for document submission and verification
-- Updated Terms and Conditions page with modern tabbed interface
 
 ## Key Features
 

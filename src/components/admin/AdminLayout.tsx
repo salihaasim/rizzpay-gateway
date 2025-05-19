@@ -15,10 +15,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { userRole, userEmail, resetUserRole } = useTransactionStore();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   
-  // Check if user is admin, if not redirect to login
+  // Check if user is admin, if not redirect to home page
   React.useEffect(() => {
     if (userRole !== 'admin') {
-      navigate('/login');
+      navigate('/', { replace: true });
     }
   }, [userRole, navigate]);
   
@@ -27,7 +27,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userEmail');
-    navigate('/login');
+    navigate('/', { replace: true });
   };
 
   const isActive = (path: string) => {
@@ -35,11 +35,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
   
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
       
       <div className="flex flex-col flex-1">
-        <AdminHeader onLogout={handleLogout} setMobileMenuOpen={setMobileMenuOpen} />
+        <AdminHeader 
+          onLogout={handleLogout} 
+          setMobileMenuOpen={setMobileMenuOpen}
+        />
         
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           {children || <Outlet />}

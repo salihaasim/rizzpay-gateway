@@ -30,6 +30,7 @@ import RefundPolicy from './pages/RefundPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import GlobalFooter from './components/GlobalFooter';
 import Auth from './pages/Auth';
+import MerchantKYC from './pages/MerchantKYC';
 
 const PublicLayout = () => (
   <div className="min-h-screen flex flex-col">
@@ -44,13 +45,11 @@ const App: React.FC = () => {
   const { setUserRole, userRole, isAuthenticated } = useTransactionStore();
   
   useEffect(() => {
-    // Simulate checking authentication status and setting user role
+    // Check authentication status and set user role
     const checkAuthStatus = async () => {
-      // Replace this with your actual authentication logic
       const isLoggedIn = localStorage.getItem('isLoggedIn');
       
       if (isLoggedIn) {
-        // Simulate fetching user role from local storage or API
         const userRole = localStorage.getItem('userRole') || 'merchant';
         const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
         setUserRole(userRole as 'admin' | 'merchant', userEmail);
@@ -73,38 +72,42 @@ const App: React.FC = () => {
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
-          
-          {/* Protected routes for authenticated users */}
-          <Route
-            path="/dashboard"
-            element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/transactions"
-            element={isAuthenticated() ? <Transactions /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/profile"
-            element={isAuthenticated() ? <Profile /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/banking"
-            element={isAuthenticated() ? <BankingPage /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/webhooks"
-            element={isAuthenticated() ? <Webhooks /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/wallet"
-            element={isAuthenticated() ? <WalletPage /> : <Navigate to="/login" replace />}
-          />
         </Route>
+        
+        {/* Protected merchant routes */}
+        <Route
+          path="/dashboard"
+          element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/transactions"
+          element={isAuthenticated() ? <Transactions /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/profile"
+          element={isAuthenticated() ? <Profile /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/banking"
+          element={isAuthenticated() ? <BankingPage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/webhooks"
+          element={isAuthenticated() ? <Webhooks /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/wallet"
+          element={isAuthenticated() ? <WalletPage /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/kyc"
+          element={isAuthenticated() ? <MerchantKYC /> : <Navigate to="/login" replace />}
+        />
         
         {/* Admin routes - Only accessible if user is admin */}
         <Route 
           path="/admin" 
-          element={userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" replace />}
+          element={userRole === 'admin' ? <AdminLayout /> : <Navigate to="/" replace />}
         >
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />

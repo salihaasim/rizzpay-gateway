@@ -1,11 +1,9 @@
 
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-
-type Theme = 'light' | 'dark';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  theme: 'light';
+  setTheme: (theme: 'light') => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({ 
@@ -14,27 +12,18 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('rizzpay-theme') as Theme;
-    if (savedTheme === 'dark' || savedTheme === 'light') {
-      return savedTheme;
-    }
-    
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    
-    return 'light';
-  });
+  // Only light theme is supported now
+  const theme = 'light';
+  const setTheme = () => {
+    // No-op function since we only support light theme
+  };
   
   // Apply theme to document
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.remove('dark', 'light');
-    root.classList.add(theme);
-    localStorage.setItem('rizzpay-theme', theme);
-  }, [theme]);
+    root.classList.remove('dark');
+    root.classList.add('light');
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
