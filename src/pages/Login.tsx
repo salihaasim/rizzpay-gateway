@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTransactionStore } from '@/stores/transactions';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -49,47 +49,67 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">Email</label>
-              <Input
-                id="email"
-                placeholder="you@example.com"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">Password</label>
-              <Input
-                id="password"
-                placeholder="••••••••"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Login'}
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+      <header className="w-full py-4 bg-white dark:bg-gray-800 shadow-sm">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <Link to="/" className="text-xl font-bold text-primary">RizzPay</Link>
+          <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
+            Back to Home
+          </Link>
+        </div>
+      </header>
+      
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Login</CardTitle>
+            <CardDescription>Enter your credentials to access your account</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <Input
+                  id="email"
+                  placeholder="you@example.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium">Password</label>
+                <Input
+                  id="password"
+                  placeholder="••••••••"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Logging in...' : 'Login'}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="link" onClick={() => navigate('/register')}>
+              Don't have an account? Register
             </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button variant="link" onClick={() => navigate('/register')}>
-            Don't have an account? Register
-          </Button>
-        </CardFooter>
-      </Card>
+            <Button variant="link" onClick={() => navigate('/')}>
+              Back to Home
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+      
+      <footer className="py-4 bg-white dark:bg-gray-800 border-t">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          © {new Date().getFullYear()} RizzPay. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 };

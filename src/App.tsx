@@ -8,6 +8,7 @@ import {
   Outlet
 } from 'react-router-dom';
 import { useTransactionStore } from './stores/transactions';
+import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Login from './pages/Login';
@@ -62,6 +63,7 @@ const App: React.FC = () => {
       <Routes>
         {/* Public routes wrapped in PublicLayout */}
         <Route element={<PublicLayout />}>
+          <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
@@ -70,7 +72,7 @@ const App: React.FC = () => {
           
           {/* Protected routes for authenticated users */}
           <Route
-            path="/"
+            path="/dashboard"
             element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />}
           />
           <Route
