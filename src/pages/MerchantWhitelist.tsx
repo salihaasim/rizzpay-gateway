@@ -13,9 +13,9 @@ const MerchantWhitelist = () => {
   const { userRole } = useTransactionStore();
   const navigate = useNavigate();
   
-  // Check if the current user is an admin
+  // Fix comparison: Check if the current user is an admin
   useEffect(() => {
-    if (!currentMerchant?.role === 'admin' && userRole !== 'admin') {
+    if (currentMerchant?.role !== 'admin' && userRole !== 'admin') {
       toast.error('Access denied. Admin privileges required.');
       navigate('/dashboard', { replace: true });
     }

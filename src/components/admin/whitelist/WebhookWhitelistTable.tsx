@@ -144,6 +144,7 @@ export const WebhookWhitelistTable = () => {
         </Table>
       )}
 
+      {/* Added open={showForm} prop to fix TypeScript error */}
       {showForm && (
         <WhitelistForm
           type="webhook"
@@ -157,6 +158,7 @@ export const WebhookWhitelistTable = () => {
             setSelectedEntry(null);
             fetchEntries();
           }}
+          open={showForm}
         />
       )}
     </div>

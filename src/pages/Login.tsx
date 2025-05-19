@@ -113,10 +113,7 @@ const Login: React.FC = () => {
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
               
-              <div className="text-sm text-center text-muted-foreground pt-2">
-                <p>Admin demo: admin@rizzpay.com / admin123</p>
-                <p>Merchant demo: merchant@example.com / merchant123</p>
-              </div>
+              {/* Removed demo credentials */}
             </form>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">

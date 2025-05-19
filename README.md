@@ -8,7 +8,10 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 ## Recent Updates
 
 - Fixed DialogPortal and DialogTrigger nesting issues in AdminMobileMenuTrigger, UserSwitcher, and WhitelistForm
-- Corrected admin access control and login flow for admin users
+- Corrected TypeScript errors in whitelist components
+- Removed demo credentials from login page for better security
+- Fixed admin access control and login flow for admin users
+- Added dedicated admin credentials file in src/admin folder
 - Enhanced dialog component usage throughout the application
 - Improved Sheet component implementation in the mobile menu
 - Fixed WhitelistForm to properly handle dialog state
@@ -49,6 +52,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 - `/src/pages` - Application pages
 - `/src/stores` - State management
 - `/src/utils` - Utility functions
+- `/src/admin` - Admin configuration and secure files
 
 ## Documentation
 
@@ -59,3 +63,4 @@ For more detailed information about the system, refer to the documentation in th
 - Email: rizzpay1@gmail.com
 - Phone: +91-9080186106
 - Address: RizzPay Headquarters, Chennai, India
+

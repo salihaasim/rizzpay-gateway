@@ -144,6 +144,7 @@ export const IpWhitelistTable = () => {
         </Table>
       )}
 
+      {/* Added open={showForm} prop to fix TypeScript error */}
       {showForm && (
         <WhitelistForm
           type="ip"
@@ -157,6 +158,7 @@ export const IpWhitelistTable = () => {
             setSelectedEntry(null);
             fetchEntries();
           }}
+          open={showForm}
         />
       )}
     </div>
