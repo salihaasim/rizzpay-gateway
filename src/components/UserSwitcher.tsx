@@ -26,7 +26,7 @@ interface UserSwitcherProps {
 const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser }) => {
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { setUserEmail, setUserRole } = useTransactionStore();
+  const { setUserRole } = useTransactionStore();
 
   // Demo users for testing
   const demoUsers = [
@@ -38,9 +38,8 @@ const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser 
   const handleSelectUser = (email: string, role: string) => {
     onSelectUser(email, role);
     
-    // Update user in store
-    setUserEmail(email);
-    setUserRole(role);
+    // Update user in store - using the correct method signature
+    setUserRole(role as 'admin' | 'merchant', email);
     
     // Close popover and dialog
     setOpen(false);

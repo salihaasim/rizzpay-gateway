@@ -8,7 +8,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 ## Recent Updates
 
 - Fixed `DialogPortal must be used within Dialog` errors in AdminMobileMenuTrigger component
-- Fixed TypeScript errors in Navbar.tsx related to user state management
+- Fixed TypeScript errors in UserSwitcher.tsx related to user state management
 - Improved Sheet component implementation in AdminMobileMenuTrigger
 - Enhanced UserSwitcher component with proper state management
 - Fixed dialog nesting issues in WhitelistForm, UserSwitcher, and other components
