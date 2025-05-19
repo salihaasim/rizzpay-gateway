@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useTransactionStore } from '@/stores/transactions';
+import { Transaction, TransactionStatus, PaymentDetails } from '@/types/transaction';
 import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
 import UpiQrCodeDisplay from '@/components/payment/UpiQrCodeDisplay';
 import PaymentSuccess from '@/components/payment/PaymentSuccess';
@@ -11,7 +12,33 @@ import PaymentPageLoading from '@/components/payment/PaymentPageLoading';
 import PaymentPageError from '@/components/payment/PaymentPageError';
 import { generateTransactionId } from '@/stores/transactions/utils';
 import { toast } from 'sonner';
-import { PaymentDetails } from '@/stores/transactions/types';
+
+// Fix the interface for error props
+interface PaymentPageErrorProps {
+  error: string;
+  navigateToHome?: () => void;
+}
+
+// Fix the interface for success props
+interface PaymentSuccessProps {
+  id?: string;
+  transactionId?: string;
+  amount?: string;
+}
+
+// Fix the interface for QR code display
+interface UpiQrCodeDisplayProps {
+  amount?: string | number;
+  transactionId: string;
+  onSuccess: (upiId: string) => void;
+  onCancel: () => void;
+}
+
+// Fix the interface for payment form
+interface UpiPaymentFormProps {
+  onSubmit?: (upiId: string) => void;
+  onShowQr?: () => void;
+}
 
 const UpiPaymentPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -102,11 +129,11 @@ const UpiPaymentPage: React.FC = () => {
   }
   
   if (error) {
-    return <PaymentPageError error={error} />;
+    return <PaymentPageError error={error} navigateToHome={() => navigate('/')} />;
   }
   
   if (isPaid) {
-    return <PaymentSuccess transactionId={transactionId} amount={paymentData?.amount} />;
+    return <PaymentSuccess id={transactionId} transactionId={transactionId} amount={paymentData?.amount} />;
   }
   
   return (

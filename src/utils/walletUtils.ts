@@ -1,70 +1,28 @@
 
-import { TransactionStatus, useTransactionStore } from '@/stores/transactionStore';
-import { delay } from './commonUtils';
+import { toast } from 'sonner';
+import { TransactionStatus } from '@/types/transaction';
+import { useTransactionStore } from '@/stores/transactions';
 
-export const simulateWalletProcessing = async (
-  userEmail: string,
-  amount: number,
-  type: 'deposit' | 'withdrawal' | 'transfer',
-  description?: string,
-  recipient?: string
-): Promise<void> => {
-  const store = useTransactionStore.getState();
-  
-  // Create appropriate transaction ID based on type
-  let transactionId: string;
-  
-  if (type === 'deposit') {
-    transactionId = store.depositToWallet(userEmail, amount, 'wallet');
-  } else if (type === 'withdrawal') {
-    transactionId = store.withdrawFromWallet(userEmail, amount, 'wallet');
-  } else if (type === 'transfer' && recipient) {
-    transactionId = store.transferFunds(userEmail, recipient, amount, description);
-  } else {
-    throw new Error(`Invalid transaction type: ${type} or missing recipient for transfer`);
-  }
-  
-  // Find the created transaction
-  const transaction = store.transactions.find(t => t.id === transactionId);
-  
-  if (!transaction) {
-    throw new Error(`Transaction with ID ${transactionId} not found`);
-  }
-  
-  // Update to processing
-  store.updateTransaction(transactionId, {
-    processingState: 'gateway_processing',
-    processingTimeline: [
-      ...(transaction.processingTimeline || []),
-      {
-        stage: 'gateway_processing',
-        timestamp: new Date().toISOString(),
-        message: 'Wallet transaction processing initiated'
+// Simulate wallet processing with success/failure
+export const simulateWalletProcessing = (
+  fromWalletId: string,
+  toWalletId: string,
+  amount: number
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() > 0.1) {
+        resolve('transaction_success_id');
+      } else {
+        reject(new Error('Transaction failed'));
       }
-    ]
-  });
-  
-  // Simulate processing delay
-  await delay(1500);
-  
-  // Complete transaction
-  store.updateTransaction(transactionId, {
-    status: 'successful' as TransactionStatus,
-    processingState: 'completed',
-    processingTimeline: [
-      ...(transaction.processingTimeline || []),
-      {
-        stage: 'completed',
-        timestamp: new Date().toISOString(),
-        message: 'Wallet transaction completed successfully'
-      }
-    ],
-    description: description || transaction.description
+    }, 1500);
   });
 };
 
+// Calculate wallet fee
 export const calculateWalletFee = (amount: number): number => {
-  // Simple fee calculation: 1.5% with min fee of ₹5 and max of ₹100
-  const fee = amount * 0.015;
-  return Math.max(5, Math.min(fee, 100));
+  // Basic fee calculation
+  const fee = amount * 0.01; // 1% fee
+  return Math.min(Math.max(fee, 5), 100); // Min 5, Max 100
 };

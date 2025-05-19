@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { TransactionState, Transaction, UserRole, Wallet } from './types';
 
@@ -373,3 +372,6 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
     return true;
   }
 }));
+
+// Export all the types from the types.ts file
+export * from './types';

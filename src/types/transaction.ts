@@ -1,5 +1,5 @@
 
-// Export all transaction types from the correct location
+// This file acts as a central place for transaction types
 export type { 
   Transaction, 
   TransactionStatus, 
