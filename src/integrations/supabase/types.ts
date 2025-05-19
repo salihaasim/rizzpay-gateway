@@ -47,135 +47,6 @@ export type Database = {
           },
         ]
       }
-      kyc_submissions: {
-        Row: {
-          aadhaar_document_path: string | null
-          gst_document_path: string | null
-          gst_number: string | null
-          id: string
-          notes: string | null
-          pan_document_path: string | null
-          status: string | null
-          submitted_at: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          aadhaar_document_path?: string | null
-          gst_document_path?: string | null
-          gst_number?: string | null
-          id?: string
-          notes?: string | null
-          pan_document_path?: string | null
-          status?: string | null
-          submitted_at?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          aadhaar_document_path?: string | null
-          gst_document_path?: string | null
-          gst_number?: string | null
-          id?: string
-          notes?: string | null
-          pan_document_path?: string | null
-          status?: string | null
-          submitted_at?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      merchant_documents: {
-        Row: {
-          document_type: string
-          document_url: string
-          id: string
-          merchant_id: string | null
-          status:
-            | Database["public"]["Enums"]["merchant_verification_status"]
-            | null
-          uploaded_at: string | null
-          verification_notes: string | null
-          verified_at: string | null
-        }
-        Insert: {
-          document_type: string
-          document_url: string
-          id?: string
-          merchant_id?: string | null
-          status?:
-            | Database["public"]["Enums"]["merchant_verification_status"]
-            | null
-          uploaded_at?: string | null
-          verification_notes?: string | null
-          verified_at?: string | null
-        }
-        Update: {
-          document_type?: string
-          document_url?: string
-          id?: string
-          merchant_id?: string | null
-          status?:
-            | Database["public"]["Enums"]["merchant_verification_status"]
-            | null
-          uploaded_at?: string | null
-          verification_notes?: string | null
-          verified_at?: string | null
-        }
-        Relationships: []
-      }
-      merchant_profiles: {
-        Row: {
-          api_key: string | null
-          business_address: string
-          business_name: string
-          business_type: string
-          contact_email: string
-          contact_phone: string
-          created_at: string | null
-          gst_number: string | null
-          id: string
-          is_active: boolean | null
-          pan_number: string
-          verification_status:
-            | Database["public"]["Enums"]["merchant_verification_status"]
-            | null
-        }
-        Insert: {
-          api_key?: string | null
-          business_address: string
-          business_name: string
-          business_type: string
-          contact_email: string
-          contact_phone: string
-          created_at?: string | null
-          gst_number?: string | null
-          id: string
-          is_active?: boolean | null
-          pan_number: string
-          verification_status?:
-            | Database["public"]["Enums"]["merchant_verification_status"]
-            | null
-        }
-        Update: {
-          api_key?: string | null
-          business_address?: string
-          business_name?: string
-          business_type?: string
-          contact_email?: string
-          contact_phone?: string
-          created_at?: string | null
-          gst_number?: string | null
-          id?: string
-          is_active?: boolean | null
-          pan_number?: string
-          verification_status?:
-            | Database["public"]["Enums"]["merchant_verification_status"]
-            | null
-        }
-        Relationships: []
-      }
       merchants: {
         Row: {
           api_key: string | null
@@ -329,14 +200,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_or_create_api_key: {
-        Args: { user_id: string }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
-      merchant_verification_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -453,7 +320,6 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
-      merchant_verification_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

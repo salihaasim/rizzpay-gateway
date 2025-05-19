@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ActivityLog } from '@/stores/activityLog/types';
+import { ActivityLog } from '@/stores/activityLog';
 
 interface ActivityLogTableProps {
   logs: ActivityLog[];

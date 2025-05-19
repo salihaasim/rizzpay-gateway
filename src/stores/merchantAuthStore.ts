@@ -4,7 +4,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { toast } from 'sonner';
 
 interface MerchantCredentials {
-  id?: string; // Added ID field to fix type errors
   username: string;
   password: string;
   fullName: string;
@@ -14,12 +13,6 @@ interface MerchantCredentials {
     monthlyFee: number; // in rupees
   };
   role?: 'admin' | 'merchant'; // Added role field
-  upiSettings?: {
-    upiId: string;
-    enabled: boolean;
-    allowManualVerification: boolean;
-    customWebhookUrl?: string;
-  };
 }
 
 interface MerchantAuthState {
@@ -29,7 +22,6 @@ interface MerchantAuthState {
   loading: boolean;
   addMerchant: (merchant: MerchantCredentials) => void;
   updateMerchantPricing: (username: string, pricing: MerchantCredentials['pricing']) => void;
-  updateMerchantUpiSettings: (username: string, upiSettings: MerchantCredentials['upiSettings']) => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
   changePassword: (username: string, currentPassword: string, newPassword: string) => boolean;
@@ -51,11 +43,6 @@ export const useMerchantAuth = create<MerchantAuthState>()(
             transactionFee: 1.0, // Updated to 1.0% as requested
             fixedFee: 5,
             monthlyFee: 499
-          },
-          upiSettings: {
-            upiId: 'demo.merchant@rizzpay',
-            enabled: true,
-            allowManualVerification: true
           }
         },
         // Default admin account
@@ -85,12 +72,6 @@ export const useMerchantAuth = create<MerchantAuthState>()(
             transactionFee: 1.0, // Default 1.0% transaction fee
             fixedFee: 5,
             monthlyFee: 499
-          },
-          // Set default UPI settings
-          upiSettings: merchant.upiSettings || {
-            upiId: `${merchant.username.toLowerCase()}@rizzpay`,
-            enabled: false,
-            allowManualVerification: true
           }
         };
         
@@ -107,18 +88,6 @@ export const useMerchantAuth = create<MerchantAuthState>()(
           )
         }));
         toast.success('Merchant pricing updated successfully');
-      },
-
-      updateMerchantUpiSettings: (username, upiSettings) => {
-        set((state) => ({
-          merchants: state.merchants.map(m => 
-            m.username === username ? { ...m, upiSettings } : m
-          ),
-          currentMerchant: state.currentMerchant?.username === username ? 
-            { ...state.currentMerchant, upiSettings } : 
-            state.currentMerchant
-        }));
-        toast.success('UPI settings updated successfully');
       },
 
       login: (username, password) => {

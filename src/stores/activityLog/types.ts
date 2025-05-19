@@ -10,8 +10,7 @@ export type ActivityType =
   | 'wallet_withdrawal'
   | 'security_setting_changed'
   | 'admin_login'
-  | 'merchant_login'
-  | 'api_key_regenerated';
+  | 'merchant_login';
 
 export interface ActivityLog {
   id: string;

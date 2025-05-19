@@ -202,10 +202,10 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
   };
   
   return (
-    <div className="space-y-4 max-w-full">
+    <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
-          <Label htmlFor="file-upload" className="block mb-2 text-sm sm:text-base">Upload Excel File</Label>
+          <Label htmlFor="file-upload" className="block mb-2">Upload Excel File</Label>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
               <Input
@@ -214,7 +214,7 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
                 accept=".xlsx, .xls"
                 onChange={handleFileUpload}
                 disabled={isUploading || isProcessing}
-                className="cursor-pointer text-xs sm:text-sm h-10 sm:h-auto"
+                className="cursor-pointer"
               />
               {isUploading && (
                 <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
@@ -228,7 +228,6 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
               size="icon"
               onClick={downloadTemplate}
               title="Download RizzPay Template"
-              className="min-w-10 h-10 flex-shrink-0"
             >
               <Download className="h-4 w-4" />
             </Button>
@@ -241,10 +240,10 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <div className="mt-2">
-              <p className="font-semibold text-sm">Please fix the following errors:</p>
-              <ul className="list-disc pl-5 mt-1 text-xs sm:text-sm">
+              <p className="font-semibold">Please fix the following errors:</p>
+              <ul className="list-disc pl-5 mt-1 text-sm">
                 {errors.map((error, index) => (
-                  <li key={index} className="break-words">{error}</li>
+                  <li key={index}>{error}</li>
                 ))}
               </ul>
             </div>
@@ -256,7 +255,7 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
         <div className="space-y-4">
           <div className="rounded-md border p-4">
             <h3 className="text-sm font-medium mb-2">Summary</h3>
-            <ul className="text-xs sm:text-sm space-y-1">
+            <ul className="text-sm space-y-1">
               <li>Total Entries: {entries.length}</li>
               <li>Total Amount: ₹{entries.reduce((sum, entry) => sum + entry.amount, 0).toFixed(2)}</li>
             </ul>
@@ -265,12 +264,12 @@ const BulkWithdrawalForm: React.FC<BulkWithdrawalFormProps> = ({ userEmail }) =>
           <Button 
             onClick={processWithdrawals} 
             disabled={isProcessing || errors.length > 0}
-            className="w-full text-sm sm:text-base h-10 sm:h-auto"
+            className="w-full"
           >
             {isProcessing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                Processing...
+                Processing RizzPay Withdrawals...
               </>
             ) : (
               'Process All Withdrawals'

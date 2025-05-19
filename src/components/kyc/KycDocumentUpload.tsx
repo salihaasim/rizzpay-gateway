@@ -1,12 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { FileUp, FileCheck, AlertCircle } from 'lucide-react';
+import { Upload, FileCheck, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/integrations/supabase/client';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 interface KycDocumentUploadProps {
   onDocumentsChange: (documents: KycDocuments) => void;
@@ -19,54 +17,13 @@ export interface KycDocuments {
 }
 
 const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange }) => {
-  const { currentMerchant } = useMerchantAuth();
   const [documents, setDocuments] = useState<KycDocuments>({
     aadhaarCard: null,
     panCard: null,
     gstCertificate: null
   });
   
-  const [existingDocuments, setExistingDocuments] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Fetch existing documents
-  useEffect(() => {
-    const fetchExistingDocuments = async () => {
-      if (!currentMerchant?.id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('kyc_submissions')
-          .select('aadhaar_document_path, pan_document_path, gst_document_path')
-          .eq('user_id', currentMerchant.id)
-          .maybeSingle();
-          
-        if (error) throw error;
-        
-        if (data) {
-          const docs: Record<string, string> = {};
-          
-          if (data.aadhaar_document_path) {
-            docs.aadhaarCard = data.aadhaar_document_path.split('/').pop() || '';
-          }
-          
-          if (data.pan_document_path) {
-            docs.panCard = data.pan_document_path.split('/').pop() || '';
-          }
-          
-          if (data.gst_document_path) {
-            docs.gstCertificate = data.gst_document_path.split('/').pop() || '';
-          }
-          
-          setExistingDocuments(docs);
-        }
-      } catch (error) {
-        console.error('Error fetching existing documents:', error);
-      }
-    };
-    
-    fetchExistingDocuments();
-  }, [currentMerchant?.id]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, docType: keyof KycDocuments) => {
     const file = event.target.files?.[0] || null;
@@ -134,12 +91,6 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
                 <span>{documents.aadhaarCard.name}</span>
               </div>
             )}
-            {existingDocuments.aadhaarCard && !documents.aadhaarCard && (
-              <div className="flex items-center mt-2 text-sm text-blue-600">
-                <FileCheck className="w-4 h-4 mr-1" />
-                <span>Previously uploaded: {existingDocuments.aadhaarCard}</span>
-              </div>
-            )}
             {errors.aadhaarCard && (
               <Alert variant="destructive" className="py-2">
                 <AlertCircle className="h-4 w-4" />
@@ -168,12 +119,6 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
                 <span>{documents.panCard.name}</span>
               </div>
             )}
-            {existingDocuments.panCard && !documents.panCard && (
-              <div className="flex items-center mt-2 text-sm text-blue-600">
-                <FileCheck className="w-4 h-4 mr-1" />
-                <span>Previously uploaded: {existingDocuments.panCard}</span>
-              </div>
-            )}
             {errors.panCard && (
               <Alert variant="destructive" className="py-2">
                 <AlertCircle className="h-4 w-4" />
@@ -200,12 +145,6 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
               <div className="flex items-center mt-2 text-sm text-emerald-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>{documents.gstCertificate.name}</span>
-              </div>
-            )}
-            {existingDocuments.gstCertificate && !documents.gstCertificate && (
-              <div className="flex items-center mt-2 text-sm text-blue-600">
-                <FileCheck className="w-4 h-4 mr-1" />
-                <span>Previously uploaded: {existingDocuments.gstCertificate}</span>
               </div>
             )}
             {errors.gstCertificate && (

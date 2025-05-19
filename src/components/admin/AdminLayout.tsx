@@ -49,7 +49,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex">
-      {/* Desktop sidebar with improved responsiveness */}
+      {/* Desktop sidebar */}
       <AdminSidebar 
         userEmail={userEmail} 
         collapsed={collapsed} 
@@ -57,19 +57,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         handleLogout={handleLogout}
       />
 
-      {/* Mobile-optimized main content */}
+      {/* Mobile sidebar trigger */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <main className={cn(
           "flex-1 min-h-screen transition-all duration-300",
           collapsed ? "lg:ml-20" : "lg:ml-[280px]",
-          "px-2 sm:px-4 md:px-6" // Improved responsive padding
+          "px-0 sm:px-0" // Remove padding for mobile, handled below
         )}>
           <AdminHeader 
             userEmail={userEmail} 
             handleLogout={handleLogout} 
           />
           
-          <div className="p-2 sm:p-4 md:p-6 lg:p-8">
+          <div className="p-4 sm:p-6 md:p-8 lg:p-6">
+            {/* Add mobile-specific padding */}
             {children}
           </div>
         </main>
@@ -89,3 +90,4 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 };
 
 export default AdminLayout;
+

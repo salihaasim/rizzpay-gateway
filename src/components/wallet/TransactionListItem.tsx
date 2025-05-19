@@ -20,13 +20,13 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({
   const getTransactionTypeIcon = (type: string) => {
     switch (type) {
       case 'deposit':
-        return <ArrowUpCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500" />;
+        return <ArrowUpCircle className="h-5 w-5 text-emerald-500" />;
       case 'withdrawal':
-        return <ArrowDownCircle className="h-4 w-4 sm:h-5 sm:w-5 text-rose-500" />;
+        return <ArrowDownCircle className="h-5 w-5 text-rose-500" />;
       case 'transfer':
-        return <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />;
+        return <CreditCard className="h-5 w-5 text-blue-500" />;
       default:
-        return <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />;
+        return <CreditCard className="h-5 w-5 text-primary" />;
     }
   };
 
@@ -46,15 +46,15 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({
   };
 
   return (
-    <Card className="mb-3 sm:mb-4 border-0 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex items-center justify-between flex-wrap gap-2 sm:flex-nowrap">
+    <Card className="mb-4 border-0 shadow-sm hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 sm:mr-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
               {getTransactionTypeIcon(transaction.walletTransactionType || '')}
             </div>
             <div>
-              <p className="text-sm sm:text-base font-medium">
+              <p className="font-medium">
                 {getTransactionTypeName(transaction.walletTransactionType || '')}
               </p>
               <p className="text-xs text-muted-foreground">
@@ -62,9 +62,9 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({
               </p>
             </div>
           </div>
-          <div className="text-right ml-auto">
+          <div className="text-right">
             <div className="flex items-center space-x-2">
-              <p className={`text-sm sm:text-base font-semibold ${
+              <p className={`font-semibold ${
                 transaction.walletTransactionType === 'deposit' || 
                 (transaction.walletTransactionType === 'transfer' && transaction.customer === userEmail)
                   ? 'text-emerald-500' 
@@ -83,18 +83,17 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({
         </div>
         
         {transaction.description && (
-          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-muted/50 rounded-md text-xs sm:text-sm">
+          <div className="mt-3 p-3 bg-muted/50 rounded-md text-sm">
             {transaction.description}
           </div>
         )}
         
         {transaction.processingState && (
-          <div className="mt-2 sm:mt-3 flex justify-end">
+          <div className="mt-3 flex justify-end">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onViewDetails(transaction.id)}
-              className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
             >
               View Details
             </Button>

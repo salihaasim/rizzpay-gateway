@@ -41,34 +41,31 @@ const TransactionCard = ({
 }: TransactionCardProps) => {
   const { icon: StatusIcon, color, bgColor, label } = statusConfig[status];
 
-  // Format payment method for display
-  const displayPaymentMethod = paymentMethod ? paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1) : 'Unknown';
-
   return (
     <Card className={cn("border shadow-sm transition-all hover:shadow-md", className)}>
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center justify-between">
+      <CardContent className="p-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
           <div className="flex-1">
-            <div className="flex items-center flex-wrap gap-1">
-              <span className="text-xs sm:text-sm font-medium">#{id}</span>
-              <span className="mx-1 text-muted-foreground">•</span>
-              <span className="text-xs sm:text-sm text-muted-foreground">{date}</span>
+            <div className="flex items-center">
+              <span className="text-sm font-medium">#{id}</span>
+              <span className="mx-2 text-muted-foreground">•</span>
+              <span className="text-sm text-muted-foreground">{date}</span>
             </div>
             
             <div className="mt-1">
-              <span className="font-semibold text-sm sm:text-base">{amount}</span>
-              <span className="text-xs sm:text-sm text-muted-foreground ml-1 hidden sm:inline">via {displayPaymentMethod}</span>
+              <span className="font-semibold">{amount}</span>
+              <span className="text-sm text-muted-foreground ml-1 hidden md:inline">via {paymentMethod}</span>
             </div>
             
-            <div className="text-xs text-muted-foreground mt-1 sm:hidden">
-              via {displayPaymentMethod}
+            <div className="text-sm text-muted-foreground mt-1 md:hidden">
+              via {paymentMethod}
             </div>
           </div>
           
-          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4">
-            <div className="text-xs sm:text-sm order-last sm:order-first">{customer}</div>
+          <div className="flex items-center justify-between md:justify-end gap-4">
+            <div className="text-sm order-last md:order-first">{customer}</div>
             
-            <div className={cn("flex items-center px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-medium", bgColor, color)}>
+            <div className={cn("flex items-center px-3 py-1 rounded-full text-xs font-medium", bgColor, color)}>
               <StatusIcon className="mr-1 h-3 w-3" />
               {label}
             </div>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -11,8 +12,7 @@ import {
   Settings,
   Users,
   Shield,
-  MonitorSmartphone,
-  MessageSquare,
+  MonitorSmartphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -94,9 +94,8 @@ const AdminSidebar: React.FC<SidebarProps> = ({
     <TooltipProvider delayDuration={0}>
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
-          collapsed ? "w-20" : "w-[280px]",
-          "lg:z-10"
+          "fixed inset-y-0 left-0 z-10 flex flex-col bg-white shadow-sm border-r border-border/40 transition-all duration-300",
+          collapsed ? "w-20" : "w-[280px]"
         )}
       >
         <div className="flex h-16 items-center justify-between px-2 md:px-4">

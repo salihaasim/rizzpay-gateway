@@ -27,11 +27,11 @@ const DepositForm: React.FC<DepositFormProps> = ({ onDeposit, isProcessing = fal
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-full">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="amount" className="text-sm sm:text-base">Amount</Label>
+        <Label htmlFor="amount">Amount</Label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm sm:text-base">₹</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
           <Input 
             id="amount"
             type="number" 
@@ -40,20 +40,20 @@ const DepositForm: React.FC<DepositFormProps> = ({ onDeposit, isProcessing = fal
             value={amount} 
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="pl-8 text-sm sm:text-base h-10 sm:h-auto"
+            className="pl-8"
             disabled={isProcessing}
           />
         </div>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="description" className="text-sm sm:text-base">Description (Optional)</Label>
+        <Label htmlFor="description">Description (Optional)</Label>
         <Textarea 
           id="description"
           value={description} 
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Add a note to this deposit"
-          className="resize-none text-sm sm:text-base" 
+          className="resize-none" 
           rows={3}
           disabled={isProcessing}
         />
@@ -62,7 +62,7 @@ const DepositForm: React.FC<DepositFormProps> = ({ onDeposit, isProcessing = fal
       <Button 
         type="submit" 
         disabled={isProcessing || !amount || parseFloat(amount) <= 0}
-        className="w-full text-sm sm:text-base h-10 sm:h-auto"
+        className="w-full"
       >
         {isProcessing ? (
           <>

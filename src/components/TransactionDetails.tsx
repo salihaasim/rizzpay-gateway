@@ -4,7 +4,7 @@ import { Transaction } from '@/stores/transactionStore';
 import { getStatusIndicatorClass } from './TransactionUtils';
 import PaymentProcessingFlow from './PaymentProcessingFlow';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Calendar, Clock, CreditCard, User, CheckCircle2, XCircle, AlertCircle, Wallet } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, CreditCard, User, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -46,24 +46,6 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, on
         return transaction.status;
     }
   };
-
-  // Get payment method icon
-  const getPaymentMethodIcon = () => {
-    const method = transaction.paymentMethod?.toLowerCase() || '';
-    
-    if (method.includes('card') || method.includes('credit') || method.includes('debit')) {
-      return <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />;
-    } else if (method.includes('wallet') || method.includes('upi') || method.includes('netbanking')) {
-      return <Wallet className="h-4 w-4 text-muted-foreground mr-2" />;
-    } else {
-      return <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />;
-    }
-  };
-
-  // Format payment method for display
-  const displayPaymentMethod = transaction.paymentMethod ? 
-    transaction.paymentMethod.charAt(0).toUpperCase() + transaction.paymentMethod.slice(1) : 
-    'Unknown';
 
   return (
     <div className="space-y-6">
@@ -109,10 +91,10 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, on
           </div>
           
           <div className="flex items-center">
-            {getPaymentMethodIcon()}
+            <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />
             <div>
               <div className="text-xs text-muted-foreground">Payment Method</div>
-              <div className="font-medium">{displayPaymentMethod}</div>
+              <div className="font-medium">{transaction.paymentMethod}</div>
             </div>
           </div>
           

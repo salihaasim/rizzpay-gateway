@@ -9,6 +9,7 @@ import PaymentPageLoading from './components/payment/PaymentPageLoading';
 import WalletPage from './pages/WalletPage';
 import TermsAndConditions from './pages/TermsAndConditions';
 import UpiPaymentPage from './pages/UpiPaymentPage';
+import AasimoAI from './components/aasimo/AasimoAI';
 import AdminMonitoring from './pages/AdminMonitoring';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminSettings from './pages/AdminSettings';
@@ -19,8 +20,6 @@ import HowItWorksTechnical from './pages/HowItWorksTechnical';
 import Dashboard from './pages/Dashboard';
 import Features from './pages/Features';
 import Features2 from './pages/Features2';
-import { default as AasimoAIComponent } from './components/aasimo/AasimoAI';
-import KycPage from './pages/KycPage';
 
 const Transactions = React.lazy(() => import('./pages/Transactions'));
 const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
@@ -80,7 +79,7 @@ const App = () => {
     } />,
     <Route key="terms" path="/terms" element={<TermsAndConditions />} />,
     
-    <Route key="aasimo" path="/aasimo-ai" element={<AasimoAIComponent />} />,
+    <Route key="aasimo" path="/aasimo-ai" element={<AasimoAI />} />,
     
     <Route key="admin" path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
     <Route key="admin-merchants" path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
@@ -113,12 +112,12 @@ const App = () => {
     
     <Route key="webhook" path="/webhook" element={
       <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/developers" replace />}
+        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
       </ProtectedRoute>
     } />,
     <Route key="webhooks" path="/webhooks" element={
       <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/developers" replace />}
+        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
       </ProtectedRoute>
     } />,
     
@@ -157,10 +156,6 @@ const App = () => {
     
     <Route key="features" path="/features" element={<Features />} />,
     <Route key="features2" path="/features2" element={<Features2 />} />,
-    
-    <Route key="kyc" path="/kyc" element={<KycPage />} />,
-    
-    <Route key="upi-plugin" element={<UpiPluginSettings />} />
     
     <Route key="not-found" path="*" element={<NotFound />} />
   ];
