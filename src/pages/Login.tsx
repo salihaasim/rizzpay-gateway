@@ -37,7 +37,7 @@ const Login: React.FC = () => {
           localStorage.setItem('isLoggedIn', 'true');
           setUserRole('merchant', email);
           toast.success('Logged in as Merchant');
-          navigate('/');
+          navigate('/dashboard');
         }
         setIsLoading(false);
       }, 1000);
@@ -94,7 +94,7 @@ const Login: React.FC = () => {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
             <Button variant="link" onClick={() => navigate('/register')}>
               Don't have an account? Register
             </Button>
@@ -104,12 +104,6 @@ const Login: React.FC = () => {
           </CardFooter>
         </Card>
       </div>
-      
-      <footer className="py-4 bg-white dark:bg-gray-800 border-t">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} RizzPay. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 };

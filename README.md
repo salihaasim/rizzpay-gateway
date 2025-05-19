@@ -7,11 +7,12 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
-- Fixed TypeScript errors in webhook utilities
+- Fixed TypeScript error in webhook utilities
+- Added Terms and Conditions page
+- Enhanced UI in Refund Policy page
+- Fixed duplicated footer in the landing page
 - Improved navigation between login page and home page
-- Added comprehensive Refund Policy page
 - Fixed transaction webhookData type issue
-- Made landing page accessible from login page with navigation links
 - Improved site navigation with global footer
 - Enhanced login user experience with better UI/UX
 - Fixed wallet transactions filtering and display
@@ -24,6 +25,7 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 - Real-time webhook notifications
 - Secure wallet operations
 - Detailed refund policy documentation
+- Clear terms and conditions
 
 ## Development Guidelines
 

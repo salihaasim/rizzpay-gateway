@@ -27,6 +27,7 @@ import WalletPage from './pages/WalletPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
 import RefundPolicy from './pages/RefundPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
 import GlobalFooter from './components/GlobalFooter';
 
 const PublicLayout = () => (
@@ -69,6 +70,7 @@ const App: React.FC = () => {
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
           
           {/* Protected routes for authenticated users */}
           <Route

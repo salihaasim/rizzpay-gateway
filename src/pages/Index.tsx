@@ -4,7 +4,6 @@ import LandingNavbar from '@/components/landing/LandingNavbar';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import RoleSectionWrapper from '@/components/landing/RoleSectionWrapper';
-import Footer from '@/components/landing/Footer';
 
 const Index = () => {
   return (
@@ -15,7 +14,7 @@ const Index = () => {
         <FeaturesSection />
       </div>
       <RoleSectionWrapper />
-      <Footer />
+      {/* Removed Footer from here as it's now handled by GlobalFooter in App.tsx */}
     </div>
   );
 };
