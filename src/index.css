@@ -1,102 +1,53 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White background */
-    --foreground: 222.2 47.4% 11.2%; /* Dark text */
-
-    --primary: 217 91% 50%; /* Coinbase blue */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
-
-    --secondary: 217 89% 94%; /* Light blue */
-    --secondary-foreground: 217 91% 50%; /* Primary blue text */
-
-    --muted: 217 89% 96%; /* Very light blue */
-    --muted-foreground: 215.4 16.3% 46.9%; /* Muted text */
-
-    --accent: 217 91% 43%; /* Darker blue */
-    --accent-foreground: 0 0% 100%; /* White text on accent */
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217 91% 50%; /* Primary blue */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
     
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    /* Maintain a similar color scheme for dark mode */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
     
-    --primary: 217 91% 50%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 217 89% 15%;
-    --secondary-foreground: 217 91% 65%;
+    --secondary: 217 30% 96%;
+    --secondary-foreground: 221 83% 53%;
     
-    --muted: 217 89% 14%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 240 3.8% 46.1%;
     
-    --accent: 217 91% 43%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 217 95% 97%;
+    --accent-foreground: 221 83% 53%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    
+    --radius: 0.75rem;
   }
 }
 
-/* Add or ensure these classes exist for the Dashboard */
-.content-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-  color: hsl(var(--foreground));
-}
-
-.page-description {
-  font-size: 0.875rem;
-  color: hsl(var(--muted-foreground));
-}
-
-.section-heading {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: hsl(var(--foreground));
-}
-
-.dashboard-card {
-  backdrop-filter: blur(8px);
-  background-color: hsl(var(--card) / 0.8);
-  transition: all 0.2s ease;
-}
-
-.dashboard-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.card-hover {
-  transition: all 0.2s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+/* Custom transitions for theme switching */
+.transition-colors {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }

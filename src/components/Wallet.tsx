@@ -22,18 +22,18 @@ const Wallet = () => {
   
   if (!userEmail) {
     return (
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Please login to access your wallet.</p>
+      <Card className="mb-4 sm:mb-8">
+        <CardContent className="pt-4 sm:pt-6">
+          <p className="text-center text-sm sm:text-base text-muted-foreground">Please login to access your wallet.</p>
         </CardContent>
       </Card>
     );
   }
   
   return (
-    <Card className="mb-8 border-0 shadow-sm">
-      <CardContent className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Card className="mb-4 sm:mb-8 border-0 shadow-sm">
+      <CardContent className="p-2 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="md:col-span-2">
             <WalletBalance balance={walletBalance} />
             
@@ -47,7 +47,7 @@ const Wallet = () => {
             />
           </div>
           
-          <div className="md:border-l md:pl-6">
+          <div className="md:border-l md:pl-4 sm:md:pl-6">
             <RecentTransactions 
               transactions={recentWalletTransactions}
               userEmail={userEmail}

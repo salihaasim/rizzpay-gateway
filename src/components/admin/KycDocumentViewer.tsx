@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { FileIcon, CheckCircle, XCircle } from 'lucide-react';
+import { FileUp, CheckCircle, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface KycDocumentViewerProps {
   merchantId: string;
@@ -27,6 +29,8 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
   onStatusChange
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [documentUrls, setDocumentUrls] = useState<Record<string, string>>({});
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -36,25 +40,98 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
     }
   };
 
-  const handleApprove = () => {
-    if (onStatusChange) {
-      onStatusChange('approved');
+  const handleDialogOpen = async (open: boolean) => {
+    setIsOpen(open);
+    
+    // Load document URLs when dialog opens
+    if (merchantId && open) {
+      try {
+        const urls: Record<string, string> = {};
+        
+        for (const [key, path] of Object.entries(kycData)) {
+          if (!path) continue;
+          
+          // Skip non-document fields
+          if (key === 'gstNumber') continue;
+          
+          const { data, error } = await supabase.storage
+            .from('kyc_documents')
+            .createSignedUrl(path, 300); // 5 minutes expiry
+            
+          if (error) throw error;
+          
+          if (data?.signedUrl) {
+            urls[key] = data.signedUrl;
+          }
+        }
+        
+        setDocumentUrls(urls);
+      } catch (error) {
+        console.error('Error loading document URLs:', error);
+        toast.error('Failed to load document URLs');
+      }
     }
-    setIsOpen(false);
   };
 
-  const handleReject = () => {
-    if (onStatusChange) {
-      onStatusChange('rejected');
+  const handleApprove = async () => {
+    if (!merchantId || !onStatusChange) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('kyc_submissions')
+        .update({ 
+          status: 'approved',
+          updated_at: new Date().toISOString() 
+        })
+        .eq('user_id', merchantId);
+        
+      if (error) throw error;
+      
+      toast.success('KYC submission approved successfully');
+      onStatusChange('approved');
+    } catch (error: any) {
+      console.error('Error approving KYC:', error);
+      toast.error(error.message || 'Failed to approve KYC submission');
+    } finally {
+      setIsLoading(false);
+      setIsOpen(false);
     }
-    setIsOpen(false);
+  };
+
+  const handleReject = async () => {
+    if (!merchantId || !onStatusChange) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('kyc_submissions')
+        .update({ 
+          status: 'rejected',
+          updated_at: new Date().toISOString() 
+        })
+        .eq('user_id', merchantId);
+        
+      if (error) throw error;
+      
+      toast.success('KYC submission rejected');
+      onStatusChange('rejected');
+    } catch (error: any) {
+      console.error('Error rejecting KYC:', error);
+      toast.error(error.message || 'Failed to reject KYC submission');
+    } finally {
+      setIsLoading(false);
+      setIsOpen(false);
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <FileIcon className="h-4 w-4 mr-2" />
+          <FileUp className="h-4 w-4 mr-2" />
           View KYC Docs
           <Badge className="ml-2" variant={getStatusBadgeVariant(kycStatus)}>
             {kycStatus.charAt(0).toUpperCase() + kycStatus.slice(1)}
@@ -82,29 +159,29 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
             </Badge>
           </div>
           
-          <Tabs defaultValue="aadhaar">
+          <Tabs defaultValue="aadhaarCard">
             <TabsList className="w-full">
-              <TabsTrigger value="aadhaar" className="flex-1">Aadhaar Card</TabsTrigger>
-              <TabsTrigger value="pan" className="flex-1">PAN Card</TabsTrigger>
+              <TabsTrigger value="aadhaarCard" className="flex-1">Aadhaar Card</TabsTrigger>
+              <TabsTrigger value="panCard" className="flex-1">PAN Card</TabsTrigger>
               {kycData.gstCertificate && (
-                <TabsTrigger value="gst" className="flex-1">GST Certificate</TabsTrigger>
+                <TabsTrigger value="gstCertificate" className="flex-1">GST Certificate</TabsTrigger>
               )}
             </TabsList>
             
-            <TabsContent value="aadhaar" className="mt-4">
-              {kycData.aadhaarCard ? (
+            <TabsContent value="aadhaarCard" className="mt-4">
+              {documentUrls.aadhaarCard ? (
                 <div className="border rounded-lg overflow-hidden">
-                  {kycData.aadhaarCard.startsWith('data:application/pdf') ? (
+                  {documentUrls.aadhaarCard.endsWith('.pdf') ? (
                     <div className="h-96 flex items-center justify-center bg-secondary/20">
                       <iframe 
-                        src={kycData.aadhaarCard} 
+                        src={documentUrls.aadhaarCard} 
                         className="w-full h-full" 
                         title="Aadhaar Card PDF"
                       />
                     </div>
                   ) : (
                     <img 
-                      src={kycData.aadhaarCard} 
+                      src={documentUrls.aadhaarCard} 
                       alt="Aadhaar Card" 
                       className="max-w-full h-auto object-contain mx-auto"
                     />
@@ -117,20 +194,20 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
               )}
             </TabsContent>
             
-            <TabsContent value="pan" className="mt-4">
-              {kycData.panCard ? (
+            <TabsContent value="panCard" className="mt-4">
+              {documentUrls.panCard ? (
                 <div className="border rounded-lg overflow-hidden">
-                  {kycData.panCard.startsWith('data:application/pdf') ? (
+                  {documentUrls.panCard.endsWith('.pdf') ? (
                     <div className="h-96 flex items-center justify-center bg-secondary/20">
                       <iframe 
-                        src={kycData.panCard} 
+                        src={documentUrls.panCard} 
                         className="w-full h-full" 
                         title="PAN Card PDF"
                       />
                     </div>
                   ) : (
                     <img 
-                      src={kycData.panCard} 
+                      src={documentUrls.panCard} 
                       alt="PAN Card" 
                       className="max-w-full h-auto object-contain mx-auto"
                     />
@@ -144,24 +221,30 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
             </TabsContent>
             
             {kycData.gstCertificate && (
-              <TabsContent value="gst" className="mt-4">
-                <div className="border rounded-lg overflow-hidden">
-                  {kycData.gstCertificate.startsWith('data:application/pdf') ? (
-                    <div className="h-96 flex items-center justify-center bg-secondary/20">
-                      <iframe 
-                        src={kycData.gstCertificate} 
-                        className="w-full h-full" 
-                        title="GST Certificate PDF"
+              <TabsContent value="gstCertificate" className="mt-4">
+                {documentUrls.gstCertificate ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    {documentUrls.gstCertificate.endsWith('.pdf') ? (
+                      <div className="h-96 flex items-center justify-center bg-secondary/20">
+                        <iframe 
+                          src={documentUrls.gstCertificate} 
+                          className="w-full h-full" 
+                          title="GST Certificate PDF"
+                        />
+                      </div>
+                    ) : (
+                      <img 
+                        src={documentUrls.gstCertificate} 
+                        alt="GST Certificate" 
+                        className="max-w-full h-auto object-contain mx-auto"
                       />
-                    </div>
-                  ) : (
-                    <img 
-                      src={kycData.gstCertificate} 
-                      alt="GST Certificate" 
-                      className="max-w-full h-auto object-contain mx-auto"
-                    />
-                  )}
-                </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-secondary/20 rounded-lg">
+                    <p className="text-muted-foreground">No GST Certificate document uploaded</p>
+                  </div>
+                )}
               </TabsContent>
             )}
           </Tabs>
@@ -169,11 +252,20 @@ const KycDocumentViewer: React.FC<KycDocumentViewerProps> = ({
         
         {kycStatus === 'pending' && onStatusChange && (
           <div className="flex justify-end space-x-2 mt-4">
-            <Button variant="outline" onClick={handleReject} className="flex items-center">
-              <XCircle className="mr-2 h-4 w-4" />
+            <Button 
+              variant="outline" 
+              onClick={handleReject} 
+              className="flex items-center"
+              disabled={isLoading}
+            >
+              <X className="mr-2 h-4 w-4" />
               Reject KYC
             </Button>
-            <Button onClick={handleApprove} className="flex items-center">
+            <Button 
+              onClick={handleApprove} 
+              className="flex items-center"
+              disabled={isLoading}
+            >
               <CheckCircle className="mr-2 h-4 w-4" />
               Approve KYC
             </Button>

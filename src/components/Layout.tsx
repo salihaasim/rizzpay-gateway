@@ -1,9 +1,11 @@
 
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
-import Navbar from './Navbar';
 import { Loader2 } from 'lucide-react';
+import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,7 +15,9 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const isMobile = useMediaQuery(mediaQueries.isMobile);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
+  
   // Monitor authentication status for changes
   useEffect(() => {
     if (!isAuthenticated && !loading) {
@@ -21,6 +25,11 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       navigate('/', { replace: true });
     }
   }, [isAuthenticated, loading, navigate]);
+  
+  // Update sidebar state when mobile status changes
+  useEffect(() => {
+    setSidebarCollapsed(isMobile);
+  }, [isMobile]);
 
   // Show loading indicator if authentication is still being checked
   if (loading) {
@@ -39,19 +48,31 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Display responsive layout for authenticated users
+  // Display responsive layout for authenticated users with sidebar
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-4">
-        {children}
-      </main>
-      <footer className="py-4 text-center text-xs text-muted-foreground border-t">
-        <div className="max-w-screen-2xl mx-auto px-4">
-          <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
-          <p className="mt-1">Version 1.0.0</p>
-        </div>
-      </footer>
+    <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
+      <DashboardSidebar 
+        collapsed={sidebarCollapsed} 
+        setCollapsed={setSidebarCollapsed} 
+      />
+      
+      <div className={`flex-1 min-h-screen transition-all duration-300 ${
+        sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]"
+      }`}>
+        <main className="p-4 sm:p-6">
+          <div className="absolute top-4 right-4 z-50">
+            <ThemeToggle />
+          </div>
+          {children}
+        </main>
+        
+        <footer className="py-3 text-center text-xs text-muted-foreground border-t">
+          <div className="max-w-screen-2xl mx-auto px-4">
+            <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
+            <p className="mt-1">Version 1.0.0</p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 });

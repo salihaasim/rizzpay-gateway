@@ -17,14 +17,14 @@ const TransactionItem = React.memo(({ transaction, userEmail }: { transaction: T
     <div className="flex items-center justify-between py-2 border-b last:border-0">
       <div className="flex items-center">
         {transaction.walletTransactionType === 'deposit' ? (
-          <ArrowUpCircle className="h-4 w-4 text-emerald-500 mr-2" />
+          <ArrowUpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-500 mr-1 sm:mr-2" />
         ) : transaction.walletTransactionType === 'withdrawal' ? (
-          <ArrowDownCircle className="h-4 w-4 text-rose-500 mr-2" />
+          <ArrowDownCircle className="h-3 w-3 sm:h-4 sm:w-4 text-rose-500 mr-1 sm:mr-2" />
         ) : (
-          <RefreshCw className="h-4 w-4 text-blue-500 mr-2" />
+          <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 mr-1 sm:mr-2" />
         )}
         <div>
-          <p className="text-sm font-medium">
+          <p className="text-xs sm:text-sm font-medium">
             {transaction.walletTransactionType === 'deposit' 
               ? 'Deposit' 
               : transaction.walletTransactionType === 'withdrawal'
@@ -33,12 +33,12 @@ const TransactionItem = React.memo(({ transaction, userEmail }: { transaction: T
                   ? 'Received Transfer'
                   : 'Sent Transfer'}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
             {new Date(transaction.date).toLocaleString()}
           </p>
         </div>
       </div>
-      <p className={`font-medium ${isIncoming ? 'text-emerald-500' : 'text-rose-500'}`}>
+      <p className={`text-xs sm:text-sm font-medium ${isIncoming ? 'text-emerald-500' : 'text-rose-500'}`}>
         {isIncoming ? '+' : '-'}{transaction.amount}
       </p>
     </div>
@@ -54,16 +54,16 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = React.memo(({
 }) => {
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium">Recent Transactions</p>
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <p className="text-xs sm:text-sm font-medium">Recent Transactions</p>
         {merchantCount > 0 && (
-          <div className="text-xs text-muted-foreground">
+          <div className="text-[10px] sm:text-xs text-muted-foreground">
             You have {merchantCount} merchants
           </div>
         )}
       </div>
       {transactions.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {transactions.map((transaction) => (
             <TransactionItem 
               key={transaction.id} 
@@ -73,7 +73,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = React.memo(({
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground text-center py-3">No transactions yet</p>
+        <p className="text-xs sm:text-sm text-muted-foreground text-center py-2 sm:py-3">No transactions yet</p>
       )}
     </div>
   );

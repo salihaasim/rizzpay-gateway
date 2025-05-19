@@ -1,118 +1,59 @@
 
-import React from 'react';
-import { Bell, Settings, Monitor, LogOut, Users, Wallet, FileText } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import SupabaseStatus from '@/components/SupabaseStatus';
-import { Link } from 'react-router-dom';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useTransactionStore } from '@/stores/transactions';
+import { LogOut, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import AdminMobileMenuTrigger from './AdminMobileMenuTrigger';
 
-interface AdminHeaderProps {
-  userEmail: string | null;
-  handleLogout: () => void;
+export interface AdminHeaderProps {
+  onLogout?: () => void;
+  setMobileMenuOpen?: (open: boolean) => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ userEmail, handleLogout }) => {
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (!userEmail) return 'A';
-    return userEmail.substring(0, 2).toUpperCase();
+const AdminHeader: React.FC<AdminHeaderProps> = ({ onLogout, setMobileMenuOpen }) => {
+  const { userEmail } = useTransactionStore();
+  const { theme, setTheme } = useTheme();
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
-    <header className="h-16 bg-white border-b flex items-center px-4 sticky top-0 z-10">
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center">
-          {/* Empty div to maintain spacing for desktop */}
-          <div className="hidden lg:block"></div>
-        </div>
+    <header className="border-b border-border">
+      <div className="flex h-16 items-center px-4 md:px-6">
+        <AdminMobileMenuTrigger setMobileMenuOpen={setMobileMenuOpen || (() => {})} />
         
-        <div className="flex items-center space-x-3">
-          <SupabaseStatus />
-          
-          <Link to="/admin/merchants">
-            <Button variant="outline" size="sm" className="flex items-center mr-2">
-              <Users className="h-4 w-4 mr-1" />
-              Manage Merchants
-            </Button>
-          </Link>
-          
-          <Link to="/admin/escrow">
-            <Button variant="outline" size="sm" className="flex items-center mr-2">
-              <Wallet className="h-4 w-4 mr-1" />
-              Escrow
-            </Button>
-          </Link>
-          
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 flex items-center justify-center text-[10px] text-white">3</span>
+        <div className="ml-auto flex items-center space-x-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme}
+            className="text-muted-foreground"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-coinbase text-white text-xs">
-                    {getUserInitials()}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{userEmail}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    Administrator
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/admin/merchants" className="cursor-pointer flex items-center">
-                  <Users className="mr-2 h-4 w-4" />
-                  <span>Manage Merchants</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/admin/escrow" className="cursor-pointer flex items-center">
-                  <Wallet className="mr-2 h-4 w-4" />
-                  <span>Escrow Account</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/admin/pricing" className="cursor-pointer flex items-center">
-                  <FileText className="mr-2 h-4 w-4" />
-                  <span>Merchant Pricing</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/admin/settings" className="cursor-pointer flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Admin Settings</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard" className="cursor-pointer flex items-center">
-                  <Monitor className="mr-2 h-4 w-4" />
-                  <span>Merchant View</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer text-rose-500 focus:text-rose-500" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="hidden md:flex items-center space-x-1">
+            <span className="text-sm text-muted-foreground">Logged in as:</span>
+            <span className="text-sm font-medium">{userEmail}</span>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleLogout}
+            className="ml-2"
+          >
+            <LogOut className="mr-1 h-4 w-4" />
+            Logout
+          </Button>
         </div>
       </div>
     </header>

@@ -9,7 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
-const BusinessInfoForm = () => {
+interface BusinessInfoFormProps {
+  merchant?: any;
+}
+
+const BusinessInfoForm: React.FC<BusinessInfoFormProps> = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({

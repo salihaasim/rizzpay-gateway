@@ -1,191 +1,116 @@
-import React, { useEffect, memo, Suspense, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+import React, { useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  Outlet
+} from 'react-router-dom';
+import { useTransactionStore } from './stores/transactions';
 import Index from './pages/Index';
-import { Toaster } from 'sonner';
-import { useMerchantAuth } from './stores/merchantAuthStore';
-import { useTransactionStore } from './stores/transactionStore';
-import Layout from './components/Layout';
-import PaymentPageLoading from './components/payment/PaymentPageLoading';
-import WalletPage from './pages/WalletPage';
-import TermsAndConditions from './pages/TermsAndConditions';
-import UpiPaymentPage from './pages/UpiPaymentPage';
-import AasimoAI from './components/aasimo/AasimoAI';
-import AdminMonitoring from './pages/AdminMonitoring';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminSettings from './pages/AdminSettings';
-import AdminTransactionLog from './pages/AdminTransactionLog';
-import MerchantWhitelist from './pages/MerchantWhitelist';
-import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
-import HowItWorksTechnical from './pages/HowItWorksTechnical';
 import Dashboard from './pages/Dashboard';
-import Features from './pages/Features';
-import Features2 from './pages/Features2';
+import Transactions from './pages/Transactions';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import BankingPage from './pages/BankingPage';
+import Webhooks from './pages/Webhooks';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminTransactions from './pages/admin/AdminTransactions';
+import AdminMerchants from './pages/admin/AdminMerchants';
+import AdminKYC from './pages/admin/AdminKYC';
+import AdminWhitelist from './pages/admin/AdminWhitelist';
+import AdminLayout from './components/admin/AdminLayout';
+import UpiPaymentPage from './pages/UpiPaymentPage';
+import WalletPage from './pages/WalletPage';
+import AdminUpiManagement from './pages/AdminUpiManagement';
+import IndiaPage from './pages/IndiaPage';
+import RefundPolicy from './pages/RefundPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import GlobalFooter from './components/GlobalFooter';
 
-const Transactions = React.lazy(() => import('./pages/Transactions'));
-const WebhookPage = React.lazy(() => import('./pages/WebhookPage'));
-const WebhookSetup = React.lazy(() => import('./pages/WebhookSetup'));
-const DeveloperIntegration = React.lazy(() => import('./pages/DeveloperIntegration'));
-const Security = React.lazy(() => import('./pages/Security'));
-const Settings = React.lazy(() => import('./pages/Settings'));
-const WebhookPayment = React.lazy(() => import('./pages/WebhookPayment'));
-const NotFound = React.lazy(() => import('./pages/NotFound'));
-const Auth = React.lazy(() => import('./pages/Auth'));
+const PublicLayout = () => (
+  <div className="min-h-screen flex flex-col">
+    <div className="flex-grow">
+      <Outlet />
+    </div>
+    <GlobalFooter />
+  </div>
+);
 
-const PageLoading = () => <PaymentPageLoading />;
-
-const App = () => {
-  const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
-  const transactionStore = useTransactionStore();
-  const { setUserRole } = transactionStore || {}; 
-  const [appReady, setAppReady] = useState(false);
+const App: React.FC = () => {
+  const { setUserRole, isAuthenticated } = useTransactionStore();
   
   useEffect(() => {
-    const hostname = window.location.hostname;
-    console.log("Current hostname:", hostname);
-    
-    document.title = hostname.includes("rizzpay.co.in") ? "Rizzpay - Official Payment Gateway" : "Rizzpay";
-    
-    if (isAuthenticated && currentMerchant && setUserRole) {
-      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
-      setUserRole(role, currentMerchant.username);
-      console.log(`User role set to ${role} on app initialization`);
-    }
-    
-    setAppReady(true);
-  }, [isAuthenticated, currentMerchant, setUserRole]);
-
-  useEffect(() => {
-    if (isAuthenticated && currentMerchant && setUserRole && transactionStore) {
-      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
-      if (transactionStore.userRole !== role) {
-        setUserRole(role, currentMerchant.username);
-        console.log(`User role updated to ${role} after authentication change`);
+    // Simulate checking authentication status and setting user role
+    const checkAuthStatus = async () => {
+      // Replace this with your actual authentication logic
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      
+      if (isLoggedIn) {
+        // Simulate fetching user role from local storage or API
+        const userRole = localStorage.getItem('userRole') || 'merchant';
+        const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
+        setUserRole(userRole as 'admin' | 'merchant', userEmail);
       }
-    }
-  }, [isAuthenticated, currentMerchant, transactionStore, setUserRole]);
-
-  if (!appReady || loading) {
-    return <PageLoading />;
-  }
-
-  const isAdmin = currentMerchant?.role === 'admin' || (transactionStore && transactionStore.userRole === 'admin');
-
-  const routes = [
-    <Route key="index" path="/" element={<Index />} />,
-    <Route key="auth" path="/auth" element={
-      isAuthenticated ? 
-        (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />) : 
-        <Auth />
-    } />,
-    <Route key="terms" path="/terms" element={<TermsAndConditions />} />,
+    };
     
-    <Route key="aasimo" path="/aasimo-ai" element={<AasimoAI />} />,
-    
-    <Route key="admin" path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-merchants" path="/admin/merchants" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-escrow" path="/admin/escrow" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-pricing" path="/admin/pricing" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-settings" path="/admin/settings" element={isAdmin ? <AdminSettings /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-analytics" path="/admin/analytics" element={isAdmin ? <AdminDashboard /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-transactions" path="/admin/transactions" element={isAdmin ? <AdminTransactionLog /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-whitelist" path="/admin/whitelist" element={isAdmin ? <MerchantWhitelist /> : <Navigate to="/auth" replace />} />,
-    <Route key="admin-monitoring" path="/admin/monitoring" element={isAdmin ? <AdminMonitoring /> : <Navigate to="/auth" replace />} />,
-    
-    <Route key="admin-monitoring-dashboard" path="/admin/monitoring/:dashboardType" element={isAdmin ? <MonitoringDashboard /> : <Navigate to="/auth" replace />} />,
-    
-    <Route key="dashboard" path="/dashboard/*" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Dashboard /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="transactions" path="/transactions" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Transactions /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="wallet" path="/wallet" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WalletPage /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="webhook" path="/webhook" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="webhooks" path="/webhooks" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><WebhookSetup /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="developers" path="/developers" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><DeveloperIntegration /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="security" path="/security" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Security /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="settings-wild" path="/settings/*" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
-      </ProtectedRoute>
-    } />,
-    <Route key="settings" path="/settings" element={
-      <ProtectedRoute>
-        {isAdmin ? <Navigate to="/admin" replace /> : <Layout><Settings /></Layout>}
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="webhook-payment" path="/webhook-payment" element={<WebhookPayment />} />,
-    
-    <Route key="upi-payment" path="/upi-payment" element={<UpiPaymentPage />} />,
-    <Route key="payment-upi" path="/payment/upi" element={<UpiPaymentPage />} />,
-    
-    <Route key="how-it-works-technical" path="/how-it-works-technical" element={
-      <ProtectedRoute>
-        <HowItWorksTechnical />
-      </ProtectedRoute>
-    } />,
-    
-    <Route key="features" path="/features" element={<Features />} />,
-    <Route key="features2" path="/features2" element={<Features2 />} />,
-    
-    <Route key="not-found" path="*" element={<NotFound />} />
-  ];
-
+    checkAuthStatus();
+  }, [setUserRole]);
+  
   return (
     <Router>
-      <Toaster position="top-right" richColors />
-      <Suspense fallback={<PageLoading />}>
-        <Routes>
-          {routes}
-        </Routes>
-      </Suspense>
+      <Routes>
+        {/* Public routes wrapped in PublicLayout */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/upi-payment" element={<UpiPaymentPage />} />
+          <Route path="/india" element={<IndiaPage />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          
+          {/* Protected routes for authenticated users */}
+          <Route
+            path="/dashboard"
+            element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/transactions"
+            element={isAuthenticated() ? <Transactions /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/profile"
+            element={isAuthenticated() ? <Profile /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/banking"
+            element={isAuthenticated() ? <BankingPage /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/webhooks"
+            element={isAuthenticated() ? <Webhooks /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/wallet"
+            element={isAuthenticated() ? <WalletPage /> : <Navigate to="/login" replace />}
+          />
+        </Route>
+        
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="transactions" element={<AdminTransactions />} />
+          <Route path="merchants" element={<AdminMerchants />} />
+          <Route path="kyc" element={<AdminKYC />} />
+          <Route path="whitelist" element={<AdminWhitelist />} />
+          <Route path="upi-management" element={<AdminUpiManagement />} />
+        </Route>
+      </Routes>
     </Router>
   );
 };
-
-const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useMerchantAuth();
-  
-  if (loading) {
-    return <PageLoading />;
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-});
-
-ProtectedRoute.displayName = 'ProtectedRoute';
 
 export default App;

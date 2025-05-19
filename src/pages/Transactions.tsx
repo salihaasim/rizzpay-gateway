@@ -1,314 +1,174 @@
+
 import React, { useState, useEffect } from 'react';
+import { useTransactionStore } from '@/stores/transactions';
+import TransactionStatusBadge from '@/components/wallet/TransactionStatusBadge';
+import { Helmet } from 'react-helmet';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { TabsContent, TabsList, TabsTrigger, Tabs } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import TransactionCard from '@/components/TransactionCard';
-import TransactionDetails from '@/components/TransactionDetails';
-import { Search, Download, Filter, ArrowUpDown } from 'lucide-react';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { useLocation } from 'react-router-dom';
+import { useFilteredTransactions } from '@/hooks/useFilteredTransactions';
+import TransactionStats from '@/components/transactions/TransactionStats';
+import TransactionFilters from '@/components/transactions/TransactionFilters';
+import TransactionTabsContent from '@/components/transactions/TransactionTabsContent';
+import TransactionHeader from '@/components/transactions/TransactionHeader';
+import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
+import Layout from '@/components/Layout';
 
 const Transactions = () => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const transactionIdParam = searchParams.get('id');
-  
   const { transactions } = useTransactionStore();
-  const [filter, setFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('all');
+  const [showUpiTransactions, setShowUpiTransactions] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(transactionIdParam);
+  const [filter, setFilter] = useState('all');
   
-  useEffect(() => {
-    if (transactionIdParam) {
-      setSelectedTransactionId(transactionIdParam);
+  // Get filtered transactions based on active tab and search term
+  const filteredTransactions = useFilteredTransactions(transactions, activeTab, searchTerm);
+  
+  // Get UPI transactions for the special UPI view
+  const upiTransactions = transactions.filter(
+    transaction => 
+      transaction.paymentMethod === 'upi' || 
+      transaction.paymentMethod === 'upi_manual'
+  );
+  
+  // Stats for the current filtered transactions
+  const totalAmount = filteredTransactions.reduce((sum, transaction) => {
+    const amount = transaction.rawAmount || parseFloat(transaction.amount.replace(/[^\d.-]/g, '')) || 0;
+    if (transaction.status === 'successful') {
+      return sum + amount;
     }
-  }, [transactionIdParam]);
+    return sum;
+  }, 0);
   
-  const selectedTransaction = transactions.find(t => t.id === selectedTransactionId);
+  // Count by payment method
+  const paymentMethodCount = filteredTransactions.reduce((acc, transaction) => {
+    const method = transaction.paymentMethod;
+    acc[method] = (acc[method] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
   
-  // Filter transactions based on selected filter
-  const filteredTransactions = transactions.filter(transaction => {
-    if (filter === 'all') return true;
-    return transaction.status === filter;
-  }).filter(transaction => {
-    if (!searchQuery) return true;
-    
-    const query = searchQuery.toLowerCase();
-    return (
-      transaction.id.toLowerCase().includes(query) ||
-      transaction.customer.toLowerCase().includes(query) ||
-      transaction.amount.toLowerCase().includes(query) ||
-      transaction.paymentMethod.toLowerCase().includes(query)
-    );
-  });
-
-  // Calculate totals
-  const getTotalAmount = (status: string) => {
-    return transactions
-      .filter(t => status === 'all' || t.status === status)
-      .reduce((sum, t) => {
-        // Remove non-numeric characters and convert to number
-        const amount = Number(t.amount.replace(/[^0-9.-]+/g, ''));
-        return sum + (isNaN(amount) ? 0 : amount);
-      }, 0);
+  // Simple percentage calculation
+  const calculatePercentage = (count: number) => {
+    return filteredTransactions.length > 0 
+      ? Math.round((count / filteredTransactions.length) * 100) 
+      : 0;
   };
-
-  const successfulTotal = getTotalAmount('successful');
-  const pendingTotal = getTotalAmount('pending');
-  const failedTotal = getTotalAmount('failed');
-  const processingTotal = getTotalAmount('processing');
-
-  // Generate payment method data for pie chart
-  const getPaymentMethodData = () => {
-    const methodCounts: Record<string, number> = {};
+  
+  // Handle sorting transactions
+  const sortedTransactions = React.useMemo(() => {
+    const displayTransactions = showUpiTransactions ? upiTransactions : filteredTransactions;
     
-    transactions.forEach(transaction => {
-      const method = transaction.paymentMethod;
-      methodCounts[method] = (methodCounts[method] || 0) + 1;
+    return [...displayTransactions].sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      } else if (sortBy === 'amount') {
+        const amountA = a.rawAmount || parseFloat(a.amount.replace(/[^\d.-]/g, '')) || 0;
+        const amountB = b.rawAmount || parseFloat(b.amount.replace(/[^\d.-]/g, '')) || 0;
+        return amountB - amountA;
+      } else if (sortBy === 'customer') {
+        return a.customer.localeCompare(b.customer);
+      }
+      return 0;
     });
-    
-    const colors: Record<string, string> = {
-      'upi': '#34A853',
-      'Google Pay': '#4285F4',
-      'UPI': '#34A853',
-      'card': '#EA4335',
-      'Credit Card': '#EA4335',
-      'Debit Card': '#FBBC05',
-      'netbanking': '#003087',
-      'PayPal': '#003087',
-      'Cash': '#6B7280',
-    };
-    
-    return Object.entries(methodCounts).map(([name, value]) => ({
-      name,
-      value,
-      color: colors[name] || '#6B7280',
-    }));
+  }, [filteredTransactions, upiTransactions, showUpiTransactions, sortBy]);
+
+  const handleExportTransactions = () => {
+    // Implementation for exporting transactions
+    console.log('Export transactions');
   };
-
-  const paymentMethodData = getPaymentMethodData();
-
-  if (selectedTransaction) {
-    return (
-      <div className="container py-6">
-        <TransactionDetails 
-          transaction={selectedTransaction} 
-          onClose={() => setSelectedTransactionId(null)} 
-        />
-      </div>
-    );
-  }
-
+  
+  const handleSelectTransaction = (id: string) => {
+    // Implementation for selecting a transaction
+    console.log('Selected transaction:', id);
+  };
+  
   return (
-    <div className="container py-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">Transactions</h1>
-          <p className="text-muted-foreground">View and manage all your payment transactions</p>
-        </div>
-        
-        <div className="flex gap-2 mt-4 md:mt-0">
-          <Button variant="outline" size="sm" className="flex items-center">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-        </div>
-      </div>
+    <Layout>
+      <Helmet>
+        <title>Transactions | RizzPay</title>
+      </Helmet>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="border-0 shadow-sm overflow-hidden lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Transaction Overview</CardTitle>
-            <CardDescription>Summary of transaction status</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex gap-4 flex-wrap">
-              <div className="bg-emerald-50 text-emerald-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Successful</div>
-                <div className="text-2xl font-bold">₹{successfulTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-emerald-600 mt-1">{transactions.filter(t => t.status === 'successful').length} transactions</div>
-              </div>
-              
-              <div className="bg-blue-50 text-blue-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Processing</div>
-                <div className="text-2xl font-bold">₹{processingTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-blue-600 mt-1">{transactions.filter(t => t.status === 'processing').length} transactions</div>
-              </div>
-              
-              <div className="bg-amber-50 text-amber-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Pending</div>
-                <div className="text-2xl font-bold">₹{pendingTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-amber-600 mt-1">{transactions.filter(t => t.status === 'pending').length} transactions</div>
-              </div>
-              
-              <div className="bg-rose-50 text-rose-500 rounded-lg p-4 flex-1 min-w-[120px]">
-                <div className="text-sm font-medium mb-1">Failed</div>
-                <div className="text-2xl font-bold">₹{failedTotal.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-rose-600 mt-1">{transactions.filter(t => t.status === 'failed').length} transactions</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="container max-w-screen-xl mx-auto p-4 md:p-6">
+        <TransactionHeader 
+          totalAmount={totalAmount}
+          transactionCount={filteredTransactions.length}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          exportAllTransactions={handleExportTransactions}
+        />
         
-        <Card className="border-0 shadow-sm overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Payment Methods</CardTitle>
-            <CardDescription>Distribution by type</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="h-[200px]">
-              {paymentMethodData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={paymentMethodData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      labelLine={false}
-                    >
-                      {paymentMethodData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Legend verticalAlign="bottom" height={36} />
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
-                  No transaction data available
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative w-full md:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-12">
+          <div className="md:col-span-3 space-y-6">
+            <TransactionStats 
+              transactions={filteredTransactions}
+              paymentMethodCount={paymentMethodCount}
+              calculatePercentage={calculatePercentage}
             />
+            
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Filters</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TransactionFilters 
+                  searchQuery={searchTerm}
+                  setSearchQuery={setSearchTerm}
+                  filter={filter}
+                  setFilter={setFilter}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                />
+              </CardContent>
+            </Card>
           </div>
           
-          <div className="flex gap-3 flex-1 items-center">
-            <div className="flex items-center">
-              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm mr-2">Filter:</span>
-            </div>
-            
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Filter by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Transactions</SelectItem>
-                <SelectItem value="successful">Successful</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <div className="flex items-center ml-1">
-              <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm mr-2">Sort:</span>
-            </div>
-            
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="amount">Amount</SelectItem>
-                <SelectItem value="customer">Customer</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="md:col-span-9">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Transaction History</CardTitle>
+                    <CardDescription>
+                      {filteredTransactions.length} transactions found
+                    </CardDescription>
+                  </div>
+                  
+                  <UpiTransactionToggle 
+                    isUpiView={false}
+                    setIsUpiView={() => {}}
+                    totalUpiTransactions={upiTransactions.length}
+                    showUpiTransactions={showUpiTransactions}
+                    setShowUpiTransactions={setShowUpiTransactions}
+                  />
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="successful">Successful</TabsTrigger>
+                    <TabsTrigger value="processing">Processing</TabsTrigger>
+                    <TabsTrigger value="pending">Pending</TabsTrigger>
+                    <TabsTrigger value="failed">Failed</TabsTrigger>
+                  </TabsList>
+                  
+                  <TransactionTabsContent 
+                    transactions={sortedTransactions}
+                    isUpiView={showUpiTransactions}
+                    onSelectTransaction={handleSelectTransaction}
+                  />
+                </Tabs>
+              </CardContent>
+            </Card>
           </div>
         </div>
-        
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full max-w-md grid grid-cols-5">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="successful">Successful</TabsTrigger>
-            <TabsTrigger value="processing">Processing</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="failed">Failed</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="all" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.length > 0 ? (
-                filteredTransactions.map((transaction) => (
-                  <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                    <TransactionCard {...transaction} />
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12 border rounded-lg">
-                  <p className="text-muted-foreground">No transactions found</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="successful" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'successful').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="processing" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'processing').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="pending" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'pending').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="failed" className="mt-6">
-            <div className="space-y-4">
-              {filteredTransactions.filter(t => t.status === 'failed').map((transaction) => (
-                <div key={transaction.id} onClick={() => setSelectedTransactionId(transaction.id)} className="cursor-pointer">
-                  <TransactionCard {...transaction} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
       </div>
-    </div>
+    </Layout>
   );
 };
 

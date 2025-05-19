@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, LogIn, Store, Loader2, Building2 } from 'lucide-react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { useTransactionStore } from '@/stores/transactionStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { roles, demoCredentials } from '@/components/role/roleConstants';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -22,7 +22,6 @@ const Auth = () => {
   });
   
   const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
-  const { setUserRole } = useTransactionStore();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -39,15 +38,13 @@ const Auth = () => {
       // Check if the user is an admin
       if (currentMerchant.role === 'admin') {
         console.log("Admin user authenticated, redirecting to admin dashboard");
-        setUserRole('admin', currentMerchant.username);
         navigate('/admin', { replace: true });
       } else {
         console.log("Merchant user authenticated, redirecting to merchant dashboard");
-        setUserRole('merchant', currentMerchant.username || '');
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [isAuthenticated, currentMerchant, navigate, setUserRole]);
+  }, [isAuthenticated, currentMerchant, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +59,7 @@ const Auth = () => {
         username: formData.username,
         password: formData.password,
         fullName: formData.fullName,
+        email: `${formData.username}@rizzpay.com`, // Add default email
         role: (activeRole === 'admin' ? 'admin' : 'merchant') as 'admin' | 'merchant'
       });
       
@@ -71,9 +69,10 @@ const Auth = () => {
       toast.success('Registration successful! Please login with your credentials.');
     } else {
       try {
-        // For debugging
-        if (formData.username === 'rizzpay' && formData.password === 'rizzpay123') {
-          console.log("Found matching admin credentials, attempting login...");
+        // Special case for admin login
+        if (activeRole === 'admin') {
+          console.log("Testing credentials:", formData.username, formData.password);
+          console.log("Demo credentials:", demoCredentials.admin);
         }
         
         // Attempt login
@@ -122,7 +121,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <header className="w-full py-6 border-b bg-background">
         <div className="container px-4 mx-auto">
           <div className="flex justify-between items-center">
@@ -138,6 +137,7 @@ const Auth = () => {
                 RizzPay
               </span>
             </div>
+            <div></div>
           </div>
         </div>
       </header>

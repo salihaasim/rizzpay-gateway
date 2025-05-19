@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Transaction } from '@/stores/transactionStore';
+import { Transaction } from '@/stores/transactions/types';
 import { getStatusIndicatorClass } from './TransactionUtils';
 import PaymentProcessingFlow from './PaymentProcessingFlow';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Calendar, Clock, CreditCard, User, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, CreditCard, User, CheckCircle2, XCircle, AlertCircle, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -46,6 +46,24 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, on
         return transaction.status;
     }
   };
+
+  // Get payment method icon
+  const getPaymentMethodIcon = () => {
+    const method = transaction.paymentMethod?.toLowerCase() || '';
+    
+    if (method.includes('card') || method.includes('credit') || method.includes('debit')) {
+      return <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />;
+    } else if (method.includes('wallet') || method.includes('upi') || method.includes('netbanking')) {
+      return <Wallet className="h-4 w-4 text-muted-foreground mr-2" />;
+    } else {
+      return <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />;
+    }
+  };
+
+  // Format payment method for display
+  const displayPaymentMethod = transaction.paymentMethod ? 
+    transaction.paymentMethod.charAt(0).toUpperCase() + transaction.paymentMethod.slice(1) : 
+    'Unknown';
 
   return (
     <div className="space-y-6">
@@ -91,10 +109,10 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, on
           </div>
           
           <div className="flex items-center">
-            <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />
+            {getPaymentMethodIcon()}
             <div>
               <div className="text-xs text-muted-foreground">Payment Method</div>
-              <div className="font-medium">{transaction.paymentMethod}</div>
+              <div className="font-medium">{displayPaymentMethod}</div>
             </div>
           </div>
           
@@ -121,12 +139,12 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, on
           </DialogHeader>
           <div className="space-y-4 mt-2">
             {transaction.paymentDetails && Object.entries(transaction.paymentDetails).map(([key, value]) => (
-              value && (
+              value !== null && value !== undefined && (
                 <div key={key} className="flex justify-between py-2 border-b border-gray-100">
                   <span className="text-sm text-muted-foreground capitalize">
                     {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                   </span>
-                  <span className="font-medium">{value}</span>
+                  <span className="font-medium">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
                 </div>
               )
             ))}

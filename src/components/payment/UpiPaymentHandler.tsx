@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink, Copy, Check } from 'lucide-react';
+import { Loader2, Smartphone, QrCode, AlertCircle, ExternalLink, Copy, Check, Download, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { addTransaction } from '../TransactionUtils';
 import { 
@@ -9,10 +9,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
+  DialogFooter
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface UpiPaymentHandlerProps {
   paymentData: {
@@ -51,6 +53,16 @@ const UPI_APPS: UpiApp[] = [
     name: 'Paytm',
     logo: 'https://play-lh.googleusercontent.com/uEkLdxQQYqZWgQTwG6XhQw7koOKUb7AV1GoZ7AyMe7iv5vPDV_j6BdBc9CJUb1qTPQ=w240-h480-rw',
     packageName: 'net.one97.paytm'
+  },
+  { 
+    id: 'amazpay', 
+    name: 'Amazon Pay',
+    logo: 'https://play-lh.googleusercontent.com/eHvNurCQXQ8DwqCG4HKTBGiqK9FCHu_JQPqSfpJGPK0OWVL32Lm1KGSgcUGHJvZ76qNk=w240-h480-rw'
+  },
+  { 
+    id: 'bhim', 
+    name: 'BHIM UPI',
+    logo: 'https://play-lh.googleusercontent.com/B5cNBA15IxjCT_huhpfkaQFiWiquLBGZJwbXkPITrtba5BzXQS6J3MLC5DTGFfoAQg=w240-h480-rw'
   }
 ];
 
@@ -67,6 +79,8 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
   const [showAppsDialog, setShowAppsDialog] = useState(false);
   const [paymentLink, setPaymentLink] = useState('');
   const [linkCopied, setLinkCopied] = useState(false);
+  const [transactionId, setTransactionId] = useState('');
+  const [verificationSubmitted, setVerificationSubmitted] = useState(false);
 
   // Generate QR code URL
   useEffect(() => {
@@ -82,14 +96,12 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       const upiUrl = `upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=${generateTransactionId()}`;
       
       // Generate QR code URL using a third-party service
-      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUrl)}`;
       
       setQrCodeUrl(qrCodeApiUrl);
       
-      // Generate direct UPI payment link instead of using upi.link (which redirects to GoDaddy)
-      // This uses the intent format which is more widely supported
-      const webLink = `https://upi://pay?pa=${paymentData.upiId}&pn=${encodeURIComponent(paymentData.name || 'User')}&am=${paymentData.amount}&cu=${paymentData.currency || 'INR'}&tn=${encodeURIComponent(`Payment via RizzPay`)}`;
-      setPaymentLink(webLink);
+      // Generate direct UPI payment link
+      setPaymentLink(upiUrl);
     } catch (error) {
       console.error("QR code generation error:", error);
       setQrCodeError(true);
@@ -126,7 +138,6 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       });
       
       // Navigate to UPI payment page with query parameters
-      // Using "/upi-payment" instead of "/payment/upi" to match route definition
       navigate(`/upi-payment?${params.toString()}`);
     } catch (error) {
       console.error("UPI payment error:", error);
@@ -152,6 +163,12 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
       toast.info(`Opening ${app.name}...`, {
         description: 'If the app doesn\'t open, please try another method.'
       });
+
+      // Show the verification dialog after a short delay
+      setTimeout(() => {
+        setShowAppsDialog(false);
+        handleShowVerification();
+      }, 1500);
     } catch (error) {
       console.error('Error opening UPI app:', error);
       toast.error('Failed to open UPI app');
@@ -171,6 +188,58 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
           toast.error('Failed to copy link');
         });
     }
+  };
+
+  const downloadQrCode = () => {
+    if (!qrCodeUrl) return;
+    
+    // Create a temporary link element
+    const downloadLink = document.createElement('a');
+    downloadLink.href = qrCodeUrl;
+    downloadLink.download = `rizzpay-upi-qr-code.png`;
+    
+    // Append to the body, click, and remove
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    
+    toast.success('QR code downloaded successfully');
+  };
+
+  const handleShowVerification = () => {
+    // Generate a unique transaction ID for verification
+    const newTransactionId = generateTransactionId();
+    setTransactionId(newTransactionId);
+    
+    // Show verification dialog
+    setShowQrDialog(false);
+    setShowAppsDialog(false);
+    setVerificationSubmitted(false);
+  };
+
+  const handleVerifyPayment = () => {
+    if (!transactionId.trim()) {
+      toast.error('Please enter your UPI transaction ID');
+      return;
+    }
+
+    setLoading(true);
+
+    // Simulate verification process
+    setTimeout(() => {
+      setLoading(false);
+      setVerificationSubmitted(true);
+
+      // Create a transaction record
+      const paymentTransactionId = `upipay_${Math.random().toString(36).substring(2, 12)}`;
+      
+      // Notify about success
+      onSuccess(paymentTransactionId);
+      
+      toast.success('Payment verification submitted!', {
+        description: 'Your payment is being verified and will be processed shortly.'
+      });
+    }, 1500);
   };
 
   return (
@@ -199,7 +268,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
             className="flex-1"
             disabled={!validateUpiId(paymentData.upiId)}
           >
-            <QrCode className="mr-2 h-4 w-4" /> QR Code
+            <QrCode className="mr-2 h-4 w-4" /> Scan QR Code
           </Button>
           
           <Button
@@ -230,7 +299,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
                 <p className="text-sm text-center">Failed to load QR code</p>
               </div>
             ) : qrCodeUrl ? (
-              <div className="bg-white p-4 rounded-lg border">
+              <div className="bg-white p-4 rounded-lg border relative group">
                 <img 
                   src={qrCodeUrl} 
                   alt="UPI QR Code"
@@ -239,6 +308,26 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
                 <p className="text-xs text-center text-muted-foreground mt-2">
                   Powered by RizzPay
                 </p>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-md">
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={downloadQrCode}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={handleShowVerification}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      I've Paid
+                    </Button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="h-48 w-48 flex items-center justify-center">
@@ -268,6 +357,16 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
               </p>
             </div>
           </div>
+
+          <DialogFooter className="sm:justify-center pt-2">
+            <Button 
+              variant="default"
+              onClick={handleShowVerification}
+            >
+              <Check className="mr-2 h-4 w-4" />
+              I've made the payment
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       
@@ -277,7 +376,7 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
           <DialogHeader>
             <DialogTitle>Choose UPI App</DialogTitle>
             <DialogDescription>
-              Select a UPI app to make your payment via RizzPay
+              Select a UPI app to make your payment of ₹{paymentData.amount}
             </DialogDescription>
           </DialogHeader>
           
@@ -318,6 +417,60 @@ const UpiPaymentHandler: React.FC<UpiPaymentHandlerProps> = ({
             <p className="text-xs text-muted-foreground mt-1">
               Use this link to make payment directly with any UPI app
             </p>
+          </div>
+
+          <DialogFooter className="sm:justify-center">
+            <Button 
+              variant="default"
+              onClick={handleShowVerification}
+            >
+              <Check className="mr-2 h-4 w-4" />
+              I've made the payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Verification Dialog */}
+      <Dialog open={verificationSubmitted} onOpenChange={setVerificationSubmitted}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Payment Successful!</DialogTitle>
+            <DialogDescription>
+              Your payment is being processed and will be confirmed shortly.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-6 flex flex-col items-center justify-center">
+            <div className="rounded-full bg-green-100 p-3 mb-4">
+              <Check className="h-8 w-8 text-green-600" />
+            </div>
+            
+            <h3 className="text-lg font-semibold">Thank You!</h3>
+            <p className="text-sm text-muted-foreground text-center mt-1">
+              Your transaction has been submitted for verification
+            </p>
+            
+            <div className="mt-6 w-full">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-muted-foreground">Amount</span>
+                    <span className="font-medium">₹{paymentData.amount}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-muted-foreground">Reference ID</span>
+                    <span className="font-mono text-sm">{transactionId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      Processing
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

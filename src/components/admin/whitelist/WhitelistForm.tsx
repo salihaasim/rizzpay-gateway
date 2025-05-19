@@ -20,9 +20,10 @@ interface WhitelistFormProps {
   entry?: IpWhitelistEntry | WebhookWhitelistEntry | null;
   onClose: () => void;
   onSubmit: () => void;
+  open: boolean; // Add open prop to control dialog visibility
 }
 
-export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormProps) => {
+export const WhitelistForm = ({ type, entry, onClose, onSubmit, open }: WhitelistFormProps) => {
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<WhitelistFormData>({
@@ -33,8 +34,10 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
   });
 
   useEffect(() => {
-    fetchMerchants();
-  }, []);
+    if (open) {
+      fetchMerchants();
+    }
+  }, [open]);
 
   const fetchMerchants = async () => {
     try {
@@ -126,7 +129,7 @@ export const WhitelistForm = ({ type, entry, onClose, onSubmit }: WhitelistFormP
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

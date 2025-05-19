@@ -8,6 +8,7 @@ import AdminStatCards from './AdminStatCards';
 import AdminDashboardCharts from './AdminDashboardCharts';
 import AdminPlatformOverview from './AdminPlatformOverview';
 import MerchantWhitelist from '@/pages/MerchantWhitelist';
+import AasimoAI from '@/components/admin/AasimoAI';
 
 interface AdminSectionContentProps {
   section: string;
@@ -42,6 +43,8 @@ const AdminSectionContent: React.FC<AdminSectionContentProps> = ({ section }) =>
           </CardContent>
         </Card>
       );
+    case 'aasimo':
+      return <AasimoAI />;
     case 'transactions':
       return (
         <Card className="border border-border/50 shadow-sm">

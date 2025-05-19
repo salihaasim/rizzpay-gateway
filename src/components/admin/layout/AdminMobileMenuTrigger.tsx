@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { ShieldCheck, Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SheetTrigger } from '@/components/ui/sheet';
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetTrigger, SheetContent } from '@/components/ui/sheet';
 
 interface AdminMobileMenuTriggerProps {
   setMobileMenuOpen: (open: boolean) => void;
@@ -10,12 +10,22 @@ interface AdminMobileMenuTriggerProps {
 
 const AdminMobileMenuTrigger: React.FC<AdminMobileMenuTriggerProps> = ({ setMobileMenuOpen }) => {
   return (
-    <div className="lg:hidden flex items-center">
-      <SheetTrigger asChild className="lg:hidden">
-        <Button variant="ghost" size="icon" className="mr-2">
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
+    <div className="lg:hidden flex items-center fixed top-4 left-4 z-20">
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="mr-2"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0">
+          {/* Sheet content can be added here if needed */}
+        </SheetContent>
+      </Sheet>
       <div className="lg:hidden flex items-center">
         <ShieldCheck className="h-5 w-5 text-[#9970e2] mr-2" />
         <span className="font-semibold">RizzAdmin</span>

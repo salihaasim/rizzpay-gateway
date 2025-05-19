@@ -1,101 +1,76 @@
 
-// Transaction related types
-export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
-export type UserRole = 'admin' | 'merchant' | null;
-export type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'neft' | 'wallet' | 'webhook';
+export type TransactionStatus = 'pending' | 'processing' | 'successful' | 'failed' | 'refunded' | 'settled' | 'declined';
+
 export type PaymentProcessingState = 
   | 'initiated' 
-  | 'gateway_processing'
-  | 'processor_routing'
+  | 'processing' 
+  | 'completed' 
+  | 'failed' 
+  | 'gateway_processing' 
+  | 'processor_routing' 
+  | 'authorization_decision' 
   | 'card_network_processing'
-  | 'bank_authorization'
-  | 'authorization_decision'
-  | 'declined'
-  | 'settlement_recording'
-  | 'settlement_initiated'
-  | 'settlement_processing'
-  | 'funds_transferred'
-  | 'merchant_credited'
-  | 'completed';
+  | 'declined';
 
-export type WalletTransactionType = 'deposit' | 'withdrawal' | 'payment' | 'transfer';
-
-export interface PaymentDetails {
-  cardNumber?: string;
-  cardHolderName?: string;
-  expiryDate?: string;
-  cvv?: string;
-  bankName?: string;
-  bankAccount?: string;
-  bankIfsc?: string;
-  upiId?: string;
-  processor?: string;
-  cardNetwork?: string;
-  issuingBank?: string;
-  acquiringBank?: string;
-  authorizationCode?: string;
-  declineReason?: string;
-  settlementId?: string;
-  processingFee?: string;
-  recipientEmail?: string;
-  recipientName?: string;
-  gateway?: string;
-  buyerName?: string;
-  buyerEmail?: string;
-  paidAmount?: string;
-  neftReference?: string;
-  razorpay_payment_id?: string;
-  razorpay_order_id?: string;
-  razorpay_signature?: string;
-  amountInPaise?: number;
+export interface TransactionTimelineItem {
+  stage: string;
+  timestamp: string;
+  message: string;
 }
 
 export interface Transaction {
   id: string;
   date: string;
   amount: string;
-  paymentMethod: string;
+  paymentMethod: PaymentMethod;
   status: TransactionStatus;
   customer: string;
+  customerEmail?: string;
   createdBy?: string;
   processingState?: PaymentProcessingState;
+  processingTimeline?: TransactionTimelineItem[];
+  paymentDetails?: import('@/types/payment').PaymentDetails;
+  description?: string;
+  walletTransactionType?: 'deposit' | 'withdrawal' | 'transfer';
   detailedStatus?: string;
   rawAmount?: number;
-  paymentDetails?: PaymentDetails;
-  processingTimeline?: {
-    stage: string;
-    timestamp: string;
-    message: string;
-  }[];
-  walletTransactionType?: WalletTransactionType;
-  description?: string;
 }
 
+export type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet' | 'neft' | 'unknown' | 'webhook' | 'upi_manual' | 'simulated' | string;
+
+export type UserRole = 'admin' | 'merchant';
+
 export interface Wallet {
+  id?: string;
   balance: number;
-  currency: string;
-  transactions: string[]; // Array of transaction IDs
+  transactions: string[];
+  owner?: string;
+  currency?: string;
 }
+
+export type WalletTransactionType = 'deposit' | 'withdrawal' | 'transfer' | 'payment';
 
 export interface TransactionState {
   transactions: Transaction[];
-  userRole: UserRole;
-  userEmail: string | null;
-  wallets: Record<string, Wallet>; // Email -> Wallet mapping
   addTransaction: (transaction: Transaction) => void;
-  updateTransaction: (id: string, updates: Partial<Transaction>) => void;
-  clearTransactions: () => void;
-  setUserRole: (role: UserRole, email: string | null) => void;
+  updateTransaction: (id: string, updatedFields: Partial<Transaction>) => void;
+  removeTransaction: (id: string) => void;
+  getTransactionById: (id: string) => Transaction | undefined;
+  userRole: UserRole;
+  userEmail: string;
+  setUserRole: (role: UserRole, email: string) => void;
   clearUserData: () => void;
-  // Wallet methods
-  initializeWallet: (email: string) => void;
-  getWalletBalance: (email: string) => number;
-  depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
-  withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
-  // New methods for merchant transfers
-  transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
-}
-
-export interface TransactionStore extends TransactionState {
   resetUserRole: () => void;
+  isAuthenticated: () => boolean;
+  getSuccessfulTransactions: () => Transaction[];
+  getPendingTransactions: () => Transaction[];
+  getFailedTransactions: () => Transaction[];
+  getRefundedTransactions: () => Transaction[];
+  wallets: Record<string, Wallet>;
+  initializeWallet: (walletId: string, initialBalance?: number) => void;
+  getWalletBalance: (walletId: string) => number;
+  depositToWallet: (walletId: string, amount: number, paymentMethod?: PaymentMethod) => string;
+  withdrawFromWallet: (walletId: string, amount: number, paymentMethod?: PaymentMethod) => string;
+  transferBetweenWallets: (fromWalletId: string, toWalletId: string, amount: number) => boolean;
+  transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
 }
