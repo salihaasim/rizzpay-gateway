@@ -8,11 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { useTransactionStore } from '@/stores/transactionStore';
 
-interface ProfileEditFormProps {
-  merchant?: any;
-}
-
-const ProfileEditForm: React.FC<ProfileEditFormProps> = () => {
+const ProfileEditForm = () => {
   const navigate = useNavigate();
   const { userEmail } = useTransactionStore();
   const [isLoading, setIsLoading] = useState(false);

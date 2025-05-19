@@ -15,19 +15,13 @@ const Footer = () => {
             </span>
           </div>
           
-          <div className="flex flex-wrap gap-4 md:gap-8 justify-center">
+          <div className="flex gap-8">
             <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Terms & Conditions
             </Link>
-            <Link to="/refund-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Refund Policy
-            </Link>
-            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Privacy Policy
-            </Link>
-            <Link to="/india" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              India
-            </Link>
+            </a>
             <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Contact Us
             </a>

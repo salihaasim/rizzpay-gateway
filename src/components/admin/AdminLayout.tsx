@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Sheet } from '@/components/ui/sheet';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 // Import refactored components
 import AdminSidebar from './layout/AdminSidebar';
@@ -24,14 +23,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userRole, userEmail, resetUserRole } = useTransactionStore();
-  const { logout: merchantLogout, currentMerchant } = useMerchantAuth();
+  const { logout: merchantLogout } = useMerchantAuth();
   
   // Redirect if not admin
   useEffect(() => {
-    if (userRole !== 'admin' && currentMerchant?.role !== 'admin') {
+    if (userRole !== 'admin') {
       navigate('/dashboard');
     }
-  }, [userRole, currentMerchant, navigate]);
+  }, [userRole, navigate]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -44,12 +43,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     navigate('/', { replace: true }); // Redirect to home page
   };
 
-  if (userRole !== 'admin' && currentMerchant?.role !== 'admin') {
+  if (userRole !== 'admin') {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex transition-colors duration-200">
+    <div className="min-h-screen bg-[#f8fafc] flex">
       {/* Desktop sidebar with improved responsiveness */}
       <AdminSidebar 
         userEmail={userEmail} 
@@ -69,10 +68,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             userEmail={userEmail} 
             handleLogout={handleLogout} 
           />
-          
-          <div className="absolute top-4 right-16 z-50">
-            <ThemeToggle />
-          </div>
           
           <div className="p-2 sm:p-4 md:p-6 lg:p-8">
             {children}

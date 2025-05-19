@@ -1,47 +1,24 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { TransactionState } from './types';
-import { createTransactionSlice } from './transactionSlice';
-import { createUserRoleSlice } from './userRoleSlice';
+import { TransactionStore } from './types';
+import { createTransactionSlice, TransactionSlice } from './transactionSlice';
+import { createUserRoleSlice, UserRoleSlice } from './userRoleSlice';
+import { createWalletSlice, WalletSlice } from './walletStore';
 
-// Storage implementation that handles JSON parsing/stringify
-const customStorage = {
-  getItem: (name: string) => {
-    try {
-      const value = localStorage.getItem(name);
-      return value;
-    } catch (error) {
-      console.warn('LocalStorage not available:', error);
-      return null;
-    }
-  },
-  setItem: (name: string, value: string) => {
-    try {
-      localStorage.setItem(name, value);
-    } catch (error) {
-      console.warn('LocalStorage not available:', error);
-    }
-  },
-  removeItem: (name: string) => {
-    try {
-      localStorage.removeItem(name);
-    } catch (error) {
-      console.warn('LocalStorage not available:', error);
-    }
-  }
-};
+// Re-export types and utils for easy access
+export * from './types';
+export * from './utils';
 
-// Create the store with proper persist configuration
-export const useTransactionStore = create<TransactionState>()(
+export const useTransactionStore = create<TransactionStore>()(
   persist(
     (set, get) => ({
       ...createTransactionSlice(set, get),
       ...createUserRoleSlice(set, get),
+      ...createWalletSlice(set, get)
     }),
     {
-      name: 'rizzpay-transaction-store',
-      storage: customStorage,
+      name: 'transactions-storage',
     }
   )
 );

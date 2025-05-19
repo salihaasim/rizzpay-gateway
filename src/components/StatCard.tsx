@@ -13,8 +13,6 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
-  iconBackground?: string;
-  iconColor?: string;
 }
 
 const StatCard = ({
@@ -24,8 +22,6 @@ const StatCard = ({
   description,
   trend,
   className,
-  iconBackground,
-  iconColor,
 }: StatCardProps) => {
   return (
     <Card className={cn("border-0 shadow-sm overflow-hidden card-hover", className)}>
@@ -33,9 +29,7 @@ const StatCard = ({
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <div className={cn("rounded-full p-2 bg-secondary", iconBackground)}>
-          <div className={cn(iconColor)}>{icon}</div>
-        </div>
+        <div className="rounded-full p-2 bg-secondary">{icon}</div>
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>

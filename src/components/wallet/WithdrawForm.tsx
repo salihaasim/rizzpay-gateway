@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,14 +70,11 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
         method: 'neft'
       });
 
-      // Generate a random UTR number
-      const utrNumber = `UTR${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-
       setTransactionDetails({
         id: `WD${Date.now()}`,
         amount: parsedAmount.toFixed(2),
         date: new Date().toISOString(),
-        utrNumber
+        utrNumber: `UTR${Math.random().toString(36).substr(2, 9).toUpperCase()}`
       });
       
       setShowReceipt(true);
@@ -100,14 +96,9 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
     
     const receipt = document.getElementById('withdrawal-receipt');
     if (receipt) {
-      const options = {
-        filename: `rizzpay-withdrawal-receipt-${transactionDetails.id}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      
-      html2pdf().from(receipt).set(options).save();
+      html2pdf()
+        .from(receipt)
+        .save(`withdrawal-receipt-${transactionDetails.id}.pdf`);
     }
   };
 
@@ -234,26 +225,12 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
           
           <div id="withdrawal-receipt" className="p-6 space-y-4">
             <div className="text-center mb-6">
-              <div className="flex justify-center mb-4">
-                <img 
-                  src="/logo.svg" 
-                  alt="RizzPay Logo" 
-                  className="h-12" 
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50"><text x="25" y="30" font-family="Arial" font-size="24" fill="%230052FF">RizzPay</text></svg>';
-                  }}
-                />
-              </div>
               <h2 className="text-2xl font-bold">Payment Receipt</h2>
-              <p className="text-muted-foreground">RizzPay Withdrawal Confirmation</p>
-              <div className="mt-2 text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full inline-block">
-                Transaction Successful
-              </div>
+              <p className="text-muted-foreground">RizzPay Withdrawal</p>
             </div>
             
             {transactionDetails && (
-              <div className="space-y-3 border-t border-b py-4">
+              <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Transaction ID:</span>
                   <span className="font-medium">{transactionDetails.id}</span>
@@ -261,27 +238,20 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
                 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Amount:</span>
-                  <span className="font-bold text-lg">₹{transactionDetails.amount}</span>
+                  <span className="font-medium">₹{transactionDetails.amount}</span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Date & Time:</span>
+                  <span className="text-muted-foreground">Date:</span>
                   <span className="font-medium">
-                    {new Date(transactionDetails.date).toLocaleString('en-IN', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
+                    {new Date(transactionDetails.date).toLocaleString()}
                   </span>
                 </div>
                 
                 {transactionDetails.utrNumber && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">UTR Number:</span>
-                    <span className="font-medium text-primary">{transactionDetails.utrNumber}</span>
+                    <span className="font-medium">{transactionDetails.utrNumber}</span>
                   </div>
                 )}
                 
@@ -299,27 +269,17 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ onWithdraw, isProcessing = 
                       <span className="text-muted-foreground">IFSC:</span>
                       <span className="font-medium">{ifscCode}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Type:</span>
-                      <span className="font-medium">NEFT Transfer</span>
-                    </div>
                   </div>
                 )}
               </div>
             )}
-            
-            <div className="text-center text-xs text-muted-foreground pt-4">
-              <p>This is an electronically generated receipt.</p>
-              <p>For any queries, please contact support@rizzpay.co.in</p>
-              <p className="mt-2">© 2025 RizzPay Payment Technologies. All rights reserved.</p>
-            </div>
           </div>
           
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setShowReceipt(false)}>
               Close
             </Button>
-            <Button onClick={downloadReceipt} className="bg-primary">
+            <Button onClick={downloadReceipt}>
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>

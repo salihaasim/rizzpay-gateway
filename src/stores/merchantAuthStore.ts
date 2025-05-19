@@ -1,232 +1,196 @@
+
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { demoCredentials } from '@/components/role/roleConstants';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { toast } from 'sonner';
 
-// Interface for bank accounts
-interface BankAccount {
-  id: string;
-  accountName: string;
-  accountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  isPrimary: boolean;
-}
-
-// Interface for UPI settings
-interface UpiSettings {
-  upiId: string;
-  name: string;
-  enabled: boolean;
-  allowManualVerification: boolean;
-  customWebhookUrl?: string; // Added missing property
-}
-
-// Interface for pricing structure
-interface PricingStructure {
-  transactionFee: number;
-  fixedFee: number;
-  monthlyFee: number;
-}
-
-interface Merchant {
+interface MerchantCredentials {
+  id?: string; // Added ID field to fix type errors
   username: string;
   password: string;
   fullName: string;
-  email?: string;
-  role?: 'admin' | 'merchant';
-  id?: string; // Added ID for KYC and other operations
-  upiSettings?: UpiSettings; // Added UPI settings
-  bankAccounts?: BankAccount[]; // Added bank accounts
-  pricing?: PricingStructure; // Added pricing structure
-  apiKey?: string; // Added API key
+  pricing?: {
+    transactionFee: number; // percentage
+    fixedFee: number; // in rupees
+    monthlyFee: number; // in rupees
+  };
+  role?: 'admin' | 'merchant'; // Added role field
+  upiSettings?: {
+    upiId: string;
+    enabled: boolean;
+    allowManualVerification: boolean;
+    customWebhookUrl?: string;
+  };
 }
 
-interface MerchantStore {
+interface MerchantAuthState {
   isAuthenticated: boolean;
-  currentMerchant: Merchant | null;
-  merchants: Merchant[];
+  currentMerchant: MerchantCredentials | null;
+  merchants: MerchantCredentials[];
   loading: boolean;
-  
+  addMerchant: (merchant: MerchantCredentials) => void;
+  updateMerchantPricing: (username: string, pricing: MerchantCredentials['pricing']) => void;
+  updateMerchantUpiSettings: (username: string, upiSettings: MerchantCredentials['upiSettings']) => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  addMerchant: (merchant: Merchant) => void;
-  updateMerchantDetails: (merchant: Partial<Merchant>) => void;
-  changePassword: (username: string, currentPassword: string, newPassword: string) => boolean; // Added change password
-  updateMerchantPricing: (merchantUsername: string, pricing: PricingStructure) => void; // Added update pricing
-  updateMerchantUpiSettings: (settings: UpiSettings) => void; // Updated parameter type
+  changePassword: (username: string, currentPassword: string, newPassword: string) => boolean;
 }
 
-export const useMerchantAuth = create<MerchantStore>()(
+export const useMerchantAuth = create<MerchantAuthState>()(
   persist(
     (set, get) => ({
       isAuthenticated: false,
       currentMerchant: null,
       merchants: [
+        // Default merchant for testing
         {
           username: 'merchant',
           password: 'password',
           fullName: 'Demo Merchant',
           role: 'merchant',
-          id: 'merchant-001',
-          upiSettings: {
-            upiId: 'merchant@rizzpay',
-            name: 'Demo Merchant',
-            enabled: true,
-            allowManualVerification: true
-          },
-          bankAccounts: [],
           pricing: {
-            transactionFee: 1.0,
+            transactionFee: 1.0, // Updated to 1.0% as requested
             fixedFee: 5,
             monthlyFee: 499
           },
-          apiKey: 'rizz_api_key_demo_merchant'
+          upiSettings: {
+            upiId: 'demo.merchant@rizzpay',
+            enabled: true,
+            allowManualVerification: true
+          }
+        },
+        // Default admin account
+        {
+          username: 'admin',
+          password: 'admin',
+          fullName: 'Admin User',
+          role: 'admin'
+        },
+        // New admin account with requested credentials
+        {
+          username: 'rizzpay',
+          password: 'rizzpay123',
+          fullName: 'RizzPay Admin',
+          role: 'admin'
         }
       ],
-      loading: true,
-      
+      loading: false,
+
+      addMerchant: (merchant) => {
+        // Set default role to merchant if not specified
+        const merchantWithRole = {
+          ...merchant,
+          role: merchant.role || 'merchant',
+          // Set default pricing for new merchants if not specified
+          pricing: merchant.pricing || {
+            transactionFee: 1.0, // Default 1.0% transaction fee
+            fixedFee: 5,
+            monthlyFee: 499
+          },
+          // Set default UPI settings
+          upiSettings: merchant.upiSettings || {
+            upiId: `${merchant.username.toLowerCase()}@rizzpay`,
+            enabled: false,
+            allowManualVerification: true
+          }
+        };
+        
+        set((state) => ({
+          merchants: [...state.merchants, merchantWithRole]
+        }));
+        toast.success('Merchant registered successfully');
+      },
+
+      updateMerchantPricing: (username, pricing) => {
+        set((state) => ({
+          merchants: state.merchants.map(m => 
+            m.username === username ? { ...m, pricing } : m
+          )
+        }));
+        toast.success('Merchant pricing updated successfully');
+      },
+
+      updateMerchantUpiSettings: (username, upiSettings) => {
+        set((state) => ({
+          merchants: state.merchants.map(m => 
+            m.username === username ? { ...m, upiSettings } : m
+          ),
+          currentMerchant: state.currentMerchant?.username === username ? 
+            { ...state.currentMerchant, upiSettings } : 
+            state.currentMerchant
+        }));
+        toast.success('UPI settings updated successfully');
+      },
+
       login: (username, password) => {
+        const { merchants } = get();
+        
         console.log("Attempting login with:", username, password);
+        console.log("Available merchants:", merchants);
         
-        // Check for demo admin credentials
-        if (username === demoCredentials.admin.username && 
-            password === demoCredentials.admin.password) {
-          
-          console.log("Demo admin credentials match, setting admin user");
-          set({
-            isAuthenticated: true,
-            currentMerchant: {
-              username: username,
-              password: password,
-              fullName: 'Admin User',
-              email: 'admin@rizzpay.com',
-              role: 'admin',
-              id: 'admin-001',
-              apiKey: 'rizz_api_key_admin'
-            },
-            loading: false
-          });
-          return true;
-        }
-        
-        // Regular merchant authentication
-        console.log("Available merchants:", get().merchants);
-        const merchant = get().merchants.find(
+        const merchant = merchants.find(
           m => m.username === username && m.password === password
         );
-        
+
         if (merchant) {
           console.log("Login successful for:", merchant);
-          set({
-            isAuthenticated: true,
+          // Update state immediately on successful login
+          set({ 
+            isAuthenticated: true, 
             currentMerchant: merchant,
             loading: false
           });
+          toast.success(`Welcome back, ${merchant.fullName}`);
           return true;
         }
-        
+
         console.log("Login failed: No matching credentials found");
+        toast.error('Invalid credentials');
         return false;
       },
-      
-      logout: () => {
-        set({
-          isAuthenticated: false,
-          currentMerchant: null
-        });
-      },
-      
-      addMerchant: (merchant) => {
-        set(state => ({
-          merchants: [...state.merchants, merchant]
-        }));
-      },
-      
-      updateMerchantDetails: (merchant) => {
-        if (!get().isAuthenticated || !get().currentMerchant) return;
-        
-        set(state => ({
-          currentMerchant: {
-            ...state.currentMerchant!,
-            ...merchant
-          }
-        }));
 
-        // Also update the merchant in the merchants array
-        set(state => ({
-          merchants: state.merchants.map(m => 
-            m.username === state.currentMerchant?.username 
-              ? { ...m, ...merchant }
-              : m
-          )
-        }));
+      logout: () => {
+        // Optimized logout - clear only necessary state
+        set({ 
+          isAuthenticated: false, 
+          currentMerchant: null 
+        });
+        toast.success('Logged out successfully');
       },
       
-      // Add change password functionality
       changePassword: (username, currentPassword, newPassword) => {
-        // Verify current password
-        const merchant = get().merchants.find(
+        const { merchants } = get();
+        const merchantIndex = merchants.findIndex(
           m => m.username === username && m.password === currentPassword
         );
         
-        if (!merchant) return false;
-        
-        // Update password in merchants array
-        set(state => ({
-          merchants: state.merchants.map(m => 
-            m.username === username
-              ? { ...m, password: newPassword }
-              : m
-          )
-        }));
-        
-        // If this is the current merchant, update currentMerchant as well
-        if (get().currentMerchant?.username === username) {
-          set(state => ({
-            currentMerchant: { ...state.currentMerchant!, password: newPassword }
-          }));
+        if (merchantIndex === -1) {
+          toast.error('Current password is incorrect');
+          return false;
         }
         
+        set((state) => ({
+          merchants: state.merchants.map((m, index) => 
+            index === merchantIndex ? { ...m, password: newPassword } : m
+          )
+        }));
+        
+        toast.success('Password changed successfully');
         return true;
-      },
-      
-      // Add update merchant pricing functionality
-      updateMerchantPricing: (merchantUsername, pricing) => {
-        set(state => ({
-          merchants: state.merchants.map(merchant => 
-            merchant.username === merchantUsername
-              ? { ...merchant, pricing }
-              : merchant
-          )
-        }));
-      },
-      
-      // Add update UPI settings functionality
-      updateMerchantUpiSettings: (settings) => {
-        if (!get().isAuthenticated || !get().currentMerchant) return;
-        
-        const updatedMerchant = {
-          ...get().currentMerchant,
-          upiSettings: settings
-        };
-        
-        set({ currentMerchant: updatedMerchant });
-        
-        // Also update in merchants array
-        set(state => ({
-          merchants: state.merchants.map(m => 
-            m.username === state.currentMerchant?.username 
-              ? { ...m, upiSettings: settings }
-              : m
-          )
-        }));
       }
     }),
     {
-      name: 'merchant-auth',
+      name: 'merchant-auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        isAuthenticated: state.isAuthenticated,
+        currentMerchant: state.currentMerchant,
+        merchants: state.merchants
+      }),
       onRehydrateStorage: () => (state) => {
-        if (state) state.loading = false;
-      },
+        if (state) {
+          console.log("Store rehydrated successfully");
+        }
+      }
     }
   )
 );

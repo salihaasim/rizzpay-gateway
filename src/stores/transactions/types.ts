@@ -1,3 +1,4 @@
+
 // Transaction related types
 export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
 export type UserRole = 'admin' | 'merchant' | null;
@@ -47,9 +48,6 @@ export interface PaymentDetails {
   razorpay_order_id?: string;
   razorpay_signature?: string;
   amountInPaise?: number;
-  upiTransactionId?: string; // Used for UTR IDs
-  description?: string; // Added for UPI link payments
-  customerTransactionId?: string; // Added for UPI QR payments
 }
 
 export interface Transaction {
