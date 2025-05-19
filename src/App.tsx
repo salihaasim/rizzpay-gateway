@@ -33,6 +33,7 @@ import Settings from './pages/Settings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 import UpiPluginPage from './pages/UpiPluginPage';
 import TransfersPage from './pages/TransfersPage';
+import DeveloperPage from './pages/DeveloperPage';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -87,6 +88,7 @@ const App: React.FC = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
           <Route path="/upi-link-payment" element={<UpiLinkPaymentPage />} />
+          <Route path="/link-payment" element={<Navigate to="/upi-link-payment" />} />
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
@@ -128,9 +130,13 @@ const App: React.FC = () => {
             path="/transfers"
             element={isAuthenticated() ? <TransfersPage /> : <Navigate to="/login" replace />}
           />
+          <Route
+            path="/developer"
+            element={isAuthenticated() ? <DeveloperPage /> : <Navigate to="/login" replace />}
+          />
         </Route>
         
-        {/* Admin routes - only redirect to admin if path explicitly starts with /admin and user is admin */}
+        {/* Admin routes - only redirect to admin if explicitly on admin path AND user is admin */}
         <Route path="/admin" element={
           userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" replace />
         }>

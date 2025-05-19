@@ -71,12 +71,13 @@ Merchants have access to:
   - **Deposits & Withdrawals**: Manage wallet funds
   - **Transfers**: Send money to other merchants
 - **Payment Tools**: Access specialized payment processing tools
+- **Developer Integration**: API keys and webhooks for platform integration
 - **Services**: Additional merchant services and features
 - **Settings**: Configure account settings and preferences
 
-## UPI Payment Features
+## Payment & Integration Features
 
-RizzPay provides comprehensive UPI payment capabilities:
+RizzPay provides comprehensive payment capabilities:
 
 - **Static QR Generation**: Create branded QR codes for UPI payments
   - **PDF Export**: Download QR codes as PDFs with full QR image for scanning
@@ -86,7 +87,7 @@ RizzPay provides comprehensive UPI payment capabilities:
 - **Direct UPI Integration**: Connect directly with popular UPI apps
 - **Real-time Notifications**: Get instant payment confirmations
 - **Customizable Payment Pages**: Branded payment experience for customers
-- **Merchant Dashboard UPI Integration**: Seamless UPI payments directly from merchant dashboard
+- **Developer Tools**: API keys, documentation and integration code for developers
 
 ## System Monitoring
 
@@ -124,6 +125,8 @@ RizzPay provides comprehensive legal documentation:
 
 ## Recent Updates
 
+- **Fixed Routing**: Added missing routes for Developer page, UPI Plugin, and UPI Link Payment
+- **Redirect Fix**: Added redirect from /link-payment to /upi-link-payment
 - **Updated Page Layout**: Global footer now appears only on the homepage for cleaner merchant interface
 - **Navigation Fix**: Fixed issues with automatic admin redirection
 - **Link Payment**: Enhanced UPI link payment functionality
@@ -149,10 +152,6 @@ RizzPay provides comprehensive legal documentation:
 - **AI Integration**: Added Aasimo AI for feature ideation and platform optimization
 - **Monitoring Enhancements**: Added specialized monitoring dashboards for all system components
 
-## Server Requirements
-
-See [SERVER_REQUIREMENTS.md](SERVER_REQUIREMENTS.md) for detailed infrastructure specifications.
-
 ## Documentation
 
 For complete documentation on RizzPay Gateway features and APIs, please refer to the documentation files:
@@ -163,3 +162,4 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Privacy Policy](/privacy-policy)
 - [Refund Policy](/refund-policy)
 - [Terms & Conditions](/terms)
+

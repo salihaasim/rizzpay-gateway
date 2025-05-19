@@ -39,6 +39,23 @@ const UpiLinkPaymentPage = () => {
       description: 'Your transaction will be verified shortly'
     });
     
+    // Add the transaction to the store for tracking
+    addTransaction({
+      id: txnId,
+      amount,
+      paymentMethod: 'upi',
+      status: 'pending',
+      customer: merchantName,
+      date: new Date().toISOString(),
+      processingState: 'initiated',
+      detailedStatus: 'Verification pending',
+      paymentDetails: {
+        upiId,
+        upiTransactionId: utrId,
+        description
+      }
+    });
+    
     // If there's a return URL, append the transaction ID and redirect
     if (returnUrl) {
       const redirectUrl = new URL(returnUrl);
@@ -53,6 +70,10 @@ const UpiLinkPaymentPage = () => {
     }
   };
   
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+  
   return (
     <>
       <Helmet>
@@ -63,7 +84,7 @@ const UpiLinkPaymentPage = () => {
         <div className="flex justify-center mb-6">
           <Button 
             variant="outline" 
-            onClick={() => navigate(-1)} 
+            onClick={handleGoBack} 
             className="absolute top-4 left-4"
           >
             Back

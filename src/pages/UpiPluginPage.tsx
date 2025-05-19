@@ -8,27 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { QrCode, Code, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import UpiPluginCode from '@/components/upi/UpiPluginCode';
+import { Helmet } from 'react-helmet';
 
 const UpiPluginPage = () => {
   const [testAmount, setTestAmount] = useState('100');
-  const [copied, setCopied] = useState<string | null>(null);
-
-  const handleCopyCode = (language: string) => {
-    const codeSnippet = `// Example code for ${language}
-// Include RizzPay UPI payment in your app
-const initializeUpiPayment = () => {
-  // This is a placeholder
-  console.log("Payment initialized");
-}`;
-    
-    navigator.clipboard.writeText(codeSnippet);
-    setCopied(language);
-    toast.success(`${language} code copied to clipboard`);
-    
-    setTimeout(() => {
-      setCopied(null);
-    }, 2000);
-  };
 
   const handleTestPayment = () => {
     const amount = parseFloat(testAmount);
@@ -44,6 +28,9 @@ const initializeUpiPayment = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>UPI Plugin | RizzPay</title>
+      </Helmet>
       <div className="container py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -66,45 +53,7 @@ const initializeUpiPayment = () => {
           </TabsList>
           
           <TabsContent value="integration">
-            <Card>
-              <CardHeader>
-                <CardTitle>Integration Code</CardTitle>
-                <CardDescription>
-                  Copy the code snippet for your platform to integrate UPI payments
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="html">
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="html">HTML</TabsTrigger>
-                    <TabsTrigger value="react">React</TabsTrigger>
-                    <TabsTrigger value="js">JavaScript</TabsTrigger>
-                  </TabsList>
-                  
-                  {["html", "react", "js"].map((lang) => (
-                    <TabsContent key={lang} value={lang} className="relative">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="absolute top-2 right-2"
-                        onClick={() => handleCopyCode(lang)}
-                      >
-                        {copied === lang ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                        <span className="ml-2">{copied === lang ? "Copied!" : "Copy"}</span>
-                      </Button>
-                      <div className="bg-muted p-4 rounded-md font-mono text-sm overflow-auto max-h-[300px]">
-                        {`// Example code for ${lang}
-// Include RizzPay UPI payment in your app
-const initializeUpiPayment = () => {
-  // This is a placeholder
-  console.log("Payment initialized");
-}`}
-                      </div>
-                    </TabsContent>
-                  ))}
-                </Tabs>
-              </CardContent>
-            </Card>
+            <UpiPluginCode />
             
             <div className="mt-8">
               <Card>
