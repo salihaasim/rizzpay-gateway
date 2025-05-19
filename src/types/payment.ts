@@ -1,4 +1,5 @@
 
+// Extended payment details type that includes all the properties used across the app
 export interface PaymentDetails {
   upiId?: string;
   cardNumber?: string;

@@ -1,70 +1,50 @@
 
-import { TransactionStatus, useTransactionStore } from '@/stores/transactionStore';
-import { delay } from './commonUtils';
+import { Transaction, PaymentMethod } from '@/stores/transactions/types';
+import { useTransactionStore } from '@/stores/transactions';
+import { v4 as uuidv4 } from 'uuid';
 
-export const simulateWalletProcessing = async (
-  userEmail: string,
-  amount: number,
-  type: 'deposit' | 'withdrawal' | 'transfer',
-  description?: string,
-  recipient?: string
-): Promise<void> => {
-  const store = useTransactionStore.getState();
-  
-  // Create appropriate transaction ID based on type
-  let transactionId: string;
-  
-  if (type === 'deposit') {
-    transactionId = store.depositToWallet(userEmail, amount, 'wallet');
-  } else if (type === 'withdrawal') {
-    transactionId = store.withdrawFromWallet(userEmail, amount, 'wallet');
-  } else if (type === 'transfer' && recipient) {
-    transactionId = store.transferFunds(userEmail, recipient, amount, description);
-  } else {
-    throw new Error(`Invalid transaction type: ${type} or missing recipient for transfer`);
+// Calculate wallet fee based on transaction type and amount
+export const calculateWalletFee = (
+  transactionType: 'deposit' | 'withdrawal' | 'transfer', 
+  amount: number
+): number => {
+  switch (transactionType) {
+    case 'deposit':
+      return Math.max(10, amount * 0.012); // 1.2% with 10 INR minimum
+    case 'withdrawal':
+      return Math.max(25, amount * 0.015); // 1.5% with 25 INR minimum
+    case 'transfer':
+      return Math.max(5, amount * 0.005); // 0.5% with 5 INR minimum
+    default:
+      return 0;
   }
-  
-  // Find the created transaction
-  const transaction = store.transactions.find(t => t.id === transactionId);
-  
-  if (!transaction) {
-    throw new Error(`Transaction with ID ${transactionId} not found`);
-  }
-  
-  // Update to processing
-  store.updateTransaction(transactionId, {
-    processingState: 'gateway_processing',
-    processingTimeline: [
-      ...(transaction.processingTimeline || []),
-      {
-        stage: 'gateway_processing',
-        timestamp: new Date().toISOString(),
-        message: 'Wallet transaction processing initiated'
-      }
-    ]
-  });
-  
-  // Simulate processing delay
-  await delay(1500);
-  
-  // Complete transaction
-  store.updateTransaction(transactionId, {
-    status: 'successful' as TransactionStatus,
-    processingState: 'completed',
-    processingTimeline: [
-      ...(transaction.processingTimeline || []),
-      {
-        stage: 'completed',
-        timestamp: new Date().toISOString(),
-        message: 'Wallet transaction completed successfully'
-      }
-    ],
-    description: description || transaction.description
-  });
 };
 
-export const calculateWalletFee = (amount: number): number => {
-  // Simple fee calculation: 1.5% with min fee of ₹5 and max of ₹100
-  const fee = amount * 0.015;
-  return Math.max(5, Math.min(fee, 100));
+// Simulate wallet processing with delays and realistic success/failure rates
+export const simulateWalletProcessing = async (
+  email: string,
+  amount: number,
+  transactionType: 'deposit' | 'withdrawal',
+  paymentMethod: PaymentMethod = 'wallet'
+): Promise<string> => {
+  const store = useTransactionStore.getState();
+  
+  // Initialize wallet if it doesn't exist
+  store.initializeWallet(email);
+  
+  // Perform deposit or withdrawal
+  try {
+    let transactionId: string;
+    
+    if (transactionType === 'deposit') {
+      transactionId = store.depositToWallet(email, amount, paymentMethod);
+      return transactionId;
+    } else {
+      transactionId = store.withdrawFromWallet(email, amount, paymentMethod);
+      return transactionId;
+    }
+  } catch (error) {
+    console.error(`Wallet ${transactionType} failed:`, error);
+    throw new Error(`Failed to process ${transactionType}: ${(error as Error).message}`);
+  }
 };

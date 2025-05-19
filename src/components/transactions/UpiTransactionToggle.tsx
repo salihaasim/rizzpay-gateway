@@ -1,87 +1,92 @@
 
-import React from 'react';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { QrCode, FileDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { Transaction } from '@/stores/transactions/types';
 import { Button } from '@/components/ui/button';
-import { Transaction } from '@/stores/transactionStore';
-import * as XLSX from 'xlsx';
-import { toast } from 'sonner';
+import { ChevronDown, ChevronUp, Activity } from 'lucide-react';
+import TransactionStatusBadge from '../wallet/TransactionStatusBadge';
+import { Card, CardContent } from '@/components/ui/card';
+import UpiTransactionActions from './UpiTransactionActions';
 
 interface UpiTransactionToggleProps {
-  showUpiTransactions: boolean;
-  setShowUpiTransactions: (value: boolean) => void;
-  upiTransactions?: Transaction[];
+  transaction: Transaction;
 }
 
-const UpiTransactionToggle: React.FC<UpiTransactionToggleProps> = ({
-  showUpiTransactions,
-  setShowUpiTransactions,
-  upiTransactions = []
-}) => {
-  const exportToExcel = () => {
-    if (upiTransactions.length === 0) {
-      toast.error('No UPI transactions available to download');
-      return;
-    }
-
-    // Format data for Excel
-    const data = upiTransactions.map(t => ({
-      'Transaction ID': t.id,
-      'Date': new Date(t.date).toLocaleString(),
-      'Amount': t.amount,
-      'Status': t.status.charAt(0).toUpperCase() + t.status.slice(1),
-      'UPI ID': t.paymentDetails?.upiId || 'Not provided',
-      'UPI Transaction ID': t.paymentDetails?.upiTransactionId || t.paymentDetails?.razorpay_payment_id || 'Not available',
-      'Customer Email': t.paymentDetails?.buyerEmail || t.customer || 'Not available',
-      'Customer Name': t.paymentDetails?.buyerName || 'Not available',
-      'Detailed Status': t.detailedStatus || '',
-    }));
-    
-    // Create worksheet
-    const ws = XLSX.utils.json_to_sheet(data);
-    
-    // Create workbook and add worksheet
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'UPI Transactions');
-    
-    // Get current date for filename
-    const date = new Date();
-    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-    
-    // Export to file
-    XLSX.writeFile(wb, `RizzPay_UPI_Transactions_${dateString}.xlsx`);
-    
-    toast.success('UPI transactions downloaded successfully');
+const UpiTransactionToggle: React.FC<UpiTransactionToggleProps> = ({ transaction }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
   };
 
+  // Format transaction date
+  const formattedDate = new Date(transaction.date).toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  
+  const transactionIcon = <Activity className="h-5 w-5 text-primary mr-2" />;
+
+  const getTransactionIdDisplay = () => {
+    const paymentDetails = transaction.paymentDetails || {};
+    return (
+      paymentDetails.upiTransactionId || 
+      paymentDetails.razorpay_payment_id || 
+      transaction.id
+    );
+  };
+  
+  const customerEmail = transaction.paymentDetails?.buyerEmail || transaction.customerEmail || 'Unknown';
+  const customerName = transaction.paymentDetails?.buyerName || transaction.customer || 'Unknown';
+  
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 bg-secondary/30 p-2 rounded-lg">
-      <div className="flex items-center space-x-2">
-        <QrCode className="h-4 w-4 text-[#9b87f5]" />
-        <Label htmlFor="upi-toggle" className="text-sm font-medium cursor-pointer">
-          Show Manual UPI Plugin Transactions
-        </Label>
-        <Switch 
-          id="upi-toggle" 
-          checked={showUpiTransactions} 
-          onCheckedChange={setShowUpiTransactions}
-          className="data-[state=checked]:bg-[#9b87f5]"
-        />
-      </div>
-      
-      {showUpiTransactions && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/10"
-          onClick={exportToExcel}
-        >
-          <FileDown className="h-4 w-4" />
-          <span>Export UPI Data</span>
-        </Button>
-      )}
-    </div>
+    <Card className="border-0 shadow-sm mb-3">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            {transactionIcon}
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="font-semibold">₹{parseFloat(transaction.amount.replace(/[^\d.]/g, '')).toFixed(2)}</h3>
+                <TransactionStatusBadge status={transaction.status} />
+              </div>
+              <p className="text-sm text-muted-foreground">{formattedDate}</p>
+            </div>
+          </div>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={toggleExpand}
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isExpanded ? 'Less' : 'More'}
+          </Button>
+        </div>
+        
+        {isExpanded && (
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Transaction ID</p>
+              <p className="text-sm font-mono">{getTransactionIdDisplay()}</p>
+            </div>
+            
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Customer Details</p>
+              <p className="text-sm">{customerName}</p>
+              <p className="text-xs text-muted-foreground">{customerEmail}</p>
+            </div>
+            
+            {transaction.status === 'pending' && (
+              <div className="mt-4">
+                <UpiTransactionActions transactionId={transaction.id} />
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

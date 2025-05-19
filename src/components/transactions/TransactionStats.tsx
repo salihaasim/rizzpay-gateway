@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Transaction } from '@/stores/transactionStore';
+import { Transaction, PaymentMethod } from '@/stores/transactions/types';
 
 interface TransactionStatsProps {
   transactions: Transaction[];
@@ -33,22 +33,22 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({ transactions }) => 
       let method = transaction.paymentMethod;
       
       // Group similar payment methods
-      if (method.includes('upi')) method = 'UPI';
-      else if (method.includes('card')) method = 'Card';
-      else if (method.includes('netbanking')) method = 'Netbanking';
-      else if (method.includes('neft')) method = 'NEFT';
-      else if (method.includes('wallet')) method = 'Wallet';
+      if (method.includes('upi')) method = 'upi';
+      else if (method.includes('card')) method = 'card';
+      else if (method.includes('netbanking')) method = 'netbanking';
+      else if (method.includes('neft')) method = 'neft';
+      else if (method.includes('wallet')) method = 'wallet';
       else method = method.charAt(0).toUpperCase() + method.slice(1);
       
       methodCounts[method] = (methodCounts[method] || 0) + 1;
     });
     
     const colors: Record<string, string> = {
-      'UPI': '#34A853',
-      'Card': '#EA4335',
-      'Netbanking': '#003087',
-      'NEFT': '#4285F4', 
-      'Wallet': '#FBBC05',
+      'upi': '#34A853',
+      'card': '#EA4335',
+      'netbanking': '#003087',
+      'neft': '#4285F4', 
+      'wallet': '#FBBC05',
     };
     
     // Calculate percentages

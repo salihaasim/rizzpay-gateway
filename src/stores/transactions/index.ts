@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
-import { Transaction, TransactionStatus, PaymentMethod, TransactionState, UserRole, Wallet } from './types';
+import { Transaction, TransactionStatus, PaymentMethod, TransactionState, UserRole, Wallet, PaymentProcessingState } from './types';
 import { createTransactionSlice, TransactionSlice } from './transactionSlice';
 import { createUserRoleSlice, UserRoleSlice } from './userRoleSlice';
 import { createWalletSlice, WalletSlice } from './walletStore';
@@ -64,5 +64,9 @@ export type {
   TransactionStatus, 
   PaymentMethod,
   Transaction,
-  Wallet
+  Wallet,
+  PaymentProcessingState
 };
+
+// Export from ./types to make them available
+export * from './types';

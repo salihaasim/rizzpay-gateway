@@ -1,60 +1,56 @@
 
-# RizzPay Payment Gateway
+# RizzPay - Modern Payment Solution
 
-RizzPay is a modern payment gateway solution designed for Indian businesses, offering a seamless payment experience with support for UPI, cards, net banking, and wallet payments.
+RizzPay is a comprehensive payment processing platform designed to handle various payment methods including UPI, card payments, net banking, and wallet transactions.
 
 ## Features
 
-- **Multiple Payment Methods**: Support for UPI, credit/debit cards, net banking, and wallet payments
-- **Admin Dashboard**: Comprehensive admin interface for monitoring transactions and managing merchants
-- **Merchant Dashboard**: User-friendly interface for merchants to track their payments
-- **Wallet System**: Built-in wallet functionality for users
-- **Transaction Management**: Complete transaction lifecycle management
-- **Mobile Responsive**: Optimized for all devices including desktops, tablets, and mobile phones
+- **Multiple Payment Methods**: Support for UPI, cards, net banking and wallets
+- **Admin Dashboard**: Complete transaction monitoring and management
+- **Merchant Onboarding**: Easy integration for merchants
+- **Real-time Analytics**: Track payment success rates and volumes
+- **Wallet System**: Built-in digital wallet functionality
+- **Responsive Design**: Works perfectly on mobile, tablet and desktop
 
-## Tech Stack
+## Technical Architecture
 
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **State Management**: Zustand
-- **UI Components**: Shadcn UI
-- **Form Validation**: Zod, React Hook Form
-- **Data Visualization**: Recharts
+- **Frontend**: React with TypeScript
+- **State Management**: Zustand for global state management
+- **UI Components**: ShadCN UI components with Tailwind CSS
+- **Charts and Analytics**: Recharts for data visualization
+- **Optimized Performance**: Lazy-loading and code splitting
 
-## Components
-
-- **Payment Processing**: Comprehensive payment flow with multiple payment methods
-- **Transaction Tracking**: Real-time transaction status updates
-- **Admin Panel**: Tools for transaction monitoring, merchant management, and system configuration
-- **Merchant Dashboard**: Analytics, transaction history, and payment management
-- **UPI Integration**: Direct UPI payment handling and QR code generation
-
-## Performance Optimizations
-
-- **Code Splitting**: Optimized bundle size with efficient code splitting
-- **Lazy Loading**: Components loaded on-demand for faster initial load times
-- **Type Safety**: Comprehensive TypeScript types to ensure code reliability
-- **Memoization**: React.memo for performance-critical components
-- **Responsive Design**: Tailored experience for all device sizes
-
-## Getting Started
+## Setup Instructions
 
 1. Clone the repository
-2. Install dependencies: `npm install`
-3. Start the development server: `npm run dev`
+2. Install dependencies with `npm install`
+3. Run the development server with `npm run dev`
 
-## Documentation
+## Payment Flow
 
-For detailed documentation on RizzPay API and integration guides, please refer to the [documentation](./rizzpay%20documentations/).
+The application implements a robust payment flow with the following stages:
+- Payment initiation
+- Gateway processing
+- Processor routing
+- Authorization decision
+- Transaction completion
 
-## Troubleshooting
+## Wallet System
 
-If you encounter any issues with the payment gateway, please check the following:
+The integrated wallet system allows users to:
+- Deposit funds
+- Withdraw funds
+- Transfer between wallets
+- Track transaction history
 
-1. Ensure all API credentials are correctly configured
-2. Verify network connectivity for API calls
-3. Check browser console for any JavaScript errors
-4. Validate transaction parameters before submission
+## Optimization Features
+
+- Responsive design for all device sizes
+- Image optimization for faster loading
+- Code splitting for improved performance
+- Type safety throughout the codebase
+- Error handling and validation
 
 ## License
 
-© 2025 RizzPay Payment Technologies. All rights reserved.
+© 2025 RizzPay. All rights reserved.
