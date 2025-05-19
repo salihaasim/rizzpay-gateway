@@ -5,16 +5,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TransactionListItem from './TransactionListItem';
 import { Transaction } from '@/stores/transactions/types';
 
-const RecentTransactions: React.FC = () => {
-  const { transactions } = useTransactionStore();
+interface RecentTransactionsProps {
+  transactions?: Transaction[];
+}
+
+const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions }) => {
+  const storeTransactions = useTransactionStore(state => state.transactions);
+  
+  // Use provided transactions or get from store
+  const transactionsToUse = transactions || storeTransactions;
   
   // Get wallet transactions (deposits, withdrawals, transfers)
-  const walletTransactions = transactions
+  const walletTransactions = transactionsToUse
     .filter((tx: Transaction) => 
       tx.walletTransactionType === 'deposit' || 
       tx.walletTransactionType === 'withdrawal' || 
-      tx.walletTransactionType === 'transfer_in' || 
-      tx.walletTransactionType === 'transfer_out'
+      tx.walletTransactionType === 'transfer'
     )
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
@@ -35,6 +41,7 @@ const RecentTransactions: React.FC = () => {
               <TransactionListItem 
                 key={transaction.id} 
                 transaction={transaction} 
+                showStatus={true}
               />
             ))}
           </div>

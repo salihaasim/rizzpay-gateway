@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 import { Card, CardContent } from '@/components/ui/card';
 import WalletBalance from '@/components/wallet/WalletBalance';
 import RecentTransactions from '@/components/wallet/RecentTransactions';
@@ -48,11 +48,7 @@ const Wallet = () => {
           </div>
           
           <div className="md:border-l md:pl-4 sm:md:pl-6">
-            <RecentTransactions 
-              transactions={recentWalletTransactions}
-              userEmail={userEmail}
-              merchantCount={merchants.length}
-            />
+            <RecentTransactions transactions={recentWalletTransactions} />
           </div>
         </div>
       </CardContent>

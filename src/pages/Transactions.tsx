@@ -1,90 +1,82 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTransactionStore } from '@/stores/transactions';
-import TransactionStatusBadge from '@/components/wallet/TransactionStatusBadge';
 import { Helmet } from 'react-helmet';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { TabsContent, TabsList, TabsTrigger, Tabs } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useFilteredTransactions } from '@/hooks/useFilteredTransactions';
-import TransactionStats from '@/components/transactions/TransactionStats';
-import TransactionFilters from '@/components/transactions/TransactionFilters';
-import TransactionTabsContent from '@/components/transactions/TransactionTabsContent';
-import TransactionHeader from '@/components/transactions/TransactionHeader';
-import UpiTransactionToggle from '@/components/transactions/UpiTransactionToggle';
 import Layout from '@/components/Layout';
+import { Search, FileText, Download } from 'lucide-react';
+
+const TransactionItem = ({ transaction }: { transaction: any }) => {
+  return (
+    <div className="flex items-center justify-between p-4 border-b hover:bg-muted/50">
+      <div className="flex items-center space-x-4">
+        <div className="flex-shrink-0">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            transaction.status === 'successful' ? 'bg-green-100' : 
+            transaction.status === 'failed' ? 'bg-red-100' : 
+            'bg-amber-100'
+          }`}>
+            <span className={`text-sm font-medium ${
+              transaction.status === 'successful' ? 'text-green-700' : 
+              transaction.status === 'failed' ? 'text-red-700' : 
+              'text-amber-700'
+            }`}>
+              {transaction.paymentMethod?.substring(0, 2).toUpperCase() || 'TX'}
+            </span>
+          </div>
+        </div>
+        <div>
+          <div className="font-medium text-sm">
+            {transaction.description || `Payment ${transaction.id.substring(0, 8)}`}
+          </div>
+          <div className="text-xs text-muted-foreground">{new Date(transaction.date).toLocaleString()}</div>
+        </div>
+      </div>
+      <div className="text-right">
+        <div className="font-medium">{transaction.amount}</div>
+        <div className={`text-xs ${
+          transaction.status === 'successful' ? 'text-green-600' : 
+          transaction.status === 'failed' ? 'text-red-600' : 
+          'text-amber-600'
+        }`}>
+          {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Transactions = () => {
   const { transactions } = useTransactionStore();
   const [activeTab, setActiveTab] = useState('all');
-  const [showUpiTransactions, setShowUpiTransactions] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('date');
-  const [filter, setFilter] = useState('all');
   
-  // Get filtered transactions based on active tab and search term
-  const filteredTransactions = useFilteredTransactions(transactions, activeTab, searchTerm);
-  
-  // Get UPI transactions for the special UPI view
-  const upiTransactions = transactions.filter(
-    transaction => 
-      transaction.paymentMethod === 'upi' || 
-      transaction.paymentMethod === 'upi_manual'
-  );
-  
-  // Stats for the current filtered transactions
-  const totalAmount = filteredTransactions.reduce((sum, transaction) => {
-    const amount = transaction.rawAmount || parseFloat(transaction.amount.replace(/[^\d.-]/g, '')) || 0;
-    if (transaction.status === 'successful') {
-      return sum + amount;
-    }
-    return sum;
-  }, 0);
-  
-  // Count by payment method
-  const paymentMethodCount = filteredTransactions.reduce((acc, transaction) => {
-    const method = transaction.paymentMethod;
-    acc[method] = (acc[method] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  // Simple percentage calculation
-  const calculatePercentage = (count: number) => {
-    return filteredTransactions.length > 0 
-      ? Math.round((count / filteredTransactions.length) * 100) 
-      : 0;
-  };
-  
-  // Handle sorting transactions
-  const sortedTransactions = React.useMemo(() => {
-    const displayTransactions = showUpiTransactions ? upiTransactions : filteredTransactions;
+  // Filter transactions based on the active tab
+  const filteredTransactions = React.useMemo(() => {
+    let filtered = [...transactions];
     
-    return [...displayTransactions].sort((a, b) => {
-      if (sortBy === 'date') {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      } else if (sortBy === 'amount') {
-        const amountA = a.rawAmount || parseFloat(a.amount.replace(/[^\d.-]/g, '')) || 0;
-        const amountB = b.rawAmount || parseFloat(b.amount.replace(/[^\d.-]/g, '')) || 0;
-        return amountB - amountA;
-      } else if (sortBy === 'customer') {
-        return a.customer.localeCompare(b.customer);
-      }
-      return 0;
-    });
-  }, [filteredTransactions, upiTransactions, showUpiTransactions, sortBy]);
-
-  const handleExportTransactions = () => {
-    // Implementation for exporting transactions
-    console.log('Export transactions');
-  };
-  
-  const handleSelectTransaction = (id: string) => {
-    // Implementation for selecting a transaction
-    console.log('Selected transaction:', id);
-  };
+    // Filter by tab
+    if (activeTab !== 'all') {
+      filtered = filtered.filter(t => t.status === activeTab);
+    }
+    
+    // Filter by search term
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.id?.toLowerCase().includes(term) ||
+        t.description?.toLowerCase().includes(term) ||
+        t.customer?.toLowerCase().includes(term) ||
+        t.amount?.toLowerCase().includes(term)
+      );
+    }
+    
+    // Sort by date (newest first)
+    return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [transactions, activeTab, searchTerm]);
   
   return (
     <Layout>
@@ -92,81 +84,67 @@ const Transactions = () => {
         <title>Transactions | RizzPay</title>
       </Helmet>
       
-      <div className="container max-w-screen-xl mx-auto p-4 md:p-6">
-        <TransactionHeader 
-          totalAmount={totalAmount}
-          transactionCount={filteredTransactions.length}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          exportAllTransactions={handleExportTransactions}
-        />
-        
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-12">
-          <div className="md:col-span-3 space-y-6">
-            <TransactionStats 
-              transactions={filteredTransactions}
-              paymentMethodCount={paymentMethodCount}
-              calculatePercentage={calculatePercentage}
-            />
-            
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Filters</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TransactionFilters 
-                  searchQuery={searchTerm}
-                  setSearchQuery={setSearchTerm}
-                  filter={filter}
-                  setFilter={setFilter}
-                  sortBy={sortBy}
-                  setSortBy={setSortBy}
-                />
-              </CardContent>
-            </Card>
+      <div className="container max-w-screen-xl mx-auto p-4 lg:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">Transactions</h1>
+            <p className="text-sm text-muted-foreground">View and manage your transaction history</p>
           </div>
           
-          <div className="md:col-span-9">
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Transaction History</CardTitle>
-                    <CardDescription>
-                      {filteredTransactions.length} transactions found
-                    </CardDescription>
-                  </div>
-                  
-                  <UpiTransactionToggle 
-                    isUpiView={false}
-                    setIsUpiView={() => {}}
-                    totalUpiTransactions={upiTransactions.length}
-                    showUpiTransactions={showUpiTransactions}
-                    setShowUpiTransactions={setShowUpiTransactions}
-                  />
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="successful">Successful</TabsTrigger>
-                    <TabsTrigger value="processing">Processing</TabsTrigger>
-                    <TabsTrigger value="pending">Pending</TabsTrigger>
-                    <TabsTrigger value="failed">Failed</TabsTrigger>
-                  </TabsList>
-                  
-                  <TransactionTabsContent 
-                    transactions={sortedTransactions}
-                    isUpiView={showUpiTransactions}
-                    onSelectTransaction={handleSelectTransaction}
-                  />
-                </Tabs>
-              </CardContent>
-            </Card>
+          <div className="flex items-center mt-4 sm:mt-0 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64 mr-2">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search transactions..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="icon">
+              <Download className="h-4 w-4" />
+              <span className="sr-only">Download</span>
+            </Button>
           </div>
         </div>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Transaction History</CardTitle>
+            <CardDescription>{filteredTransactions.length} transactions found</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="px-4 border-b">
+                <TabsList className="mb-0 bg-transparent">
+                  <TabsTrigger value="all" className="data-[state=active]:bg-background">All</TabsTrigger>
+                  <TabsTrigger value="successful" className="data-[state=active]:bg-background">Successful</TabsTrigger>
+                  <TabsTrigger value="pending" className="data-[state=active]:bg-background">Pending</TabsTrigger>
+                  <TabsTrigger value="failed" className="data-[state=active]:bg-background">Failed</TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <TabsContent value={activeTab} className="m-0">
+                {filteredTransactions.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <FileText className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
+                    <h3 className="mt-4 text-lg font-medium">No transactions found</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {searchTerm ? 'Try a different search term' : 'Transactions will appear here once created'}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    {filteredTransactions.map((transaction) => (
+                      <TransactionItem key={transaction.id} transaction={transaction} />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

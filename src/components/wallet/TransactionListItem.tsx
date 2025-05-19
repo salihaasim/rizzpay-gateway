@@ -7,18 +7,20 @@ import { Transaction } from '@/stores/transactions/types';
 interface TransactionListItemProps {
   transaction: Transaction;
   showStatus?: boolean;
+  onViewDetails?: (id: string) => void;
 }
 
 const TransactionListItem: React.FC<TransactionListItemProps> = ({
   transaction,
-  showStatus = false
+  showStatus = false,
+  onViewDetails
 }) => {
   const getTransactionIcon = () => {
     if (transaction.walletTransactionType === 'deposit') {
       return <ArrowDown className="h-4 w-4 text-green-500" />;
     } else if (transaction.walletTransactionType === 'withdrawal') {
       return <ArrowUp className="h-4 w-4 text-red-500" />;
-    } else if (transaction.walletTransactionType === 'transfer_in' || transaction.walletTransactionType === 'transfer_out') {
+    } else if (transaction.walletTransactionType === 'transfer') {
       return <RefreshCw className="h-4 w-4 text-blue-500" />;
     } else if (transaction.paymentMethod === 'card') {
       return <CreditCard className="h-4 w-4 text-purple-500" />;
@@ -32,37 +34,53 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({
       return 'Deposit to Wallet';
     } else if (transaction.walletTransactionType === 'withdrawal') {
       return 'Withdrawal from Wallet';
-    } else if (transaction.walletTransactionType === 'transfer_in') {
-      return 'Transfer Received';
-    } else if (transaction.walletTransactionType === 'transfer_out') {
-      return 'Transfer Sent';
+    } else if (transaction.walletTransactionType === 'transfer') {
+      return transaction.createdBy === transaction.customer 
+        ? 'Transfer Sent' 
+        : 'Transfer Received';
     } else {
       return transaction.description || 'Payment';
     }
   };
 
   const getAmountColor = () => {
-    if (transaction.walletTransactionType === 'deposit' || transaction.walletTransactionType === 'transfer_in') {
+    if (transaction.walletTransactionType === 'deposit') {
       return 'text-green-600';
-    } else if (transaction.walletTransactionType === 'withdrawal' || transaction.walletTransactionType === 'transfer_out') {
+    } else if (transaction.walletTransactionType === 'withdrawal') {
       return 'text-red-600';
+    } else if (transaction.walletTransactionType === 'transfer') {
+      return transaction.createdBy === transaction.customer 
+        ? 'text-red-600' 
+        : 'text-green-600';
     } else {
       return '';
     }
   };
 
   const getAmountPrefix = () => {
-    if (transaction.walletTransactionType === 'deposit' || transaction.walletTransactionType === 'transfer_in') {
+    if (transaction.walletTransactionType === 'deposit') {
       return '+';
-    } else if (transaction.walletTransactionType === 'withdrawal' || transaction.walletTransactionType === 'transfer_out') {
+    } else if (transaction.walletTransactionType === 'withdrawal' || 
+              (transaction.walletTransactionType === 'transfer' && transaction.createdBy === transaction.customer)) {
       return '-';
+    } else if (transaction.walletTransactionType === 'transfer' && transaction.createdBy !== transaction.customer) {
+      return '+';
     } else {
       return '';
     }
   };
 
+  const handleClick = () => {
+    if (onViewDetails) {
+      onViewDetails(transaction.id);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-between p-4">
+    <div 
+      className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50"
+      onClick={handleClick}
+    >
       <div className="flex items-center">
         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
           {getTransactionIcon()}

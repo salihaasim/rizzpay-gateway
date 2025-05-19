@@ -1,17 +1,15 @@
 
 import React from 'react';
-import { Transaction } from '@/stores/transactionStore';
+import { Transaction } from '@/stores/transactions/types';
 import TransactionListItem from './TransactionListItem';
 
 interface TransactionListProps {
   transactions: Transaction[];
-  userEmail: string;
-  onViewDetails: (id: string) => void;
+  onViewDetails?: (id: string) => void;
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
-  userEmail,
   onViewDetails
 }) => {
   if (transactions.length === 0) {
@@ -28,8 +26,8 @@ const TransactionList: React.FC<TransactionListProps> = ({
         <TransactionListItem
           key={transaction.id}
           transaction={transaction}
-          userEmail={userEmail}
           onViewDetails={onViewDetails}
+          showStatus={true}
         />
       ))}
     </div>

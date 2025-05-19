@@ -31,21 +31,24 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import GlobalFooter from './components/GlobalFooter';
 import Settings from './pages/Settings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
+import UpiPluginPage from './pages/UpiPluginPage';
 
-const PublicLayout = () => (
-  <div className="min-h-screen flex flex-col">
-    <div className="flex-grow">
-      <Outlet />
-    </div>
-  </div>
-);
-
+// Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
   <div className="min-h-screen flex flex-col">
     <div className="flex-grow">
       <Outlet />
     </div>
     <GlobalFooter />
+  </div>
+);
+
+// Layout for pages without footer
+const PublicLayout = () => (
+  <div className="min-h-screen flex flex-col">
+    <div className="flex-grow">
+      <Outlet />
+    </div>
   </div>
 );
 
@@ -115,6 +118,10 @@ const App: React.FC = () => {
           <Route
             path="/wallet"
             element={isAuthenticated() ? <WalletPage /> : <Navigate to="/login" replace />}
+          />
+          <Route 
+            path="/upi-plugin"
+            element={isAuthenticated() ? <UpiPluginPage /> : <Navigate to="/login" replace />}
           />
         </Route>
         
