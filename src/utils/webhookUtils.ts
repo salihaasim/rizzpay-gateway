@@ -1,8 +1,28 @@
-import { getTransactionById } from '@/stores/transactions';
+
+import { Transaction, useTransactionStore } from '@/stores/transactions';
+
+// Renamed the local function to avoid name conflict with import
+const fetchTransactionById = (id: string): Transaction | null => {
+  // In a real implementation, this would get the transaction from a store
+  console.log(`Fetching transaction with ID: ${id}`);
+  
+  // Mock implementation
+  return {
+    id,
+    date: new Date().toISOString(),
+    amount: '₹100',
+    rawAmount: 100,
+    status: 'pending',
+    processingState: 'initiated',
+    customer: 'Test Customer',
+    paymentMethod: 'card',
+    webhookData: {}
+  } as Transaction;
+};
 
 export const updateTransactionFromWebhook = (transactionId: string, webhookData: any) => {
   // Find the transaction in the store
-  const transaction = getTransactionById(transactionId);
+  const transaction = fetchTransactionById(transactionId);
   
   if (!transaction) {
     console.error(`Transaction with ID ${transactionId} not found`);
@@ -27,21 +47,6 @@ export const updateTransactionFromWebhook = (transactionId: string, webhookData:
   console.log('Transaction updated from webhook:', updatedTransaction);
   
   return updatedTransaction;
-};
-
-// Helper function to get a transaction by ID
-const getTransactionById = (id: string) => {
-  // In a real implementation, this would get the transaction from a store
-  // For now, just console log for illustration
-  console.log(`Fetching transaction with ID: ${id}`);
-  
-  // Mock implementation
-  return {
-    id,
-    status: 'pending',
-    processingState: 'initiated',
-    webhookData: {}
-  };
 };
 
 export const processWebhookTransaction = async (webhookData: any) => {

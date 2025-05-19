@@ -7,10 +7,11 @@ RizzPay is a comprehensive payment processing platform designed to facilitate va
 
 ## Recent Updates
 
-- Fixed issues in the Transactions page UI
-- Implemented missing utility functions for status indicators and payment state labels
-- Added webhook transaction update functionality
-- Optimized transaction filtering and sorting
+- Fixed name conflicts in webhook utilities
+- Resolved build errors in payment processing functions
+- Fixed transaction webhook processing implementation
+- Improved error handling in webhook callbacks
+- Enhanced typescript type safety across the application
 
 ## Key Features
 
