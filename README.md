@@ -105,15 +105,16 @@ RizzPay provides comprehensive legal documentation:
 
 ## Recent Updates
 
+- **Fixed UPI Plugin Route**: Added dedicated route for /plugin to redirect properly
+- **Improved Admin Layout**: Enhanced admin sidebar navigation
+- **Removed Dark Mode**: Removed dark mode toggle from admin interface
+- **Fixed Navigation Issues**: Improved routing for merchant and admin pages
+- **Added AdminSettings Route**: Added proper route for admin settings page
 - **Fixed Admin Page Access**: Fixed issues preventing access to admin pages
 - **Fixed UPI Plugin**: Resolved issues with UPI plugin page for merchant users
 - **Improved Routing Protection**: Enhanced admin route protection with proper redirects
 - **Prevented Auto-Redirects**: Fixed issue where website would auto-redirect to admin
 - **Improved Logout Function**: Updated logout to always redirect to home page
-- **Fixed Navigation**: Improved navigation flow using React Router
-- **Fixed Dialog Error**: Resolved error with DialogPortal component in admin layout
-- **Enhanced Error Messages**: Added better error notifications for unauthorized access
-- **Footer Placement**: Ensured footer only appears on the home/landing page
 
 ## Documentation
 

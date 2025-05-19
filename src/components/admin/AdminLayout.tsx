@@ -34,10 +34,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }
   
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar 
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
+        userEmail={currentMerchant?.email || ''}
+        handleLogout={handleLogout}
       />
       
       <div className="flex flex-col flex-1">

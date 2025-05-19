@@ -14,8 +14,6 @@ import { useMerchantAuth } from './stores/merchantAuthStore';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Profile from './pages/Profile';
 import BankingPage from './pages/BankingPage';
 import Webhooks from './pages/Webhooks';
@@ -38,6 +36,7 @@ import UpiPluginPage from './pages/UpiPluginPage';
 import TransfersPage from './pages/TransfersPage';
 import DeveloperPage from './pages/DeveloperPage';
 import Auth from './pages/Auth';
+import AdminSettings from './pages/AdminSettings';
 import { toast } from 'sonner';
 
 // Layout for pages that should have the footer (only home page)
@@ -63,7 +62,6 @@ const PublicLayout = () => (
 const MerchantRouteGuard = ({ element }) => {
   const { isAuthenticated } = useMerchantAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   
   useEffect(() => {
     if (!isAuthenticated) {
@@ -78,22 +76,21 @@ const MerchantRouteGuard = ({ element }) => {
 const AdminRouteGuard = ({ element }) => {
   const { currentMerchant } = useMerchantAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   
   useEffect(() => {
     // Check if user is not authenticated or not an admin
     if (!currentMerchant || currentMerchant.role !== 'admin') {
       toast.error('Access denied. Admin privileges required.');
       navigate('/auth', { replace: true });
-      return;
     }
-  }, [currentMerchant, navigate, location]);
+  }, [currentMerchant, navigate]);
   
   return currentMerchant?.role === 'admin' ? element : null;
 };
 
 const App: React.FC = () => {
-  const { setUserRole, isAuthenticated, userRole, resetUserRole } = useTransactionStore();
+  const { setUserRole, resetUserRole } = useTransactionStore();
+  const { isAuthenticated } = useMerchantAuth();
   
   useEffect(() => {
     // Simulate checking authentication status and setting user role
@@ -142,6 +139,11 @@ const App: React.FC = () => {
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
+          
+          {/* Add a redirect for the /plugin route to go to UPI plugin page if authenticated */}
+          <Route path="/plugin" element={
+            isAuthenticated ? <Navigate to="/upi-plugin" replace /> : <Navigate to="/auth" replace />
+          } />
         </Route>
         
         {/* Merchant routes */}
@@ -166,6 +168,7 @@ const App: React.FC = () => {
           <Route path="kyc" element={<AdminKYC />} />
           <Route path="whitelist" element={<AdminWhitelist />} />
           <Route path="upi-management" element={<AdminUpiManagement />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
     </Router>

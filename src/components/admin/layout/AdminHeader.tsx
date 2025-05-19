@@ -1,9 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useTransactionStore } from '@/stores/transactions';
-import { LogOut, Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
+import { LogOut } from 'lucide-react';
 import AdminMobileMenuTrigger from './AdminMobileMenuTrigger';
 
 export interface AdminHeaderProps {
@@ -13,16 +12,11 @@ export interface AdminHeaderProps {
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ onLogout, setMobileMenuOpen }) => {
   const { userEmail } = useTransactionStore();
-  const { theme, setTheme } = useTheme();
 
   const handleLogout = () => {
     if (onLogout) {
       onLogout();
     }
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -31,15 +25,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onLogout, setMobileMenuOpen }
         <AdminMobileMenuTrigger setMobileMenuOpen={setMobileMenuOpen || (() => {})} />
         
         <div className="ml-auto flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleTheme}
-            className="text-muted-foreground"
-          >
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-          
           <div className="hidden md:flex items-center space-x-1">
             <span className="text-sm text-muted-foreground">Logged in as:</span>
             <span className="text-sm font-medium">{userEmail}</span>
