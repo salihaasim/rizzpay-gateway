@@ -65,7 +65,7 @@ const App: React.FC = () => {
         <Route path="/webhooks" element={<Webhooks />} />
         <Route path="/wallet" element={<WalletPage />} />
         
-        {/* Admin routes */}
+        {/* Admin routes - pass children to AdminLayout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />

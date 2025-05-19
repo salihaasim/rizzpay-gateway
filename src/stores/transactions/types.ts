@@ -1,5 +1,6 @@
+
 // Transaction related types
-export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined';
+export type TransactionStatus = 'successful' | 'failed' | 'pending' | 'processing' | 'settled' | 'declined' | 'refunded';
 export type UserRole = 'admin' | 'merchant' | null;
 export type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'neft' | 'wallet' | 'webhook';
 export type PaymentProcessingState = 
@@ -15,7 +16,9 @@ export type PaymentProcessingState =
   | 'settlement_processing'
   | 'funds_transferred'
   | 'merchant_credited'
-  | 'completed';
+  | 'completed'
+  | 'failed'
+  | 'processing';
 
 export type WalletTransactionType = 'deposit' | 'withdrawal' | 'payment' | 'transfer';
 
@@ -71,6 +74,7 @@ export interface Transaction {
   }[];
   walletTransactionType?: WalletTransactionType;
   description?: string;
+  customerEmail?: string;
 }
 
 export interface Wallet {

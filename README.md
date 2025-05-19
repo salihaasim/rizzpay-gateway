@@ -1,108 +1,56 @@
 
 # RizzPay Payment Gateway
 
-RizzPay is a modern payment gateway solution that offers a variety of payment options including UPI, cards, net banking, and more.
+## Overview
 
-## Features
+RizzPay is a comprehensive payment gateway solution designed for businesses operating in India. This platform enables secure payment processing through various methods including UPI, cards, and bank transfers while providing a feature-rich dashboard for both merchants and administrators.
 
-- Multiple payment methods support (UPI, Cards, Net Banking, NEFT)
-- Seamless checkout experience
-- Admin dashboard for analytics and transaction management
-- Merchant onboarding and KYC
-- Webhook integration for real-time notifications
-- UPI management with multiple provider support
-- Wallet system with P2P transfers
-- API access for developers
+## Core Features
 
-## API Structure
+- **Multiple Payment Methods**: Support for UPI, credit/debit cards, net banking, and wallet payments
+- **Merchant Dashboard**: Comprehensive transaction monitoring and management
+- **Admin Controls**: Complete oversight of platform operations, merchant management, and KYC verification
+- **Analytics**: Detailed insights into transaction patterns and business performance
+- **Webhooks**: Real-time integration capabilities for merchants
 
-The API is organized in a modular structure for better maintainability:
+## Recent Updates
 
-```
-src/api/
-├── auth/
-│   ├── login.ts
-│   ├── register.ts
-│   └── index.ts
-├── merchant/
-│   ├── kyc.ts
-│   ├── profile.ts
-│   ├── whitelist.ts
-│   └── index.ts
-├── payment/
-│   ├── index.ts
-│   ├── phonepe.ts
-│   ├── razorpay.ts
-│   └── upi.ts
-├── transactions/
-│   ├── fetch.ts
-│   ├── index.ts
-│   ├── process.ts
-│   └── report.ts
-└── webhook/
-    ├── create.ts
-    ├── index.ts
-    └── verify.ts
-```
+- **Fixed TypeScript Type Definitions**: Resolved type compatibility issues across the codebase
+- **Enhanced Payment Details Interface**: Unified the PaymentDetails interface to support all payment methods
+- **Fixed Home Page Routing**: Ensured proper navigation to the home page
+- **Light Theme Implementation**: Standardized the application on a light theme for consistency
 
-## Admin Features
+## Developer Notes
 
-- **Dashboard**: Comprehensive overview of platform metrics
-- **Transaction Management**: View, filter, and manage transactions
-- **UPI Management**: Configure UPI providers, accounts, and QR codes
-- **Merchant Management**: Onboard and manage merchants
-- **KYC Verification**: Verify merchant identity documents
-- **Whitelist Management**: Manage IP and domain whitelisting
+### Project Structure
 
-## UPI Management
+- `/src/components` - Reusable UI components
+- `/src/pages` - Main application pages
+- `/src/api` - API integration services
+- `/src/utils` - Utility functions and helpers
+- `/src/stores` - State management using Zustand
+- `/src/types` - TypeScript type definitions
 
-The platform supports multiple UPI providers and accounts:
+### Type System
 
-- Configure provider integrations (PhonePe, Google Pay, Paytm)
-- Manage UPI accounts with rotation capabilities
-- Set transaction limits and priorities
-- Generate and manage QR codes for payments
+The project uses a comprehensive TypeScript type system to ensure consistency across components:
 
-## Developer API
-
-RizzPay offers a comprehensive API for developers to integrate payment solutions:
-
-- REST API for payment processing
-- Webhook notifications for payment events
-- SDKs for easy integration
-- Comprehensive documentation
-
-## Pages Structure
-
-```
-src/pages/
-├── Dashboard.tsx              # Main merchant dashboard
-├── Transactions.tsx           # Transaction history and management
-├── Login.tsx                  # User login page
-├── Register.tsx               # User registration page
-├── Profile.tsx                # User profile management
-├── BankingPage.tsx            # Banking services and management
-├── Webhooks.tsx               # Webhook configuration
-├── UpiPaymentPage.tsx         # UPI payment processing
-├── WalletPage.tsx             # Wallet management
-├── IndiaPage.tsx              # India-specific information
-└── admin/                     # Admin section
-    ├── AdminDashboard.tsx     # Admin dashboard
-    ├── AdminTransactions.tsx  # Admin transaction management
-    ├── AdminMerchants.tsx     # Merchant management
-    ├── AdminKYC.tsx           # KYC verification
-    ├── AdminWhitelist.tsx     # Whitelist management
-    └── AdminUpiManagement.tsx # UPI provider management
-```
+- `Transaction` - Represents payment transactions with their full lifecycle
+- `PaymentDetails` - Contains payment method-specific details
+- `TransactionStatus` - Defines all possible transaction states
+- `PaymentProcessingState` - Defines the detailed processing stages of a transaction
 
 ## Getting Started
 
 1. Clone the repository
 2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Start the development server: `npm run dev`
+3. Start the development server: `npm run dev`
+4. Access the application at `http://localhost:5173`
+
+## Deployment
+
+The application can be deployed to any hosting service that supports React applications.
 
 ## License
 
-This project is proprietary software.
-
+Proprietary - All rights reserved

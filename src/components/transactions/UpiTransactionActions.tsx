@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 import { toast } from 'sonner';
 
 interface UpiTransactionActionsProps {
