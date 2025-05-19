@@ -1,185 +1,218 @@
 
-import React from 'react';
-import Layout from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, Printer, CreditCard, ArrowLeftRight, Clock } from 'lucide-react';
 
-const RefundPolicy = () => {
+const RefundPolicy: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
   return (
-    <Layout>
-      <div className="container max-w-4xl py-12">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold tracking-tight">RizzPay Refund Policy</h1>
-          <p className="text-muted-foreground mt-2">Last updated: May 16, 2025</p>
+    <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Refund Policy | RizzPay</title>
+      </Helmet>
+      
+      <div className="container max-w-5xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <Link to="/" className="text-primary hover:underline flex items-center gap-2">
+            <ArrowLeft size={18} />
+            <span>Back to Home</span>
+          </Link>
+          
+          <Button variant="ghost" size="sm" className="flex items-center gap-1">
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
         </div>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-            <CardDescription>
-              Our approach to refunds and returns
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              At RizzPay, we strive to ensure complete satisfaction with our payment services. This Refund Policy outlines the terms and conditions regarding refunds for transactions processed through the RizzPay payment gateway.
-            </p>
-            <p>
-              We understand that issues can arise with transactions, and we have established this policy to provide clarity on when and how refunds are processed within our platform.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Transaction Refund Policy</CardTitle>
-            <CardDescription>
-              Guidelines for payment refunds
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Merchant-Initiated Refunds</h3>
-              <p>
-                Merchants using RizzPay can initiate refunds for their customers through the RizzPay dashboard for up to 180 days after the original transaction date. Refund processing typically takes 5-7 business days to reflect in the customer's account, depending on the payment method and issuing bank.
+        
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">RizzPay Refund Policy</h1>
+        
+        <div className="mb-8 flex flex-wrap gap-4 text-sm justify-center">
+          <span className="bg-primary/10 rounded-full px-4 py-1 text-primary">Version: 1.0</span>
+          <span className="bg-primary/10 rounded-full px-4 py-1 text-primary">Effective Date: May 15, 2025</span>
+        </div>
+        
+        <div className="mb-8 p-6 bg-card rounded-lg border shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="bg-primary/10 p-2 rounded-full">
+              <CreditCard className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Introduction</h2>
+              <p className="text-muted-foreground">
+                This Refund Policy defines the conditions and procedures under which RizzPay handles refund requests 
+                from merchants and integrated partners using our digital payment infrastructure. RizzPay operates as a 
+                technical service provider facilitating UPI and bank-based payments.
               </p>
             </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Full and Partial Refunds</h3>
-              <p>
-                RizzPay supports both full and partial refunds. Merchants can choose to refund the complete transaction amount or only a portion, based on their business policies and agreement with the customer.
-              </p>
-              <p>
-                The refund processing fee is 1% of the refund amount, with a minimum charge of ₹5 and a maximum of ₹50 per refund transaction.
-              </p>
+          </div>
+        </div>
+        
+        <Tabs 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="grid grid-cols-3 mb-8">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              <span>Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="process" className="flex items-center gap-2">
+              <ArrowLeftRight className="h-4 w-4" />
+              <span>Refund Process</span>
+            </TabsTrigger>
+            <TabsTrigger value="timelines" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>Timelines</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-8">
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Eligibility for Refund</h2>
+              <p>Refunds through RizzPay may be initiated under the following circumstances:</p>
+              <ul className="list-none space-y-4 mt-4">
+                <li className="flex items-start">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-2 flex-shrink-0"></span>
+                  <div>
+                    <strong className="text-primary/90">Duplicate Payments:</strong> A transaction was processed more than once due to technical or manual error.
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-2 flex-shrink-0"></span>
+                  <div>
+                    <strong className="text-primary/90">Failed Transaction with Debit:</strong> The transaction failed but funds were debited from the payer's account.
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-2 flex-shrink-0"></span>
+                  <div>
+                    <strong className="text-primary/90">Technical Malfunction:</strong> Infrastructure or API-level issues from RizzPay's side caused unintended settlement or routing.
+                  </div>
+                </li>
+              </ul>
+              
+              <h2 className="text-xl font-semibold">Non-Refundable Scenarios</h2>
+              <p>RizzPay will not facilitate refunds in the following cases:</p>
+              <div className="mt-4 border border-muted rounded-lg overflow-hidden">
+                <div className="bg-muted p-3 font-medium">Non-Refundable Cases</div>
+                <ul className="divide-y divide-muted">
+                  <li className="p-3">Legitimate, merchant-initiated orders with successful transaction logs.</li>
+                  <li className="p-3">Transactions where the user explicitly consented and verified payment.</li>
+                  <li className="p-3">Complaints based solely on user dissatisfaction or buyer's remorse.</li>
+                  <li className="p-3">Transactions processed through third-party gateways or off-RizzPay infrastructure.</li>
+                </ul>
+              </div>
             </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">RizzPay Service Fee Refunds</h3>
-              <p>
-                RizzPay service fees are non-refundable. When a merchant initiates a refund for their customer, the original transaction fee charged by RizzPay is not returned to the merchant.
-              </p>
+          </TabsContent>
+          
+          <TabsContent value="process" className="space-y-8">
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Refund Request Procedure</h2>
+              <p>To initiate a refund request, the merchant must:</p>
+              <ul className="list-disc pl-6 space-y-2 mt-4">
+                <li>Submit a refund request via email (rizzpay1@gmail.com) or merchant dashboard.</li>
+                <li>Include the following:
+                  <ul className="list-disc pl-6 mt-2">
+                    <li>RizzPay Transaction ID</li>
+                    <li>Merchant Order/Reference ID</li>
+                    <li>Reason for Refund</li>
+                    <li>Supporting Documentation (user complaints, screenshots, logs)</li>
+                  </ul>
+                </li>
+              </ul>
+              
+              <div className="bg-muted p-4 rounded-md mt-4">
+                <p className="font-medium">Internal Review:</p>
+                <p>RizzPay will review the request within 2–5 business days and may request additional clarification.</p>
+              </div>
+              
+              <div className="mt-4">
+                <p className="font-medium">Decision Outcome:</p>
+                <ul className="list-disc pl-6 space-y-2 mt-2">
+                  <li><strong className="text-green-600 dark:text-green-400">Approved:</strong> Refund processed to the payer's original account via UPI or IMPS/NEFT.</li>
+                  <li><strong className="text-red-600 dark:text-red-400">Declined:</strong> Merchant receives written justification for denial.</li>
+                </ul>
+              </div>
             </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Failed Transactions</h3>
-              <p>
-                For failed transactions where the customer's account was debited but the transaction did not complete successfully, RizzPay automatically initiates a refund process. These refunds are typically processed within 5-7 business days.
-              </p>
-              <p>
-                If a customer's account was debited but no refund has been processed after 7 business days, the customer should contact their merchant directly. Merchants can then raise a ticket through the RizzPay dashboard for resolution.
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Disputes and Chargebacks</h3>
-              <p>
-                In case of disputes or chargebacks initiated by customers through their card issuer or bank, RizzPay will notify the merchant and may temporarily hold the disputed funds until the dispute is resolved. Merchants are required to provide evidence to contest the dispute within 7 calendar days of notification.
-              </p>
-              <p>
-                If a dispute is resolved in favor of the customer, the funds will be refunded, and a chargeback fee of ₹300 will be charged to the merchant.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Platform Service Fee Refunds</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              For merchants using RizzPay's platform services, the following refund policies apply to subscription and service fees:
-            </p>
             
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Monthly Subscription Plans</h3>
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Merchant Obligations</h2>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                  <div className="bg-primary/20 p-2 rounded-full text-primary">1</div>
+                  <div>Maintain adequate balances in settlement or escrow accounts to fund approved refunds.</div>
+                </li>
+                <li className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                  <div className="bg-primary/20 p-2 rounded-full text-primary">2</div>
+                  <div>Ensure refund requests are initiated within 30 calendar days of the original transaction.</div>
+                </li>
+                <li className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                  <div className="bg-primary/20 p-2 rounded-full text-primary">3</div>
+                  <div>RizzPay remains neutral in customer disputes unless compelled by law or regulatory order.</div>
+                </li>
+              </ul>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="timelines" className="space-y-8">
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Refund Timelines</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="bg-muted p-4 rounded-md">
+                  <p className="font-medium">UPI-based refunds:</p>
+                  <p>1–3 business days after approval</p>
+                </div>
+                <div className="bg-muted p-4 rounded-md">
+                  <p className="font-medium">Bank refunds (NEFT/IMPS):</p>
+                  <p>2–5 business days</p>
+                </div>
+              </div>
+              <p className="mt-4">Delays beyond 5 days may occur due to banking holidays, regulatory holds, or recipient bank policies.</p>
+            
+              <h2 className="text-xl font-semibold">Chargebacks & Compliance Actions</h2>
+              <div className="bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-400 p-4 rounded-r-md mt-4">
+                <p>RizzPay may withhold settlements or reverse funds upon receipt of chargebacks or regulatory orders (RBI, NPCI).</p>
+                <p className="mt-2">Investigations may incur fees or penalties as per our merchant agreement.</p>
+              </div>
+            
+              <h2 className="text-xl font-semibold">Policy Modifications</h2>
               <p>
-                Monthly subscription fees are non-refundable once the billing cycle has begun. If you cancel your subscription, you will continue to have access to the service until the end of your current billing period.
+                This policy may be amended to align with regulatory changes, platform updates, or internal risk assessments. 
+                Major revisions will be communicated at least 7 days in advance.
               </p>
             </div>
-
-            <Separator className="my-4" />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Annual Subscription Plans</h3>
-              <p>
-                For annual subscription plans, you may request a prorated refund within 30 days of your subscription renewal. The refund amount will be calculated based on the unused portion of your subscription period.
-              </p>
+          </TabsContent>
+        </Tabs>
+        
+        <div className="mt-10 p-5 border-t">
+          <div className="text-center">
+            <h3 className="font-semibold text-lg mb-4">Contact Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-muted p-4 rounded-md text-center">
+                <p className="font-medium">Email</p>
+                <p className="text-primary">rizzpay1@gmail.com</p>
+              </div>
+              <div className="bg-muted p-4 rounded-md text-center">
+                <p className="font-medium">Phone</p>
+                <p className="text-primary">+91-9080186106</p>
+              </div>
+              <div className="bg-muted p-4 rounded-md text-center">
+                <p className="font-medium">Address</p>
+                <p className="text-primary">RizzPay HQ, Chennai, India</p>
+              </div>
             </div>
-
-            <Separator className="my-4" />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Setup and Integration Fees</h3>
-              <p>
-                One-time setup and integration fees are non-refundable once the integration process has begun. However, if RizzPay fails to deliver the integration services as specified in your contract, you may be eligible for a full or partial refund at our discretion.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>How to Request a Refund</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">For Customers</h3>
-              <p>
-                If you, as a customer, wish to request a refund for a purchase made using RizzPay, please contact the merchant directly. As a payment processor, RizzPay does not decide when refunds should be issued - this decision lies solely with the merchant according to their refund policy.
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">For Merchants</h3>
-              <p>
-                Merchants can process refunds by following these steps:
-              </p>
-              <ol className="list-decimal pl-5 space-y-2">
-                <li>Log in to your RizzPay merchant dashboard</li>
-                <li>Navigate to "Transactions" section</li>
-                <li>Locate the transaction you wish to refund</li>
-                <li>Click on the "Refund" button next to the transaction</li>
-                <li>Enter the refund amount (for partial refunds)</li>
-                <li>Provide a reason for the refund</li>
-                <li>Confirm the refund</li>
-              </ol>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              If you have any questions or concerns regarding our Refund Policy, please contact our support team:
+            <p className="text-center font-semibold mt-8 py-3 bg-primary/5 rounded-md border border-primary/10">
+              This document is binding upon all merchants operating through RizzPay's infrastructure.
             </p>
-            <div className="space-y-1">
-              <p><strong>Email:</strong> support@rizzpay.co.in</p>
-              <p><strong>Phone:</strong> +91-7550248887</p>
-              <p><strong>Hours:</strong> Monday to Saturday, 9:00 AM to 6:00 PM IST</p>
-            </div>
-            <p className="text-sm text-muted-foreground mt-6">
-              RizzPay reserves the right to update or modify this Refund Policy at any time without prior notice. Any changes will be effective immediately upon posting on our website.
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 

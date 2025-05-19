@@ -3,13 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { Helmet } from 'react-helmet';
 
 // Import refactored components
 import RoleManagement from '@/components/admin/settings/RoleManagement';
@@ -21,33 +19,36 @@ import GeneralSettings from '@/components/admin/settings/GeneralSettings';
 const AdminSettings = () => {
   const navigate = useNavigate();
   const { currentMerchant } = useMerchantAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
-    // Small delay to ensure the store is properly loaded
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 300);
+    // Check if user is admin
+    if (currentMerchant && currentMerchant.role !== 'admin') {
+      toast.error('Access denied. Admin privileges required.');
+      navigate('/dashboard', { replace: true });
+    }
+  }, [currentMerchant, navigate]);
+  
+  const handleSaveSettings = () => {
+    setIsLoading(true);
     
-    return () => clearTimeout(timer);
-  }, []);
+    // Simulate saving settings
+    setTimeout(() => {
+      toast.success("Settings saved successfully");
+      setIsLoading(false);
+    }, 600);
+  };
   
-  // Show loading state
-  if (isLoading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-        </div>
-      </AdminLayout>
-    );
+  // Show access denied if not admin
+  if (currentMerchant && currentMerchant.role !== 'admin') {
+    return null; // Will redirect via useEffect
   }
-  
-  // Removed the access denied check since this is an admin-only route
-  // Already protected by AdminLayout
   
   return (
     <AdminLayout>
+      <Helmet>
+        <title>Admin Settings | RizzPay</title>
+      </Helmet>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Admin Settings</h1>
@@ -82,10 +83,12 @@ const AdminSettings = () => {
         </Tabs>
         
         <div className="flex justify-end">
-          <Button onClick={() => {
-            toast.success("Settings saved successfully");
-            navigate("/admin");
-          }}>Save Settings</Button>
+          <Button 
+            onClick={handleSaveSettings} 
+            disabled={isLoading}
+          >
+            {isLoading ? "Saving..." : "Save Settings"}
+          </Button>
         </div>
       </div>
     </AdminLayout>

@@ -1,168 +1,118 @@
 
-import React, { useState, useEffect } from 'react';
-import { useProfileStore, Merchant } from '@/stores/profileStore';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { User, LogOut, UserPlus, Users } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import UserRegistrationForm from './UserRegistrationForm';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { v4 as uuidv4 } from 'uuid';
+import { Check, ChevronsUpDown, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { useTransactionStore } from '@/stores/transactionStore';
 
-const UserSwitcher = () => {
-  const { userEmail, setUserRole } = useTransactionStore();
-  const { merchants, addMerchant } = useProfileStore();
-  const { logout: merchantLogout } = useMerchantAuth();
+interface UserSwitcherProps {
+  onSelectUser: (email: string, role: string) => void;
+  selectedUser: { email: string; role: string };
+}
+
+const UserSwitcher: React.FC<UserSwitcherProps> = ({ onSelectUser, selectedUser }) => {
   const [open, setOpen] = useState(false);
-  const [registerOpen, setRegisterOpen] = useState(false);
-  const navigate = useNavigate();
-  
-  // Mock login functionality
-  const handleUserSwitch = (email: string) => {
-    // Initialize wallet for the user if it doesn't exist
-    useTransactionStore.getState().initializeWallet(email);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { setUserRole } = useTransactionStore();
+
+  // Demo users for testing
+  const demoUsers = [
+    { email: 'merchant@rizzpay.com', role: 'merchant' },
+    { email: 'admin@rizzpay.com', role: 'admin' },
+    { email: 'user@example.com', role: 'user' },
+  ];
+
+  const handleSelectUser = (email: string, role: string) => {
+    onSelectUser(email, role);
     
-    // Set user role as merchant
-    setUserRole('merchant', email);
+    // Update user in store - using the correct method signature
+    setUserRole(role as 'admin' | 'merchant', email);
     
-    // Close the dropdown
+    // Close popover and dialog
     setOpen(false);
-    
-    // Show success toast
-    toast.success(`Switched to ${email}`);
-    
-    // Redirect to dashboard
-    navigate('/dashboard');
+    setDialogOpen(false);
   };
-  
-  const handleLogout = () => {
-    // Call both logout methods to ensure complete logout
-    setUserRole(null, null);
-    merchantLogout(); // Add this to ensure proper merchant logout
-    
-    setOpen(false);
-    
-    // Redirect to home page
-    navigate('/', { replace: true });
-    
-    toast.success('Logged out successfully');
-  };
-  
-  const handleRegisterUser = (userData: { name: string; email: string; phone: string; company: string }) => {
-    // Create new merchant with all required properties
-    const newMerchant: Merchant = {
-      id: uuidv4(),
-      name: userData.name,
-      email: userData.email,
-      phone: userData.phone,
-      company: userData.company,
-      createdAt: new Date().toISOString(),
-      kycStatus: 'pending',
-      kycData: {
-        aadhaarCard: null,
-        panCard: null,
-        gstCertificate: null,
-        gstNumber: null
-      }
-    };
-    
-    // Add the new merchant
-    addMerchant(newMerchant);
-    
-    // Initialize wallet for the new user
-    useTransactionStore.getState().initializeWallet(userData.email);
-    
-    // Switch to the new user
-    handleUserSwitch(userData.email);
-    
-    // Close dialog
-    setRegisterOpen(false);
-    
-    // Success message
-    toast.success('New user registered successfully!');
-  };
-  
-  // Get current user details
-  const currentMerchant = userEmail ? merchants.find(m => m.email === userEmail) : null;
-  
+
   return (
-    <>
-      <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full justify-start md:w-auto md:px-3 gap-2">
-            <User className="h-4 w-4" />
-            <span className="truncate max-w-[150px]">
-              {currentMerchant?.name || userEmail || 'Sign In'}
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>
-            <div className="font-normal text-xs text-muted-foreground">Signed in as</div>
-            <div className="font-semibold truncate">{userEmail || 'Not signed in'}</div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          
-          {merchants.length > 0 && (
-            <>
-              <DropdownMenuLabel>Switch User</DropdownMenuLabel>
-              {merchants.map(merchant => (
-                <DropdownMenuItem 
-                  key={merchant.id} 
-                  onClick={() => handleUserSwitch(merchant.email)}
-                  disabled={merchant.email === userEmail}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  <span className="truncate">{merchant.name}</span>
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-            </>
-          )}
-          
-          <DropdownMenuItem 
-            onClick={() => {
-              setOpen(false);
-              setRegisterOpen(true);
-            }}
-          >
-            <UserPlus className="mr-2 h-4 w-4" />
-            Register New User
-          </DropdownMenuItem>
-          
-          {userEmail ? (
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem onClick={() => navigate('/login')}>
-              <User className="mr-2 h-4 w-4" />
-              Sign In
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Button 
+        onClick={() => setDialogOpen(true)} 
+        variant="outline" 
+        className="relative h-8 w-full justify-between md:w-40"
+      >
+        <User className="mr-2 h-4 w-4" />
+        <span className="truncate">{selectedUser.email}</span>
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
       
-      <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Register New User</DialogTitle>
-          </DialogHeader>
-          <UserRegistrationForm onRegister={handleRegisterUser} />
-        </DialogContent>
-      </Dialog>
-    </>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Switch User</DialogTitle>
+        </DialogHeader>
+        
+        <div className="p-2">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between"
+              >
+                {selectedUser.email}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0">
+              <Command>
+                <CommandInput placeholder="Search users..." />
+                <CommandEmpty>No users found.</CommandEmpty>
+                <CommandGroup>
+                  {demoUsers.map((user) => (
+                    <CommandItem
+                      key={user.email}
+                      onSelect={() => handleSelectUser(user.email, user.role)}
+                      className="text-sm"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      {user.email}
+                      <Check
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          selectedUser.email === user.email
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          
+          <div className="mt-4">
+            <div className="rounded-md bg-secondary p-2 text-xs text-muted-foreground">
+              <p>Selected role: <strong>{selectedUser.role}</strong></p>
+              <p className="mt-1">This is a demo user switcher for testing different roles.</p>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

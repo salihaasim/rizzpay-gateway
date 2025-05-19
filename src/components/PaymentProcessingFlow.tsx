@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Transaction, PaymentProcessingState } from '@/stores/transactionStore';
+import { Transaction, PaymentProcessingState } from '@/stores/transactions/types';
 import { getPaymentStateLabel } from './TransactionUtils';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -17,7 +17,7 @@ const PaymentProcessingFlow: React.FC<PaymentProcessingFlowProps> = ({ transacti
   // Simplified flow stages based on transaction status
   const mainFlowStages: PaymentProcessingState[] = [
     'initiated',
-    'gateway_processing', 
+    'gateway_processing',
     'processor_routing',
     'authorization_decision'
   ];

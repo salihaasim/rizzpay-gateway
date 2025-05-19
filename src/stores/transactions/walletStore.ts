@@ -1,14 +1,16 @@
 
-import { Transaction, Wallet, WalletTransactionType, TransactionState } from './types';
+import { Transaction, Wallet, TransactionState } from './types';
 import { generateTransactionId } from './utils';
+import { PaymentMethod } from './types';
 
 export interface WalletSlice {
   wallets: Record<string, Wallet>;
   initializeWallet: (email: string) => void;
   getWalletBalance: (email: string) => number;
-  depositToWallet: (email: string, amount: number, paymentMethod: string) => string;
-  withdrawFromWallet: (email: string, amount: number, paymentMethod: string) => string;
+  depositToWallet: (email: string, amount: number, paymentMethod?: PaymentMethod) => string;
+  withdrawFromWallet: (email: string, amount: number, paymentMethod?: PaymentMethod) => string;
   transferFunds: (fromEmail: string, toEmail: string, amount: number, description?: string) => string;
+  transferBetweenWallets: (fromWalletId: string, toWalletId: string, amount: number) => boolean;
 }
 
 export const createWalletSlice = (
@@ -38,7 +40,7 @@ export const createWalletSlice = (
     return state.wallets[email]?.balance || 0;
   },
   
-  depositToWallet: (email, amount, paymentMethod) => {
+  depositToWallet: (email, amount, paymentMethod = 'wallet') => {
     const state = get();
     const transactionId = generateTransactionId();
     const date = new Date().toISOString();
@@ -55,6 +57,7 @@ export const createWalletSlice = (
       createdBy: email,
       walletTransactionType: 'deposit',
       description: 'Deposit to wallet',
+      processingState: 'completed'
     };
     
     // Update wallet
@@ -77,7 +80,7 @@ export const createWalletSlice = (
     return transactionId;
   },
   
-  withdrawFromWallet: (email, amount, paymentMethod) => {
+  withdrawFromWallet: (email, amount, paymentMethod = 'wallet') => {
     const state = get();
     const currentBalance = state.wallets[email]?.balance || 0;
     
@@ -101,6 +104,7 @@ export const createWalletSlice = (
       createdBy: email,
       walletTransactionType: 'withdrawal',
       description: 'Withdrawal from wallet',
+      processingState: 'completed'
     };
     
     // Update wallet
@@ -121,6 +125,43 @@ export const createWalletSlice = (
     });
     
     return transactionId;
+  },
+  
+  transferBetweenWallets: (fromEmail, toEmail, amount) => {
+    const state = get();
+    const senderBalance = state.wallets[fromEmail]?.balance || 0;
+    
+    // Check if sufficient balance
+    if (senderBalance < amount) {
+      return false;
+    }
+    
+    // Ensure recipient wallet exists
+    if (!state.wallets[toEmail]) {
+      return false;
+    }
+    
+    // Update both wallets
+    set((state) => {
+      const senderWallet = state.wallets[fromEmail] || { balance: 0, currency: '₹', transactions: [] };
+      const recipientWallet = state.wallets[toEmail] || { balance: 0, currency: '₹', transactions: [] };
+      
+      return {
+        wallets: {
+          ...state.wallets,
+          [fromEmail]: {
+            ...senderWallet,
+            balance: senderWallet.balance - amount,
+          },
+          [toEmail]: {
+            ...recipientWallet,
+            balance: recipientWallet.balance + amount,
+          }
+        }
+      };
+    });
+    
+    return true;
   },
   
   transferFunds: (fromEmail, toEmail, amount, description = 'Fund transfer') => {

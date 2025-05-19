@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoSvg from '../../assets/logo.svg';
+import logoSvg from '../assets/logo.svg';
 
-const Footer = () => {
+const GlobalFooter = () => {
   return (
     <footer className="bg-background py-8 border-t mt-auto">
       <div className="container px-4 mx-auto">
@@ -39,4 +39,4 @@ const Footer = () => {
   );
 };
 
-export default React.memo(Footer);
+export default React.memo(GlobalFooter);

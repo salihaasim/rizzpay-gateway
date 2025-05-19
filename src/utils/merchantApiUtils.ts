@@ -52,7 +52,7 @@ export const regenerateApiKey = async (): Promise<string | null> => {
       useActivityLogStore.getState().addActivityLog({
         activityType: 'api_key_regenerated',
         userId: user.id,
-        userEmail: user.email,
+        userEmail: user.email || '',
         details: { method: 'manual', reason: 'user_requested' }
       });
     } catch (e) {

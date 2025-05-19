@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 import { simulateWalletProcessing } from '@/utils/walletUtils';
 import { toast } from 'sonner';
 import { handleWalletToBankTransfer } from '@/utils/hdfcBankApi';
+import { PaymentMethod } from '@/stores/transactions/types';
 
 export const useWalletActions = (userEmail: string | null) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -31,7 +32,7 @@ export const useWalletActions = (userEmail: string | null) => {
       toast.info("Processing deposit...");
       
       // Use the utility function to simulate processing
-      await simulateWalletProcessing(userEmail, amount, 'deposit', description);
+      await simulateWalletProcessing(userEmail, amount, 'deposit', 'wallet' as PaymentMethod);
       
       toast.success("Deposit successful", {
         description: `₹${amount.toFixed(2)} has been added to your wallet.`
@@ -89,7 +90,7 @@ export const useWalletActions = (userEmail: string | null) => {
         const enhancedDescription = `${description || 'NEFT Transfer'} | To: ${bankDetails.beneficiaryName} | A/C: ${bankDetails.accountNumber.substring(0, 4)}XXXX${bankDetails.accountNumber.substring(bankDetails.accountNumber.length - 4)} | IFSC: ${bankDetails.ifscCode}`;
         
         // Process the wallet withdrawal
-        await simulateWalletProcessing(userEmail, amount, 'withdrawal', enhancedDescription);
+        await simulateWalletProcessing(userEmail, amount, 'withdrawal', 'neft' as PaymentMethod);
         
         toast.success("NEFT transfer initiated", {
           description: `₹${amount.toFixed(2)} is being transferred to your bank account.`
@@ -99,7 +100,7 @@ export const useWalletActions = (userEmail: string | null) => {
         toast.info("Processing withdrawal...");
         
         // Use the utility function to simulate processing
-        await simulateWalletProcessing(userEmail, amount, 'withdrawal', description);
+        await simulateWalletProcessing(userEmail, amount, 'withdrawal', 'wallet' as PaymentMethod);
         
         toast.success("Withdrawal successful", {
           description: `₹${amount.toFixed(2)} has been withdrawn from your wallet.`
@@ -137,8 +138,12 @@ export const useWalletActions = (userEmail: string | null) => {
     try {
       toast.info("Processing transfer...");
       
-      // Use the utility function to simulate processing for transfers too
-      await simulateWalletProcessing(userEmail, amount, 'transfer', description, recipient);
+      // Use the store's transferFunds function
+      const transferId = store.transferFunds(userEmail, recipient, amount, description);
+      
+      if (!transferId) {
+        throw new Error("Transfer failed");
+      }
       
       toast.success("Transfer successful", {
         description: `₹${amount.toFixed(2)} has been sent successfully.`

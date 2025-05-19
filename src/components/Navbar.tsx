@@ -21,6 +21,7 @@ import UserSwitcher from './UserSwitcher';
 import logoSvg from '../assets/logo.svg';
 import { motion } from "@/components/ui/motion";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useTransactionStore } from '@/stores/transactionStore';
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -28,6 +29,23 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const { userEmail, userRole } = useTransactionStore();
+
+  // Create default selectedUser state for UserSwitcher
+  const [selectedUser, setSelectedUser] = useState<{ email: string; role: string }>({
+    email: userEmail || 'user@example.com',
+    role: userRole || 'user'
+  });
+
+  // Update selectedUser when userEmail or userRole changes
+  useEffect(() => {
+    if (userEmail && userRole) {
+      setSelectedUser({
+        email: userEmail,
+        role: userRole
+      });
+    }
+  }, [userEmail, userRole]);
 
   // Set mounted state to true after initial render for animations
   useEffect(() => {
@@ -40,6 +58,13 @@ const Navbar = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  // Handle user selection from UserSwitcher
+  const handleSelectUser = (email: string, role: string) => {
+    setSelectedUser({ email, role });
+    // We need to use the store's actions to update the user info
+    // This will be handled by UserSwitcher component
   };
 
   const navItems = [
@@ -164,7 +189,10 @@ const Navbar = () => {
         </nav>
         
         <div className="flex items-center gap-2 ml-auto">
-          <UserSwitcher />
+          <UserSwitcher 
+            onSelectUser={handleSelectUser}
+            selectedUser={selectedUser}
+          />
           
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="md:hidden">
