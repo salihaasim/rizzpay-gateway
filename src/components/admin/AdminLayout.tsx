@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import AdminSidebar from './layout/AdminSidebar';
@@ -16,7 +16,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Check if user is admin, if not redirect to login
-  React.useEffect(() => {
+  useEffect(() => {
     if (!currentMerchant || currentMerchant.role !== 'admin') {
       toast.error('Access denied. Admin privileges required.');
       navigate('/auth', { replace: true });
@@ -25,16 +25,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   
   const handleLogout = () => {
     logout();
-    // The logout function in merchantAuthStore already handles redirection
+    navigate('/', { replace: true });
   };
 
   // If not admin, don't render anything
-  if (currentMerchant?.role !== 'admin') {
+  if (!currentMerchant || currentMerchant.role !== 'admin') {
     return null;
   }
   
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100">
       <AdminSidebar 
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
@@ -42,11 +42,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         handleLogout={handleLogout}
       />
       
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <AdminHeader onLogout={handleLogout} />
         
         <main className="flex-1 p-4 md:p-6 overflow-auto">
-          {children ? children : <Outlet />}
+          {children || <Outlet />}
         </main>
       </div>
     </div>

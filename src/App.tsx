@@ -37,6 +37,8 @@ import TransfersPage from './pages/TransfersPage';
 import DeveloperPage from './pages/DeveloperPage';
 import Auth from './pages/Auth';
 import AdminSettings from './pages/AdminSettings';
+import AdminTransactionLog from './pages/AdminTransactionLog';
+import AdminActivityLog from './pages/AdminActivityLog';
 import { toast } from 'sonner';
 
 // Layout for pages that should have the footer (only home page)
@@ -78,7 +80,6 @@ const AdminRouteGuard = ({ element }) => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Check if user is not authenticated or not an admin
     if (!currentMerchant || currentMerchant.role !== 'admin') {
       toast.error('Access denied. Admin privileges required.');
       navigate('/auth', { replace: true });
@@ -95,11 +96,9 @@ const App: React.FC = () => {
   useEffect(() => {
     // Simulate checking authentication status and setting user role
     const checkAuthStatus = async () => {
-      // Replace this with your actual authentication logic
       const isLoggedIn = localStorage.getItem('isLoggedIn');
       
       if (isLoggedIn) {
-        // Simulate fetching user role from local storage or API
         const userRole = localStorage.getItem('userRole') || 'merchant';
         const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
         setUserRole(userRole as 'admin' | 'merchant', userEmail);
@@ -108,15 +107,6 @@ const App: React.FC = () => {
     
     checkAuthStatus();
   }, [setUserRole]);
-
-  // Debug info
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      console.info('Domain:', window.location.hostname);
-      console.info('Path:', window.location.pathname);
-      console.info('Full URL:', window.location.href);
-    }
-  }, []);
   
   return (
     <Router>
@@ -139,11 +129,6 @@ const App: React.FC = () => {
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
-          
-          {/* Add a redirect for the /plugin route to go to UPI plugin page if authenticated */}
-          <Route path="/plugin" element={
-            isAuthenticated ? <Navigate to="/upi-plugin" replace /> : <Navigate to="/auth" replace />
-          } />
         </Route>
         
         {/* Merchant routes */}
@@ -158,6 +143,9 @@ const App: React.FC = () => {
           <Route path="/upi-plugin" element={<MerchantRouteGuard element={<UpiPluginPage />} />} />
           <Route path="/transfers" element={<MerchantRouteGuard element={<TransfersPage />} />} />
           <Route path="/developer" element={<MerchantRouteGuard element={<DeveloperPage />} />} />
+          <Route path="/plugin" element={
+            isAuthenticated ? <Navigate to="/upi-plugin" replace /> : <Navigate to="/auth" replace />
+          } />
         </Route>
         
         {/* Admin routes */}
@@ -169,6 +157,8 @@ const App: React.FC = () => {
           <Route path="whitelist" element={<AdminWhitelist />} />
           <Route path="upi-management" element={<AdminUpiManagement />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="transactions-log" element={<AdminTransactionLog />} />
+          <Route path="activity-log" element={<AdminActivityLog />} />
         </Route>
       </Routes>
     </Router>
