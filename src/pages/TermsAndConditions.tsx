@@ -136,7 +136,7 @@ const TermsAndConditions = () => {
               <ul className="list-disc list-inside mt-2">
                 <li>Email: rizzpay1@gmail.com</li>
                 <li>Phone: +91-9080186106</li>
-                <li>Address: RizzPay Headquarters, Chennai, India</li>
+                <li>Address: First Floor, 11/6, Ramanathan St, Mahalingapuram, Nungambakkam, Chennai, Tamil Nadu 600034</li>
               </ul>
               <p className="mt-4">This policy is binding upon all users, merchants, and partners engaging with the RizzPay platform.</p>
             </section>

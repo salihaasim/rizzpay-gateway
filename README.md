@@ -114,6 +114,7 @@ RizzPay provides comprehensive legal documentation:
 - **Improved Logout Function**: Updated logout to always redirect to home page
 - **Admin Activity Log**: Added admin activity tracking and reporting
 - **Admin Transaction Log**: Enhanced transaction monitoring for admins
+- **Updated Legal Documents**: Updated company address in Terms & Conditions and Refund Policy
 
 ## Documentation
 
