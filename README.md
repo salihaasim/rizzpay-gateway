@@ -106,6 +106,7 @@ RizzPay provides comprehensive legal documentation:
 ## Recent Updates
 
 - **Admin UI Refresh**: Updated admin interface with improved layout and styling
+- **Component Refactoring**: Improved code organization by breaking down large components
 - **Fixed Build Errors**: Corrected import errors in AdminMerchantsList component
 - **Admin Area Restoration**: Restored admin interface to May 2nd version
 - **Fixed Admin Sidebar**: Improved admin navigation with working sidebar
