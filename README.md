@@ -107,6 +107,8 @@ RizzPay provides comprehensive legal documentation:
 
 ## Recent Updates
 
+- **Added Bank API Management**: Improved admin settings with bank API key management
+- **Fixed Admin Navigation**: Restored monitoring option and fixed duplicated navigation
 - **Back Button Fixed**: Fixed back button functionality in Auth and UPI Link Payment pages
 - **Added Office Address**: Updated Contact Us page with our physical address in Chennai
 - **Fixed Logout Redirection**: Ensured users are always redirected to home page after logout
