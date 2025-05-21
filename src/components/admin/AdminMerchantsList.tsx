@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProfileStore, Merchant } from '@/stores/profileStore';
@@ -12,7 +13,11 @@ import {
   CreditCard,
   FileText, 
   CheckCircle, 
-  XCircle
+  XCircle,
+  ArrowUpRight,
+  ArrowDownRight,
+  DollarSign,
+  User
 } from 'lucide-react';
 import { 
   Table, 
@@ -158,6 +163,7 @@ const AdminMerchantsList = () => {
   const { getWalletBalance } = useTransactionStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
   
   const handleKycStatusChange = (merchantId: string, status: 'approved' | 'rejected') => {
     updateMerchantKycStatus(merchantId, status);
