@@ -18,19 +18,6 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const isMobile = useMediaQuery(mediaQueries.isMobile);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
   
-  // Monitor authentication status for changes
-  useEffect(() => {
-    if (!isAuthenticated && !loading) {
-      // User logged out, redirect to home page
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
-  
-  // Update sidebar state when mobile status changes
-  useEffect(() => {
-    setSidebarCollapsed(isMobile);
-  }, [isMobile]);
-
   // Show loading indicator if authentication is still being checked
   if (loading) {
     return (
@@ -43,10 +30,15 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     );
   }
 
-  // If not authenticated, redirect to home page
+  // If not authenticated, redirect to auth page instead of home
   if (!isAuthenticated) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
+
+  // Update sidebar state when mobile status changes
+  useEffect(() => {
+    setSidebarCollapsed(isMobile);
+  }, [isMobile]);
 
   // Display responsive layout for authenticated users with sidebar
   return (

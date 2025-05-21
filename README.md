@@ -23,6 +23,7 @@ RizzPay is a secure, fast, and reliable payment gateway solution for businesses 
 - Admin routes (/admin/*) are protected and only accessible to users with admin role
 - Merchant routes are protected and require authentication
 - Public routes are accessible to all visitors
+- **IMPORTANT**: Users always land on the home page first - no automatic redirects based on authentication
 
 ## Authentication
 
@@ -106,6 +107,7 @@ RizzPay provides comprehensive legal documentation:
 
 ## Recent Updates
 
+- **Auth Behavior Improved**: Users always land on the home page first without automatic redirects
 - **Contact Us Page**: Added dedicated page with support channels and contact information
 - **Mobile Optimization**: Enhanced UI for better performance on Android and iOS devices
 - **Admin Area Restoration**: Restored admin interface to May 2nd version
@@ -137,4 +139,3 @@ For technical support or questions about the payment system, please contact:
 - Phone: +91-755024887
 - WhatsApp: +91-7550248887
 - Live Chat: Available on the dashboard (business hours)
-

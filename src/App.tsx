@@ -61,41 +61,38 @@ const PublicLayout = () => (
   </div>
 );
 
-// Authentication guard for merchant routes
+// Authentication guard for merchant routes - NO AUTO-REDIRECT
 const MerchantRouteGuard = ({ element }) => {
   const { isAuthenticated } = useMerchantAuth();
   const navigate = useNavigate();
   
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  // Only check auth, but don't auto-redirect
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
   
-  return isAuthenticated ? element : null;
+  return element;
 };
 
-// Authentication guard for admin routes
+// Authentication guard for admin routes - NO AUTO-REDIRECT
 const AdminRouteGuard = ({ element }) => {
   const { currentMerchant } = useMerchantAuth();
-  const navigate = useNavigate();
   
-  useEffect(() => {
-    if (!currentMerchant || currentMerchant.role !== 'admin') {
-      toast.error('Access denied. Admin privileges required.');
-      navigate('/auth', { replace: true });
-    }
-  }, [currentMerchant, navigate]);
+  // Only check admin role, but don't auto-redirect
+  if (!currentMerchant || currentMerchant.role !== 'admin') {
+    toast.error('Access denied. Admin privileges required.');
+    return <Navigate to="/auth" replace />;
+  }
   
-  return currentMerchant?.role === 'admin' ? element : null;
+  return element;
 };
 
 const App: React.FC = () => {
-  const { setUserRole, resetUserRole } = useTransactionStore();
-  const { isAuthenticated } = useMerchantAuth();
+  const { setUserRole } = useTransactionStore();
   
+  // Remove auto-redirect logic from here
   useEffect(() => {
-    // Simulate checking authentication status and setting user role
+    // Just check auth status but don't redirect
     const checkAuthStatus = async () => {
       const isLoggedIn = localStorage.getItem('isLoggedIn');
       
@@ -112,7 +109,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Home page route with footer */}
+        {/* Home page route with footer - ALWAYS ACCESSIBLE */}
         <Route element={<HomePageLayout />}>
           <Route path="/" element={<Index />} />
         </Route>
@@ -145,9 +142,7 @@ const App: React.FC = () => {
           <Route path="/upi-plugin" element={<MerchantRouteGuard element={<UpiPluginPage />} />} />
           <Route path="/transfers" element={<MerchantRouteGuard element={<TransfersPage />} />} />
           <Route path="/developer" element={<MerchantRouteGuard element={<DeveloperPage />} />} />
-          <Route path="/plugin" element={
-            isAuthenticated ? <Navigate to="/upi-plugin" replace /> : <Navigate to="/auth" replace />
-          } />
+          <Route path="/plugin" element={<Navigate to="/upi-plugin" replace />} />
         </Route>
         
         {/* Admin routes */}

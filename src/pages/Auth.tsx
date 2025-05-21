@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,24 +27,7 @@ const Auth = () => {
   // Get the previous location from state or default to home
   const { from } = location.state || { from: { pathname: '/' } };
 
-  // Check authentication status on mount and when it changes
-  useEffect(() => {
-    console.log("Auth effect running, authenticated:", isAuthenticated, "merchant:", currentMerchant);
-    
-    if (isAuthenticated && currentMerchant) {
-      setLoading(false); // Ensure loading is turned off
-      
-      // Check if the user is an admin
-      if (currentMerchant.role === 'admin') {
-        console.log("Admin user authenticated, redirecting to admin dashboard");
-        navigate('/admin', { replace: true });
-      } else {
-        console.log("Merchant user authenticated, redirecting to merchant dashboard");
-        navigate('/dashboard', { replace: true });
-      }
-    }
-  }, [isAuthenticated, currentMerchant, navigate]);
-
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -69,20 +51,22 @@ const Auth = () => {
       toast.success('Registration successful! Please login with your credentials.');
     } else {
       try {
-        // Special case for admin login
-        if (activeRole === 'admin') {
-          console.log("Testing credentials:", formData.username, formData.password);
-          console.log("Demo credentials:", demoCredentials.admin);
-        }
-        
         // Attempt login
         const success = login(formData.username, formData.password);
         
-        if (!success) {
+        if (success) {
+          setLoading(false);
+          // Redirect based on user role
+          if (currentMerchant?.role === 'admin') {
+            navigate('/admin', { replace: true });
+          } else {
+            navigate('/dashboard', { replace: true });
+          }
+          toast.success('Login successful');
+        } else {
           setLoading(false);
           toast.error('Invalid credentials. Please check your username and password.');
         }
-        // If successful, the useEffect will handle redirection
       } catch (error) {
         console.error("Login error:", error);
         setLoading(false);
@@ -99,8 +83,8 @@ const Auth = () => {
   };
 
   const handleBack = () => {
-    // Navigate back to where the user came from or to the home page
-    navigate(-1);
+    // Navigate back to the home page
+    navigate('/', { replace: true });
   };
 
   // Auto-fill demo credentials based on selected role

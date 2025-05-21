@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { demoCredentials } from '@/components/role/roleConstants';
@@ -136,7 +137,7 @@ export const useMerchantAuth = create<MerchantStore>()(
           currentMerchant: null
         });
         
-        // Redirect to home page after logout
+        // Redirect to home page after logout - MODIFIED
         if (typeof window !== 'undefined') {
           window.location.href = '/';
         }
