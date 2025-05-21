@@ -64,19 +64,14 @@ const RoleSelector = () => {
     setIsLoading(true);
 
     try {
-      console.log("Testing credentials:", credentials.email, credentials.password);
-      
       // Try merchantAuth login first
       const loginSuccess = merchantLogin(credentials.email, credentials.password);
       
       if (loginSuccess) {
-        console.log("Merchant auth login successful");
         setIsLoading(false);
         // Navigation will be handled by the useEffect
         return;
       }
-      
-      console.log("Merchant auth login failed, trying Supabase auth");
       
       // Try Supabase login as fallback
       try {
@@ -89,13 +84,9 @@ const RoleSelector = () => {
           // Check if credentials match demo user
           const demoUser = demoCredentials[selectedRole as keyof typeof demoCredentials];
           
-          console.log("Checking demo credentials:", demoUser);
-          
           if ((credentials.email === demoUser.username || 
               credentials.email.toLowerCase() === selectedRole.toLowerCase()) && 
               (credentials.password === demoUser.password)) {
-            
-            console.log("Demo credentials match, logging in as:", selectedRole);
             
             setUserRole(selectedRole as 'admin' | 'merchant', credentials.email);
             
@@ -149,7 +140,7 @@ const RoleSelector = () => {
   };
 
   const handleRegisterAsMerchant = () => {
-    navigate('/auth');
+    navigate('/auth', { replace: false });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

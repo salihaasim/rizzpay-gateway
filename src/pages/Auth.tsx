@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { roles, demoCredentials } from '@/components/role/roleConstants';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -22,19 +23,31 @@ const Auth = () => {
   });
   
   const { login, addMerchant, isAuthenticated, currentMerchant } = useMerchantAuth();
+  const { setUserRole } = useTransactionStore();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Get the previous location from state or default to home
-  const { from } = location.state || { from: { pathname: '/' } };
+  const from = location.state?.from?.pathname || '/';
+
+  // Check if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && currentMerchant) {
+      const role = currentMerchant.role === 'admin' ? 'admin' : 'merchant';
+      setUserRole(role, currentMerchant.username);
+      
+      if (role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [isAuthenticated, currentMerchant, navigate, setUserRole]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    console.log("Form submitted:", formData);
-    console.log("Active role:", activeRole);
 
     if (isRegister) {
       // Handle registration
@@ -83,23 +96,23 @@ const Auth = () => {
     }));
   };
 
-  // FIXED: Make back button work properly
+  // Fixed: Make back button work properly by navigating to the root route
   const handleBack = () => {
-    navigate('/', { replace: true });
+    navigate('/', { replace: false });
   };
 
   // Auto-fill demo credentials based on selected role
   const fillDemoCredentials = () => {
     if (activeRole === 'admin') {
       setFormData({
-        username: 'rizzpay',
-        password: 'rizzpay123',
+        username: demoCredentials.admin.username,
+        password: demoCredentials.admin.password,
         fullName: ''
       });
     } else {
       setFormData({
-        username: 'merchant',
-        password: 'password',
+        username: demoCredentials.merchant.username,
+        password: demoCredentials.merchant.password,
         fullName: ''
       });
     }
@@ -134,6 +147,9 @@ const Auth = () => {
               <CardTitle className="text-2xl">
                 {isRegister ? 'Register Account' : `${activeRole === 'admin' ? 'Admin' : 'Merchant'} Login`}
               </CardTitle>
+              <CardDescription>
+                {isRegister ? 'Create your account credentials' : 'Enter your credentials to continue'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {!isRegister && (
@@ -245,13 +261,13 @@ const Auth = () => {
             <p>Demo credentials:</p>
             {activeRole === 'admin' ? (
               <>
-                <p>Username: rizzpay</p>
-                <p>Password: rizzpay123</p>
+                <p>Username: {demoCredentials.admin.username}</p>
+                <p>Password: {demoCredentials.admin.password}</p>
               </>
             ) : (
               <>
-                <p>Username: merchant</p>
-                <p>Password: password</p>
+                <p>Username: {demoCredentials.merchant.username}</p>
+                <p>Password: {demoCredentials.merchant.password}</p>
               </>
             )}
           </div>
