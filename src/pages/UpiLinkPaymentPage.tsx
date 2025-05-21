@@ -70,8 +70,13 @@ const UpiLinkPaymentPage = () => {
     }
   };
   
+  // FIXED: Make back button work properly
   const handleGoBack = () => {
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
   };
   
   return (
@@ -81,7 +86,7 @@ const UpiLinkPaymentPage = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6 w-full relative">
           <Button 
             variant="outline" 
             onClick={handleGoBack} 

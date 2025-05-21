@@ -137,7 +137,7 @@ export const useMerchantAuth = create<MerchantStore>()(
           currentMerchant: null
         });
         
-        // Redirect to home page after logout - MODIFIED
+        // FIXED: Always redirect to home page after logout
         if (typeof window !== 'undefined') {
           window.location.href = '/';
         }

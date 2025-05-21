@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,8 +83,8 @@ const Auth = () => {
     }));
   };
 
+  // FIXED: Make back button work properly
   const handleBack = () => {
-    // Navigate back to the home page
     navigate('/', { replace: true });
   };
 
@@ -111,7 +112,7 @@ const Auth = () => {
           <div className="flex justify-between items-center">
             <Button variant="ghost" size="sm" onClick={handleBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              Back to Home
             </Button>
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">

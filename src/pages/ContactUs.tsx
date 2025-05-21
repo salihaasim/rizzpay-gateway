@@ -57,8 +57,27 @@ const ContactUs = () => {
               </CardContent>
             </Card>
 
-            {/* Live Chat */}
+            {/* Address - NEW */}
             <Card className="shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center">
+                  <MapPin className="w-5 h-5 mr-2 text-primary" />
+                  Office Address
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-2">Visit us at:</p>
+                <address className="not-italic">
+                  First Floor, 11/6, Ramanathan St,<br />
+                  Mahalingapuram, Nungambakkam,<br />
+                  Chennai, Tamil Nadu 600034<br />
+                  India
+                </address>
+              </CardContent>
+            </Card>
+
+            {/* Live Chat */}
+            <Card className="shadow-md hover:shadow-lg transition-shadow md:col-span-2 lg:col-span-3">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center">
                   <MessageSquare className="w-5 h-5 mr-2 text-primary" />

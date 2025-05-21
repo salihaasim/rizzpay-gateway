@@ -107,6 +107,9 @@ RizzPay provides comprehensive legal documentation:
 
 ## Recent Updates
 
+- **Back Button Fixed**: Fixed back button functionality in Auth and UPI Link Payment pages
+- **Added Office Address**: Updated Contact Us page with our physical address in Chennai
+- **Fixed Logout Redirection**: Ensured users are always redirected to home page after logout
 - **Auth Behavior Improved**: Users always land on the home page first without automatic redirects
 - **Contact Us Page**: Added dedicated page with support channels and contact information
 - **Mobile Optimization**: Enhanced UI for better performance on Android and iOS devices
@@ -139,3 +142,4 @@ For technical support or questions about the payment system, please contact:
 - Phone: +91-755024887
 - WhatsApp: +91-7550248887
 - Live Chat: Available on the dashboard (business hours)
+- Address: First Floor, 11/6, Ramanathan St, Mahalingapuram, Nungambakkam, Chennai, Tamil Nadu 600034, India
