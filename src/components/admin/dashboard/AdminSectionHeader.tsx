@@ -1,73 +1,83 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Wallet, ShieldCheck, CreditCard, BarChart3, Settings, Percent } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  Users, 
+  DollarSign, 
+  Tag, 
+  Shield, 
+  Activity,
+  ShoppingCart,
+  BarChart3,
+  Settings
+} from 'lucide-react';
 
 interface AdminSectionHeaderProps {
   section: string;
 }
 
 const AdminSectionHeader: React.FC<AdminSectionHeaderProps> = ({ section }) => {
-  const navigate = useNavigate();
+  // Define titles and descriptions for each section
+  const sectionData = {
+    dashboard: {
+      title: 'Platform Overview',
+      description: 'Monitor and manage your payment gateway platform',
+      icon: <LayoutDashboard className="h-5 w-5 text-primary" />,
+    },
+    merchants: {
+      title: 'Manage Merchants',
+      description: 'View and manage merchant accounts',
+      icon: <Users className="h-5 w-5 text-primary" />,
+    },
+    escrow: {
+      title: 'Escrow Account',
+      description: 'Manage escrow funds and settlements',
+      icon: <DollarSign className="h-5 w-5 text-primary" />,
+    },
+    pricing: {
+      title: 'Pricing Control',
+      description: 'Set transaction fees and pricing rules',
+      icon: <Tag className="h-5 w-5 text-primary" />,
+    },
+    whitelist: {
+      title: 'Access Control Whitelist',
+      description: 'Manage authorized IP addresses and webhook domains',
+      icon: <Shield className="h-5 w-5 text-primary" />,
+    },
+    monitoring: {
+      title: 'System Monitoring',
+      description: 'Monitor platform performance and status',
+      icon: <Activity className="h-5 w-5 text-primary" />,
+    },
+    transactions: {
+      title: 'Transactions',
+      description: 'View and manage all payment transactions',
+      icon: <ShoppingCart className="h-5 w-5 text-primary" />,
+    },
+    analytics: {
+      title: 'Analytics Dashboard',
+      description: 'Review performance metrics and insights',
+      icon: <BarChart3 className="h-5 w-5 text-primary" />,
+    },
+    settings: {
+      title: 'Admin Settings',
+      description: 'Configure platform settings and preferences',
+      icon: <Settings className="h-5 w-5 text-primary" />,
+    }
+  };
 
-  const title = () => {
-    switch (section) {
-      case 'merchants': return 'Merchant Management';
-      case 'escrow': return 'Escrow Account';
-      case 'pricing': return 'Merchant Pricing Control';
-      case 'transactions': return 'Transaction Management';
-      case 'analytics': return 'Analytics Dashboard';
-      case 'settings': return 'Admin Settings';
-      case 'whitelist': return 'Merchant Whitelist';
-      default: return 'Admin Dashboard';
-    }
-  };
-  
-  const description = () => {
-    switch (section) {
-      case 'merchants': return 'Manage merchant accounts and permissions';
-      case 'escrow': return 'Monitor and manage the platform escrow account';
-      case 'pricing': return 'Control transaction fees and pricing for merchants';
-      case 'transactions': return 'Monitor and manage payment transactions';
-      case 'analytics': return 'Platform performance metrics and insights';
-      case 'settings': return 'Configure platform settings and permissions';
-      case 'whitelist': return 'Manage trusted merchants with privileged access';
-      default: return 'Manage merchants and monitor platform performance';
-    }
-  };
-  
-  const icon = () => {
-    switch (section) {
-      case 'merchants': return <Users className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'escrow': return <Wallet className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'pricing': return <Percent className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'transactions': return <CreditCard className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'analytics': return <BarChart3 className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'settings': return <Settings className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'whitelist': return <ShieldCheck className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      default: return <ShieldCheck className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-    }
-  };
+  // Get the data for the current section, or use dashboard as default
+  const currentSection = sectionData[section as keyof typeof sectionData] || sectionData.dashboard;
 
   return (
-    <div className="flex items-center justify-between mb-8">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center">
-          {icon()}
-          {title()}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {description()}
-        </p>
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-1">
+        {currentSection.icon}
+        <h1 className="text-2xl font-bold">{currentSection.title}</h1>
       </div>
-      
-      <div className="hidden md:flex items-center gap-3">
-        <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Merchant View
-        </Button>
-      </div>
+      <p className="text-muted-foreground">
+        {currentSection.description}
+      </p>
     </div>
   );
 };

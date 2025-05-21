@@ -34,7 +34,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }
   
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-white">
       <AdminSidebar 
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
@@ -45,7 +45,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="flex flex-col flex-1 overflow-hidden">
         <AdminHeader onLogout={handleLogout} />
         
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
+        <main className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
           {children || <Outlet />}
         </main>
       </div>

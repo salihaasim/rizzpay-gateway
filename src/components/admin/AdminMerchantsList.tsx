@@ -5,7 +5,15 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Wallet, ArrowUpRight, ArrowDownRight, User, DollarSign, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { 
+  Search, 
+  Users, 
+  Wallet, 
+  CreditCard,
+  FileText, 
+  CheckCircle, 
+  XCircle
+} from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -150,7 +158,6 @@ const AdminMerchantsList = () => {
   const { getWalletBalance } = useTransactionStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
-  const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
   
   const handleKycStatusChange = (merchantId: string, status: 'approved' | 'rejected') => {
     updateMerchantKycStatus(merchantId, status);
@@ -164,10 +171,12 @@ const AdminMerchantsList = () => {
       merchant.company.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
-    if (activeTab !== 'all') {
-      filtered = filtered.filter(merchant => 
-        merchant.kycStatus === activeTab
-      );
+    if (activeTab === 'pending') {
+      filtered = filtered.filter(merchant => merchant.kycStatus === 'pending');
+    } else if (activeTab === 'approved') {
+      filtered = filtered.filter(merchant => merchant.kycStatus === 'approved');
+    } else if (activeTab === 'rejected') {
+      filtered = filtered.filter(merchant => merchant.kycStatus === 'rejected');
     }
     
     return filtered;
@@ -185,7 +194,31 @@ const AdminMerchantsList = () => {
   
   return (
     <div className="space-y-6">
-      <Card className="border-0 shadow-sm">
+      <div>
+        <h1 className="text-2xl font-bold">Platform Overview</h1>
+        <p className="text-muted-foreground mt-1">
+          Manage your platform's merchants and finances
+        </p>
+      </div>
+      
+      <Tabs defaultValue="merchants" className="mb-6">
+        <TabsList>
+          <TabsTrigger value="merchants" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Merchants
+          </TabsTrigger>
+          <TabsTrigger value="wallets" className="flex items-center gap-2">
+            <Wallet className="h-4 w-4" />
+            Wallets
+          </TabsTrigger>
+          <TabsTrigger value="payment-links" className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4" />
+            Payment Links
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+      
+      <Card className="border shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <CardTitle className="text-xl">Merchant Accounts</CardTitle>
@@ -300,60 +333,55 @@ const AdminMerchantsList = () => {
         </CardContent>
       </Card>
       
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl">Wallet Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border border-border">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <p className="text-muted-foreground text-sm">Total Merchants</p>
-                  <p className="text-3xl font-bold">{merchants.length}</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border border-border">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <p className="text-muted-foreground text-sm">Total wallet balance</p>
-                  <p className="text-3xl font-bold">
-                    ₹{merchants.reduce((total, merchant) => 
-                      total + getWalletBalance(merchant.email), 0).toFixed(2)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border border-border">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <p className="text-muted-foreground text-sm">Active Companies</p>
-                  <p className="text-3xl font-bold">
-                    {new Set(merchants.map(m => m.company)).size}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border border-border">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <p className="text-muted-foreground text-sm">Average Balance</p>
-                  <p className="text-3xl font-bold">
-                    ₹{merchants.length ? 
-                      (merchants.reduce((total, merchant) => 
-                        total + getWalletBalance(merchant.email), 0) / merchants.length).toFixed(2)
-                      : "0.00"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
+      <h2 className="text-xl font-bold mt-8">Wallet Statistics</h2>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="border border-border">
+          <CardContent className="p-4">
+            <div className="flex flex-col">
+              <p className="text-muted-foreground text-sm">Total Merchants</p>
+              <p className="text-3xl font-bold">{merchants.length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border border-border">
+          <CardContent className="p-4">
+            <div className="flex flex-col">
+              <p className="text-muted-foreground text-sm">Total wallet balance</p>
+              <p className="text-3xl font-bold">
+                ₹{merchants.reduce((total, merchant) => 
+                  total + getWalletBalance(merchant.email), 0).toFixed(2)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border border-border">
+          <CardContent className="p-4">
+            <div className="flex flex-col">
+              <p className="text-muted-foreground text-sm">Active Companies</p>
+              <p className="text-3xl font-bold">
+                {new Set(merchants.map(m => m.company)).size}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border border-border">
+          <CardContent className="p-4">
+            <div className="flex flex-col">
+              <p className="text-muted-foreground text-sm">Average Balance</p>
+              <p className="text-3xl font-bold">
+                ₹{merchants.length ? 
+                  (merchants.reduce((total, merchant) => 
+                    total + getWalletBalance(merchant.email), 0) / merchants.length).toFixed(2)
+                  : "0.00"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
