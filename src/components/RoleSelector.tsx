@@ -10,7 +10,7 @@ import { supabase } from '@/utils/supabaseClient';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import RoleTabs from './role/RoleTabs';
 import LoginForm from './role/LoginForm';
-import { roles, demoCredentials } from './role/roleConstants';
+import { roles, demoCredentials, rolesArray } from './role/roleConstants';
 
 const RoleSelector = () => {
   const [selectedRole, setSelectedRole] = useState('admin');
@@ -168,7 +168,7 @@ const RoleSelector = () => {
       <Card className="shadow-lg border-0 overflow-hidden glass">
         <CardHeader className="pb-0">
           <CardTitle className="text-2xl font-bold">
-            {showLogin ? `Login as ${roles.find(r => r.id === selectedRole)?.name}` : "Select Your Role"}
+            {showLogin ? `Login as ${rolesArray.find(r => r.id === selectedRole)?.name}` : "Select Your Role"}
           </CardTitle>
           <CardDescription>
             {showLogin 
@@ -179,7 +179,7 @@ const RoleSelector = () => {
         <CardContent className="pt-6">
           {!showLogin ? (
             <RoleTabs 
-              roles={roles} 
+              roles={rolesArray} 
               selectedRole={selectedRole} 
               onRoleChange={setSelectedRole} 
             />
