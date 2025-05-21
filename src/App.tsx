@@ -22,6 +22,7 @@ import AdminTransactions from './pages/admin/AdminTransactions';
 import AdminMerchants from './pages/admin/AdminMerchants';
 import AdminKYC from './pages/admin/AdminKYC';
 import AdminWhitelist from './pages/admin/AdminWhitelist';
+import AdminLayout from './components/admin/AdminLayout';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
@@ -38,7 +39,6 @@ import Auth from './pages/Auth';
 import AdminSettings from './pages/AdminSettings';
 import AdminTransactionLog from './pages/AdminTransactionLog';
 import AdminActivityLog from './pages/AdminActivityLog';
-import MerchantWhitelist from './pages/MerchantWhitelist';
 import { toast } from 'sonner';
 
 // Layout for pages that should have the footer (only home page)
@@ -90,7 +90,7 @@ const AdminRouteGuard = ({ element }) => {
 };
 
 const App: React.FC = () => {
-  const { setUserRole } = useTransactionStore();
+  const { setUserRole, resetUserRole } = useTransactionStore();
   const { isAuthenticated } = useMerchantAuth();
   
   useEffect(() => {
@@ -149,18 +149,17 @@ const App: React.FC = () => {
         </Route>
         
         {/* Admin routes */}
-        <Route path="/admin/*" element={<AdminRouteGuard element={<AdminDashboard />} />} />
-        <Route path="/admin/transactions" element={<AdminRouteGuard element={<AdminDashboard />} />} />
-        <Route path="/admin/merchants" element={<AdminRouteGuard element={<AdminDashboard />} />} />
-        <Route path="/admin/escrow" element={<AdminRouteGuard element={<AdminDashboard />} />} />
-        <Route path="/admin/pricing" element={<AdminRouteGuard element={<AdminDashboard />} />} /> 
-        <Route path="/admin/whitelist" element={<AdminRouteGuard element={<MerchantWhitelist />} />} />
-        <Route path="/admin/monitoring" element={<AdminRouteGuard element={<AdminDashboard />} />} />
-        <Route path="/admin/transactions-log" element={<AdminRouteGuard element={<AdminTransactionLog />} />} />
-        <Route path="/admin/analytics" element={<AdminRouteGuard element={<AdminDashboard />} />} />
-        <Route path="/admin/settings" element={<AdminRouteGuard element={<AdminSettings />} />} />
-        <Route path="/admin/upi-management" element={<AdminRouteGuard element={<AdminUpiManagement />} />} />
-        <Route path="/admin/activity-log" element={<AdminRouteGuard element={<AdminActivityLog />} />} />
+        <Route path="/admin" element={<AdminRouteGuard element={<AdminLayout />} />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="transactions" element={<AdminTransactions />} />
+          <Route path="merchants" element={<AdminMerchants />} />
+          <Route path="kyc" element={<AdminKYC />} />
+          <Route path="whitelist" element={<AdminWhitelist />} />
+          <Route path="upi-management" element={<AdminUpiManagement />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="transactions-log" element={<AdminTransactionLog />} />
+          <Route path="activity-log" element={<AdminActivityLog />} />
+        </Route>
       </Routes>
     </Router>
   );

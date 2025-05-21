@@ -1,18 +1,19 @@
 
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  Users,
-  CircleDollarSign,
-  CreditCard,
-  Shield,
-  Activity,
-  BarChart3,
   Settings,
-  LogOut
+  User,
+  UserPlus,
+  ShoppingCart,
+  CreditCard,
+  Smartphone,
+  FileText,
+  Activity
 } from "lucide-react";
 
+import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
 interface AdminSidebarProps {
@@ -23,7 +24,6 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ userEmail, collapsed, setCollapsed, handleLogout }: AdminSidebarProps) {
-  const location = useLocation();
   const navigate = useNavigate();
   
   const navigationItems = [
@@ -33,39 +33,39 @@ export function AdminSidebar({ userEmail, collapsed, setCollapsed, handleLogout 
       icon: <LayoutDashboard className="h-5 w-5" />
     },
     {
+      title: "Transactions",
+      href: "/admin/transactions",
+      icon: <ShoppingCart className="h-5 w-5" />
+    },
+    {
+      title: "Transaction Log",
+      href: "/admin/transactions-log",
+      icon: <FileText className="h-5 w-5" />
+    },
+    {
+      title: "Activity Log",
+      href: "/admin/activity-log",
+      icon: <Activity className="h-5 w-5" />
+    },
+    {
+      title: "UPI Management",
+      href: "/admin/upi-management",
+      icon: <Smartphone className="h-5 w-5" />
+    },
+    {
       title: "Merchants",
       href: "/admin/merchants",
-      icon: <Users className="h-5 w-5" />
+      icon: <UserPlus className="h-5 w-5" />
     },
     {
-      title: "Escrow",
-      href: "/admin/escrow",
-      icon: <CircleDollarSign className="h-5 w-5" />
-    },
-    {
-      title: "Pricing",
-      href: "/admin/pricing",
-      icon: <CreditCard className="h-5 w-5" />
+      title: "KYC",
+      href: "/admin/kyc",
+      icon: <User className="h-5 w-5" />
     },
     {
       title: "Whitelist",
       href: "/admin/whitelist",
-      icon: <Shield className="h-5 w-5" />
-    },
-    {
-      title: "Monitoring",
-      href: "/admin/monitoring",
-      icon: <Activity className="h-5 w-5" />
-    },
-    {
-      title: "Transactions",
-      href: "/admin/transactions",
       icon: <CreditCard className="h-5 w-5" />
-    },
-    {
-      title: "Analytics",
-      href: "/admin/analytics",
-      icon: <BarChart3 className="h-5 w-5" />
     },
     {
       title: "Settings",
@@ -76,64 +76,65 @@ export function AdminSidebar({ userEmail, collapsed, setCollapsed, handleLogout 
   
   return (
     <div className={cn(
-      "h-screen bg-[#111827] flex-col transition-all duration-300",
-      collapsed ? "w-16" : "w-[240px]"
+      "flex h-screen bg-white border-r flex-col transition-all duration-300",
+      collapsed ? "w-20" : "w-[280px]"
     )}>
-      <div className="flex flex-col h-full">
-        <div className="p-4 border-b border-gray-700">
-          <div className="flex items-center">
-            {!collapsed && (
-              <Link to="/admin" className="text-white font-bold text-xl ml-1">
-                RizzPay
-              </Link>
-            )}
-            {collapsed && (
-              <Link to="/admin" className="text-white font-bold text-xl mx-auto">
-                RP
-              </Link>
-            )}
-          </div>
+      <div className="flex flex-col h-full gap-4 py-4 text-sm">
+        <div className="px-3 py-2">
+          <button
+            onClick={() => navigate("/")}
+            className="font-bold text-lg"
+          >
+            {collapsed ? "RP" : siteConfig.name}
+          </button>
         </div>
-        
-        <div className="flex-1 overflow-y-auto py-2">
-          <nav className="px-2 space-y-1">
-            {navigationItems.map((item) => {
-              const isActive = location.pathname === item.href || 
-                (item.href !== '/admin' && location.pathname.startsWith(item.href));
-                
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    "flex items-center py-2 px-3 rounded-md transition-colors",
-                    isActive 
-                      ? "bg-blue-600 text-white" 
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                    collapsed ? "justify-center" : "justify-start"
-                  )}
-                >
-                  <div className={cn("flex items-center", collapsed ? "justify-center" : "")}>
+        <div className="flex-1">
+          <nav className="px-2">
+            <ul className="space-y-1">
+              {navigationItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    to={item.href}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100"
+                  >
                     {item.icon}
-                    {!collapsed && <span className="ml-3">{item.title}</span>}
-                  </div>
-                </Link>
-              );
-            })}
+                    {!collapsed && <span>{item.title}</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </nav>
         </div>
         
-        <div className="p-4 border-t border-gray-700">
-          <div className="flex items-center justify-between text-gray-300 text-xs">
-            {!collapsed && <span>rizzpay</span>}
-            <button 
-              onClick={handleLogout}
-              className="flex items-center text-gray-300 hover:text-white"
-            >
-              <LogOut className="h-5 w-5" />
-              {!collapsed && <span className="ml-2">Logout</span>}
-            </button>
+        {!collapsed && userEmail && (
+          <div className="mt-auto px-3 py-2 border-t">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                {userEmail.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-medium">{userEmail}</p>
+                <p className="text-xs text-muted-foreground">Admin</p>
+              </div>
+            </div>
+            {handleLogout && (
+              <button 
+                onClick={handleLogout}
+                className="mt-2 w-full text-sm text-left px-2 py-1 hover:bg-gray-100 rounded-md"
+              >
+                Logout
+              </button>
+            )}
           </div>
+        )}
+        
+        <div className="px-3 pt-2 border-t">
+          <button 
+            onClick={() => setCollapsed && setCollapsed(!collapsed)}
+            className="w-full flex justify-center items-center p-2 rounded-md hover:bg-gray-100"
+          >
+            {collapsed ? "›" : "‹"}
+          </button>
         </div>
       </div>
     </div>
