@@ -1,25 +1,35 @@
 
-import { Building2, Store } from 'lucide-react';
-import React from 'react';
-
-export const roles = [
-  {
-    id: 'admin',
-    name: 'Admin',
-    description: 'Full access to all settings, merchants, and transactions. Monitor and manage the entire system.',
-    icon: React.createElement(Building2, { className: "h-8 w-8 text-primary" }),
-    permissions: ['View all transactions', 'Manage merchants', 'System settings', 'Analytics access']
-  },
-  {
-    id: 'merchant',
-    name: 'Merchant',
-    description: 'Accept payments, manage your store, and view transaction history for your business.',
-    icon: React.createElement(Store, { className: "h-8 w-8 text-primary" }),
-    permissions: ['Process payments', 'View your transactions', 'Business settings', 'Financial reports']
-  }
-];
-
+// Demo credentials
 export const demoCredentials = {
-  admin: { username: 'rizzpay', password: 'rizzpay123' },
-  merchant: { username: 'merchant', password: 'password' },
+  admin: {
+    username: 'rizzpay',
+    password: 'rizzpay123'
+  },
+  merchant: {
+    username: 'merchant',
+    password: 'password'
+  }
+};
+
+// Role definitions
+export const roles = {
+  admin: {
+    name: 'Admin',
+    description: 'Full access to all features and settings',
+    permissions: [
+      'manage_merchants',
+      'view_all_transactions',
+      'manage_settings',
+      'access_admin_dashboard'
+    ]
+  },
+  merchant: {
+    name: 'Merchant',
+    description: 'Access to merchant dashboard and features',
+    permissions: [
+      'view_own_transactions',
+      'manage_own_settings',
+      'access_merchant_dashboard'
+    ]
+  }
 };
