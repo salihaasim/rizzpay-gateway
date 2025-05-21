@@ -22,12 +22,9 @@ const GlobalFooter = () => {
             <Link to="/refund-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Refund Policy
             </Link>
-            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Privacy Policy
-            </Link>
-            <a href="mailto:rizzpay1@gmail.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Contact Us
-            </a>
+            </Link>
           </div>
           
           <div className="text-sm text-muted-foreground mt-4 md:mt-0">

@@ -18,21 +18,30 @@ const config: CapacitorConfig = {
       keystoreAliasPassword: undefined,
       releaseType: undefined,
     },
-    // Mobile specific optimizations
+    // Enhanced mobile optimizations for Android
     backgroundColor: "#ffffff",
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: true
+    webContentsDebuggingEnabled: true,
+    initialFocus: true,
+    hideLogs: false,
+    overrideUserAgent: false,
+    appendUserAgent: "RizzPay-AndroidApp",
+    minWebViewVersion: 55
   },
   ios: {
-    // iOS specific configurations
+    // Enhanced iOS specific configurations
     contentInset: "always",
     allowsLinkPreview: false,
     scrollEnabled: true,
-    useUserAgent: false,
-    limitsNavigationsToAppBoundDomains: true
+    useUserAgent: true,
+    overrideUserAgent: "RizzPay-iOSApp",
+    limitsNavigationsToAppBoundDomains: true,
+    cordovaSwiftVersion: "5.0",
+    preferredContentMode: "mobile",
+    backgroundColor: "#ffffff"
   },
-  // General mobile device optimizations
+  // Enhanced mobile device optimizations
   plugins: {
     SplashScreen: {
       launchAutoHide: true,
@@ -47,6 +56,23 @@ const config: CapacitorConfig = {
       resize: "body",
       style: "dark",
       resizeOnFullScreen: true
+    },
+    // Added for better mobile experience
+    StatusBar: {
+      style: "dark",
+      backgroundColor: "#ffffff",
+      overlaysWebView: false,
+      animation: "fade"
+    },
+    CapacitorHttp: {
+      enabled: true
+    },
+    Device: {
+      overrideUserAgent: "RizzPay Mobile App"
+    },
+    LocalNotifications: {
+      smallIcon: "ic_stat_icon_config_sample",
+      iconColor: "#2563eb"
     }
   }
 };

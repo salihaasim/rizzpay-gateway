@@ -16,6 +16,7 @@ RizzPay is a secure, fast, and reliable payment gateway solution for businesses 
 - **Admin Dashboard**: Only accessible to admin users
 - **Logout**: Redirects all users back to the home page
 - **UPI Plugin**: Merchant-only feature for UPI payment integration
+- **Contact Us**: Public page with contact information for support
 
 ### Routing Protection
 
@@ -101,10 +102,12 @@ RizzPay provides comprehensive legal documentation:
 
 - **Terms & Conditions**: Detailed terms of service
 - **Refund Policy**: Clear guidelines on refunds and cancellations
-- **Privacy Policy**: Information on data collection and usage
+- **Contact Information**: Multiple ways to get in touch with our support team
 
 ## Recent Updates
 
+- **Contact Us Page**: Added dedicated page with support channels and contact information
+- **Mobile Optimization**: Enhanced UI for better performance on Android and iOS devices
 - **Admin Area Restoration**: Restored admin interface to May 2nd version
 - **Fixed Admin Sidebar**: Improved admin navigation with working sidebar
 - **Removed Dark Mode**: Removed dark mode toggle from admin interface
@@ -123,6 +126,15 @@ For complete documentation on RizzPay Gateway features and APIs, please refer to
 - [Payment Processing](PAYMENT_README.md)
 - [Webhook Integration](WEBHOOK_README.md)
 - [Full Documentation](RIZZPAY_DOCUMENTATION.md)
-- [Privacy Policy](/privacy-policy)
 - [Refund Policy](/refund-policy)
 - [Terms & Conditions](/terms)
+- [Contact Us](/contact)
+
+## Contact Support
+
+For technical support or questions about the payment system, please contact:
+- Email: support@rizzpay.com
+- Phone: +91-755024887
+- WhatsApp: +91-7550248887
+- Live Chat: Available on the dashboard (business hours)
+

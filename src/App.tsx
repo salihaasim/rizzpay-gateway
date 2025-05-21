@@ -29,6 +29,7 @@ import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
 import RefundPolicy from './pages/RefundPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
+import ContactUs from './pages/ContactUs';
 import GlobalFooter from './components/GlobalFooter';
 import Settings from './pages/Settings';
 import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
@@ -129,6 +130,7 @@ const App: React.FC = () => {
           <Route path="/india" element={<IndiaPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/contact" element={<ContactUs />} />
         </Route>
         
         {/* Merchant routes */}
