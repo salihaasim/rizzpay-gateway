@@ -21,16 +21,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     }
   };
   
-  // Return an empty header when hideNavigation is true
-  if (hideNavigation) {
-    return null;
-  }
-  
-  return (
-    <header className="border-b border-border bg-white">
-      {/* Header content */}
-    </header>
-  );
+  // Don't render header when we have sidebar navigation to avoid duplicates
+  return null;
 };
 
 export default AdminHeader;
