@@ -61,12 +61,10 @@ const PublicLayout = () => (
   </div>
 );
 
-// Authentication guard for merchant routes - NO AUTO-REDIRECT
-const MerchantRouteGuard = ({ element }) => {
-  const { isAuthenticated } = useMerchantAuth();
-  const navigate = useNavigate();
+// Authentication guard for merchant routes
+const MerchantRouteGuard = ({ element }: { element: React.ReactElement }) => {
+  const isAuthenticated = useMerchantAuth((state) => state.isAuthenticated);
   
-  // Only check auth, but don't auto-redirect
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
@@ -74,11 +72,10 @@ const MerchantRouteGuard = ({ element }) => {
   return element;
 };
 
-// Authentication guard for admin routes - NO AUTO-REDIRECT
-const AdminRouteGuard = ({ element }) => {
-  const { currentMerchant } = useMerchantAuth();
+// Authentication guard for admin routes
+const AdminRouteGuard = ({ element }: { element: React.ReactElement }) => {
+  const currentMerchant = useMerchantAuth((state) => state.currentMerchant);
   
-  // Only check admin role, but don't auto-redirect
   if (!currentMerchant || currentMerchant.role !== 'admin') {
     toast.error('Access denied. Admin privileges required.');
     return <Navigate to="/auth" replace />;
@@ -88,18 +85,20 @@ const AdminRouteGuard = ({ element }) => {
 };
 
 const App: React.FC = () => {
-  const { setUserRole } = useTransactionStore();
+  const setUserRole = useTransactionStore((state) => state.setUserRole);
   
-  // Remove auto-redirect logic from here
   useEffect(() => {
-    // Just check auth status but don't redirect
     const checkAuthStatus = async () => {
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      
-      if (isLoggedIn) {
-        const userRole = localStorage.getItem('userRole') || 'merchant';
-        const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
-        setUserRole(userRole as 'admin' | 'merchant', userEmail);
+      try {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        
+        if (isLoggedIn) {
+          const userRole = localStorage.getItem('userRole') || 'merchant';
+          const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
+          setUserRole(userRole as 'admin' | 'merchant', userEmail);
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
       }
     };
     
