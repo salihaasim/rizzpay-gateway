@@ -1,16 +1,12 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Navigate,
-  Outlet,
-  useNavigate,
-  useLocation
+  Outlet
 } from 'react-router-dom';
-import { useTransactionStore } from './stores/transactions';
-import { useMerchantAuth } from './stores/merchantAuthStore';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
@@ -36,11 +32,9 @@ import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
 import UpiPluginPage from './pages/UpiPluginPage';
 import TransfersPage from './pages/TransfersPage';
 import DeveloperPage from './pages/DeveloperPage';
-import Auth from './pages/Auth';
 import AdminSettings from './pages/AdminSettings';
 import AdminTransactionLog from './pages/AdminTransactionLog';
 import AdminActivityLog from './pages/AdminActivityLog';
-import { toast } from 'sonner';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -61,50 +55,7 @@ const PublicLayout = () => (
   </div>
 );
 
-// Authentication guard for merchant routes
-const MerchantRouteGuard = ({ element }: { element: React.ReactElement }) => {
-  const isAuthenticated = useMerchantAuth((state) => state.isAuthenticated);
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return element;
-};
-
-// Authentication guard for admin routes
-const AdminRouteGuard = ({ element }: { element: React.ReactElement }) => {
-  const currentMerchant = useMerchantAuth((state) => state.currentMerchant);
-  
-  if (!currentMerchant || currentMerchant.role !== 'admin') {
-    toast.error('Access denied. Admin privileges required.');
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return element;
-};
-
 const App: React.FC = () => {
-  const setUserRole = useTransactionStore((state) => state.setUserRole);
-  
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const isLoggedIn = localStorage.getItem('isLoggedIn');
-        
-        if (isLoggedIn) {
-          const userRole = localStorage.getItem('userRole') || 'merchant';
-          const userEmail = localStorage.getItem('userEmail') || 'merchant@example.com';
-          setUserRole(userRole as 'admin' | 'merchant', userEmail);
-        }
-      } catch (error) {
-        console.error('Error checking auth status:', error);
-      }
-    };
-    
-    checkAuthStatus();
-  }, [setUserRole]);
-  
   return (
     <Router>
       <Routes>
@@ -113,13 +64,8 @@ const App: React.FC = () => {
           <Route path="/" element={<Index />} />
         </Route>
         
-        {/* Auth routes */}
+        {/* Public pages without authentication */}
         <Route element={<PublicLayout />}>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/login" element={<Navigate to="/auth" replace />} />
-          <Route path="/register" element={<Navigate to="/auth" replace />} />
-          
-          {/* Public pages without authentication */}
           <Route path="/upi-payment" element={<UpiPaymentPage />} />
           <Route path="/upi-link-payment" element={<UpiLinkPaymentPage />} />
           <Route path="/link-payment" element={<Navigate to="/upi-link-payment" />} />
@@ -129,23 +75,23 @@ const App: React.FC = () => {
           <Route path="/contact" element={<ContactUs />} />
         </Route>
         
-        {/* Merchant routes */}
+        {/* Merchant routes - directly accessible for now */}
         <Route element={<PublicLayout />}>
-          <Route path="/dashboard" element={<MerchantRouteGuard element={<Dashboard />} />} />
-          <Route path="/transactions" element={<MerchantRouteGuard element={<Transactions />} />} />
-          <Route path="/profile" element={<MerchantRouteGuard element={<Profile />} />} />
-          <Route path="/settings" element={<MerchantRouteGuard element={<Settings />} />} />
-          <Route path="/banking" element={<MerchantRouteGuard element={<BankingPage />} />} />
-          <Route path="/webhooks" element={<MerchantRouteGuard element={<Webhooks />} />} />
-          <Route path="/wallet" element={<MerchantRouteGuard element={<WalletPage />} />} />
-          <Route path="/upi-plugin" element={<MerchantRouteGuard element={<UpiPluginPage />} />} />
-          <Route path="/transfers" element={<MerchantRouteGuard element={<TransfersPage />} />} />
-          <Route path="/developer" element={<MerchantRouteGuard element={<DeveloperPage />} />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/banking" element={<BankingPage />} />
+          <Route path="/webhooks" element={<Webhooks />} />
+          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/upi-plugin" element={<UpiPluginPage />} />
+          <Route path="/transfers" element={<TransfersPage />} />
+          <Route path="/developer" element={<DeveloperPage />} />
           <Route path="/plugin" element={<Navigate to="/upi-plugin" replace />} />
         </Route>
         
-        {/* Admin routes */}
-        <Route path="/admin" element={<AdminRouteGuard element={<AdminLayout />} />}>
+        {/* Admin routes - directly accessible for now */}
+        <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="merchants" element={<AdminMerchants />} />
