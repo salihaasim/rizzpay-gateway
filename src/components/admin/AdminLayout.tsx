@@ -11,7 +11,7 @@ export interface AdminLayoutProps {
   hideNavigation?: boolean;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentMerchant, logout } = useMerchantAuth();
@@ -37,17 +37,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
     return null;
   }
   
-  // Use the hideNavigation prop passed from parent or default to false
-  const shouldHideNavigation = hideNavigation || false;
-  
   return (
-    <div className="flex h-screen bg-gray-50">
-      {!shouldHideNavigation && (
+    <div className="flex h-screen bg-gray-50 w-full">
+      {!hideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
           userEmail={currentMerchant?.email || ''}
           handleLogout={handleLogout}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
         />
       )}
       
@@ -55,7 +54,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
         <AdminHeader 
           onLogout={handleLogout} 
           setMobileMenuOpen={setMobileMenuOpen} 
-          hideNavigation={shouldHideNavigation}
+          hideNavigation={hideNavigation}
           userEmail={currentMerchant?.email || ''}
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
