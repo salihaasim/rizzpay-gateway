@@ -42,7 +42,12 @@ const KycStatus: React.FC = () => {
           throw error;
         }
 
-        setKycData(data);
+        if (data) {
+          setKycData({
+            ...data,
+            status: data.status as 'pending' | 'approved' | 'rejected'
+          });
+        }
       } catch (error) {
         console.error('Error fetching KYC status:', error);
       } finally {

@@ -34,21 +34,32 @@ const AdminKycTable: React.FC = () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
+      // First, get all KYC submissions
+      const { data: kycData, error: kycError } = await supabase
         .from('kyc_submissions')
-        .select(`
-          *,
-          merchants!inner(name, email)
-        `)
+        .select('*')
         .order('submitted_at', { ascending: false });
 
-      if (error) throw error;
+      if (kycError) throw kycError;
 
-      const formattedData = data?.map(item => ({
-        ...item,
-        merchant_email: item.merchants?.email || 'Unknown',
-        merchant_name: item.merchants?.name || 'Unknown'
-      })) || [];
+      // Then get merchant profile data for each submission
+      const formattedData: KycSubmission[] = [];
+      
+      for (const submission of kycData || []) {
+        // Try to get merchant profile data using user_id
+        const { data: merchantData } = await supabase
+          .from('merchant_profiles')
+          .select('business_name, contact_email')
+          .eq('id', submission.user_id)
+          .maybeSingle();
+
+        formattedData.push({
+          ...submission,
+          status: submission.status as 'pending' | 'approved' | 'rejected',
+          merchant_email: merchantData?.contact_email || 'Unknown',
+          merchant_name: merchantData?.business_name || 'Unknown'
+        });
+      }
 
       setSubmissions(formattedData);
       setFilteredSubmissions(formattedData);
