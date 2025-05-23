@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,6 @@ import { format } from "date-fns";
 import { CalendarIcon, FileSpreadsheet, Search } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { toast } from "sonner";
-import AdminLayout from '@/components/admin/AdminLayout';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Helmet } from 'react-helmet';
 
@@ -65,7 +65,7 @@ const AdminTransactionLog = () => {
   };
   
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>Transaction Log | RizzPay Admin</title>
       </Helmet>
@@ -225,7 +225,7 @@ const AdminTransactionLog = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 

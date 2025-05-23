@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Helmet } from 'react-helmet';
 
 // Import refactored components
@@ -44,7 +43,7 @@ const AdminSettings = () => {
   }
   
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>Admin Settings | RizzPay</title>
       </Helmet>
@@ -85,7 +84,7 @@ const AdminSettings = () => {
           </div>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 

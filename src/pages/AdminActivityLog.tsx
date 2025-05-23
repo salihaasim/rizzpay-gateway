@@ -8,7 +8,6 @@ import { format } from "date-fns";
 import { CalendarIcon, Download } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { toast } from "sonner";
-import AdminLayout from '@/components/admin/AdminLayout';
 import ActivityLogTable from '@/components/admin/activity/ActivityLogTable';
 import { useActivityLogStore } from '@/stores/activityLog';
 import { Helmet } from 'react-helmet';
@@ -45,7 +44,7 @@ const AdminActivityLog = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>Activity Logs | RizzPay Admin</title>
       </Helmet>
@@ -124,7 +123,7 @@ const AdminActivityLog = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 
