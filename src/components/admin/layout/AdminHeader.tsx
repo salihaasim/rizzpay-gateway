@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, Bell, Activity } from 'lucide-react';
+import { LogOut, Bell } from 'lucide-react';
 import AdminMobileMenuTrigger from './AdminMobileMenuTrigger';
 
 export interface AdminHeaderProps {

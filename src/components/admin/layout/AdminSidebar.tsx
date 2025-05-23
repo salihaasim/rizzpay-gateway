@@ -23,7 +23,7 @@ interface AdminSidebarProps {
   handleLogout?: () => void;
 }
 
-export function AdminSidebar({ userEmail, collapsed, setCollapsed, handleLogout }: AdminSidebarProps) {
+export function AdminSidebar({ userEmail, collapsed, setCollapsed }: AdminSidebarProps) {
   const navigate = useNavigate();
   
   const navigationItems = [
@@ -117,14 +117,6 @@ export function AdminSidebar({ userEmail, collapsed, setCollapsed, handleLogout 
                 <p className="text-xs text-muted-foreground">Admin</p>
               </div>
             </div>
-            {handleLogout && (
-              <button 
-                onClick={handleLogout}
-                className="mt-2 w-full text-sm text-left px-2 py-1 hover:bg-gray-100 rounded-md"
-              >
-                Logout
-              </button>
-            )}
           </div>
         )}
         
