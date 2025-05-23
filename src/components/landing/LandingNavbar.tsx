@@ -38,7 +38,7 @@ const LandingNavbar = () => {
           
           <Link to="/auth">
             <Button size="sm" className="bg-[#0052FF] text-white hover:bg-[#0045DB]">
-              Sign Up
+              Get Started
             </Button>
           </Link>
         </div>

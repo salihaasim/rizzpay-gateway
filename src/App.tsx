@@ -36,6 +36,7 @@ import AdminSettings from './pages/AdminSettings';
 import AdminTransactionLog from './pages/AdminTransactionLog';
 import AdminActivityLog from './pages/AdminActivityLog';
 import KycPage from './pages/KycPage';
+import Auth from './pages/Auth';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -63,6 +64,11 @@ const App: React.FC = () => {
         {/* Home page route with footer - ALWAYS ACCESSIBLE */}
         <Route element={<HomePageLayout />}>
           <Route path="/" element={<Index />} />
+        </Route>
+        
+        {/* Auth route - accessible for login/signup */}
+        <Route element={<PublicLayout />}>
+          <Route path="/auth" element={<Auth />} />
         </Route>
         
         {/* Public pages without authentication */}

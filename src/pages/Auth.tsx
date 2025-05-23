@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { roles, demoCredentials } from '@/components/role/roleConstants';
 import { useTransactionStore } from '@/stores/transactions';
+import { goBack } from '@/utils/navigationUtils';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -96,14 +97,9 @@ const Auth = () => {
     }));
   };
 
-  // Fixed back button to ensure proper navigation
+  // Use standardized back navigation
   const handleBack = () => {
-    // Use window.history.back() if there's a previous page, otherwise go to home
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      navigate('/', { replace: false });
-    }
+    goBack(navigate);
   };
 
   // Auto-fill demo credentials based on selected role

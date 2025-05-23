@@ -7,6 +7,7 @@ import { IndianRupee, QrCode, ArrowRight, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
 import { Helmet } from 'react-helmet';
+import { goBack } from '@/utils/navigationUtils';
 
 const UpiLinkPaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -70,13 +71,8 @@ const UpiLinkPaymentPage = () => {
     }
   };
   
-  // FIXED: Make back button work properly
   const handleGoBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
+    goBack(navigate);
   };
   
   return (
