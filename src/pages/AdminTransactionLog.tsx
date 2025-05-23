@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { CalendarIcon, Download, FileSpreadsheet, Search } from "lucide-react";
+import { CalendarIcon, FileSpreadsheet, Search } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { toast } from "sonner";
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -72,7 +72,6 @@ const AdminTransactionLog = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Transaction Log</h1>
             <p className="text-muted-foreground mt-1">
               View and export transaction records
             </p>

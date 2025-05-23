@@ -15,7 +15,6 @@ import BankAPISettings from '@/components/admin/settings/BankAPISettings';
 import SecuritySettings from '@/components/admin/settings/SecuritySettings';
 import GeneralSettings from '@/components/admin/settings/GeneralSettings';
 
-// Main Admin Settings page
 const AdminSettings = () => {
   const navigate = useNavigate();
   const { currentMerchant } = useMerchantAuth();
@@ -50,15 +49,8 @@ const AdminSettings = () => {
         <title>Admin Settings | RizzPay</title>
       </Helmet>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Admin Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            Configure system settings, roles, and integrations
-          </p>
-        </div>
-        
         <Tabs defaultValue="general" className="space-y-6">
-          <TabsList>
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="api">Bank API</TabsTrigger>

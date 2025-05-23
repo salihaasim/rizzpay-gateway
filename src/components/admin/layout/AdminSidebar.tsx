@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Settings,
@@ -10,11 +10,16 @@ import {
   CreditCard,
   Smartphone,
   FileText,
-  Activity
+  Activity,
+  LogOut,
+  Shield
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 interface AdminSidebarProps {
   userEmail?: string;
@@ -23,8 +28,9 @@ interface AdminSidebarProps {
   handleLogout?: () => void;
 }
 
-export function AdminSidebar({ userEmail, collapsed, setCollapsed }: AdminSidebarProps) {
+export function AdminSidebar({ userEmail, collapsed, setCollapsed, handleLogout }: AdminSidebarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const navigationItems = [
     {
@@ -65,7 +71,7 @@ export function AdminSidebar({ userEmail, collapsed, setCollapsed }: AdminSideba
     {
       title: "Whitelist",
       href: "/admin/whitelist",
-      icon: <CreditCard className="h-5 w-5" />
+      icon: <Shield className="h-5 w-5" />
     },
     {
       title: "Settings",
@@ -74,60 +80,95 @@ export function AdminSidebar({ userEmail, collapsed, setCollapsed }: AdminSideba
     }
   ];
   
+  const isActiveRoute = (href: string) => {
+    if (href === '/admin') {
+      return location.pathname === '/admin';
+    }
+    return location.pathname.startsWith(href);
+  };
+  
   return (
     <div className={cn(
-      "flex h-screen bg-white border-r flex-col transition-all duration-300",
-      collapsed ? "w-20" : "w-[280px]"
+      "flex h-screen bg-white border-r border-gray-200 flex-col transition-all duration-300 shadow-sm",
+      collapsed ? "w-16" : "w-64"
     )}>
-      <div className="flex flex-col h-full gap-4 py-4 text-sm">
-        <div className="px-3 py-2">
-          <button
-            onClick={() => navigate("/")}
-            className="font-bold text-lg"
-          >
-            {collapsed ? "RP" : siteConfig.name}
-          </button>
-        </div>
-        <div className="flex-1">
-          <nav className="px-2">
-            <ul className="space-y-1">
-              {navigationItems.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    to={item.href}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100"
-                  >
-                    {item.icon}
-                    {!collapsed && <span>{item.title}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-        
+      {/* Header */}
+      <div className="flex items-center justify-center p-4 border-b border-gray-200">
+        <button
+          onClick={() => navigate("/")}
+          className={cn(
+            "flex items-center gap-2 font-bold text-lg text-primary",
+            collapsed && "justify-center"
+          )}
+        >
+          {collapsed ? (
+            <span className="text-xl">RP</span>
+          ) : (
+            <>
+              <CreditCard className="h-6 w-6" />
+              <span>{siteConfig.name}</span>
+            </>
+          )}
+        </button>
+      </div>
+      
+      {/* Navigation */}
+      <div className="flex-1 py-4">
+        <nav className="px-2 space-y-1">
+          {navigationItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                isActiveRoute(item.href)
+                  ? "bg-primary/10 text-primary"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                collapsed && "justify-center px-2"
+              )}
+              title={collapsed ? item.title : undefined}
+            >
+              {item.icon}
+              {!collapsed && <span>{item.title}</span>}
+            </Link>
+          ))}
+        </nav>
+      </div>
+      
+      {/* User Section */}
+      <div className="border-t border-gray-200 p-4">
         {!collapsed && userEmail && (
-          <div className="mt-auto px-3 py-2 border-t">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                {userEmail.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-sm font-medium">{userEmail}</p>
-                <p className="text-xs text-muted-foreground">Admin</p>
+          <>
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary text-white text-sm">
+                  {userEmail.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {userEmail.split('@')[0]}
+                </p>
+                <p className="text-xs text-gray-500">Administrator</p>
               </div>
             </div>
-          </div>
+            <Separator className="mb-3" />
+          </>
         )}
         
-        <div className="px-3 pt-2 border-t">
-          <button 
-            onClick={() => setCollapsed && setCollapsed(!collapsed)}
-            className="w-full flex justify-center items-center p-2 rounded-md hover:bg-gray-100"
-          >
-            {collapsed ? "›" : "‹"}
-          </button>
-        </div>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleLogout}
+          className={cn(
+            "w-full text-gray-600 hover:text-red-600 hover:bg-red-50 justify-start",
+            collapsed && "justify-center px-2"
+          )}
+          title={collapsed ? "Logout" : undefined}
+        >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">Logout</span>}
+        </Button>
       </div>
     </div>
   );

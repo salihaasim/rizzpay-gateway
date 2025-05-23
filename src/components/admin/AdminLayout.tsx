@@ -28,6 +28,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
   
   const handleLogout = () => {
     logout();
+    toast.success('Logged out successfully');
     navigate('/', { replace: true });
   };
 
@@ -40,7 +41,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
   const shouldHideNavigation = hideNavigation || false;
   
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-50">
       {!shouldHideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
@@ -55,9 +56,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
           onLogout={handleLogout} 
           setMobileMenuOpen={setMobileMenuOpen} 
           hideNavigation={shouldHideNavigation}
+          userEmail={currentMerchant?.email || ''}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
         />
         
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
+        <main className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
           {children || <Outlet />}
         </main>
       </div>
