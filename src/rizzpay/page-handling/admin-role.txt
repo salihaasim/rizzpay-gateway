@@ -1,0 +1,89 @@
+
+# RizzPay Admin Role Documentation
+
+## Overview
+The admin role in RizzPay provides complete system control including merchant management, transaction monitoring, and system configuration. This role is designed for platform administrators.
+
+## Access & Authentication
+- Login credentials: username/password (default demo: rizzpay/rizzpay123)
+- Role-based access: After login, users with admin role are redirected to /admin
+- Authentication store: Uses merchantAuthStore with role checking
+
+## Pages Available to Administrators
+
+1. **Admin Dashboard (/admin)**
+   - Platform-wide stats
+   - System health monitoring
+   - Quick access to critical functions
+   - Admin activity summary
+
+2. **Merchant Management (/admin/merchants)**
+   - View all merchants
+   - Approve/reject merchants
+   - Edit merchant details
+   - Suspend/activate accounts
+
+3. **Transaction Log (/admin/transactions-log)**
+   - Complete system-wide transaction view
+   - Advanced filtering capabilities
+   - Detailed transaction inspection
+   - Export to Excel functionality
+
+4. **Activity Log (/admin/activity-log)**
+   - System-wide activity monitoring
+   - User actions tracking
+   - Filtering by date and activity type
+   - Export capabilities
+
+5. **Settings (/admin/settings)**
+   - General system settings
+   - Role management
+   - Bank API configurations
+   - Security settings
+
+6. **KYC Management (/admin/kyc)**
+   - Review merchant submissions
+   - Approve/reject documents
+   - Request additional information
+   - View document history
+
+7. **UPI Management (/admin/upi-management)**
+   - Configure UPI providers
+   - Manage UPI integration settings
+   - Monitor UPI transactions
+   - Troubleshoot UPI issues
+
+8. **Whitelist Management (/admin/whitelist)**
+   - IP whitelist configuration
+   - Domain whitelist management
+   - Webhook endpoint validation
+   - Security policy enforcement
+
+## Permissions & Capabilities
+
+Administrators can:
+- View all merchants and their data
+- Access all transaction records
+- Approve/reject merchant applications
+- Modify system settings and configurations
+- Enable/disable features system-wide
+- Export comprehensive reports
+- Monitor system health and activity
+- Manage roles and permissions
+
+## Component Structure
+- AdminLayout.tsx - Base layout with admin sidebar
+- AdminHeader.tsx - Header with admin tools
+- Admin dashboard components - System stats, merchant management widgets
+- Settings components - System configuration forms
+- Merchant management components - Tables, filters, action buttons
+- KYC review components - Document viewer, approval workflows
+- Whitelist components - IP/domain management interfaces
+
+## Navigation Structure
+The admin interface uses a hierarchical navigation system:
+- Primary navigation: Main admin sections
+- Secondary navigation: Sub-pages within each section
+- Context-specific actions: Available based on current view
+
+Each admin page implements hideNavigation=true when using AdminLayout for pages like settings, activity log, and transaction log to prevent duplicate navigation bars.

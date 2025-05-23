@@ -1,0 +1,76 @@
+
+# RizzPay Merchant Role Documentation
+
+## Overview
+The merchant role in RizzPay allows business owners to process payments, manage transactions, and access merchant-specific features. This role is designed for day-to-day payment operations.
+
+## Access & Authentication
+- Login credentials: username/password (default demo: merchant/password)
+- Role-based access: After login, users with merchant role are redirected to /dashboard
+- Authentication store: Uses merchantAuthStore for state management
+
+## Pages Available to Merchants
+
+1. **Dashboard (/dashboard)**
+   - Transaction overview
+   - Quick stats (daily/weekly/monthly revenue)
+   - Recent transactions list
+   - Analytics charts
+
+2. **Transactions (/transactions)**
+   - Complete transaction history
+   - Filtering & search capabilities
+   - Transaction detail view
+   - Export functionality
+
+3. **Wallet (/wallet)**
+   - Current balance view
+   - Deposit/Withdraw functionality
+   - Transfer between accounts
+   - Transaction history
+
+4. **Settings (/settings)**
+   - Profile management
+   - Security settings
+   - Notification preferences
+   - Business information
+
+5. **KYC (/kyc)**
+   - Document upload interface
+   - Verification status tracking
+   - Re-submission options
+
+6. **UPI Management**
+   - UPI link generation (/upi-link-payment)
+   - UPI plugin settings (/upi-plugin-settings)
+   - QR code generation
+
+7. **Webhook Integration (/webhooks)**
+   - Webhook setup
+   - Integration documentation
+   - Testing tools
+
+## Permissions & Capabilities
+
+Merchants can:
+- View own transactions only
+- Process payments via multiple methods
+- Generate payment links and QR codes
+- Manage their business profile
+- View settlement reports
+- Upload KYC documents
+- Setup webhook endpoints
+
+Merchants cannot:
+- Access admin dashboard
+- View other merchants' data
+- Modify system settings
+- Approve KYC applications
+- Change fee structures
+
+## Component Structure
+- MerchantLayout.tsx - Base layout with sidebar navigation
+- MerchantHeader.tsx - Header with notifications, profile menu
+- Dashboard components - Charts, stats, transaction lists
+- Transaction components - Tables, filters, export tools
+- Settings components - Form sections for various settings

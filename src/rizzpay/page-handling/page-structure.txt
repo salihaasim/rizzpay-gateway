@@ -1,0 +1,63 @@
+
+# RizzPay Page Structure Overview
+
+## Root Pages
+
+- `/` - Role selector/landing page
+- `/auth` - Authentication page (login/register)
+
+## Merchant Pages
+
+- `/dashboard` - Merchant dashboard
+- `/transactions` - Transaction history and management
+- `/wallet` - Wallet management
+- `/settings` - Merchant account settings
+- `/kyc` - KYC document submission
+- `/upi-link-payment` - UPI payment link generation
+- `/upi-plugin-settings` - UPI plugin configuration
+- `/webhooks` - Webhook integration
+
+## Admin Pages
+
+- `/admin` - Admin dashboard
+- `/admin/merchants` - Merchant management
+- `/admin/transactions-log` - All transactions log
+- `/admin/activity-log` - System activity log
+- `/admin/settings` - System settings
+- `/admin/kyc` - KYC approval management
+- `/admin/upi-management` - UPI system management
+- `/admin/whitelist` - IP and domain whitelist management
+
+## Page Component Structure
+
+Most pages follow this structure:
+```
+Page Component
+└── Layout Component (AdminLayout or regular Layout)
+    ├── Header Component
+    ├── Sidebar Component
+    └── Main Content
+        ├── Page-specific Components
+        ├── UI Components
+        └── Data Display Components
+```
+
+## Navigation Flow
+
+1. Unauthenticated users can only access:
+   - Role selector (/)
+   - Authentication (/auth)
+
+2. Authenticated merchants can access:
+   - All merchant pages
+   - Cannot access admin pages
+
+3. Authenticated admins can access:
+   - All admin pages
+   - All merchant pages (for support purposes)
+
+## Conditional Navigation
+
+- Some pages hide the standard navigation (settings, logs) to prevent duplicate UI elements
+- This is controlled via the `hideNavigation` prop in layout components
+- Mobile views use collapsible navigation for better space utilization
