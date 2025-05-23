@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,6 @@ const AdminTransactionLog = () => {
   // Get transactions from store
   const { transactions } = useTransactionStore();
   
-  // Filter transactions by date range and search term
   const filteredTransactions = transactions.filter(transaction => {
     const transactionDate = new Date(transaction.date);
     const inDateRange = 
@@ -43,9 +41,7 @@ const AdminTransactionLog = () => {
     return inDateRange && matchesSearch;
   });
   
-  // Export to Excel function
   const exportToExcel = () => {
-    // Format data for Excel
     const data = filteredTransactions.map(t => ({
       'Transaction ID': t.id,
       'Date': format(new Date(t.date), 'dd/MM/yyyy HH:mm'),
@@ -58,14 +54,10 @@ const AdminTransactionLog = () => {
       'Description': t.description || 'N/A'
     }));
     
-    // Create worksheet
     const ws = XLSX.utils.json_to_sheet(data);
-    
-    // Create workbook and add worksheet
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
     
-    // Export to file
     const fileName = `RizzPay_Transactions_${format(startDate || new Date(), 'yyyyMMdd')}_${format(endDate || new Date(), 'yyyyMMdd')}.xlsx`;
     XLSX.writeFile(wb, fileName);
     

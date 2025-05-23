@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,7 +26,7 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <Layout>
+      <Layout hideNavigation={true}>
         <div className="flex items-center justify-center h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -40,7 +39,7 @@ const Settings = () => {
   }
 
   return (
-    <Layout>
+    <Layout hideNavigation={true}>
       <Helmet>
         <title>Settings | RizzPay</title>
       </Helmet>
