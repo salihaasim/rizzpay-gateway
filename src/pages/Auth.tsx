@@ -10,7 +10,7 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { roles, demoCredentials } from '@/components/role/roleConstants';
-import { useTransactionStore } from '@/stores/transactionStore';
+import { useTransactionStore } from '@/stores/transactions';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -96,9 +96,14 @@ const Auth = () => {
     }));
   };
 
-  // Fixed: Make back button work properly by navigating to the root route
+  // Fixed back button to ensure proper navigation
   const handleBack = () => {
-    navigate('/', { replace: false });
+    // Use window.history.back() if there's a previous page, otherwise go to home
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigate('/', { replace: false });
+    }
   };
 
   // Auto-fill demo credentials based on selected role
@@ -125,7 +130,7 @@ const Auth = () => {
           <div className="flex justify-between items-center">
             <Button variant="ghost" size="sm" onClick={handleBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              Back
             </Button>
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
