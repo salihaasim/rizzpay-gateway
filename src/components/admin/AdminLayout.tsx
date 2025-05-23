@@ -46,12 +46,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
   
   return (
     <div className="flex h-screen bg-gray-100">
-      <AdminSidebar 
-        collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
-        userEmail={currentMerchant?.email || ''}
-        handleLogout={handleLogout}
-      />
+      {!shouldHideNavigation && (
+        <AdminSidebar 
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+          userEmail={currentMerchant?.email || ''}
+          handleLogout={handleLogout}
+        />
+      )}
       
       <div className="flex flex-col flex-1 overflow-hidden">
         <AdminHeader 
