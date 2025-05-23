@@ -9,9 +9,10 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface LayoutProps {
   children: React.ReactNode;
+  hideNavigation?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = memo(({ children }) => {
+const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }) => {
   const { isAuthenticated, loading, currentMerchant } = useMerchantAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,13 +44,15 @@ const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   // Display responsive layout for authenticated users with sidebar
   return (
     <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
-      <DashboardSidebar 
-        collapsed={sidebarCollapsed} 
-        setCollapsed={setSidebarCollapsed} 
-      />
+      {!hideNavigation && (
+        <DashboardSidebar 
+          collapsed={sidebarCollapsed} 
+          setCollapsed={setSidebarCollapsed} 
+        />
+      )}
       
       <div className={`flex-1 min-h-screen transition-all duration-300 ${
-        sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]"
+        !hideNavigation ? (sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]") : ""
       }`}>
         <main className="p-4 sm:p-6">
           <div className="absolute top-4 right-4 z-50">
