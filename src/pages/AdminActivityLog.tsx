@@ -49,7 +49,7 @@ const AdminActivityLog = () => {
       <Helmet>
         <title>Activity Logs | RizzPay Admin</title>
       </Helmet>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-muted-foreground mt-1">
@@ -68,14 +68,14 @@ const AdminActivityLog = () => {
             <CardTitle>Filter Logs</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Start Date</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[200px] justify-start text-left font-normal"
+                      className="w-full md:w-[200px] justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {startDate ? format(startDate, 'PPP') : <span>Pick a date</span>}
@@ -98,7 +98,7 @@ const AdminActivityLog = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[200px] justify-start text-left font-normal"
+                      className="w-full md:w-[200px] justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {endDate ? format(endDate, 'PPP') : <span>Pick a date</span>}

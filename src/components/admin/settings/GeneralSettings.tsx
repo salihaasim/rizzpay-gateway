@@ -15,48 +15,66 @@ const GeneralSettings = () => {
           Manage basic platform settings
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
             <Label htmlFor="platform-name">Platform Name</Label>
-            <div className="text-sm text-muted-foreground">
+            <Input 
+              id="platform-name" 
+              value="RizzPay" 
+              className="w-full" 
+            />
+            <p className="text-sm text-muted-foreground">
               This will be displayed throughout the application
-            </div>
+            </p>
           </div>
-          <Input 
-            id="platform-name" 
-            value="RizzPay" 
-            className="max-w-xs" 
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Maintenance Mode</Label>
-            <div className="text-sm text-muted-foreground">
-              Put the platform in maintenance mode
-            </div>
-          </div>
-          <Switch />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Default Currency</Label>
-            <div className="text-sm text-muted-foreground">
+          
+          <div className="space-y-2">
+            <Label htmlFor="default-currency">Default Currency</Label>
+            <Select defaultValue="inr">
+              <SelectTrigger id="default-currency" className="w-full">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="inr">Indian Rupee (INR)</SelectItem>
+                <SelectItem value="usd">US Dollar (USD)</SelectItem>
+                <SelectItem value="eur">Euro (EUR)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
               Set the default currency for transactions
-            </div>
+            </p>
           </div>
-          <Select defaultValue="inr">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select currency" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="inr">Indian Rupee (INR)</SelectItem>
-              <SelectItem value="usd">US Dollar (USD)</SelectItem>
-              <SelectItem value="eur">Euro (EUR)</SelectItem>
-            </SelectContent>
-          </Select>
+        </div>
+        
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div>
+            <Label htmlFor="maintenance-mode">Maintenance Mode</Label>
+            <p className="text-sm text-muted-foreground">
+              Put the platform in maintenance mode
+            </p>
+          </div>
+          <Switch id="maintenance-mode" />
+        </div>
+        
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div>
+            <Label htmlFor="debug-mode">Debug Mode</Label>
+            <p className="text-sm text-muted-foreground">
+              Enable detailed error reporting for developers
+            </p>
+          </div>
+          <Switch id="debug-mode" />
+        </div>
+        
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div>
+            <Label htmlFor="notifications">Email Notifications</Label>
+            <p className="text-sm text-muted-foreground">
+              Send email notifications for important events
+            </p>
+          </div>
+          <Switch id="notifications" defaultChecked />
         </div>
       </CardContent>
     </Card>

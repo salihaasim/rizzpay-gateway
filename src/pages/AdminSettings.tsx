@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -48,40 +48,42 @@ const AdminSettings = () => {
       <Helmet>
         <title>Admin Settings | RizzPay</title>
       </Helmet>
-      <div className="space-y-6">
-        <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="roles">Roles</TabsTrigger>
-            <TabsTrigger value="api">Bank API</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-          </TabsList>
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <Card className="p-6 bg-card">
+          <Tabs defaultValue="general" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="roles">Roles</TabsTrigger>
+              <TabsTrigger value="api">Bank API</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="general" className="space-y-6">
+              <GeneralSettings />
+            </TabsContent>
+            
+            <TabsContent value="roles" className="space-y-6">
+              <RoleManagement />
+            </TabsContent>
+            
+            <TabsContent value="api" className="space-y-6">
+              <BankAPISettings />
+            </TabsContent>
+            
+            <TabsContent value="security" className="space-y-6">
+              <SecuritySettings />
+            </TabsContent>
+          </Tabs>
           
-          <TabsContent value="general" className="space-y-6">
-            <GeneralSettings />
-          </TabsContent>
-          
-          <TabsContent value="roles" className="space-y-6">
-            <RoleManagement />
-          </TabsContent>
-          
-          <TabsContent value="api" className="space-y-6">
-            <BankAPISettings />
-          </TabsContent>
-          
-          <TabsContent value="security" className="space-y-6">
-            <SecuritySettings />
-          </TabsContent>
-        </Tabs>
-        
-        <div className="flex justify-end">
-          <Button 
-            onClick={handleSaveSettings} 
-            disabled={isLoading}
-          >
-            {isLoading ? "Saving..." : "Save Settings"}
-          </Button>
-        </div>
+          <div className="flex justify-end mt-6">
+            <Button 
+              onClick={handleSaveSettings} 
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving..." : "Save Settings"}
+            </Button>
+          </div>
+        </Card>
       </div>
     </AdminLayout>
   );
