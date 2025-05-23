@@ -36,13 +36,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) =
     return null;
   }
   
-  // Check if the current path is a settings, activity-log, or transaction-log page
-  const isSettingsPage = location.pathname.includes('/admin/settings');
-  const isActivityLogPage = location.pathname.includes('/admin/activity-log');
-  const isTransactionLogPage = location.pathname.includes('/admin/transactions-log');
-  
-  // Hide navigation if explicitly passed or on specific pages
-  const shouldHideNavigation = hideNavigation || isSettingsPage || isActivityLogPage || isTransactionLogPage;
+  // Use the hideNavigation prop passed from parent or default to false
+  const shouldHideNavigation = hideNavigation || false;
   
   return (
     <div className="flex h-screen bg-gray-100">

@@ -44,7 +44,7 @@ const AdminActivityLog = () => {
   };
 
   return (
-    <AdminLayout hideNavigation={true}>
+    <AdminLayout>
       <Helmet>
         <title>Activity Logs | RizzPay Admin</title>
       </Helmet>

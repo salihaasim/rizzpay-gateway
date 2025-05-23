@@ -45,7 +45,7 @@ const AdminSettings = () => {
   }
   
   return (
-    <AdminLayout hideNavigation={true}>
+    <AdminLayout>
       <Helmet>
         <title>Admin Settings | RizzPay</title>
       </Helmet>
