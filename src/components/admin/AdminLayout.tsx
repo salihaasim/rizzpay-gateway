@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
@@ -8,12 +8,15 @@ import { toast } from 'sonner';
 
 export interface AdminLayoutProps {
   children?: React.ReactNode;
+  hideNavigation?: boolean;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentMerchant, logout } = useMerchantAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Check if user is admin, if not redirect to login
   useEffect(() => {
@@ -33,6 +36,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     return null;
   }
   
+  // Check if the current path is a settings, activity-log, or transaction-log page
+  const isSettingsPage = location.pathname.includes('/admin/settings');
+  const isActivityLogPage = location.pathname.includes('/admin/activity-log');
+  const isTransactionLogPage = location.pathname.includes('/admin/transactions-log');
+  
+  // Hide navigation if explicitly passed or on specific pages
+  const shouldHideNavigation = hideNavigation || isSettingsPage || isActivityLogPage || isTransactionLogPage;
+  
   return (
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar 
@@ -43,7 +54,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       />
       
       <div className="flex flex-col flex-1 overflow-hidden">
-        <AdminHeader onLogout={handleLogout} />
+        <AdminHeader 
+          onLogout={handleLogout} 
+          setMobileMenuOpen={setMobileMenuOpen} 
+          hideNavigation={shouldHideNavigation}
+        />
         
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           {children || <Outlet />}

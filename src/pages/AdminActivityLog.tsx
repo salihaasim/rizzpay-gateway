@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import AdminLayout from '@/components/admin/AdminLayout';
 import ActivityLogTable from '@/components/admin/activity/ActivityLogTable';
 import { useActivityLogStore } from '@/stores/activityLog';
+import { Helmet } from 'react-helmet';
 
 const AdminActivityLog = () => {
   const [startDate, setStartDate] = useState<Date>();
@@ -44,7 +45,10 @@ const AdminActivityLog = () => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout hideNavigation={true}>
+      <Helmet>
+        <title>Activity Logs | RizzPay Admin</title>
+      </Helmet>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

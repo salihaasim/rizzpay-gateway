@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { CalendarIcon, Download, FileSpreadsheet, Search, Filter } from "lucide-react";
+import { CalendarIcon, Download, FileSpreadsheet, Search } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { toast } from "sonner";
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useTransactionStore } from '@/stores/transactionStore';
+import { Helmet } from 'react-helmet';
 
 const AdminTransactionLog = () => {
   // Date range state
@@ -72,7 +73,10 @@ const AdminTransactionLog = () => {
   };
   
   return (
-    <AdminLayout>
+    <AdminLayout hideNavigation={true}>
+      <Helmet>
+        <title>Transaction Log | RizzPay Admin</title>
+      </Helmet>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
