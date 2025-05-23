@@ -35,6 +35,7 @@ import DeveloperPage from './pages/DeveloperPage';
 import AdminSettings from './pages/AdminSettings';
 import AdminTransactionLog from './pages/AdminTransactionLog';
 import AdminActivityLog from './pages/AdminActivityLog';
+import KycPage from './pages/KycPage';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -84,6 +85,7 @@ const App: React.FC = () => {
           <Route path="/banking" element={<BankingPage />} />
           <Route path="/webhooks" element={<Webhooks />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/kyc" element={<KycPage />} />
           <Route path="/upi-plugin" element={<UpiPluginPage />} />
           <Route path="/transfers" element={<TransfersPage />} />
           <Route path="/developer" element={<DeveloperPage />} />

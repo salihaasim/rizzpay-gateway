@@ -19,7 +19,8 @@ import {
   Link as LinkIcon,
   BanknoteIcon,
   IndianRupee,
-  LogOut
+  LogOut,
+  IdCard
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
@@ -68,6 +69,11 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
       title: "Banking",
       href: "/banking",
       icon: <BanknoteIcon className="h-5 w-5" />
+    },
+    {
+      title: "KYC Verification",
+      href: "/kyc",
+      icon: <IdCard className="h-5 w-5" />
     },
     {
       title: "UPI Payment Link",
