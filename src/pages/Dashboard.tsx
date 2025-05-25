@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -17,7 +18,8 @@ import {
   QrCode, 
   Star,
   Trash2,
-  Plus
+  Plus,
+  AlertCircle
 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +49,8 @@ const Dashboard = () => {
   const [amount, setAmount] = useState('');
   const [customerUpiId, setCustomerUpiId] = useState('');
   const [isUpiPopupOpen, setIsUpiPopupOpen] = useState(false);
+  const [showUpiQr, setShowUpiQr] = useState(false);
+  const [generatedUpiUrl, setGeneratedUpiUrl] = useState('');
   
   // Bank account favorites
   const [bankAccounts, setBankAccounts] = useState([
@@ -75,6 +79,19 @@ const Dashboard = () => {
       )
     );
     toast.success('Favorite status updated');
+  };
+
+  // Validate UPI ID format
+  const validateUpiId = (upiId: string): boolean => {
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    return upiRegex.test(upiId);
+  };
+
+  // Generate UPI QR code URL
+  const generateUpiQrCode = (upiId: string, amount: string) => {
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(customerName || 'Customer')}&am=${amount}&cu=INR&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=RIZZPAY${Date.now()}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUrl)}`;
+    return { upiUrl, qrCodeUrl };
   };
   
   const handlePaymentSubmit = async (e: React.FormEvent) => {
@@ -158,19 +175,17 @@ const Dashboard = () => {
         break;
       
       case 'upi':
-        if (customerUpiId && customerUpiId.includes('@')) {
-          toast.info(`Sending UPI payment request to ${customerUpiId}`);
-          // Here you would integrate with UPI direct API
-          setTimeout(() => {
-            toast.success('UPI payment request sent successfully');
-            // Clear form
-            setCustomerName('');
-            setCustomerEmail('');
-            setAmount('');
-            setCustomerUpiId('');
-          }, 1500);
+        if (customerUpiId && validateUpiId(customerUpiId)) {
+          // Generate UPI QR code for custom UPI ID
+          const { upiUrl, qrCodeUrl } = generateUpiQrCode(customerUpiId, amount);
+          setGeneratedUpiUrl(qrCodeUrl);
+          setShowUpiQr(true);
+          
+          toast.success('UPI QR code generated', {
+            description: 'Customer can scan the QR code to make payment'
+          });
         } else if (upiProvider) {
-          // Open UPI QR popup
+          // Open UPI QR popup for merchant UPI
           setIsUpiPopupOpen(true);
         } else {
           toast.error('Please enter a valid UPI ID or select a provider');
@@ -266,41 +281,76 @@ const Dashboard = () => {
                   {paymentMethod === 'upi' && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="upiId" className="text-sm font-medium">Customer UPI ID (Optional)</Label>
+                        <Label htmlFor="upiId" className="text-sm font-medium">Customer UPI ID</Label>
                         <Input
                           type="text"
                           id="upiId"
                           value={customerUpiId}
                           onChange={(e) => setCustomerUpiId(e.target.value)}
-                          placeholder="name@upi"
+                          placeholder="customer@upi (e.g. john@paytm)"
                           className="w-full"
                         />
+                        {customerUpiId && !validateUpiId(customerUpiId) && (
+                          <p className="text-xs text-destructive flex items-center mt-1">
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            Please enter a valid UPI ID (e.g. name@bank)
+                          </p>
+                        )}
                         <p className="text-xs text-muted-foreground mt-1">
-                          Enter UPI ID or select a provider below to generate QR code
+                          Enter customer's UPI ID to generate QR code for them, or select provider below for merchant QR
                         </p>
                       </div>
                       
-                      <div className="space-y-2 p-4 bg-muted/20 rounded-md">
-                        <Label className="text-sm font-medium">UPI Provider</Label>
-                        <RadioGroup value={upiProvider} onValueChange={setUpiProvider} className="grid grid-cols-2 gap-2 mt-2">
-                          <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                            <RadioGroupItem value="gpay" id="gpay" />
-                            <Label htmlFor="gpay" className="cursor-pointer">Google Pay</Label>
+                      {!customerUpiId && (
+                        <div className="space-y-2 p-4 bg-muted/20 rounded-md">
+                          <Label className="text-sm font-medium">Or use Merchant UPI Provider</Label>
+                          <RadioGroup value={upiProvider} onValueChange={setUpiProvider} className="grid grid-cols-2 gap-2 mt-2">
+                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                              <RadioGroupItem value="gpay" id="gpay" />
+                              <Label htmlFor="gpay" className="cursor-pointer">Google Pay</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                              <RadioGroupItem value="phonepe" id="phonepe" />
+                              <Label htmlFor="phonepe" className="cursor-pointer">PhonePe</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                              <RadioGroupItem value="paytm" id="paytm" />
+                              <Label htmlFor="paytm" className="cursor-pointer">Paytm</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
+                              <RadioGroupItem value="other" id="other" />
+                              <Label htmlFor="other" className="cursor-pointer">Other UPI</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      )}
+
+                      {/* Display generated QR code */}
+                      {showUpiQr && generatedUpiUrl && (
+                        <div className="border rounded-md p-4 bg-white">
+                          <div className="text-center">
+                            <h4 className="text-sm font-medium mb-2">UPI QR Code for {customerUpiId}</h4>
+                            <img 
+                              src={generatedUpiUrl} 
+                              alt="UPI QR Code" 
+                              className="mx-auto border rounded"
+                              width="200" 
+                              height="200"
+                            />
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Customer can scan this QR code to pay ₹{amount}
+                            </p>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="mt-2"
+                              onClick={() => setShowUpiQr(false)}
+                            >
+                              Close QR Code
+                            </Button>
                           </div>
-                          <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                            <RadioGroupItem value="phonepe" id="phonepe" />
-                            <Label htmlFor="phonepe" className="cursor-pointer">PhonePe</Label>
-                          </div>
-                          <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                            <RadioGroupItem value="paytm" id="paytm" />
-                            <Label htmlFor="paytm" className="cursor-pointer">Paytm</Label>
-                          </div>
-                          <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                            <RadioGroupItem value="other" id="other" />
-                            <Label htmlFor="other" className="cursor-pointer">Other UPI</Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   
@@ -349,7 +399,7 @@ const Dashboard = () => {
                     {paymentMethod === 'card' && <CreditCard className="mr-2 h-4 w-4" />}
                     {paymentMethod === 'neft' && <IndianRupee className="mr-2 h-4 w-4" />}
                     {paymentMethod === 'upi' && <QrCode className="mr-2 h-4 w-4" />}
-                    Generate {paymentMethod.toUpperCase()} Payment
+                    {paymentMethod === 'upi' && customerUpiId ? 'Generate QR Code' : `Generate ${paymentMethod.toUpperCase()} Payment`}
                   </Button>
                 </form>
               </Tabs>
