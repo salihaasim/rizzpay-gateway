@@ -14,7 +14,9 @@ import {
   Wallet,
   ShieldCheck,
   Code,
-  ActivitySquare
+  ActivitySquare,
+  EyeOff,
+  Eye
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserSwitcher from './UserSwitcher';
@@ -24,10 +26,12 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   // Set mounted state to true after initial render for animations
   useEffect(() => {
@@ -40,6 +44,10 @@ const Navbar = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const toggleNavVisibility = () => {
+    setNavHidden(!navHidden);
   };
 
   const navItems = [
@@ -78,7 +86,11 @@ const Navbar = () => {
           </Link>
         </div>
         
-        <nav className="hidden lg:flex items-center justify-center flex-1 px-4">
+        {/* Desktop Navigation */}
+        <nav className={cn(
+          "hidden lg:flex items-center justify-center flex-1 px-4 transition-all duration-300",
+          navHidden && "opacity-0 pointer-events-none"
+        )}>
           <div className="flex gap-1 bg-secondary/30 p-1 rounded-lg">
             {navItems.map((item, index) => 
               mounted ? (
@@ -98,7 +110,8 @@ const Navbar = () => {
                     )}
                   >
                     {item.icon}
-                    {item.name}
+                    <span className="hidden xl:inline">{item.name}</span>
+                    <span className="xl:hidden">{item.name.split(' ')[0]}</span>
                   </Link>
                 </motion.div>
               ) : (
@@ -113,15 +126,19 @@ const Navbar = () => {
                   )}
                 >
                   {item.icon}
-                  {item.name}
+                  <span className="hidden xl:inline">{item.name}</span>
+                  <span className="xl:hidden">{item.name.split(' ')[0]}</span>
                 </Link>
               )
             )}
           </div>
         </nav>
         
-        {/* Tablet view: simplified navigation */}
-        <nav className="hidden md:flex lg:hidden gap-1 mx-4 overflow-x-auto pb-2 flex-1 justify-center">
+        {/* Tablet Navigation */}
+        <nav className={cn(
+          "hidden md:flex lg:hidden gap-1 mx-4 overflow-x-auto pb-2 flex-1 justify-center transition-all duration-300",
+          navHidden && "opacity-0 pointer-events-none"
+        )}>
           {navItems.map((item, index) => 
             mounted ? (
               <motion.div
@@ -164,6 +181,19 @@ const Navbar = () => {
         </nav>
         
         <div className="flex items-center gap-2 ml-auto">
+          {/* Navigation visibility toggle for mobile/tablet */}
+          {!isDesktop && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleNavVisibility}
+              className="md:flex lg:hidden"
+              title={navHidden ? "Show navigation" : "Hide navigation"}
+            >
+              {navHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            </Button>
+          )}
+          
           <UserSwitcher />
           
           <Sheet open={open} onOpenChange={setOpen}>

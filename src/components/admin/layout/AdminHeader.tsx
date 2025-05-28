@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, Bell, Menu, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, Bell, Menu, ChevronLeft, ChevronRight, EyeOff, Eye } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'react-router-dom';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 export interface AdminHeaderProps {
   onLogout?: () => void;
@@ -13,6 +14,8 @@ export interface AdminHeaderProps {
   userEmail?: string;
   collapsed?: boolean;
   setCollapsed?: (collapsed: boolean) => void;
+  hiddenOnMobile?: boolean;
+  setHiddenOnMobile?: (hidden: boolean) => void;
 }
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({
@@ -21,12 +24,22 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   hideNavigation = false,
   userEmail,
   collapsed,
-  setCollapsed
+  setCollapsed,
+  hiddenOnMobile = false,
+  setHiddenOnMobile
 }) => {
   const location = useLocation();
+  const isMobile = useMediaQuery('(max-width: 1024px)');
   
   const getPageTitle = () => {
     const path = location.pathname;
+    if (path.includes('/admin/monitoring')) {
+      if (path.includes('/admin/monitoring/')) {
+        const dashboardType = path.split('/admin/monitoring/')[1];
+        return `${dashboardType.charAt(0).toUpperCase() + dashboardType.slice(1)} Monitoring`;
+      }
+      return 'System Monitoring';
+    }
     if (path.includes('/admin/settings')) return 'Admin Settings';
     if (path.includes('/admin/activity-log')) return 'Activity Log';
     if (path.includes('/admin/transactions-log')) return 'Transaction Log';
@@ -42,6 +55,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   const handleLogout = () => {
     if (onLogout) {
       onLogout();
+    }
+  };
+
+  const toggleMobileNavVisibility = () => {
+    if (setHiddenOnMobile) {
+      setHiddenOnMobile(!hiddenOnMobile);
     }
   };
   
@@ -64,27 +83,48 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
               )}
             </Button>
             
-            {/* Mobile menu toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden h-8 w-8"
-              onClick={() => setMobileMenuOpen && setMobileMenuOpen(true)}
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
+            {/* Mobile controls */}
+            <div className="lg:hidden flex items-center gap-2">
+              {/* Mobile menu toggle - only show if nav is not hidden */}
+              {!hiddenOnMobile && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setMobileMenuOpen && setMobileMenuOpen(true)}
+                  title="Open navigation menu"
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              )}
+              
+              {/* Mobile navigation visibility toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={toggleMobileNavVisibility}
+                title={hiddenOnMobile ? "Show navigation" : "Hide navigation"}
+              >
+                {hiddenOnMobile ? (
+                  <Eye className="h-4 w-4" />
+                ) : (
+                  <EyeOff className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </>
         )}
         
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">{getPageTitle()}</h1>
-          <p className="text-sm text-gray-500">Manage your platform from here</p>
+          <h1 className="text-xl font-semibold text-gray-900 truncate">{getPageTitle()}</h1>
+          <p className="text-sm text-gray-500 hidden sm:block">Manage your platform from here</p>
         </div>
       </div>
       
       <div className="flex items-center gap-3">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative hidden sm:flex">
           <Bell className="h-5 w-5" />
           <Badge 
             variant="destructive" 
@@ -96,8 +136,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         
         {/* User Profile */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:block text-right">
-            <p className="text-sm font-medium text-gray-900">
+          <div className="hidden md:block text-right">
+            <p className="text-sm font-medium text-gray-900 truncate max-w-32">
               {userEmail?.split('@')[0] || 'Admin'}
             </p>
             <p className="text-xs text-gray-500">Administrator</p>

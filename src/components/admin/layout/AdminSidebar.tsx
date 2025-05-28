@@ -30,6 +30,8 @@ interface AdminSidebarProps {
   handleLogout?: () => void;
   mobileMenuOpen?: boolean;
   setMobileMenuOpen?: (open: boolean) => void;
+  hiddenOnMobile?: boolean;
+  setHiddenOnMobile?: (hidden: boolean) => void;
 }
 
 export function AdminSidebar({ 
@@ -38,7 +40,9 @@ export function AdminSidebar({
   setCollapsed, 
   handleLogout,
   mobileMenuOpen,
-  setMobileMenuOpen 
+  setMobileMenuOpen,
+  hiddenOnMobile = false,
+  setHiddenOnMobile
 }: AdminSidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -103,13 +107,20 @@ export function AdminSidebar({
     return location.pathname.startsWith(href);
   };
   
+  // Mobile overlay for closing sidebar when clicking outside
+  const handleOverlayClick = () => {
+    if (setMobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  };
+  
   return (
     <>
       {/* Mobile Overlay */}
-      {mobileMenuOpen && (
+      {mobileMenuOpen && !hiddenOnMobile && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setMobileMenuOpen && setMobileMenuOpen(false)}
+          onClick={handleOverlayClick}
         />
       )}
       
@@ -118,8 +129,14 @@ export function AdminSidebar({
         "flex h-screen bg-white border-r border-gray-200 flex-col transition-all duration-300 shadow-sm z-50",
         "fixed lg:static inset-y-0 left-0",
         collapsed ? "w-16" : "w-64",
-        // Mobile menu state
-        mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        // Mobile responsiveness
+        "lg:translate-x-0",
+        // Mobile menu state - only show when not hidden on mobile
+        hiddenOnMobile 
+          ? "-translate-x-full lg:translate-x-0" 
+          : mobileMenuOpen 
+            ? "translate-x-0" 
+            : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -135,7 +152,8 @@ export function AdminSidebar({
             ) : (
               <>
                 <CreditCard className="h-6 w-6" />
-                <span>{siteConfig.name}</span>
+                <span className="hidden sm:inline">{siteConfig.name}</span>
+                <span className="sm:hidden">RP</span>
               </>
             )}
           </button>
@@ -152,7 +170,7 @@ export function AdminSidebar({
         </div>
         
         {/* Navigation */}
-        <div className="flex-1 py-4">
+        <div className="flex-1 py-4 overflow-y-auto">
           <nav className="px-2 space-y-1">
             {navigationItems.map((item) => (
               <Link
@@ -169,7 +187,7 @@ export function AdminSidebar({
                 title={collapsed ? item.title : undefined}
               >
                 {item.icon}
-                {!collapsed && <span>{item.title}</span>}
+                {!collapsed && <span className="truncate">{item.title}</span>}
               </Link>
             ))}
           </nav>

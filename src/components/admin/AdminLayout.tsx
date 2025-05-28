@@ -5,6 +5,7 @@ import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
 import { toast } from 'sonner';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 export interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -15,8 +16,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const navigate = useNavigate();
   const location = useLocation();
   const { currentMerchant, logout } = useMerchantAuth();
+  const isMobile = useMediaQuery('(max-width: 1024px)');
+  
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hiddenOnMobile, setHiddenOnMobile] = useState(false);
   
   // Check if user is admin, if not redirect to login
   useEffect(() => {
@@ -25,6 +29,25 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
       navigate('/auth', { replace: true });
     }
   }, [currentMerchant, navigate]);
+
+  // Auto-hide mobile menu when route changes
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  }, [location.pathname]);
+
+  // Close mobile menu when clicking outside (handled by overlay in AdminSidebar)
+  useEffect(() => {
+    const handleResize = () => {
+      if (!isMobile && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile, mobileMenuOpen]);
   
   const handleLogout = () => {
     logout();
@@ -38,7 +61,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   }
   
   return (
-    <div className="flex h-screen bg-gray-50 w-full">
+    <div className="flex h-screen bg-gray-50 w-full overflow-hidden">
       {!hideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
@@ -47,6 +70,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           handleLogout={handleLogout}
           mobileMenuOpen={mobileMenuOpen}
           setMobileMenuOpen={setMobileMenuOpen}
+          hiddenOnMobile={hiddenOnMobile}
+          setHiddenOnMobile={setHiddenOnMobile}
         />
       )}
       
@@ -58,6 +83,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           userEmail={currentMerchant?.email || ''}
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
+          hiddenOnMobile={hiddenOnMobile}
+          setHiddenOnMobile={setHiddenOnMobile}
         />
         
         <main className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
