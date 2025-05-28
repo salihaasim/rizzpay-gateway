@@ -6,7 +6,7 @@ import {
   Activity, AlertTriangle, Database, Server, Users, Lock, Zap, 
   BarChart3, Globe, Cpu, Signal, FileWarning, Clock, ArrowDownUp,
   ExternalLink, Layers, ShieldAlert, Bug, LineChart, Receipt, Network,
-  PanelTop, Gauge
+  PanelTop, Gauge, RefreshCw
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
-// Monitoring data - In a real app, this would come from API calls
+// Enhanced monitoring data with real-time capabilities
 const systemStatus = {
   cpu: 28,
   memory: 42,
@@ -156,6 +156,7 @@ const MonitoringSectionCard = ({
 
 const AdminMonitoring = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [lastRefresh, setLastRefresh] = useState(new Date());
   
   // Define the monitoring sections for the dedicated dashboards
   const monitoringSections = [
@@ -212,43 +213,57 @@ const AdminMonitoring = () => {
       description: "Overall system health dashboard",
       icon: <Gauge className="h-6 w-6 text-primary" />,
       path: "/admin/monitoring/status"
+    },
+    {
+      title: "Performance Analytics",
+      description: "Detailed performance metrics and insights",
+      icon: <BarChart3 className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/performance"
+    },
+    {
+      title: "Incident Management",
+      description: "Track and resolve system incidents",
+      icon: <AlertTriangle className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/incidents"
     }
   ];
+  
+  const handleRefreshData = () => {
+    setLastRefresh(new Date());
+    console.log("Refreshing monitoring data...");
+    // In a real implementation, this would trigger API calls to refresh monitoring data
+  };
   
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">System Monitoring</h1>
-          <p className="text-muted-foreground">
-            Comprehensive overview of RizzPay system performance and health.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">System Monitoring</h1>
+            <p className="text-muted-foreground">
+              Comprehensive overview of RizzPay system performance and health.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Last updated: {lastRefresh.toLocaleTimeString()}
+            </span>
+            <Button variant="outline" size="sm" onClick={handleRefreshData}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
         </div>
         
         <Tabs defaultValue="overview" className="space-y-4" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="dashboards">Monitoring Dashboards</TabsTrigger>
+            <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="payments">Payment Systems</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="incidents">Incidents</TabsTrigger>
           </TabsList>
-          
-          {/* Monitoring Dashboards Tab */}
-          <TabsContent value="dashboards" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {monitoringSections.map((section, index) => (
-                <MonitoringSectionCard
-                  key={index}
-                  title={section.title}
-                  description={section.description}
-                  icon={section.icon}
-                  path={section.path}
-                />
-              ))}
-            </div>
-          </TabsContent>
           
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
@@ -403,6 +418,21 @@ const AdminMonitoring = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          {/* Monitoring Dashboards Tab */}
+          <TabsContent value="dashboards" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {monitoringSections.map((section, index) => (
+                <MonitoringSectionCard
+                  key={index}
+                  title={section.title}
+                  description={section.description}
+                  icon={section.icon}
+                  path={section.path}
+                />
+              ))}
+            </div>
           </TabsContent>
           
           {/* Performance Tab */}

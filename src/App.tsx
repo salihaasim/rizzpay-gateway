@@ -35,6 +35,8 @@ import DeveloperPage from './pages/DeveloperPage';
 import AdminSettings from './pages/AdminSettings';
 import AdminTransactionLog from './pages/AdminTransactionLog';
 import AdminActivityLog from './pages/AdminActivityLog';
+import AdminMonitoring from './pages/AdminMonitoring';
+import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
 import KycPage from './pages/KycPage';
 import Auth from './pages/Auth';
 
@@ -101,6 +103,8 @@ const App: React.FC = () => {
         {/* Admin routes - directly accessible for now */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="monitoring" element={<AdminMonitoring />} />
+          <Route path="monitoring/:dashboardType" element={<MonitoringDashboard />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="merchants" element={<AdminMerchants />} />
           <Route path="kyc" element={<AdminKYC />} />

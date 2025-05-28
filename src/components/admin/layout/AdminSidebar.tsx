@@ -13,7 +13,8 @@ import {
   Activity,
   LogOut,
   Shield,
-  X
+  X,
+  Monitor
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -47,6 +48,11 @@ export function AdminSidebar({
       title: "Dashboard",
       href: "/admin",
       icon: <LayoutDashboard className="h-5 w-5" />
+    },
+    {
+      title: "Monitoring",
+      href: "/admin/monitoring",
+      icon: <Monitor className="h-5 w-5" />
     },
     {
       title: "Transactions",
