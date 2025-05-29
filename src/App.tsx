@@ -40,6 +40,7 @@ import AdminMonitoring from './pages/AdminMonitoring';
 import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
 import KycPage from './pages/KycPage';
 import Auth from './pages/Auth';
+import AdminEscrow from './pages/AdminEscrow';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -107,6 +108,7 @@ const App: React.FC = () => {
           <Route index element={<AdminDashboard />} />
           <Route path="monitoring" element={<AdminMonitoring />} />
           <Route path="monitoring/:dashboardType" element={<MonitoringDashboard />} />
+          <Route path="escrow" element={<AdminEscrow />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="merchants" element={<AdminMerchants />} />
           <Route path="kyc" element={<AdminKYC />} />

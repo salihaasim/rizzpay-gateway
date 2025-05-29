@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -14,7 +13,8 @@ import {
   LogOut,
   Shield,
   X,
-  Monitor
+  Monitor,
+  Wallet
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -57,6 +57,11 @@ export function AdminSidebar({
       title: "Monitoring",
       href: "/admin/monitoring",
       icon: <Monitor className="h-5 w-5" />
+    },
+    {
+      title: "Escrow Management",
+      href: "/admin/escrow",
+      icon: <Wallet className="h-5 w-5" />
     },
     {
       title: "Transactions",
