@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { 
   Wallet, 
   CreditCard, 
-  Bank, 
+  Building2, 
   IndianRupee, 
   ArrowUpRight, 
   Clock,
