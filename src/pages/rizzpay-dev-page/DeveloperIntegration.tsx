@@ -149,14 +149,14 @@ const DeveloperIntegration = () => {
                       </Button>
                     </div>
                     <div className="space-y-2">
-                      <div>const RizzPay = require('rizzpay-sdk');</div>
-                      <div>const client = new RizzPay('your-api-key');</div>
+                      <div>const RizzPay = require(&apos;rizzpay-sdk&apos;);</div>
+                      <div>const client = new RizzPay(&apos;your-api-key&apos;);</div>
                       <div className="mt-4"></div>
-                      <div>const payment = await client.payments.create({'{'}}</div>
+                      <div>const payment = await client.payments.create(&#123;</div>
                       <div className="ml-4">amount: 1000,</div>
-                      <div className="ml-4">currency: 'INR',</div>
-                      <div className="ml-4">customer_email: 'user@example.com'</div>
-                      <div>{'});'}</div>
+                      <div className="ml-4">currency: &apos;INR&apos;,</div>
+                      <div className="ml-4">customer_email: &apos;user@example.com&apos;</div>
+                      <div>&#125;);</div>
                     </div>
                   </div>
                 </TabsContent>
@@ -171,13 +171,13 @@ const DeveloperIntegration = () => {
                     </div>
                     <div className="space-y-2">
                       <div>import rizzpay</div>
-                      <div>client = rizzpay.Client('your-api-key')</div>
+                      <div>client = rizzpay.Client(&apos;your-api-key&apos;)</div>
                       <div className="mt-4"></div>
-                      <div>payment = client.payments.create({'{'}}</div>
-                      <div className="ml-4">'amount': 1000,</div>
-                      <div className="ml-4">'currency': 'INR',</div>
-                      <div className="ml-4">'customer_email': 'user@example.com'</div>
-                      <div>{'})'}</div>
+                      <div>payment = client.payments.create(&#123;</div>
+                      <div className="ml-4">&apos;amount&apos;: 1000,</div>
+                      <div className="ml-4">&apos;currency&apos;: &apos;INR&apos;,</div>
+                      <div className="ml-4">&apos;customer_email&apos;: &apos;user@example.com&apos;</div>
+                      <div>&#125;)</div>
                     </div>
                   </div>
                 </TabsContent>
@@ -192,12 +192,12 @@ const DeveloperIntegration = () => {
                     </div>
                     <div className="space-y-2">
                       <div>use RizzPay\Client;</div>
-                      <div>$client = new Client('your-api-key');</div>
+                      <div>$client = new Client(&apos;your-api-key&apos;);</div>
                       <div className="mt-4"></div>
-                      <div>$payment = $client->payments->create([</div>
-                      <div className="ml-4">'amount' => 1000,</div>
-                      <div className="ml-4">'currency' => 'INR',</div>
-                      <div className="ml-4">'customer_email' => 'user@example.com'</div>
+                      <div>$payment = $client-&gt;payments-&gt;create([</div>
+                      <div className="ml-4">&apos;amount&apos; =&gt; 1000,</div>
+                      <div className="ml-4">&apos;currency&apos; =&gt; &apos;INR&apos;,</div>
+                      <div className="ml-4">&apos;customer_email&apos; =&gt; &apos;user@example.com&apos;</div>
                       <div>]);</div>
                     </div>
                   </div>
@@ -213,13 +213,13 @@ const DeveloperIntegration = () => {
                     </div>
                     <div className="space-y-2">
                       <div>curl -X POST https://api.rizzpay.com/v1/payments \</div>
-                      <div className="ml-4">-H "Authorization: Bearer your-api-key" \</div>
-                      <div className="ml-4">-H "Content-Type: application/json" \</div>
-                      <div className="ml-4">-d '{'{'}' \</div>
-                      <div className="ml-8">"amount": 1000,</div>
-                      <div className="ml-8">"currency": "INR",</div>
-                      <div className="ml-8">"customer_email": "user@example.com"</div>
-                      <div className="ml-4">{'}'}</div>
+                      <div className="ml-4">-H &quot;Authorization: Bearer your-api-key&quot; \</div>
+                      <div className="ml-4">-H &quot;Content-Type: application/json&quot; \</div>
+                      <div className="ml-4">-d &apos;&#123; \</div>
+                      <div className="ml-8">&quot;amount&quot;: 1000,</div>
+                      <div className="ml-8">&quot;currency&quot;: &quot;INR&quot;,</div>
+                      <div className="ml-8">&quot;customer_email&quot;: &quot;user@example.com&quot;</div>
+                      <div className="ml-4">&#125;&apos;</div>
                     </div>
                   </div>
                 </TabsContent>

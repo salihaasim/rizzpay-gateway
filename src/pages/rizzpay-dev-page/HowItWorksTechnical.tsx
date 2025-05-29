@@ -193,18 +193,18 @@ const HowItWorksTechnical = () => {
             <CardContent>
               <div className="bg-gray-900 rounded-lg p-6 text-green-400 font-mono text-sm overflow-x-auto">
                 <div className="mb-4 text-gray-500">// Initialize RizzPay SDK</div>
-                <div className="mb-2">import RizzPay from 'rizzpay-sdk';</div>
-                <div className="mb-4">const rizzpay = new RizzPay('your-api-key');</div>
+                <div className="mb-2">import RizzPay from &apos;rizzpay-sdk&apos;;</div>
+                <div className="mb-4">const rizzpay = new RizzPay(&apos;your-api-key&apos;);</div>
                 
                 <div className="mb-4 text-gray-500">// Create payment</div>
-                <div className="mb-2">const payment = await rizzpay.createPayment({'{'}}</div>
+                <div className="mb-2">const payment = await rizzpay.createPayment(&#123;</div>
                 <div className="mb-2 ml-4">amount: 1000,</div>
-                <div className="mb-2 ml-4">currency: 'INR',</div>
-                <div className="mb-2 ml-4">customer: {'{'} email: 'user@example.com' {'}'}</div>
-                <div className="mb-4">{'});'}</div>
+                <div className="mb-2 ml-4">currency: &apos;INR&apos;,</div>
+                <div className="mb-2 ml-4">customer: &#123; email: &apos;user@example.com&apos; &#125;</div>
+                <div className="mb-4">&#125;);</div>
                 
                 <div className="mb-4 text-gray-500">// Handle success</div>
-                <div>console.log('Payment successful:', payment.id);</div>
+                <div>console.log(&apos;Payment successful:&apos;, payment.id);</div>
               </div>
             </CardContent>
           </Card>
