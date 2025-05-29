@@ -22,10 +22,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hiddenOnMobile, setHiddenOnMobile] = useState(false);
   
-  // Check if current page is a monitoring dashboard page (but NOT escrow page)
+  // Check if current page is a monitoring dashboard page
   const isMonitoringDashboard = location.pathname.startsWith('/admin/monitoring/') && 
-                               location.pathname !== '/admin/monitoring' &&
-                               location.pathname !== '/admin/escrow';
+                               location.pathname !== '/admin/monitoring';
   
   // Check if user is admin, if not redirect to login
   useEffect(() => {
@@ -69,7 +68,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const shouldHideNavigation = hideNavigation || isMonitoringDashboard;
   
   return (
-    <div className="flex h-screen bg-gray-900 w-full overflow-hidden">
+    <div className="flex h-screen bg-gray-50 w-full overflow-hidden">
       {!shouldHideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
@@ -97,7 +96,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           />
         )}
         
-        <main className={`flex-1 overflow-auto bg-gray-100 ${shouldHideNavigation ? '' : 'p-4 md:p-6'}`}>
+        <main className={`flex-1 overflow-auto bg-gray-50 ${shouldHideNavigation ? '' : 'p-4 md:p-6'}`}>
           {children || <Outlet />}
         </main>
       </div>
