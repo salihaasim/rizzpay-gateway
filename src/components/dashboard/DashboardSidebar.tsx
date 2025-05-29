@@ -41,19 +41,16 @@ const DashboardSidebar = () => {
     { name: 'Settings', path: '/settings', icon: Settings }
   ];
 
-  const activeStyle = {
-    backgroundColor: '#0052FF',
-    color: '#FFFFFF'
-  };
-
   const renderSidebarItems = () => (
     <div className="flex flex-col space-y-2">
       {sidebarItems.map((item) => (
         <NavLink
           key={item.name}
           to={item.path}
-          className="flex items-center px-4 py-2 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-          style={location.pathname === item.path ? activeStyle : undefined}
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-colors
+            ${isActive ? 'bg-purple-600 text-white' : ''}
+          `}
         >
           <item.icon className="h-5 w-5 mr-2" />
           <span>{item.name}</span>
@@ -63,9 +60,9 @@ const DashboardSidebar = () => {
   );
 
   return (
-    <aside className="bg-white w-64 flex-shrink-0 border-r border-gray-200 hidden md:block shadow-sm">
-      <div className="h-full px-3 py-4 overflow-y-auto bg-white">
-        <div className="text-blue-600 text-sm font-semibold mb-4">
+    <aside className="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 hidden md:block shadow-sm">
+      <div className="h-full px-3 py-4 overflow-y-auto bg-gray-800">
+        <div className="text-purple-400 text-sm font-semibold mb-4">
           Merchant Dashboard
         </div>
         {renderSidebarItems()}
