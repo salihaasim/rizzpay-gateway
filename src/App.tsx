@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -18,6 +17,7 @@ import AdminTransactions from './pages/admin/AdminTransactions';
 import AdminMerchants from './pages/admin/AdminMerchants';
 import AdminKYC from './pages/admin/AdminKYC';
 import AdminWhitelist from './pages/admin/AdminWhitelist';
+import AdminEscrow from './pages/admin/AdminEscrow';
 import AdminLayout from './components/admin/AdminLayout';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
@@ -39,6 +39,7 @@ import AdminMonitoring from './pages/AdminMonitoring';
 import MonitoringDashboard from './components/admin/monitoring/MonitoringDashboard';
 import KycPage from './pages/KycPage';
 import Auth from './pages/Auth';
+import PayoutPage from './pages/PayoutPage';
 
 // Layout for pages that should have the footer (only home page)
 const HomePageLayout = () => (
@@ -97,6 +98,7 @@ const App: React.FC = () => {
           <Route path="/upi-plugin" element={<UpiPluginPage />} />
           <Route path="/transfers" element={<TransfersPage />} />
           <Route path="/developer" element={<DeveloperPage />} />
+          <Route path="/payout" element={<PayoutPage />} />
           <Route path="/plugin" element={<Navigate to="/upi-plugin" replace />} />
         </Route>
         
@@ -110,6 +112,7 @@ const App: React.FC = () => {
           <Route path="kyc" element={<AdminKYC />} />
           <Route path="whitelist" element={<AdminWhitelist />} />
           <Route path="upi-management" element={<AdminUpiManagement />} />
+          <Route path="escrow" element={<AdminEscrow />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="transactions-log" element={<AdminTransactionLog />} />
           <Route path="activity-log" element={<AdminActivityLog />} />
