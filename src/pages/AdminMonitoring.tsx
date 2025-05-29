@@ -1,614 +1,266 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Activity, AlertTriangle, Database, Server, Users, Lock, Zap, 
-  BarChart3, Globe, Cpu, Signal, FileWarning, Clock, ArrowDownUp,
-  ExternalLink, Layers, ShieldAlert, Bug, LineChart, Receipt, Network,
-  PanelTop, Gauge, RefreshCw, CreditCard
-} from 'lucide-react';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-
-// Enhanced monitoring data with real-time capabilities
-const systemStatus = {
-  cpu: 28,
-  memory: 42,
-  disk: 56,
-  network: 33,
-  serverUptime: '18d 12h 45m',
-  responseTime: '126ms',
-  queuedTasks: 7,
-  activeUsers: 187,
-  databaseConnections: 46,
-  cachingEfficiency: 91,
-  lastRestart: '2023-03-15 04:32:00',
-  errorRate: 0.34,
-  currentLoad: 'Normal',
-  serverRegion: 'ap-south-1',
-  activeTransactions: 23,
-  pendingPayments: 12,
-  upiStatus: 'Operational',
-  bankStatus: 'Operational',
-  cardStatus: 'Degraded',
-  securityEvents: 14,
-  failedLogins: 8,
-  apiCalls: {
-    total: 23845,
-    successful: 23729,
-    failed: 116,
-    averageTime: '187ms'
-  },
-  recentIncidents: [
-    { id: 1, time: '2023-04-12 14:23', description: 'Card payment gateway timeout', status: 'Resolved', severity: 'Medium' },
-    { id: 2, time: '2023-04-10 09:17', description: 'Temporary database connection issues', status: 'Resolved', severity: 'High' },
-    { id: 3, time: '2023-04-05 18:42', description: 'API rate limiting triggered', status: 'Resolved', severity: 'Low' }
-  ]
-};
-
-// Status badge component
-const StatusBadge = ({ status }: { status: string }) => {
-  const getStatusColor = () => {
-    switch(status.toLowerCase()) {
-      case 'operational':
-        return 'bg-green-500/20 text-green-600';
-      case 'degraded':
-        return 'bg-orange-500/20 text-orange-600';
-      case 'down':
-        return 'bg-red-500/20 text-red-600';
-      default:
-        return 'bg-gray-500/20 text-gray-600';
-    }
-  };
-  
-  return (
-    <Badge className={`${getStatusColor()} rounded-full px-2 py-0.5`}>
-      {status}
-    </Badge>
-  );
-};
-
-// Resource usage component
-const ResourceUsage = ({ name, value, icon }: { name: string, value: number, icon: React.ReactNode }) => (
-  <div className="flex items-center gap-4 mb-4">
-    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-      {icon}
-    </div>
-    <div className="flex-1">
-      <div className="flex justify-between mb-1">
-        <span className="text-sm font-medium">{name}</span>
-        <span className="text-sm text-muted-foreground">{value}%</span>
-      </div>
-      <Progress value={value} className="h-2" />
-    </div>
-  </div>
-);
-
-// Incident component
-const Incident = ({ incident }: { incident: any }) => {
-  const getSeverityColor = () => {
-    switch(incident.severity.toLowerCase()) {
-      case 'high':
-        return 'text-red-500';
-      case 'medium':
-        return 'text-orange-500';
-      case 'low':
-        return 'text-yellow-500';
-      default:
-        return 'text-gray-500';
-    }
-  };
-  
-  return (
-    <div className="flex items-start gap-3 mb-4 p-3 bg-secondary/30 rounded-lg">
-      <AlertTriangle className={`h-5 w-5 mt-1 ${getSeverityColor()}`} />
-      <div className="flex-1">
-        <div className="flex justify-between">
-          <p className="font-medium">{incident.description}</p>
-          <Badge variant="outline">{incident.status}</Badge>
-        </div>
-        <div className="flex justify-between mt-1">
-          <p className="text-sm text-muted-foreground">{incident.time}</p>
-          <p className={`text-xs font-medium ${getSeverityColor()}`}>{incident.severity} Severity</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Monitoring section card component
-const MonitoringSectionCard = ({ 
-  title, 
-  description, 
-  icon, 
-  path 
-}: { 
-  title: string; 
-  description: string; 
-  icon: React.ReactNode; 
-  path: string;
-}) => (
-  <Card className="hover:shadow-md transition-shadow">
-    <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <div className="space-y-1">
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </div>
-      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-        {icon}
-      </div>
-    </CardHeader>
-    <CardFooter className="pt-0">
-      <Button asChild variant="outline" className="w-full justify-between mt-2">
-        <Link to={path}>
-          <span>Open Dashboard</span>
-          <ExternalLink className="h-4 w-4" />
-        </Link>
-      </Button>
-    </CardFooter>
-  </Card>
-);
+import { 
+  Monitor, 
+  Server, 
+  Database, 
+  Activity, 
+  Shield, 
+  TrendingUp,
+  AlertCircle,
+  BarChart3,
+  Zap,
+  Eye,
+  GitBranch
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import MonitoringDashboard from '@/components/admin/monitoring/MonitoringDashboard';
+import { Helmet } from 'react-helmet';
 
 const AdminMonitoring = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [lastRefresh, setLastRefresh] = useState(new Date());
-  
-  // Define the monitoring sections for the dedicated dashboards
-  const monitoringSections = [
+  const navigate = useNavigate();
+
+  const monitoringCategories = [
     {
-      title: "Server Performance",
-      description: "CPU, memory, and system resource monitoring",
-      icon: <Cpu className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/server"
+      id: 'server',
+      title: 'Server Performance',
+      description: 'Monitor CPU, memory, and system resources',
+      icon: Server,
+      status: 'operational',
+      metrics: { cpu: '28%', memory: '42%', uptime: '99.9%' }
     },
     {
-      title: "API Gateway",
-      description: "API performance and endpoint monitoring",
-      icon: <Network className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/api"
+      id: 'api',
+      title: 'API Gateway',
+      description: 'Track API performance and response times',
+      icon: Zap,
+      status: 'operational',
+      metrics: { requests: '1.2K/min', latency: '145ms', errors: '0.1%' }
     },
     {
-      title: "Database Health",
-      description: "Database connections and query performance",
-      icon: <Database className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/database"
+      id: 'database',
+      title: 'Database Health',
+      description: 'Monitor database performance and queries',
+      icon: Database,
+      status: 'operational',
+      metrics: { connections: '45/100', queries: '2.3K/min', cache: '91%' }
     },
     {
-      title: "Bank API Integration",
-      description: "HDFC, ICICI, SBI, and Axis Bank API monitoring",
-      icon: <CreditCard className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/bank-api"
+      id: 'payment',
+      title: 'Payment Gateway',
+      description: 'Payment processor status and metrics',
+      icon: Activity,
+      status: 'operational',
+      metrics: { volume: '₹1.2M', success: '99.8%', pending: '12' }
     },
     {
-      title: "Payment Gateways",
-      description: "Payment processor status and performance",
-      icon: <Receipt className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/payment"
+      id: 'security',
+      title: 'Security Monitoring',
+      description: 'Security events and threat detection',
+      icon: Shield,
+      status: 'operational',
+      metrics: { threats: '0', logins: '245', failed: '3' }
     },
     {
-      title: "Security",
-      description: "Security events and threat detection",
-      icon: <ShieldAlert className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/security"
+      id: 'transactions',
+      title: 'Transaction Flow',
+      description: 'Real-time transaction monitoring',
+      icon: TrendingUp,
+      status: 'operational',
+      metrics: { volume: '892', success: '99.2%', avg: '2.3s' }
     },
     {
-      title: "Transaction Monitoring",
-      description: "Real-time transaction tracking",
-      icon: <ArrowDownUp className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/transactions"
+      id: 'errors',
+      title: 'Error Tracking',
+      description: 'Application errors and exceptions',
+      icon: AlertCircle,
+      status: 'warning',
+      metrics: { errors: '12', resolved: '98%', critical: '0' }
     },
     {
-      title: "Error Tracking",
-      description: "Application errors and exceptions",
-      icon: <Bug className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/errors"
+      id: 'analytics',
+      title: 'Business Analytics',
+      description: 'User behavior and performance metrics',
+      icon: BarChart3,
+      status: 'operational',
+      metrics: { users: '1.8K', conversion: '15.2%', revenue: '₹156K' }
     },
     {
-      title: "Analytics",
-      description: "User behavior and business metrics",
-      icon: <LineChart className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/analytics"
+      id: 'status',
+      title: 'System Status',
+      description: 'Overall system health dashboard',
+      icon: Monitor,
+      status: 'operational',
+      metrics: { uptime: '99.95%', incidents: '0', maintenance: '1' }
     },
     {
-      title: "System Status",
-      description: "Overall system health dashboard",
-      icon: <Gauge className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/status"
+      id: 'performance',
+      title: 'Performance Analytics',
+      description: 'Detailed performance metrics',
+      icon: TrendingUp,
+      status: 'operational',
+      metrics: { speed: '1.2s', optimization: '94%', bottlenecks: '2' }
     },
     {
-      title: "Performance Analytics",
-      description: "Detailed performance metrics and insights",
-      icon: <BarChart3 className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/performance"
+      id: 'incidents',
+      title: 'Incident Management',
+      description: 'Track and resolve system incidents',
+      icon: AlertCircle,
+      status: 'operational',
+      metrics: { active: '0', resolved: '15', avg: '45min' }
     },
     {
-      title: "Incident Management",
-      description: "Track and resolve system incidents",
-      icon: <AlertTriangle className="h-6 w-6 text-primary" />,
-      path: "/admin/monitoring/incidents"
+      id: 'bank-api',
+      title: 'Bank API Integration',
+      description: 'Monitor all bank API connections',
+      icon: GitBranch,
+      status: 'operational',
+      metrics: { apis: '4', uptime: '99.1%', latency: '170ms' }
     }
   ];
-  
-  const handleRefreshData = () => {
-    setLastRefresh(new Date());
-    console.log("Refreshing monitoring data...");
-    // In a real implementation, this would trigger API calls to refresh monitoring data
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'operational': return 'text-green-600 bg-green-100';
+      case 'warning': return 'text-orange-600 bg-orange-100';
+      case 'error': return 'text-red-600 bg-red-100';
+      default: return 'text-gray-600 bg-gray-100';
+    }
   };
-  
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'operational': return '●';
+      case 'warning': return '▲';
+      case 'error': return '✕';
+      default: return '○';
+    }
+  };
+
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/admin/monitoring/${categoryId}`);
+  };
+
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    <Routes>
+      <Route index element={
+        <div className="space-y-6">
+          <Helmet>
+            <title>System Monitoring | RizzPay Admin</title>
+          </Helmet>
+          
           <div>
             <h1 className="text-3xl font-bold tracking-tight">System Monitoring</h1>
-            <p className="text-muted-foreground">
-              Comprehensive overview of RizzPay system performance and health.
+            <p className="text-muted-foreground mt-2">
+              Comprehensive monitoring dashboard for all system components and services
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Last updated: {lastRefresh.toLocaleTimeString()}
-            </span>
-            <Button variant="outline" size="sm" onClick={handleRefreshData}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+
+          {/* Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">System Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold text-green-600">Operational</div>
+                  <Monitor className="h-6 w-6 text-green-600" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">All systems running normally</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold text-orange-600">2</div>
+                  <AlertCircle className="h-6 w-6 text-orange-600" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Warnings requiring attention</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Uptime</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold text-blue-600">99.95%</div>
+                  <TrendingUp className="h-6 w-6 text-blue-600" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Performance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold text-green-600">Excellent</div>
+                  <Eye className="h-6 w-6 text-green-600" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Response times optimal</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Monitoring Categories Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {monitoringCategories.map((category) => {
+              const IconComponent = category.icon;
+              return (
+                <Card key={category.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleCategoryClick(category.id)}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <IconComponent className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">{category.title}</CardTitle>
+                          <CardDescription className="text-sm">{category.description}</CardDescription>
+                        </div>
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(category.status)}`}>
+                        <span className="mr-1">{getStatusIcon(category.status)}</span>
+                        {category.status}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      {Object.entries(category.metrics).map(([key, value], index) => (
+                        <div key={index} className="text-center">
+                          <p className="text-muted-foreground capitalize">{key}</p>
+                          <p className="font-semibold">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4">
+                      <Button variant="outline" className="w-full" onClick={() => handleCategoryClick(category.id)}>
+                        <Monitor className="h-4 w-4 mr-2" />
+                        View Dashboard
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
-        
-        <Tabs defaultValue="overview" className="space-y-4" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="payments">Payment Systems</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="incidents">Incidents</TabsTrigger>
-          </TabsList>
-          
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">System Status</CardTitle>
-                  <Server className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{systemStatus.currentLoad}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Server uptime: {systemStatus.serverUptime}
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Transactions</CardTitle>
-                  <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{systemStatus.activeTransactions}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {systemStatus.pendingPayments} pending payments
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">API Performance</CardTitle>
-                  <Zap className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{systemStatus.apiCalls.averageTime}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Success rate: {((systemStatus.apiCalls.successful / systemStatus.apiCalls.total) * 100).toFixed(2)}%
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Security Events</CardTitle>
-                  <Lock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{systemStatus.securityEvents}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {systemStatus.failedLogins} failed login attempts
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>System Health</CardTitle>
-                  <CardDescription>
-                    Current resource utilization and server performance
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResourceUsage name="CPU Usage" value={systemStatus.cpu} icon={<Cpu className="h-5 w-5 text-primary" />} />
-                  <ResourceUsage name="Memory Usage" value={systemStatus.memory} icon={<Activity className="h-5 w-5 text-primary" />} />
-                  <ResourceUsage name="Disk Space" value={systemStatus.disk} icon={<Database className="h-5 w-5 text-primary" />} />
-                  <ResourceUsage name="Network" value={systemStatus.network} icon={<Globe className="h-5 w-5 text-primary" />} />
-                  
-                  <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div>
-                      <p className="text-sm font-medium mb-1">Response Time</p>
-                      <p className="text-xl font-bold">{systemStatus.responseTime}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-1">Active Users</p>
-                      <p className="text-xl font-bold">{systemStatus.activeUsers}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-1">DB Connections</p>
-                      <p className="text-xl font-bold">{systemStatus.databaseConnections}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-1">Cache Efficiency</p>
-                      <p className="text-xl font-bold">{systemStatus.cachingEfficiency}%</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Services</CardTitle>
-                  <CardDescription>
-                    Current status of payment processors
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Signal className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>UPI Gateway</span>
-                      </div>
-                      <StatusBadge status={systemStatus.upiStatus} />
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Signal className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>Bank Transfers</span>
-                      </div>
-                      <StatusBadge status={systemStatus.bankStatus} />
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Signal className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>Card Processing</span>
-                      </div>
-                      <StatusBadge status={systemStatus.cardStatus} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Incidents</CardTitle>
-                <CardDescription>
-                  System events and incidents from the past 7 days
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {systemStatus.recentIncidents.map(incident => (
-                    <Incident key={incident.id} incident={incident} />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          {/* Monitoring Dashboards Tab */}
-          <TabsContent value="dashboards" className="space-y-4">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2">Available Monitoring Dashboards</h3>
-              <p className="text-muted-foreground">
-                Click on any dashboard to view detailed real-time monitoring data and analytics.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {monitoringSections.map((section, index) => (
-                <MonitoringSectionCard
-                  key={index}
-                  title={section.title}
-                  description={section.description}
-                  icon={section.icon}
-                  path={section.path}
-                />
-              ))}
-            </div>
-          </TabsContent>
-          
-          {/* Performance Tab */}
-          <TabsContent value="performance">
-            <Card>
-              <CardHeader>
-                <CardTitle>System Performance</CardTitle>
-                <CardDescription>
-                  Detailed metrics for system performance monitoring
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Detailed performance monitoring view will be displayed here, including:
-                </p>
-                <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                  <li>Real-time server performance graphs</li>
-                  <li>API response time trends</li>
-                  <li>Database query performance</li>
-                  <li>Resource utilization over time</li>
-                  <li>Network traffic analysis</li>
-                </ul>
-                <div className="mt-6">
-                  <Button asChild variant="outline">
-                    <Link to="/admin/monitoring/performance">
-                      <span>Open Detailed Performance Dashboard</span>
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          {/* Payments Systems Tab */}
-          <TabsContent value="payments">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bank API Integration</CardTitle>
-                  <CardDescription>
-                    Monitor all integrated bank APIs including HDFC, ICICI, SBI, and Axis Bank
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">
-                    Comprehensive bank API monitoring includes:
-                  </p>
-                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                    <li>Real-time API status for each bank</li>
-                    <li>Response time tracking and alerts</li>
-                    <li>Transaction success rates by bank</li>
-                    <li>Endpoint health monitoring</li>
-                    <li>Integration documentation links</li>
-                  </ul>
-                  <div className="mt-6">
-                    <Button asChild variant="outline">
-                      <Link to="/admin/monitoring/bank-api">
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        <span>Open Bank API Dashboard</span>
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Gateways</CardTitle>
-                  <CardDescription>
-                    Monitoring of payment processors and gateway services
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">
-                    Payment gateway monitoring includes:
-                  </p>
-                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                    <li>Gateway status for each provider</li>
-                    <li>Transaction processing times</li>
-                    <li>Settlement status tracking</li>
-                    <li>Failed transaction analysis</li>
-                    <li>Provider-specific metrics</li>
-                  </ul>
-                  <div className="mt-6">
-                    <Button asChild variant="outline">
-                      <Link to="/admin/monitoring/payment">
-                        <Receipt className="mr-2 h-4 w-4" />
-                        <span>Open Payment Gateway Dashboard</span>
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          {/* Security Tab */}
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Monitoring</CardTitle>
-                <CardDescription>
-                  Security events and threat detection
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Security monitoring dashboard will be displayed here, including:
-                </p>
-                <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                  <li>Login attempt monitoring</li>
-                  <li>API authentication failures</li>
-                  <li>Suspicious transaction patterns</li>
-                  <li>Data access audit logs</li>
-                  <li>Compliance status indicators</li>
-                </ul>
-                <div className="mt-6">
-                  <Button asChild variant="outline">
-                    <Link to="/admin/monitoring/security">
-                      <span>Open Security Dashboard</span>
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          {/* Incidents Tab */}
-          <TabsContent value="incidents">
-            <Card>
-              <CardHeader>
-                <CardTitle>System Incidents</CardTitle>
-                <CardDescription>
-                  Historical record of system incidents and resolutions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Full incident history and management interface will be displayed here, including:
-                </p>
-                <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                  <li>Incident timeline with severity tracking</li>
-                  <li>Resolution status and ownership</li>
-                  <li>Root cause analysis reports</li>
-                  <li>Affected system components</li>
-                  <li>Mitigation and prevention measures</li>
-                </ul>
-                <div className="mt-6">
-                  <Button asChild variant="outline">
-                    <Link to="/admin/monitoring/incidents">
-                      <span>Open Incidents Dashboard</span>
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </AdminLayout>
+      } />
+      <Route path=":dashboardType" element={<MonitoringDashboard />} />
+    </Routes>
   );
 };
 
