@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
@@ -11,7 +12,7 @@ import {
   FileText, 
   Database, 
   Settings,
-  Logout
+  LogOut
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -193,7 +194,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   className="justify-start text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-900"
                   onClick={handleLogout}
                 >
-                  <Logout className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
               </nav>
@@ -248,7 +249,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               className="w-full justify-start text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-900"
               onClick={handleLogout}
             >
-              <Logout className="h-4 w-4 mr-2" />
+              <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>
           </div>

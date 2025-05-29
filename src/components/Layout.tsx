@@ -45,10 +45,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
   return (
     <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
       {!hideNavigation && (
-        <DashboardSidebar 
-          collapsed={sidebarCollapsed} 
-          setCollapsed={setSidebarCollapsed} 
-        />
+        <DashboardSidebar />
       )}
       
       <div className={`flex-1 min-h-screen transition-all duration-300 ${
