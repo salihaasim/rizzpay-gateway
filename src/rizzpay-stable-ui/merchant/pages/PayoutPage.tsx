@@ -173,7 +173,7 @@ const PayoutPage = () => {
                     <SelectContent>
                       <SelectItem value="bank">
                         <div className="flex items-center gap-2">
-                          <Bank className="h-4 w-4" />
+                          <Building2 className="h-4 w-4" />
                           Bank Transfer
                         </div>
                       </SelectItem>
