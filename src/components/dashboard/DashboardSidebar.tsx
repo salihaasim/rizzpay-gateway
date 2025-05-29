@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   LayoutDashboard,
@@ -41,8 +42,8 @@ const DashboardSidebar = () => {
   ];
 
   const activeStyle = {
-    backgroundColor: '#E2E8F0',
-    color: '#000'
+    backgroundColor: '#0052FF',
+    color: '#FFFFFF'
   };
 
   const renderSidebarItems = () => (
@@ -51,7 +52,7 @@ const DashboardSidebar = () => {
         <NavLink
           key={item.name}
           to={item.path}
-          className="flex items-center px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+          className="flex items-center px-4 py-2 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
           style={location.pathname === item.path ? activeStyle : undefined}
         >
           <item.icon className="h-5 w-5 mr-2" />
@@ -62,9 +63,9 @@ const DashboardSidebar = () => {
   );
 
   return (
-    <aside className="bg-white w-64 flex-shrink-0 border-r border-gray-200 hidden md:block">
+    <aside className="bg-white w-64 flex-shrink-0 border-r border-gray-200 hidden md:block shadow-sm">
       <div className="h-full px-3 py-4 overflow-y-auto bg-white">
-        <div className="text-gray-500 text-sm font-semibold mb-4">
+        <div className="text-blue-600 text-sm font-semibold mb-4">
           Merchant Dashboard
         </div>
         {renderSidebarItems()}

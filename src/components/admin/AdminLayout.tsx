@@ -69,7 +69,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const shouldHideNavigation = hideNavigation || isMonitoringDashboard;
   
   return (
-    <div className="flex h-screen bg-gray-50 w-full overflow-hidden">
+    <div className="flex h-screen bg-gray-900 w-full overflow-hidden">
       {!shouldHideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
@@ -97,7 +97,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           />
         )}
         
-        <main className={`flex-1 overflow-auto bg-gray-50 ${shouldHideNavigation ? '' : 'p-4 md:p-6'}`}>
+        <main className={`flex-1 overflow-auto bg-gray-100 ${shouldHideNavigation ? '' : 'p-4 md:p-6'}`}>
           {children || <Outlet />}
         </main>
       </div>

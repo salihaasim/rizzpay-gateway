@@ -154,12 +154,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetContent 
             side="left" 
-            className="w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-700"
+            className="w-64 bg-gray-800 border-r border-gray-700"
             onClick={closeMobileMenu}
           >
             <SheetHeader className="text-left">
-              <SheetTitle>Admin Menu</SheetTitle>
-              <SheetDescription>
+              <SheetTitle className="text-white">Admin Menu</SheetTitle>
+              <SheetDescription className="text-gray-300">
                 Manage your Rizzpay platform
               </SheetDescription>
             </SheetHeader>
@@ -167,14 +167,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               <div className="flex items-center justify-center mb-4">
                 <Avatar>
                   <AvatarImage src="https://github.com/shadcn.png" alt="Admin Avatar" />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback className="bg-purple-600 text-white">AD</AvatarFallback>
                 </Avatar>
                 <div className="ml-3">
-                  <div className="font-medium">{userEmail}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Administrator</div>
+                  <div className="font-medium text-white">{userEmail}</div>
+                  <div className="text-sm text-gray-400">Administrator</div>
                 </div>
               </div>
-              <Separator className="mb-4" />
+              <Separator className="mb-4 bg-gray-700" />
               <nav className="flex flex-col space-y-1">
                 {sidebarItems.map((item) => (
                   <NavLink
@@ -182,7 +182,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     to={item.path}
                     className={({ isActive }) =>
                       `flex items-center px-3 py-2 text-sm font-medium rounded-md
-                      ${isActive ? 'bg-blue-600 text-white dark:bg-blue-800' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}
+                      ${isActive ? 'bg-purple-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
                     `}
                   >
                     <item.icon className="h-4 w-4 mr-2" />
@@ -191,7 +191,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 ))}
                 <Button 
                   variant="ghost" 
-                  className="justify-start text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-900"
+                  className="justify-start text-sm font-medium text-red-400 hover:bg-red-900 hover:text-red-300"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -205,22 +205,22 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <aside className={`
           ${collapsed ? 'w-16' : 'w-64'}
           ${hiddenOnMobile ? 'hidden' : ''}
-          flex flex-col h-full bg-white dark:bg-gray-900 border-r dark:border-gray-700 transition-width duration-300 ease-in-out`
+          flex flex-col h-full bg-gray-800 border-r border-gray-700 transition-width duration-300 ease-in-out`
         }>
           <div className="flex items-center justify-between py-3 px-4">
             <div className="flex items-center">
               <Avatar>
                 <AvatarImage src="https://github.com/shadcn.png" alt="Admin Avatar" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback className="bg-purple-600 text-white">AD</AvatarFallback>
               </Avatar>
               {!collapsed && (
                 <div className="ml-3">
-                  <div className="font-medium">{userEmail}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Administrator</div>
+                  <div className="font-medium text-white">{userEmail}</div>
+                  <div className="text-sm text-gray-400">Administrator</div>
                 </div>
               )}
             </div>
-            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-gray-300 hover:text-white">
               {collapsed ? <Menu className="h-5 w-5" /> : <Menu className="h-5 w-5 rotate-180 transition-transform duration-300" />}
             </Button>
           </div>
@@ -232,7 +232,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     to={item.path}
                     className={({ isActive }) =>
                       `flex items-center px-3 py-2 text-sm font-medium rounded-md
-                      ${isActive ? 'bg-blue-600 text-white dark:bg-blue-800' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}
+                      ${isActive ? 'bg-purple-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
                       ${collapsed ? 'justify-center' : ''}
                     `}
                   >
@@ -246,7 +246,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <div className="p-3">
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-900"
+              className="w-full justify-start text-sm font-medium text-red-400 hover:bg-red-900 hover:text-red-300"
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4 mr-2" />
