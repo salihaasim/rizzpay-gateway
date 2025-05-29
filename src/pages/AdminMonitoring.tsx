@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,7 +5,7 @@ import {
   Activity, AlertTriangle, Database, Server, Users, Lock, Zap, 
   BarChart3, Globe, Cpu, Signal, FileWarning, Clock, ArrowDownUp,
   ExternalLink, Layers, ShieldAlert, Bug, LineChart, Receipt, Network,
-  PanelTop, Gauge, RefreshCw
+  PanelTop, Gauge, RefreshCw, CreditCard
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Badge } from '@/components/ui/badge';
@@ -177,6 +176,12 @@ const AdminMonitoring = () => {
       description: "Database connections and query performance",
       icon: <Database className="h-6 w-6 text-primary" />,
       path: "/admin/monitoring/database"
+    },
+    {
+      title: "Bank API Integration",
+      description: "HDFC, ICICI, SBI, and Axis Bank API monitoring",
+      icon: <CreditCard className="h-6 w-6 text-primary" />,
+      path: "/admin/monitoring/bank-api"
     },
     {
       title: "Payment Gateways",
@@ -422,6 +427,12 @@ const AdminMonitoring = () => {
           
           {/* Monitoring Dashboards Tab */}
           <TabsContent value="dashboards" className="space-y-4">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Available Monitoring Dashboards</h3>
+              <p className="text-muted-foreground">
+                Click on any dashboard to view detailed real-time monitoring data and analytics.
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {monitoringSections.map((section, index) => (
                 <MonitoringSectionCard
@@ -469,34 +480,67 @@ const AdminMonitoring = () => {
           
           {/* Payments Systems Tab */}
           <TabsContent value="payments">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Systems</CardTitle>
-                <CardDescription>
-                  Monitoring of all payment processors and gateways
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Payment systems monitoring dashboard will be displayed here, including:
-                </p>
-                <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                  <li>Payment gateway status for each provider</li>
-                  <li>Transaction success rates by payment method</li>
-                  <li>Payment processing times</li>
-                  <li>Settlement status tracking</li>
-                  <li>Failed transaction analysis</li>
-                </ul>
-                <div className="mt-6">
-                  <Button asChild variant="outline">
-                    <Link to="/admin/monitoring/payment">
-                      <span>Open Payment Systems Dashboard</span>
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bank API Integration</CardTitle>
+                  <CardDescription>
+                    Monitor all integrated bank APIs including HDFC, ICICI, SBI, and Axis Bank
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4">
+                    Comprehensive bank API monitoring includes:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                    <li>Real-time API status for each bank</li>
+                    <li>Response time tracking and alerts</li>
+                    <li>Transaction success rates by bank</li>
+                    <li>Endpoint health monitoring</li>
+                    <li>Integration documentation links</li>
+                  </ul>
+                  <div className="mt-6">
+                    <Button asChild variant="outline">
+                      <Link to="/admin/monitoring/bank-api">
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        <span>Open Bank API Dashboard</span>
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Gateways</CardTitle>
+                  <CardDescription>
+                    Monitoring of payment processors and gateway services
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4">
+                    Payment gateway monitoring includes:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                    <li>Gateway status for each provider</li>
+                    <li>Transaction processing times</li>
+                    <li>Settlement status tracking</li>
+                    <li>Failed transaction analysis</li>
+                    <li>Provider-specific metrics</li>
+                  </ul>
+                  <div className="mt-6">
+                    <Button asChild variant="outline">
+                      <Link to="/admin/monitoring/payment">
+                        <Receipt className="mr-2 h-4 w-4" />
+                        <span>Open Payment Gateway Dashboard</span>
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
           
           {/* Security Tab */}

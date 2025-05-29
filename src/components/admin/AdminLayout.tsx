@@ -22,6 +22,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hiddenOnMobile, setHiddenOnMobile] = useState(false);
   
+  // Check if current page is a monitoring dashboard page
+  const isMonitoringDashboard = location.pathname.startsWith('/admin/monitoring/') && 
+                               location.pathname !== '/admin/monitoring';
+  
   // Check if user is admin, if not redirect to login
   useEffect(() => {
     if (!currentMerchant || currentMerchant.role !== 'admin') {
@@ -60,9 +64,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
     return null;
   }
   
+  // For monitoring dashboard pages, hide navigation by default to prevent double headers
+  const shouldHideNavigation = hideNavigation || isMonitoringDashboard;
+  
   return (
     <div className="flex h-screen bg-gray-50 w-full overflow-hidden">
-      {!hideNavigation && (
+      {!shouldHideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
@@ -76,18 +83,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
       )}
       
       <div className="flex flex-col flex-1 overflow-hidden">
-        <AdminHeader 
-          onLogout={handleLogout} 
-          setMobileMenuOpen={setMobileMenuOpen} 
-          hideNavigation={hideNavigation}
-          userEmail={currentMerchant?.email || ''}
-          collapsed={sidebarCollapsed}
-          setCollapsed={setSidebarCollapsed}
-          hiddenOnMobile={hiddenOnMobile}
-          setHiddenOnMobile={setHiddenOnMobile}
-        />
+        {!shouldHideNavigation && (
+          <AdminHeader 
+            onLogout={handleLogout} 
+            setMobileMenuOpen={setMobileMenuOpen} 
+            hideNavigation={shouldHideNavigation}
+            userEmail={currentMerchant?.email || ''}
+            collapsed={sidebarCollapsed}
+            setCollapsed={setSidebarCollapsed}
+            hiddenOnMobile={hiddenOnMobile}
+            setHiddenOnMobile={setHiddenOnMobile}
+          />
+        )}
         
-        <main className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
+        <main className={`flex-1 overflow-auto bg-gray-50 ${shouldHideNavigation ? '' : 'p-4 md:p-6'}`}>
           {children || <Outlet />}
         </main>
       </div>

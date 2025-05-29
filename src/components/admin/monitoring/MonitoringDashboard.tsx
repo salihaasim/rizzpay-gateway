@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Monitor, RefreshCw, Activity, TrendingUp, AlertCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import BankApiMonitoring from './BankApiMonitoring';
 
 // Mock dashboard definitions with enhanced metrics
 const dashboards = {
@@ -187,6 +187,24 @@ const MonitoringDashboard = () => {
   };
   
   console.log("Rendering monitoring dashboard for type:", dashboardType);
+  
+  // If this is the bank API dashboard, render the dedicated component
+  if (dashboardType === 'bank-api') {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Bank API Integration Monitoring</h1>
+            <p className="text-muted-foreground">Comprehensive monitoring of all bank API integrations</p>
+          </div>
+        </div>
+        <BankApiMonitoring />
+      </div>
+    );
+  }
   
   return (
     <AdminLayout>
