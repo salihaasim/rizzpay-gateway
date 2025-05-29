@@ -21,6 +21,7 @@ import AdminWhitelist from './pages/admin/AdminWhitelist';
 import AdminLayout from './components/admin/AdminLayout';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import WalletPage from './pages/WalletPage';
+import PayoutPage from './pages/PayoutPage';
 import AdminUpiManagement from './pages/AdminUpiManagement';
 import IndiaPage from './pages/IndiaPage';
 import RefundPolicy from './pages/RefundPolicy';
@@ -93,6 +94,7 @@ const App: React.FC = () => {
           <Route path="/banking" element={<BankingPage />} />
           <Route path="/webhooks" element={<Webhooks />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/payout" element={<PayoutPage />} />
           <Route path="/kyc" element={<KycPage />} />
           <Route path="/upi-plugin" element={<UpiPluginPage />} />
           <Route path="/transfers" element={<TransfersPage />} />

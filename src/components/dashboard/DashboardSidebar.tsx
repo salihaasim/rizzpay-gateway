@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,13 +14,16 @@ import {
   Settings,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   QrCode,
   Shield,
   Link as LinkIcon,
   BanknoteIcon,
   IndianRupee,
   LogOut,
-  IdCard
+  IdCard,
+  ArrowUpRight
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
@@ -36,6 +39,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
   const { currentMerchant, logout } = useMerchantAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const navigate = useNavigate();
+  const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
   
   // Only show sidebar toggle on desktop
   const showToggle = !isMobile;
@@ -58,7 +62,20 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     {
       title: "Wallet",
       href: "/wallet",
-      icon: <Wallet className="h-5 w-5" />
+      icon: <Wallet className="h-5 w-5" />,
+      hasDropdown: true,
+      dropdownItems: [
+        {
+          title: "Wallet Overview",
+          href: "/wallet",
+          icon: <Wallet className="h-4 w-4" />
+        },
+        {
+          title: "Payout",
+          href: "/payout",
+          icon: <ArrowUpRight className="h-4 w-4" />
+        }
+      ]
     },
     {
       title: "Transfers",
@@ -109,6 +126,14 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     navigate('/', { replace: true });
   };
 
+  const handleWalletDropdownToggle = () => {
+    if (!collapsed) {
+      setWalletDropdownOpen(!walletDropdownOpen);
+    }
+  };
+
+  const isWalletActive = pathname === '/wallet' || pathname === '/payout';
+
   return (
     <div
       className={cn(
@@ -145,17 +170,60 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
       <ScrollArea className="flex-1 py-2">
         <nav className="grid gap-1 px-2">
           {navigationItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
-                pathname === item.href && "bg-gray-800 dark:bg-gray-700 text-white"
+            <div key={index}>
+              {item.hasDropdown ? (
+                <div>
+                  <div
+                    onClick={handleWalletDropdownToggle}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer",
+                      isWalletActive && "bg-gray-800 dark:bg-gray-700 text-white"
+                    )}
+                  >
+                    {item.icon}
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1">{item.title}</span>
+                        {walletDropdownOpen ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </>
+                    )}
+                  </div>
+                  
+                  {!collapsed && walletDropdownOpen && item.dropdownItems && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
+                        <Link
+                          key={dropdownIndex}
+                          to={dropdownItem.href}
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
+                            pathname === dropdownItem.href && "bg-gray-800 dark:bg-gray-700 text-white"
+                          )}
+                        >
+                          {dropdownItem.icon}
+                          <span>{dropdownItem.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
+                    pathname === item.href && "bg-gray-800 dark:bg-gray-700 text-white"
+                  )}
+                >
+                  {item.icon}
+                  {!collapsed && <span>{item.title}</span>}
+                </Link>
               )}
-            >
-              {item.icon}
-              {!collapsed && <span>{item.title}</span>}
-            </Link>
+            </div>
           ))}
         </nav>
       </ScrollArea>
