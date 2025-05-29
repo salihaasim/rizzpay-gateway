@@ -22,9 +22,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hiddenOnMobile, setHiddenOnMobile] = useState(false);
   
-  // Check if current page is a monitoring dashboard page
+  // Check if current page is a monitoring dashboard page (but NOT escrow page)
   const isMonitoringDashboard = location.pathname.startsWith('/admin/monitoring/') && 
-                               location.pathname !== '/admin/monitoring';
+                               location.pathname !== '/admin/monitoring' &&
+                               location.pathname !== '/admin/escrow';
   
   // Check if user is admin, if not redirect to login
   useEffect(() => {
