@@ -207,77 +207,75 @@ const MonitoringDashboard = () => {
   }
   
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="icon" onClick={handleBack}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">{dashboard.title}</h1>
-              <p className="text-muted-foreground">{dashboard.description}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Last updated: {lastRefresh.toLocaleTimeString()}
-            </span>
-            <Button variant="outline" className="flex items-center gap-2" onClick={handleRefresh}>
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{dashboard.title}</h1>
+            <p className="text-muted-foreground">{dashboard.description}</p>
           </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {dashboard.metrics.map((metric, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{metric.name}</CardTitle>
-                  {getTrendIcon(metric.trend)}
-                </div>
-                <CardDescription>Real-time monitoring data</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold">{metric.value}{typeof metric.value === 'number' && metric.value < 100 ? '%' : ''}</span>
-                    <Badge className={getStatusColor(metric.status)}>
-                      {metric.status}
-                    </Badge>
-                  </div>
-                  {typeof metric.value === 'number' && metric.value <= 100 && (
-                    <Progress value={metric.value} className="h-2" />
-                  )}
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Trend: {metric.trend}</span>
-                    <span>Status: {metric.status}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            Last updated: {lastRefresh.toLocaleTimeString()}
+          </span>
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleRefresh}>
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </Button>
         </div>
-        
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Detailed Analysis</CardTitle>
-            <CardDescription>Comprehensive {dashboardType || 'server'} monitoring data with insights</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="min-h-56 flex items-center justify-center bg-secondary/30 rounded-md">
-              <div className="flex flex-col items-center text-muted-foreground">
-                <Monitor className="h-10 w-10 mb-3" />
-                <p>Detailed {dashboardType || 'server'} analytics dashboard will be displayed here</p>
-                <p className="text-sm mt-1">Data is updated in real-time</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
-    </AdminLayout>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {dashboard.metrics.map((metric, index) => (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">{metric.name}</CardTitle>
+                {getTrendIcon(metric.trend)}
+              </div>
+              <CardDescription>Real-time monitoring data</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold">{metric.value}{typeof metric.value === 'number' && metric.value < 100 ? '%' : ''}</span>
+                  <Badge className={getStatusColor(metric.status)}>
+                    {metric.status}
+                  </Badge>
+                </div>
+                {typeof metric.value === 'number' && metric.value <= 100 && (
+                  <Progress value={metric.value} className="h-2" />
+                )}
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Trend: {metric.trend}</span>
+                  <span>Status: {metric.status}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Detailed Analysis</CardTitle>
+          <CardDescription>Comprehensive {dashboardType || 'server'} monitoring data with insights</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="min-h-56 flex items-center justify-center bg-secondary/30 rounded-md">
+            <div className="flex flex-col items-center text-muted-foreground">
+              <Monitor className="h-10 w-10 mb-3" />
+              <p>Detailed {dashboardType || 'server'} analytics dashboard will be displayed here</p>
+              <p className="text-sm mt-1">Data is updated in real-time</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
