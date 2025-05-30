@@ -153,7 +153,7 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({
         {/* GST Certificate Upload */}
         <div>
           <Label htmlFor="gstCertificate" className="block mb-2">
-            GST Certificate <span className="text-muted-foreground text-sm">mandatory </span>
+            GST Certificate <span className="text-muted-foreground text-sm">mandatory</span>
           </Label>
           <div className="flex flex-col space-y-2">
             <Input id="gstCertificate" type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={e => handleFileChange(e, 'gstCertificate')} className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
