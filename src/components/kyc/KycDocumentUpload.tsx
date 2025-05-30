@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -7,25 +6,25 @@ import { FileUp, FileCheck, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-
 interface KycDocumentUploadProps {
   onDocumentsChange: (documents: KycDocuments) => void;
 }
-
 export interface KycDocuments {
   aadhaarCard: File | null;
   panCard: File | null;
   gstCertificate: File | null;
 }
-
-const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange }) => {
-  const { currentMerchant } = useMerchantAuth();
+const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({
+  onDocumentsChange
+}) => {
+  const {
+    currentMerchant
+  } = useMerchantAuth();
   const [documents, setDocuments] = useState<KycDocuments>({
     aadhaarCard: null,
     panCard: null,
     gstCertificate: null
   });
-  
   const [existingDocuments, setExistingDocuments] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -33,82 +32,74 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
   useEffect(() => {
     const fetchExistingDocuments = async () => {
       if (!currentMerchant?.id) return;
-      
       try {
-        const { data, error } = await supabase
-          .from('kyc_submissions')
-          .select('aadhaar_document_path, pan_document_path, gst_document_path')
-          .eq('user_id', currentMerchant.id)
-          .maybeSingle();
-          
+        const {
+          data,
+          error
+        } = await supabase.from('kyc_submissions').select('aadhaar_document_path, pan_document_path, gst_document_path').eq('user_id', currentMerchant.id).maybeSingle();
         if (error) throw error;
-        
         if (data) {
           const docs: Record<string, string> = {};
-          
           if (data.aadhaar_document_path) {
             docs.aadhaarCard = data.aadhaar_document_path.split('/').pop() || '';
           }
-          
           if (data.pan_document_path) {
             docs.panCard = data.pan_document_path.split('/').pop() || '';
           }
-          
           if (data.gst_document_path) {
             docs.gstCertificate = data.gst_document_path.split('/').pop() || '';
           }
-          
           setExistingDocuments(docs);
         }
       } catch (error) {
         console.error('Error fetching existing documents:', error);
       }
     };
-    
     fetchExistingDocuments();
   }, [currentMerchant?.id]);
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, docType: keyof KycDocuments) => {
     const file = event.target.files?.[0] || null;
-    
+
     // Validate file
     if (file) {
       // Check file type
       const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
       if (!validTypes.includes(file.type)) {
-        setErrors(prev => ({ 
-          ...prev, 
-          [docType]: 'Invalid file type. Please upload a JPEG, PNG, or PDF file.' 
+        setErrors(prev => ({
+          ...prev,
+          [docType]: 'Invalid file type. Please upload a JPEG, PNG, or PDF file.'
         }));
         return;
       }
-      
+
       // Check file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ 
-          ...prev, 
-          [docType]: 'File size exceeds 5MB limit. Please upload a smaller file.' 
+        setErrors(prev => ({
+          ...prev,
+          [docType]: 'File size exceeds 5MB limit. Please upload a smaller file.'
         }));
         return;
       }
-      
+
       // Clear error if previously set
       if (errors[docType]) {
         setErrors(prev => {
-          const newErrors = {...prev};
+          const newErrors = {
+            ...prev
+          };
           delete newErrors[docType];
           return newErrors;
         });
       }
     }
-    
-    const updatedDocuments = { ...documents, [docType]: file };
+    const updatedDocuments = {
+      ...documents,
+      [docType]: file
+    };
     setDocuments(updatedDocuments);
     onDocumentsChange(updatedDocuments);
   };
-
-  return (
-    <div className="space-y-6 border rounded-lg p-6 bg-card">
+  return <div className="space-y-6 border rounded-lg p-6 bg-card">
       <div className="text-lg font-medium">KYC Documents</div>
       <p className="text-sm text-muted-foreground mb-4">
         Please upload clear copies of the following documents to verify your identity and business.
@@ -121,31 +112,19 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
             Aadhaar Card <span className="text-destructive">*</span>
           </Label>
           <div className="flex flex-col space-y-2">
-            <Input
-              id="aadhaarCard"
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={(e) => handleFileChange(e, 'aadhaarCard')}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-            />
-            {documents.aadhaarCard && (
-              <div className="flex items-center mt-2 text-sm text-emerald-600">
+            <Input id="aadhaarCard" type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={e => handleFileChange(e, 'aadhaarCard')} className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+            {documents.aadhaarCard && <div className="flex items-center mt-2 text-sm text-emerald-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>{documents.aadhaarCard.name}</span>
-              </div>
-            )}
-            {existingDocuments.aadhaarCard && !documents.aadhaarCard && (
-              <div className="flex items-center mt-2 text-sm text-blue-600">
+              </div>}
+            {existingDocuments.aadhaarCard && !documents.aadhaarCard && <div className="flex items-center mt-2 text-sm text-blue-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>Previously uploaded: {existingDocuments.aadhaarCard}</span>
-              </div>
-            )}
-            {errors.aadhaarCard && (
-              <Alert variant="destructive" className="py-2">
+              </div>}
+            {errors.aadhaarCard && <Alert variant="destructive" className="py-2">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{errors.aadhaarCard}</AlertDescription>
-              </Alert>
-            )}
+              </Alert>}
           </div>
         </div>
         
@@ -155,65 +134,41 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
             PAN Card <span className="text-destructive">*</span>
           </Label>
           <div className="flex flex-col space-y-2">
-            <Input
-              id="panCard"
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={(e) => handleFileChange(e, 'panCard')}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-            />
-            {documents.panCard && (
-              <div className="flex items-center mt-2 text-sm text-emerald-600">
+            <Input id="panCard" type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={e => handleFileChange(e, 'panCard')} className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+            {documents.panCard && <div className="flex items-center mt-2 text-sm text-emerald-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>{documents.panCard.name}</span>
-              </div>
-            )}
-            {existingDocuments.panCard && !documents.panCard && (
-              <div className="flex items-center mt-2 text-sm text-blue-600">
+              </div>}
+            {existingDocuments.panCard && !documents.panCard && <div className="flex items-center mt-2 text-sm text-blue-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>Previously uploaded: {existingDocuments.panCard}</span>
-              </div>
-            )}
-            {errors.panCard && (
-              <Alert variant="destructive" className="py-2">
+              </div>}
+            {errors.panCard && <Alert variant="destructive" className="py-2">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{errors.panCard}</AlertDescription>
-              </Alert>
-            )}
+              </Alert>}
           </div>
         </div>
 
         {/* GST Certificate Upload */}
         <div>
           <Label htmlFor="gstCertificate" className="block mb-2">
-            GST Certificate <span className="text-muted-foreground text-sm">(Optional)</span>
+            GST Certificate <span className="text-muted-foreground text-sm">mandatory </span>
           </Label>
           <div className="flex flex-col space-y-2">
-            <Input
-              id="gstCertificate"
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={(e) => handleFileChange(e, 'gstCertificate')}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-            />
-            {documents.gstCertificate && (
-              <div className="flex items-center mt-2 text-sm text-emerald-600">
+            <Input id="gstCertificate" type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={e => handleFileChange(e, 'gstCertificate')} className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+            {documents.gstCertificate && <div className="flex items-center mt-2 text-sm text-emerald-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>{documents.gstCertificate.name}</span>
-              </div>
-            )}
-            {existingDocuments.gstCertificate && !documents.gstCertificate && (
-              <div className="flex items-center mt-2 text-sm text-blue-600">
+              </div>}
+            {existingDocuments.gstCertificate && !documents.gstCertificate && <div className="flex items-center mt-2 text-sm text-blue-600">
                 <FileCheck className="w-4 h-4 mr-1" />
                 <span>Previously uploaded: {existingDocuments.gstCertificate}</span>
-              </div>
-            )}
-            {errors.gstCertificate && (
-              <Alert variant="destructive" className="py-2">
+              </div>}
+            {errors.gstCertificate && <Alert variant="destructive" className="py-2">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{errors.gstCertificate}</AlertDescription>
-              </Alert>
-            )}
+              </Alert>}
           </div>
         </div>
       </div>
@@ -224,8 +179,6 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
           Acceptable formats are JPG, PNG, and PDF.
         </p>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default KycDocumentUpload;
