@@ -10,13 +10,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import KycDocumentUpload from './KycDocumentUpload';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const kycFormSchema = z.object({
-  gstNumber: z.string().optional(),
+  gstNumber: z.string().min(15, "GST Number is required and must be at least 15 characters").regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Please enter a valid GST Number"),
 });
 
 type KycFormValues = z.infer<typeof kycFormSchema>;
@@ -82,7 +82,7 @@ const KycUploadForm: React.FC = () => {
         .from('kyc_submissions')
         .upsert({
           user_id: currentMerchant.id,
-          gst_number: data.gstNumber || null,
+          gst_number: data.gstNumber,
           status: 'pending',
           updated_at: new Date().toISOString(),
           ...documentPaths
@@ -182,13 +182,14 @@ const KycUploadForm: React.FC = () => {
                   name="gstNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>GST Number <span className="text-muted-foreground text-sm">(if applicable)</span></FormLabel>
+                      <FormLabel>GST Number <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Enter your GST Number" 
+                          placeholder="Enter your GST Number (e.g., 22AAAAA0000A1Z5)" 
                           {...field} 
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

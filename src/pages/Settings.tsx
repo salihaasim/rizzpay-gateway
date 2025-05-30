@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -71,15 +70,7 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>Manage your account security</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SecuritySettings merchant={currentMerchant} />
-              </CardContent>
-            </Card>
+            <SecuritySettings merchant={currentMerchant} />
           </TabsContent>
 
           <TabsContent value="business">
