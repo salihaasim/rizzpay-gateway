@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-export const GA_MEASUREMENT_ID = 'GA_MEASUREMENT_ID'; // Replace with your actual GA4 Measurement ID
+export const GA_MEASUREMENT_ID = 'G-1RX3HPX8ZV'; // Your actual GA4 Measurement ID
 
 // Track page views
 export const trackPageView = (url: string) => {
