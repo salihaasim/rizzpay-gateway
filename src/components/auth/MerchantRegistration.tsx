@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -21,7 +20,7 @@ const merchantSchema = z.object({
   phone: z.string().min(10, { message: "Please enter a valid phone number" }).optional(),
   businessName: z.string().min(2, { message: "Business name is required" }),
   businessType: z.string().min(2, { message: "Business type is required" }).optional(),
-  gstNumber: z.string().optional()
+  gstNumber: z.string().min(15, "GST Number is required and must be at least 15 characters").regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Please enter a valid GST Number")
 });
 
 type MerchantFormValues = z.infer<typeof merchantSchema>;
@@ -33,8 +32,7 @@ const MerchantRegistration = () => {
   const { setUserRole, initializeWallet } = useTransactionStore();
   const [kycDocuments, setKycDocuments] = useState<KycDocuments>({
     aadhaarCard: null,
-    panCard: null,
-    gstCertificate: null
+    panCard: null
   });
 
   const form = useForm<MerchantFormValues>({
@@ -87,8 +85,7 @@ const MerchantRegistration = () => {
       const kycData = {
         aadhaarCard: kycDocuments.aadhaarCard ? await convertFileToBase64(kycDocuments.aadhaarCard) : null,
         panCard: kycDocuments.panCard ? await convertFileToBase64(kycDocuments.panCard) : null,
-        gstCertificate: kycDocuments.gstCertificate ? await convertFileToBase64(kycDocuments.gstCertificate) : null,
-        gstNumber: data.gstNumber || null
+        gstNumber: data.gstNumber
       };
 
       // 1. Create the user in Supabase Auth
@@ -256,7 +253,7 @@ const MerchantRegistration = () => {
           name="gstNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>GST Number <span className="text-muted-foreground text-sm">(if applicable)</span></FormLabel>
+              <FormLabel>GST Number <span className="text-red-500">*</span></FormLabel>
               <FormControl>
                 <Input placeholder="22AAAAA0000A1Z5" {...field} />
               </FormControl>
