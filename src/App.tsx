@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import LandingPage from '@/pages/Index';
 import AuthPage from '@/pages/Auth';
 import { ThemeProvider } from "@/context/ThemeContext"
-import { MerchantDashboard } from '@/pages/Dashboard';
+import MerchantDashboard from '@/pages/Dashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import { trackPageView } from './utils/analytics';
 
@@ -33,7 +33,7 @@ function AppContent() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-react-theme">
+    <ThemeProvider>
       <Router>
         <AppContent />
       </Router>
