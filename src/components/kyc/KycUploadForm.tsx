@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,6 +74,7 @@ const KycUploadForm: React.FC = () => {
       const documentPaths = {
         aadhaar_document_path: existingKyc?.aadhaar_document_path || null,
         pan_document_path: existingKyc?.pan_document_path || null,
+        gst_document_path: existingKyc?.gst_document_path || null,
       };
             
       // Submit to Supabase
@@ -106,7 +108,8 @@ const KycUploadForm: React.FC = () => {
     try {
       const documentPaths: Record<string, string | null> = {
         aadhaar_document_path: null,
-        pan_document_path: null
+        pan_document_path: null,
+        gst_document_path: null
       };
       
       // Upload each document to Supabase storage

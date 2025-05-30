@@ -32,7 +32,8 @@ const MerchantRegistration = () => {
   const { setUserRole, initializeWallet } = useTransactionStore();
   const [kycDocuments, setKycDocuments] = useState<KycDocuments>({
     aadhaarCard: null,
-    panCard: null
+    panCard: null,
+    gstCertificate: null
   });
 
   const form = useForm<MerchantFormValues>({
@@ -85,6 +86,7 @@ const MerchantRegistration = () => {
       const kycData = {
         aadhaarCard: kycDocuments.aadhaarCard ? await convertFileToBase64(kycDocuments.aadhaarCard) : null,
         panCard: kycDocuments.panCard ? await convertFileToBase64(kycDocuments.panCard) : null,
+        gstCertificate: kycDocuments.gstCertificate ? await convertFileToBase64(kycDocuments.gstCertificate) : null,
         gstNumber: data.gstNumber
       };
 

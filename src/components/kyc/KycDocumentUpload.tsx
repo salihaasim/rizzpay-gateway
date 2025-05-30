@@ -15,13 +15,15 @@ interface KycDocumentUploadProps {
 export interface KycDocuments {
   aadhaarCard: File | null;
   panCard: File | null;
+  gstCertificate: File | null;
 }
 
 const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange }) => {
   const { currentMerchant } = useMerchantAuth();
   const [documents, setDocuments] = useState<KycDocuments>({
     aadhaarCard: null,
-    panCard: null
+    panCard: null,
+    gstCertificate: null
   });
   
   const [existingDocuments, setExistingDocuments] = useState<Record<string, string>>({});
@@ -35,7 +37,7 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
       try {
         const { data, error } = await supabase
           .from('kyc_submissions')
-          .select('aadhaar_document_path, pan_document_path')
+          .select('aadhaar_document_path, pan_document_path, gst_document_path')
           .eq('user_id', currentMerchant.id)
           .maybeSingle();
           
@@ -50,6 +52,10 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
           
           if (data.pan_document_path) {
             docs.panCard = data.pan_document_path.split('/').pop() || '';
+          }
+          
+          if (data.gst_document_path) {
+            docs.gstCertificate = data.gst_document_path.split('/').pop() || '';
           }
           
           setExistingDocuments(docs);
@@ -172,6 +178,40 @@ const KycDocumentUpload: React.FC<KycDocumentUploadProps> = ({ onDocumentsChange
               <Alert variant="destructive" className="py-2">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{errors.panCard}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+        </div>
+
+        {/* GST Certificate Upload */}
+        <div>
+          <Label htmlFor="gstCertificate" className="block mb-2">
+            GST Certificate <span className="text-muted-foreground text-sm">(Optional)</span>
+          </Label>
+          <div className="flex flex-col space-y-2">
+            <Input
+              id="gstCertificate"
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf"
+              onChange={(e) => handleFileChange(e, 'gstCertificate')}
+              className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+            />
+            {documents.gstCertificate && (
+              <div className="flex items-center mt-2 text-sm text-emerald-600">
+                <FileCheck className="w-4 h-4 mr-1" />
+                <span>{documents.gstCertificate.name}</span>
+              </div>
+            )}
+            {existingDocuments.gstCertificate && !documents.gstCertificate && (
+              <div className="flex items-center mt-2 text-sm text-blue-600">
+                <FileCheck className="w-4 h-4 mr-1" />
+                <span>Previously uploaded: {existingDocuments.gstCertificate}</span>
+              </div>
+            )}
+            {errors.gstCertificate && (
+              <Alert variant="destructive" className="py-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{errors.gstCertificate}</AlertDescription>
               </Alert>
             )}
           </div>
