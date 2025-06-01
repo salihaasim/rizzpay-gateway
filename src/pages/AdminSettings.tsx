@@ -1,90 +1,68 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useNavigate } from 'react-router-dom';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import { Helmet } from 'react-helmet';
-
-// Import refactored components
-import RoleManagement from '@/components/admin/settings/RoleManagement';
-import BankAPISettings from '@/components/admin/settings/BankAPISettings';
-import SecuritySettings from '@/components/admin/settings/SecuritySettings';
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GeneralSettings from '@/components/admin/settings/GeneralSettings';
+import SecuritySettings from '@/components/admin/settings/SecuritySettings';
+import BankAPISettings from '@/components/admin/settings/BankAPISettings';
+import BankCallbackSettings from '@/components/admin/settings/BankCallbackSettings';
+import RoleManagement from '@/components/admin/settings/RoleManagement';
+import { Settings, Shield, KeyRound, Link, Users } from 'lucide-react';
 
 const AdminSettings = () => {
-  const navigate = useNavigate();
-  const { currentMerchant } = useMerchantAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  
-  useEffect(() => {
-    // Check if user is admin
-    if (currentMerchant && currentMerchant.role !== 'admin') {
-      toast.error('Access denied. Admin privileges required.');
-      navigate('/dashboard', { replace: true });
-    }
-  }, [currentMerchant, navigate]);
-  
-  const handleSaveSettings = () => {
-    setIsLoading(true);
-    
-    // Simulate saving settings
-    setTimeout(() => {
-      toast.success("Settings saved successfully");
-      setIsLoading(false);
-    }, 600);
-  };
-  
-  // Show access denied if not admin
-  if (currentMerchant && currentMerchant.role !== 'admin') {
-    return null; // Will redirect via useEffect
-  }
-  
   return (
-    <>
-      <Helmet>
-        <title>Admin Settings | RizzPay</title>
-      </Helmet>
-      <div className="space-y-6 max-w-5xl mx-auto">
-        <Card className="p-6 bg-card">
-          <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="general">General</TabsTrigger>
-              <TabsTrigger value="roles">Roles</TabsTrigger>
-              <TabsTrigger value="api">Bank API</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="general" className="space-y-6">
-              <GeneralSettings />
-            </TabsContent>
-            
-            <TabsContent value="roles" className="space-y-6">
-              <RoleManagement />
-            </TabsContent>
-            
-            <TabsContent value="api" className="space-y-6">
-              <BankAPISettings />
-            </TabsContent>
-            
-            <TabsContent value="security" className="space-y-6">
-              <SecuritySettings />
-            </TabsContent>
-          </Tabs>
-          
-          <div className="flex justify-end mt-6">
-            <Button 
-              onClick={handleSaveSettings} 
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save Settings"}
-            </Button>
-          </div>
-        </Card>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-muted-foreground">
+          Manage your platform settings and configurations
+        </p>
       </div>
-    </>
+
+      <Tabs defaultValue="general" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="general" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            General
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="bank-api" className="flex items-center gap-2">
+            <KeyRound className="h-4 w-4" />
+            Bank API
+          </TabsTrigger>
+          <TabsTrigger value="callbacks" className="flex items-center gap-2">
+            <Link className="h-4 w-4" />
+            Callbacks
+          </TabsTrigger>
+          <TabsTrigger value="roles" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Roles
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="space-y-4">
+          <GeneralSettings />
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-4">
+          <SecuritySettings />
+        </TabsContent>
+
+        <TabsContent value="bank-api" className="space-y-4">
+          <BankAPISettings />
+        </TabsContent>
+
+        <TabsContent value="callbacks" className="space-y-4">
+          <BankCallbackSettings />
+        </TabsContent>
+
+        <TabsContent value="roles" className="space-y-4">
+          <RoleManagement />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
