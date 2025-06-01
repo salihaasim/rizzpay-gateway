@@ -6,7 +6,8 @@ import SecuritySettings from '@/components/admin/settings/SecuritySettings';
 import BankAPISettings from '@/components/admin/settings/BankAPISettings';
 import BankCallbackSettings from '@/components/admin/settings/BankCallbackSettings';
 import RoleManagement from '@/components/admin/settings/RoleManagement';
-import { Settings, Shield, KeyRound, Link, Users } from 'lucide-react';
+import AdminApiManagement from '@/pages/AdminApiManagement';
+import { Settings, Shield, KeyRound, Link, Users, Globe } from 'lucide-react';
 
 const AdminSettings = () => {
   return (
@@ -19,7 +20,7 @@ const AdminSettings = () => {
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="general" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             General
@@ -35,6 +36,10 @@ const AdminSettings = () => {
           <TabsTrigger value="callbacks" className="flex items-center gap-2">
             <Link className="h-4 w-4" />
             Callbacks
+          </TabsTrigger>
+          <TabsTrigger value="api-management" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            API Management
           </TabsTrigger>
           <TabsTrigger value="roles" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -56,6 +61,10 @@ const AdminSettings = () => {
 
         <TabsContent value="callbacks" className="space-y-4">
           <BankCallbackSettings />
+        </TabsContent>
+
+        <TabsContent value="api-management" className="space-y-4">
+          <AdminApiManagement />
         </TabsContent>
 
         <TabsContent value="roles" className="space-y-4">
