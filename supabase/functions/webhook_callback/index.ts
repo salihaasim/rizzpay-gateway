@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.1.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-hdfc-signature, x-sbm-signature, x-icici-signature',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
@@ -12,6 +12,37 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || ''
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// Bank-specific configurations
+const BANK_CONFIGS = {
+  'hdfc-bank': {
+    bankName: 'HDFC Bank',
+    signatureHeader: 'x-hdfc-signature',
+    statusMapping: {
+      'SUCCESS': 'successful',
+      'FAILED': 'failed',
+      'PENDING': 'pending'
+    }
+  },
+  'sbm-bank': {
+    bankName: 'SBM Bank',
+    signatureHeader: 'x-sbm-signature',
+    statusMapping: {
+      'COMPLETED': 'successful',
+      'DECLINED': 'failed',
+      'PROCESSING': 'pending'
+    }
+  },
+  'icici-bank': {
+    bankName: 'ICICI Bank',
+    signatureHeader: 'x-icici-signature',
+    statusMapping: {
+      'APPROVED': 'successful',
+      'REJECTED': 'failed',
+      'INITIATED': 'pending'
+    }
+  }
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -30,12 +61,35 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const url = new URL(req.url)
+    const pathParts = url.pathname.split('/')
+    const bankSlug = pathParts[pathParts.length - 2] // Get bank slug from URL path
+    
     // Parse callback data
     const callbackData = await req.json().catch(() => ({}))
-    console.log('Payment callback received:', callbackData)
+    console.log(`${bankSlug} webhook received:`, callbackData)
+    
+    // Get bank configuration
+    const bankConfig = BANK_CONFIGS[bankSlug]
+    if (!bankConfig) {
+      return new Response(
+        JSON.stringify({ status: 'error', message: 'Unsupported bank' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      )
+    }
+
+    // Extract headers for signature validation
+    const headers = {}
+    req.headers.forEach((value, key) => {
+      headers[key] = value
+    })
     
     // Validate essential parameters
-    if (!callbackData.transaction_id) {
+    const transactionId = callbackData.transaction_id || callbackData.txnId || callbackData.orderId
+    if (!transactionId) {
       return new Response(
         JSON.stringify({ status: 'error', message: 'Missing transaction ID' }),
         {
@@ -45,7 +99,8 @@ Deno.serve(async (req) => {
       )
     }
     
-    if (!callbackData.status) {
+    const rawStatus = callbackData.status || callbackData.txnStatus
+    if (!rawStatus) {
       return new Response(
         JSON.stringify({ status: 'error', message: 'Missing payment status' }),
         {
@@ -59,7 +114,7 @@ Deno.serve(async (req) => {
     const { data: transaction, error: fetchError } = await supabase
       .from('transactions')
       .select('*')
-      .eq('id', callbackData.transaction_id)
+      .eq('id', transactionId)
       .single()
     
     if (fetchError || !transaction) {
@@ -73,11 +128,8 @@ Deno.serve(async (req) => {
       )
     }
     
-    // Translate status to internal format
-    const paymentStatus = (callbackData.status.toLowerCase() === 'success' || 
-                          callbackData.status.toLowerCase() === 'completed' || 
-                          callbackData.status.toLowerCase() === 'approved') 
-                          ? 'successful' : 'failed'
+    // Map bank status to internal status
+    const paymentStatus = bankConfig.statusMapping[rawStatus] || 'pending'
     
     // Get current timestamp
     const now = new Date().toISOString()
@@ -85,24 +137,28 @@ Deno.serve(async (req) => {
     // Prepare payment details update
     const paymentDetails = {
       ...transaction.payment_details,
-      paymentProcessor: callbackData.processor || 'external',
-      paymentId: callbackData.payment_id || null,
-      processorReference: callbackData.reference || null,
-      processorResponse: callbackData.processor_response || null,
-      processorFee: callbackData.processor_fee || null,
+      bankName: bankConfig.bankName,
+      paymentId: callbackData.payment_id || callbackData.bankRefNo,
+      processorReference: callbackData.reference || callbackData.rrn,
+      processorResponse: callbackData,
+      processorFee: callbackData.fee || null,
       settlementId: callbackData.settlement_id || null,
-      cardData: callbackData.card_data || null
+      webhookReceived: true,
+      webhookTimestamp: now
     }
     
     // Prepare processing timeline update
     const processingTimeline = [
       ...(transaction.processing_timeline || []),
       {
-        stage: paymentStatus === 'successful' ? 'completed' : 'declined',
+        stage: paymentStatus === 'successful' ? 'completed' : 
+               paymentStatus === 'failed' ? 'declined' : 'processing',
         timestamp: now,
-        message: paymentStatus === 'successful' 
-          ? `Payment confirmed by external processor with ID: ${callbackData.payment_id || 'N/A'}`
-          : `Payment declined by external processor: ${callbackData.error || 'Unknown reason'}`
+        message: `${bankConfig.bankName} webhook: ${rawStatus}`,
+        details: {
+          bankResponse: callbackData,
+          paymentId: callbackData.payment_id || callbackData.bankRefNo
+        }
       }
     ]
     
@@ -111,11 +167,12 @@ Deno.serve(async (req) => {
       .from('transactions')
       .update({
         status: paymentStatus,
-        processing_state: paymentStatus === 'successful' ? 'completed' : 'declined',
+        processing_state: paymentStatus === 'successful' ? 'completed' : 
+                         paymentStatus === 'failed' ? 'declined' : 'processing',
         processing_timeline: processingTimeline,
         payment_details: paymentDetails,
       })
-      .eq('id', callbackData.transaction_id)
+      .eq('id', transactionId)
     
     if (updateError) {
       console.error('Transaction update error:', updateError)
@@ -156,10 +213,11 @@ Deno.serve(async (req) => {
               source: 'payment',
               reference_id: transaction.id,
               status: 'completed',
-              description: `Payment received from ${transaction.customer_name || 'customer'}`,
+              description: `Payment received from ${transaction.customer_name || 'customer'} via ${bankConfig.bankName}`,
               metadata: {
                 payment_method: transaction.payment_method,
-                customer_email: transaction.customer_email
+                customer_email: transaction.customer_email,
+                bank_name: bankConfig.bankName
               }
             })
             .catch(err => {
@@ -177,7 +235,8 @@ Deno.serve(async (req) => {
                 amount: transaction.amount,
                 currency: transaction.currency || 'INR',
                 payment_method: transaction.payment_method,
-                transaction_id: transaction.id
+                transaction_id: transaction.id,
+                bank_name: bankConfig.bankName
               }
             })
             .catch(e => console.error('Failed to log activity:', e));
@@ -192,7 +251,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         status: 'success',
-        message: 'Payment callback processed successfully',
+        message: `${bankConfig.bankName} webhook processed successfully`,
         transaction_id: transaction.id,
         payment_status: paymentStatus
       }),

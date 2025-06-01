@@ -1,5 +1,7 @@
 
 import { Transaction, useTransactionStore } from '@/stores/transactions';
+import { handleWebhookCallback, WebhookPayload } from '@/api/webhook/handler';
+import { processBankWebhook } from '@/api/webhook/bankHandlers';
 
 // Extended Transaction type to include webhookData
 type ExtendedTransaction = Transaction & {
@@ -80,4 +82,41 @@ export const processWebhookTransaction = async (webhookData: any) => {
     console.error('Error processing webhook transaction:', error);
     return { success: false, message: 'Error processing webhook transaction' };
   }
+};
+
+// New function to handle bank-specific webhooks
+export const processBankWebhookRequest = async (
+  bankSlug: string,
+  payload: any,
+  headers: Record<string, string>
+) => {
+  try {
+    console.log(`Processing webhook for bank: ${bankSlug}`, payload);
+    
+    // Use the bank-specific processor
+    const result = await processBankWebhook(bankSlug, payload, headers);
+    
+    if (result.success) {
+      console.log(`Bank webhook processed successfully for ${bankSlug}`);
+    } else {
+      console.error(`Bank webhook processing failed for ${bankSlug}:`, result.message);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error(`Error in bank webhook processing for ${bankSlug}:`, error);
+    return { success: false, message: 'Internal server error' };
+  }
+};
+
+// Function to generate webhook endpoint URLs
+export const generateWebhookEndpoints = (bankName: string, environment: 'test' | 'production') => {
+  const baseUrl = environment === 'production' ? 'https://rizz-pay.in' : 'https://sandbox.rizz-pay.in';
+  const sanitizedName = bankName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  
+  return {
+    callback: `${baseUrl}/api/${sanitizedName}/callback`,
+    webhook: `${baseUrl}/api/${sanitizedName}/webhook`,
+    status: `${baseUrl}/api/${sanitizedName}/status`
+  };
 };
