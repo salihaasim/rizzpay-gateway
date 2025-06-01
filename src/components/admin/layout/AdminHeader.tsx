@@ -33,6 +33,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   
   const getPageTitle = () => {
     const path = location.pathname;
+    if (path.includes('/admin/production-api')) return 'Production API Management';
+    if (path.includes('/admin/api-management')) return 'API Management';
     if (path.includes('/admin/monitoring')) {
       if (path.includes('/admin/monitoring/')) {
         const dashboardType = path.split('/admin/monitoring/')[1];
@@ -40,6 +42,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
       }
       return 'System Monitoring';
     }
+    if (path.includes('/admin/escrow')) return 'Escrow Management';
     if (path.includes('/admin/settings')) return 'Admin Settings';
     if (path.includes('/admin/activity-log')) return 'Activity Log';
     if (path.includes('/admin/transactions-log')) return 'Transaction Log';
@@ -63,58 +66,59 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
       setHiddenOnMobile(!hiddenOnMobile);
     }
   };
+
+  // Don't render if navigation should be hidden
+  if (hideNavigation) {
+    return null;
+  }
   
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        {!hideNavigation && (
-          <>
-            {/* Desktop sidebar toggle */}
+        {/* Desktop sidebar toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hidden lg:flex h-8 w-8"
+          onClick={() => setCollapsed && setCollapsed(!collapsed)}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+        
+        {/* Mobile controls */}
+        <div className="lg:hidden flex items-center gap-2">
+          {/* Mobile menu toggle - only show if nav is not hidden */}
+          {!hiddenOnMobile && (
             <Button
               variant="ghost"
               size="icon"
-              className="hidden lg:flex h-8 w-8"
-              onClick={() => setCollapsed && setCollapsed(!collapsed)}
+              className="h-8 w-8"
+              onClick={() => setMobileMenuOpen && setMobileMenuOpen(true)}
+              title="Open navigation menu"
             >
-              {collapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
+              <Menu className="h-4 w-4" />
             </Button>
-            
-            {/* Mobile controls */}
-            <div className="lg:hidden flex items-center gap-2">
-              {/* Mobile menu toggle - only show if nav is not hidden */}
-              {!hiddenOnMobile && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setMobileMenuOpen && setMobileMenuOpen(true)}
-                  title="Open navigation menu"
-                >
-                  <Menu className="h-4 w-4" />
-                </Button>
-              )}
-              
-              {/* Mobile navigation visibility toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={toggleMobileNavVisibility}
-                title={hiddenOnMobile ? "Show navigation" : "Hide navigation"}
-              >
-                {hiddenOnMobile ? (
-                  <Eye className="h-4 w-4" />
-                ) : (
-                  <EyeOff className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </>
-        )}
+          )}
+          
+          {/* Mobile navigation visibility toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={toggleMobileNavVisibility}
+            title={hiddenOnMobile ? "Show navigation" : "Hide navigation"}
+          >
+            {hiddenOnMobile ? (
+              <Eye className="h-4 w-4" />
+            ) : (
+              <EyeOff className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
         
         <div>
           <h1 className="text-xl font-semibold text-gray-900 truncate">{getPageTitle()}</h1>
