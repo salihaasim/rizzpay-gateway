@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Building, 
@@ -16,7 +18,9 @@ import {
   AlertTriangle,
   DollarSign,
   Banknote,
-  Shield
+  Shield,
+  Globe,
+  TestTube
 } from 'lucide-react';
 import { toast } from 'sonner';
 import BankApiIntegration from '@/components/admin/BankApiIntegration';
