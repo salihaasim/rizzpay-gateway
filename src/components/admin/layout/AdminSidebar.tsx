@@ -65,6 +65,11 @@ export function AdminSidebar({
       icon: <Globe className="h-5 w-5" />
     },
     {
+      title: "Production APIs",
+      href: "/admin/production-api",
+      icon: <CreditCard className="h-5 w-5" />
+    },
+    {
       title: "Escrow Management",
       href: "/admin/escrow",
       icon: <Wallet className="h-5 w-5" />
