@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +18,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import MonitoringDashboard from '@/components/admin/monitoring/MonitoringDashboard';
 import { Helmet } from 'react-helmet';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 const AdminMonitoring = () => {
   const navigate = useNavigate();
@@ -147,117 +147,119 @@ const AdminMonitoring = () => {
   return (
     <Routes>
       <Route index element={
-        <div className="space-y-6">
+        <AdminLayout>
           <Helmet>
             <title>System Monitoring | RizzPay Admin</title>
           </Helmet>
           
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">System Monitoring</h1>
-            <p className="text-muted-foreground mt-2">
-              Comprehensive monitoring dashboard for all system components and services
-            </p>
-          </div>
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">System Monitoring</h1>
+              <p className="text-muted-foreground mt-2">
+                Comprehensive monitoring dashboard for all system components and services
+              </p>
+            </div>
 
-          {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">System Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-green-600">Operational</div>
-                  <Monitor className="h-6 w-6 text-green-600" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">All systems running normally</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-orange-600">2</div>
-                  <AlertCircle className="h-6 w-6 text-orange-600" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Warnings requiring attention</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Uptime</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-blue-600">99.95%</div>
-                  <TrendingUp className="h-6 w-6 text-blue-600" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Performance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-green-600">Excellent</div>
-                  <Eye className="h-6 w-6 text-green-600" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Response times optimal</p>
-              </CardContent>
-            </Card>
-          </div>
+            {/* Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">System Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-green-600">Operational</div>
+                    <Monitor className="h-6 w-6 text-green-600" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">All systems running normally</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-orange-600">2</div>
+                    <AlertCircle className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Warnings requiring attention</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Uptime</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-blue-600">99.95%</div>
+                    <TrendingUp className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-green-600">Excellent</div>
+                    <Eye className="h-6 w-6 text-green-600" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Response times optimal</p>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Monitoring Categories Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {monitoringCategories.map((category) => {
-              const IconComponent = category.icon;
-              return (
-                <Card key={category.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleCategoryClick(category.id)}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <IconComponent className="h-5 w-5 text-primary" />
+            {/* Monitoring Categories Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {monitoringCategories.map((category) => {
+                const IconComponent = category.icon;
+                return (
+                  <Card key={category.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleCategoryClick(category.id)}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <IconComponent className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg">{category.title}</CardTitle>
+                            <CardDescription className="text-sm">{category.description}</CardDescription>
+                          </div>
                         </div>
-                        <div>
-                          <CardTitle className="text-lg">{category.title}</CardTitle>
-                          <CardDescription className="text-sm">{category.description}</CardDescription>
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(category.status)}`}>
+                          <span className="mr-1">{getStatusIcon(category.status)}</span>
+                          {category.status}
                         </div>
                       </div>
-                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(category.status)}`}>
-                        <span className="mr-1">{getStatusIcon(category.status)}</span>
-                        {category.status}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        {Object.entries(category.metrics).map(([key, value], index) => (
+                          <div key={index} className="text-center">
+                            <p className="text-muted-foreground capitalize">{key}</p>
+                            <p className="font-semibold">{value}</p>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      {Object.entries(category.metrics).map(([key, value], index) => (
-                        <div key={index} className="text-center">
-                          <p className="text-muted-foreground capitalize">{key}</p>
-                          <p className="font-semibold">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-4">
-                      <Button variant="outline" className="w-full" onClick={() => handleCategoryClick(category.id)}>
-                        <Monitor className="h-4 w-4 mr-2" />
-                        View Dashboard
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      <div className="mt-4">
+                        <Button variant="outline" className="w-full" onClick={() => handleCategoryClick(category.id)}>
+                          <Monitor className="h-4 w-4 mr-2" />
+                          View Dashboard
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </AdminLayout>
       } />
       <Route path=":dashboardType" element={<MonitoringDashboard />} />
     </Routes>
