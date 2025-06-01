@@ -4,16 +4,14 @@ import { handleWebhookCallback, WebhookPayload } from './handler';
 export interface BankWebhookConfig {
   bankName: string;
   signatureHeader: string;
-  secretKey: string;
   statusMapping: Record<string, 'success' | 'failed' | 'pending'>;
 }
 
-// Bank-specific configurations
+// Bank-specific configurations (without environment variables for frontend)
 export const BANK_CONFIGS: Record<string, BankWebhookConfig> = {
   'hdfc-bank': {
     bankName: 'HDFC Bank',
     signatureHeader: 'x-hdfc-signature',
-    secretKey: process.env.HDFC_WEBHOOK_SECRET || '',
     statusMapping: {
       'SUCCESS': 'success',
       'FAILED': 'failed',
@@ -23,7 +21,6 @@ export const BANK_CONFIGS: Record<string, BankWebhookConfig> = {
   'sbm-bank': {
     bankName: 'SBM Bank',
     signatureHeader: 'x-sbm-signature',
-    secretKey: process.env.SBM_WEBHOOK_SECRET || '',
     statusMapping: {
       'COMPLETED': 'success',
       'DECLINED': 'failed',
@@ -33,7 +30,6 @@ export const BANK_CONFIGS: Record<string, BankWebhookConfig> = {
   'icici-bank': {
     bankName: 'ICICI Bank',
     signatureHeader: 'x-icici-signature',
-    secretKey: process.env.ICICI_WEBHOOK_SECRET || '',
     statusMapping: {
       'APPROVED': 'success',
       'REJECTED': 'failed',
@@ -53,11 +49,10 @@ export const processBankWebhook = async (
       throw new Error(`Unsupported bank: ${bankSlug}`);
     }
 
-    // Validate signature if available
+    // Validate signature if available (signature validation would be done on the server side)
     const signature = headers[config.signatureHeader];
-    if (signature && config.secretKey) {
-      // Implement signature validation here
-      console.log(`Validating signature for ${config.bankName}`);
+    if (signature) {
+      console.log(`Signature received for ${config.bankName}:`, signature);
     }
 
     // Transform bank-specific payload to standard format
@@ -81,6 +76,6 @@ export const processBankWebhook = async (
 
   } catch (error) {
     console.error(`Error processing ${bankSlug} webhook:`, error);
-    return { success: false, message: error.message };
+    return { success: false, message: (error as Error).message };
   }
 };
