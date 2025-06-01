@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,7 @@ import {
   Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
+import BankApiIntegration from '@/components/admin/BankApiIntegration';
 
 const AdminEscrow = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -213,6 +213,7 @@ const AdminEscrow = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
+              <TabsTrigger value="api-integration">Bank API</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
 
@@ -329,6 +330,10 @@ const AdminEscrow = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="api-integration" className="space-y-4">
+              <BankApiIntegration />
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-4">
