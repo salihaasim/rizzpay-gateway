@@ -226,7 +226,6 @@ const BankAPISettings = () => {
                       <Switch
                         checked={api.environment === 'production'}
                         onCheckedChange={() => toggleEnvironment(api.id)}
-                        size="sm"
                       />
                     </div>
                   </TableCell>
