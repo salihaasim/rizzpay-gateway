@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface BankTransactionData {
@@ -21,6 +20,7 @@ export interface BankTransactionData {
   gst_amount?: number;
   remarks?: string;
   bank_response?: any;
+  webhook_received_at?: string;
 }
 
 export interface UTRLogData {
@@ -57,7 +57,8 @@ export const createBankTransaction = async (transactionData: BankTransactionData
         gst_amount: transactionData.gst_amount || 0,
         net_amount: transactionData.amount - (transactionData.bank_charges || 0) - (transactionData.gst_amount || 0),
         remarks: transactionData.remarks,
-        bank_response: transactionData.bank_response
+        bank_response: transactionData.bank_response,
+        webhook_received_at: transactionData.webhook_received_at
       })
       .select()
       .single();

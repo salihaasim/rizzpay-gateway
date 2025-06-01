@@ -129,7 +129,7 @@ const AdminProductionApiManagement = () => {
                         <span className="text-sm font-medium">Bank Transactions</span>
                       </div>
                       <div className="text-2xl font-bold mt-2">
-                        {isLoading ? '...' : productionMetrics?.totalTransactions.toLocaleString()}
+                        {isLoading ? '...' : (productionMetrics?.totalTransactions || 0).toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground">Total processed</div>
                     </CardContent>
@@ -142,7 +142,7 @@ const AdminProductionApiManagement = () => {
                         <span className="text-sm font-medium">UTR Logs</span>
                       </div>
                       <div className="text-2xl font-bold mt-2">
-                        {isLoading ? '...' : productionMetrics?.totalUtrLogs.toLocaleString()}
+                        {isLoading ? '...' : (productionMetrics?.totalUtrLogs || 0).toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground">Webhook callbacks</div>
                     </CardContent>
@@ -155,7 +155,7 @@ const AdminProductionApiManagement = () => {
                         <span className="text-sm font-medium">API Calls</span>
                       </div>
                       <div className="text-2xl font-bold mt-2">
-                        {isLoading ? '...' : productionMetrics?.totalApiCalls.toLocaleString()}
+                        {isLoading ? '...' : (productionMetrics?.totalApiCalls || 0).toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground">Total requests</div>
                     </CardContent>
@@ -168,7 +168,7 @@ const AdminProductionApiManagement = () => {
                         <span className="text-sm font-medium">Payout Jobs</span>
                       </div>
                       <div className="text-2xl font-bold mt-2">
-                        {isLoading ? '...' : productionMetrics?.totalPayoutJobs.toLocaleString()}
+                        {isLoading ? '...' : (productionMetrics?.totalPayoutJobs || 0).toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground">Fund transfers</div>
                     </CardContent>
@@ -201,7 +201,7 @@ const AdminProductionApiManagement = () => {
                         <div>
                           <p className="font-medium">{transaction.transaction_type}</p>
                           <p className="text-sm text-muted-foreground">
-                            ₹{parseFloat(transaction.amount).toLocaleString()}
+                            ₹{parseFloat(transaction.amount.toString()).toLocaleString()}
                           </p>
                         </div>
                       </div>
