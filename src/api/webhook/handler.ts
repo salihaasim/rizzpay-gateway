@@ -37,9 +37,14 @@ export const handleWebhookCallback = async (payload: WebhookPayload) => {
     const internalStatus = payload.status === 'success' ? 'successful' : 
                           payload.status === 'failed' ? 'failed' : 'pending';
 
+    // Safely handle processing timeline - ensure it's an array
+    const existingTimeline = Array.isArray(transaction.processing_timeline) 
+      ? transaction.processing_timeline 
+      : [];
+
     // Update processing timeline
     const updatedTimeline = [
-      ...(transaction.processing_timeline || []),
+      ...existingTimeline,
       {
         stage: internalStatus === 'successful' ? 'completed' : 
                internalStatus === 'failed' ? 'declined' : 'processing',
@@ -49,9 +54,16 @@ export const handleWebhookCallback = async (payload: WebhookPayload) => {
       }
     ];
 
+    // Safely handle payment details - ensure it's an object
+    const existingPaymentDetails = transaction.payment_details && 
+                                 typeof transaction.payment_details === 'object' &&
+                                 !Array.isArray(transaction.payment_details)
+      ? transaction.payment_details as Record<string, any>
+      : {};
+
     // Update payment details
     const updatedPaymentDetails = {
-      ...transaction.payment_details,
+      ...existingPaymentDetails,
       webhookReceived: true,
       paymentId: payload.payment_id,
       processorResponse: payload.processor_response,
@@ -79,7 +91,7 @@ export const handleWebhookCallback = async (payload: WebhookPayload) => {
 
   } catch (error) {
     console.error('Webhook processing error:', error);
-    return { success: false, message: error.message };
+    return { success: false, message: (error as Error).message };
   }
 };
 
