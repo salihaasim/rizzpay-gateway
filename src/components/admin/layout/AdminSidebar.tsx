@@ -14,7 +14,8 @@ import {
   Shield,
   X,
   Monitor,
-  Wallet
+  Wallet,
+  Globe
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -57,6 +58,11 @@ export function AdminSidebar({
       title: "Monitoring",
       href: "/admin/monitoring",
       icon: <Monitor className="h-5 w-5" />
+    },
+    {
+      title: "API Management",
+      href: "/admin/api-management",
+      icon: <Globe className="h-5 w-5" />
     },
     {
       title: "Escrow Management",
