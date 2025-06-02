@@ -66,13 +66,13 @@ export class PayoutWebhookService {
       
       if (updateError) throw updateError;
       
-      // Log webhook activity
+      // Log webhook activity with proper JSON conversion
       await supabase
         .from('payout_webhooks')
         .insert({
           payout_request_id: payout_id,
           webhook_type: 'status_update',
-          payload: payload,
+          payload: payload as any, // Convert to JSONB-compatible format
           response_code: 200,
           delivered: true
         });
@@ -92,13 +92,13 @@ export class PayoutWebhookService {
     } catch (error) {
       console.error('Webhook processing error:', error);
       
-      // Log failed webhook
+      // Log failed webhook with proper JSON conversion
       await supabase
         .from('payout_webhooks')
         .insert({
           payout_request_id: payload.payout_id,
           webhook_type: 'status_update',
-          payload: payload,
+          payload: payload as any, // Convert to JSONB-compatible format
           response_code: 500,
           response_body: (error as Error).message,
           delivered: false
@@ -184,7 +184,7 @@ export class PayoutWebhookService {
         .insert({
           payout_request_id: payoutId,
           webhook_type: 'status_update',
-          payload: webhookPayload,
+          payload: webhookPayload as any, // Convert to JSONB-compatible format
           response_code: response.status,
           response_body: await response.text(),
           delivered: response.ok

@@ -31,7 +31,8 @@ import {
   RotateCcw,
   Download,
   Filter,
-  Search
+  Search,
+  Play
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
