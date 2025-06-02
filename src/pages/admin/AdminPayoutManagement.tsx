@@ -56,6 +56,38 @@ interface PayoutRequest {
   internal_notes?: string;
 }
 
+// Utility functions for status display
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'completed':
+      return <CheckCircle className="h-4 w-4 text-green-500" />;
+    case 'processing':
+      return <Play className="h-4 w-4 text-blue-500" />;
+    case 'pending':
+      return <Clock className="h-4 w-4 text-yellow-500" />;
+    case 'failed':
+      return <XCircle className="h-4 w-4 text-red-500" />;
+    default:
+      return <Clock className="h-4 w-4 text-gray-500" />;
+  }
+};
+
+const getStatusBadge = (status: string) => {
+  const variants = {
+    completed: 'bg-green-100 text-green-800',
+    processing: 'bg-blue-100 text-blue-800',
+    pending: 'bg-yellow-100 text-yellow-800',
+    failed: 'bg-red-100 text-red-800',
+    cancelled: 'bg-gray-100 text-gray-800'
+  };
+  
+  return (
+    <Badge className={variants[status as keyof typeof variants] || 'bg-gray-100 text-gray-800'}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </Badge>
+  );
+};
+
 const AdminPayoutManagement = () => {
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,11 +164,23 @@ const AdminPayoutManagement = () => {
   const retryPayout = async (payoutId: string) => {
     try {
       setIsProcessing(true);
+      
+      // First get the current retry count
+      const { data: currentPayout, error: fetchError } = await supabase
+        .from('payout_requests')
+        .select('retry_count')
+        .eq('id', payoutId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const newRetryCount = (currentPayout?.retry_count || 0) + 1;
+
       const { error } = await supabase
         .from('payout_requests')
         .update({
           status: 'pending',
-          retry_count: supabase.sql`retry_count + 1`,
+          retry_count: newRetryCount,
           updated_at: new Date().toISOString()
         })
         .eq('id', payoutId);
@@ -151,37 +195,6 @@ const AdminPayoutManagement = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'processing':
-        return <Play className="h-4 w-4 text-blue-500" />;
-      case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'failed':
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      completed: 'bg-green-100 text-green-800',
-      processing: 'bg-blue-100 text-blue-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      failed: 'bg-red-100 text-red-800',
-      cancelled: 'bg-gray-100 text-gray-800'
-    };
-    
-    return (
-      <Badge className={variants[status as keyof typeof variants] || 'bg-gray-100 text-gray-800'}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
   };
 
   const getPriorityBadge = (priority: number) => {
