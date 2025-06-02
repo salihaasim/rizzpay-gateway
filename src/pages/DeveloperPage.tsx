@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -10,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Download, FileText, Code, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import MerchantUrlBank from '@/components/developer/MerchantUrlBank';
 
 const DeveloperPage = () => {
   const { currentMerchant } = useMerchantAuth();
@@ -140,12 +140,17 @@ const DeveloperPage = () => {
             </p>
           </div>
 
-          <Tabs defaultValue="api" className="space-y-6">
-            <TabsList className="grid grid-cols-3 w-full md:w-auto">
+          <Tabs defaultValue="url-bank" className="space-y-6">
+            <TabsList className="grid grid-cols-4 w-full md:w-auto">
+              <TabsTrigger value="url-bank">URL Bank</TabsTrigger>
               <TabsTrigger value="api">API</TabsTrigger>
               <TabsTrigger value="webhook">Webhook</TabsTrigger>
               <TabsTrigger value="docs">Documentation</TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="url-bank">
+              <MerchantUrlBank />
+            </TabsContent>
             
             <TabsContent value="api">
               <Card>
