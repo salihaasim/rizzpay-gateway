@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -65,13 +65,14 @@ const AdminTransactionLog = () => {
   };
   
   return (
-    <>
+    <AdminLayout>
       <Helmet>
         <title>Transaction Log | RizzPay Admin</title>
       </Helmet>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
+            <h1 className="text-2xl font-bold">Transaction Log</h1>
             <p className="text-muted-foreground mt-1">
               View and export transaction records
             </p>
@@ -225,7 +226,7 @@ const AdminTransactionLog = () => {
           </CardContent>
         </Card>
       </div>
-    </>
+    </AdminLayout>
   );
 };
 

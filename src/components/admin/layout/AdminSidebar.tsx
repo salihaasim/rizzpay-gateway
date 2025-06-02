@@ -15,7 +15,8 @@ import {
   X,
   Monitor,
   Wallet,
-  Globe
+  Globe,
+  Headphones
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -105,6 +106,11 @@ export function AdminSidebar({
       icon: <User className="h-5 w-5" />
     },
     {
+      title: "Support",
+      href: "/admin/support",
+      icon: <Headphones className="h-5 w-5" />
+    },
+    {
       title: "Whitelist",
       href: "/admin/whitelist",
       icon: <Shield className="h-5 w-5" />
@@ -123,7 +129,6 @@ export function AdminSidebar({
     return location.pathname.startsWith(href);
   };
   
-  // Mobile overlay for closing sidebar when clicking outside
   const handleOverlayClick = () => {
     if (setMobileMenuOpen) {
       setMobileMenuOpen(false);

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -35,6 +34,7 @@ import AdminMerchants from '@/pages/admin/AdminMerchants';
 import AdminKYC from '@/pages/admin/AdminKYC';
 import AdminWhitelist from '@/pages/AdminWhitelist';
 import AdminSettings from '@/pages/AdminSettings';
+import AdminSupport from '@/pages/admin/AdminSupport';
 
 // Other Pages
 import Profile from '@/pages/Profile';
@@ -92,6 +92,7 @@ function App() {
               <Route path="/admin/kyc" element={<AdminKYC />} />
               <Route path="/admin/whitelist" element={<AdminWhitelist />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
+              <Route path="/admin/support" element={<AdminSupport />} />
 
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
