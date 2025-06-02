@@ -1,5 +1,6 @@
 
 import React from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,97 +32,104 @@ const AdminTransactions: React.FC = () => {
   });
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Transactions Management</h1>
-      
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Transaction Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div>
-              <label htmlFor="search" className="text-sm font-medium">Search</label>
-              <Input
-                id="search"
-                placeholder="Search by ID, merchant, or customer"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Transactions Management</h1>
+          <p className="text-muted-foreground mt-1">
+            Monitor and manage all system transactions
+          </p>
+        </div>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Transaction Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-4">
+              <div>
+                <label htmlFor="search" className="text-sm font-medium">Search</label>
+                <Input
+                  id="search"
+                  placeholder="Search by ID, merchant, or customer"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="status" className="text-sm font-medium">Status</label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="successful">Successful</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="failed">Failed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="date" className="text-sm font-medium">Date Range</label>
+                <Input id="date" type="date" />
+              </div>
+              <div className="flex items-end">
+                <Button>Apply Filters</Button>
+              </div>
             </div>
-            <div>
-              <label htmlFor="status" className="text-sm font-medium">Status</label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="successful">Successful</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label htmlFor="date" className="text-sm font-medium">Date Range</label>
-              <Input id="date" type="date" />
-            </div>
-            <div className="flex items-end">
-              <Button>Apply Filters</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Transaction List</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="py-3 text-left">Transaction ID</th>
-                  <th className="py-3 text-left">Date</th>
-                  <th className="py-3 text-left">Amount</th>
-                  <th className="py-3 text-left">Merchant</th>
-                  <th className="py-3 text-left">Customer</th>
-                  <th className="py-3 text-left">Status</th>
-                  <th className="py-3 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="border-b hover:bg-muted/50">
-                    <td className="py-3">{transaction.id}</td>
-                    <td className="py-3">{new Date(transaction.date).toLocaleDateString()}</td>
-                    <td className="py-3">{transaction.amount}</td>
-                    <td className="py-3">{transaction.merchant}</td>
-                    <td className="py-3">{transaction.customer}</td>
-                    <td className="py-3">
-                      <span className={`px-2 py-1 text-xs rounded ${
-                        transaction.status === 'successful' 
-                          ? 'bg-green-100 text-green-800' 
-                          : transaction.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {transaction.status}
-                      </span>
-                    </td>
-                    <td className="py-3">
-                      <Button variant="ghost" size="sm">View</Button>
-                    </td>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Transaction List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-3 text-left">Transaction ID</th>
+                    <th className="py-3 text-left">Date</th>
+                    <th className="py-3 text-left">Amount</th>
+                    <th className="py-3 text-left">Merchant</th>
+                    <th className="py-3 text-left">Customer</th>
+                    <th className="py-3 text-left">Status</th>
+                    <th className="py-3 text-left">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                </thead>
+                <tbody>
+                  {filteredTransactions.map((transaction) => (
+                    <tr key={transaction.id} className="border-b hover:bg-muted/50">
+                      <td className="py-3">{transaction.id}</td>
+                      <td className="py-3">{new Date(transaction.date).toLocaleDateString()}</td>
+                      <td className="py-3">{transaction.amount}</td>
+                      <td className="py-3">{transaction.merchant}</td>
+                      <td className="py-3">{transaction.customer}</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-1 text-xs rounded ${
+                          transaction.status === 'successful' 
+                            ? 'bg-green-100 text-green-800' 
+                            : transaction.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {transaction.status}
+                        </span>
+                      </td>
+                      <td className="py-3">
+                        <Button variant="ghost" size="sm">View</Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AdminLayout>
   );
 };
 
