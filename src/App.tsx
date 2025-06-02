@@ -11,6 +11,7 @@ import Dashboard from '@/pages/Dashboard';
 import Transactions from '@/pages/Transactions';
 import WalletPage from '@/pages/WalletPage';
 import PayoutPage from '@/pages/PayoutPage';
+import EnhancedPayoutPage from '@/pages/EnhancedPayoutPage';
 import TransfersPage from '@/pages/TransfersPage';
 import BankingPage from '@/pages/BankingPage';
 import KycPage from '@/pages/KycPage';
@@ -35,6 +36,7 @@ import AdminKYC from '@/pages/admin/AdminKYC';
 import AdminWhitelist from '@/pages/AdminWhitelist';
 import AdminSettings from '@/pages/AdminSettings';
 import AdminSupport from '@/pages/admin/AdminSupport';
+import AdminPayoutManagement from '@/pages/admin/AdminPayoutManagement';
 
 // Other Pages
 import Profile from '@/pages/Profile';
@@ -70,6 +72,7 @@ function App() {
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/wallet" element={<WalletPage />} />
               <Route path="/payout" element={<PayoutPage />} />
+              <Route path="/payout-enhanced" element={<EnhancedPayoutPage />} />
               <Route path="/transfers" element={<TransfersPage />} />
               <Route path="/banking" element={<BankingPage />} />
               <Route path="/kyc" element={<KycPage />} />
@@ -93,6 +96,7 @@ function App() {
               <Route path="/admin/whitelist" element={<AdminWhitelist />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
               <Route path="/admin/support" element={<AdminSupport />} />
+              <Route path="/admin/payout-management" element={<AdminPayoutManagement />} />
 
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />

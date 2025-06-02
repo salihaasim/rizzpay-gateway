@@ -16,7 +16,8 @@ import {
   Monitor,
   Wallet,
   Globe,
-  Headphones
+  Headphones,
+  ArrowUpRight
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -74,6 +75,11 @@ export function AdminSidebar({
       title: "Escrow Management",
       href: "/admin/escrow",
       icon: <Wallet className="h-5 w-5" />
+    },
+    {
+      title: "Payout Management",
+      href: "/admin/payout-management",
+      icon: <ArrowUpRight className="h-5 w-5" />
     },
     {
       title: "Transactions",

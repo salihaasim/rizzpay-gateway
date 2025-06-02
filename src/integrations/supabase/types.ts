@@ -499,6 +499,51 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_payout_settings: {
+        Row: {
+          auto_payout_enabled: boolean | null
+          auto_payout_schedule: string | null
+          auto_payout_threshold: number | null
+          created_at: string
+          daily_limit: number | null
+          id: string
+          merchant_id: string
+          monthly_limit: number | null
+          preferred_payout_method: string | null
+          updated_at: string
+          webhook_secret: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          auto_payout_enabled?: boolean | null
+          auto_payout_schedule?: string | null
+          auto_payout_threshold?: number | null
+          created_at?: string
+          daily_limit?: number | null
+          id?: string
+          merchant_id: string
+          monthly_limit?: number | null
+          preferred_payout_method?: string | null
+          updated_at?: string
+          webhook_secret?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          auto_payout_enabled?: boolean | null
+          auto_payout_schedule?: string | null
+          auto_payout_threshold?: number | null
+          created_at?: string
+          daily_limit?: number | null
+          id?: string
+          merchant_id?: string
+          monthly_limit?: number | null
+          preferred_payout_method?: string | null
+          updated_at?: string
+          webhook_secret?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       merchant_profiles: {
         Row: {
           api_key: string | null
@@ -585,6 +630,190 @@ export type Database = {
           status?: string | null
         }
         Relationships: []
+      }
+      payout_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at: string
+          description: string | null
+          id: string
+          merchant_id: string
+          payout_request_id: string
+          reference_id: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          merchant_id: string
+          payout_request_id: string
+          reference_id?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          merchant_id?: string
+          payout_request_id?: string
+          reference_id?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_ledger_payout_request_id_fkey"
+            columns: ["payout_request_id"]
+            isOneToOne: false
+            referencedRelation: "payout_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_requests: {
+        Row: {
+          account_number: string | null
+          amount: number
+          bank_name: string | null
+          bank_reference_id: string | null
+          beneficiary_name: string | null
+          completed_at: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          failed_at: string | null
+          failure_reason: string | null
+          gst_amount: number | null
+          id: string
+          ifsc_code: string | null
+          internal_notes: string | null
+          max_retries: number | null
+          merchant_id: string
+          net_amount: number | null
+          next_retry_at: string | null
+          payout_method: string
+          priority: number | null
+          processing_fee: number | null
+          processing_started_at: string | null
+          retry_count: number | null
+          status: string
+          updated_at: string
+          upi_id: string | null
+          utr_number: string | null
+          webhook_data: Json | null
+        }
+        Insert: {
+          account_number?: string | null
+          amount: number
+          bank_name?: string | null
+          bank_reference_id?: string | null
+          beneficiary_name?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          failed_at?: string | null
+          failure_reason?: string | null
+          gst_amount?: number | null
+          id?: string
+          ifsc_code?: string | null
+          internal_notes?: string | null
+          max_retries?: number | null
+          merchant_id: string
+          net_amount?: number | null
+          next_retry_at?: string | null
+          payout_method: string
+          priority?: number | null
+          processing_fee?: number | null
+          processing_started_at?: string | null
+          retry_count?: number | null
+          status?: string
+          updated_at?: string
+          upi_id?: string | null
+          utr_number?: string | null
+          webhook_data?: Json | null
+        }
+        Update: {
+          account_number?: string | null
+          amount?: number
+          bank_name?: string | null
+          bank_reference_id?: string | null
+          beneficiary_name?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          failed_at?: string | null
+          failure_reason?: string | null
+          gst_amount?: number | null
+          id?: string
+          ifsc_code?: string | null
+          internal_notes?: string | null
+          max_retries?: number | null
+          merchant_id?: string
+          net_amount?: number | null
+          next_retry_at?: string | null
+          payout_method?: string
+          priority?: number | null
+          processing_fee?: number | null
+          processing_started_at?: string | null
+          retry_count?: number | null
+          status?: string
+          updated_at?: string
+          upi_id?: string | null
+          utr_number?: string | null
+          webhook_data?: Json | null
+        }
+        Relationships: []
+      }
+      payout_webhooks: {
+        Row: {
+          delivered: boolean | null
+          id: string
+          payload: Json
+          payout_request_id: string
+          response_body: string | null
+          response_code: number | null
+          sent_at: string
+          webhook_type: string
+        }
+        Insert: {
+          delivered?: boolean | null
+          id?: string
+          payload: Json
+          payout_request_id: string
+          response_body?: string | null
+          response_code?: number | null
+          sent_at?: string
+          webhook_type: string
+        }
+        Update: {
+          delivered?: boolean | null
+          id?: string
+          payload?: Json
+          payout_request_id?: string
+          response_body?: string | null
+          response_code?: number | null
+          sent_at?: string
+          webhook_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_webhooks_payout_request_id_fkey"
+            columns: ["payout_request_id"]
+            isOneToOne: false
+            referencedRelation: "payout_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -756,6 +985,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_payout_net_amount: {
+        Args: {
+          gross_amount: number
+          processing_fee?: number
+          gst_rate?: number
+        }
+        Returns: number
+      }
+      get_merchant_wallet_balance: {
+        Args: { merchant_uuid: string }
+        Returns: number
+      }
       get_or_create_api_key: {
         Args: { user_id: string }
         Returns: string
