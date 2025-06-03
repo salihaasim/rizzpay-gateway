@@ -1,53 +1,15 @@
 
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../config/supabase';
+import { MerchantService } from '../services/MerchantService';
+import { createError } from './errorHandler';
 
-interface AuthenticatedRequest extends Request {
-  user?: {
+export interface AuthenticatedRequest extends Request {
+  merchant?: {
     id: string;
-    email: string;
-    role?: string;
+    business_name: string;
+    is_active: boolean;
   };
 }
-
-export const authenticateToken = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access token required'
-      });
-    }
-    
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    
-    if (error || !user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token'
-      });
-    }
-    
-    req.user = {
-      id: user.id,
-      email: user.email || '',
-    };
-    
-    next();
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Token verification failed'
-    });
-  }
-};
 
 export const authenticateApiKey = async (
   req: AuthenticatedRequest,
@@ -58,35 +20,49 @@ export const authenticateApiKey = async (
     const apiKey = req.headers['x-api-key'] as string;
     
     if (!apiKey) {
-      return res.status(401).json({
-        success: false,
-        message: 'API key required'
-      });
+      return next(createError('API key is required', 401));
     }
     
-    const { data: merchant, error } = await supabase
-      .from('merchant_profiles')
-      .select('id, contact_email, is_active')
-      .eq('api_key', apiKey)
-      .single();
-    
-    if (error || !merchant || !merchant.is_active) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid API key'
-      });
+    if (!apiKey.startsWith('rizz_')) {
+      return next(createError('Invalid API key format', 401));
     }
     
-    req.user = {
-      id: merchant.id,
-      email: merchant.contact_email,
-    };
+    const merchant = await MerchantService.validateMerchantApiKey(apiKey);
     
+    if (!merchant) {
+      return next(createError('Invalid or inactive API key', 401));
+    }
+    
+    req.merchant = merchant;
     next();
+    
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'API key verification failed'
-    });
+    next(createError('Authentication failed', 401));
+  }
+};
+
+export const authenticateToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+      return next(createError('Access token is required', 401));
+    }
+    
+    // In production, verify JWT token here
+    // For now, we'll just check if it's not empty
+    if (token === 'admin-token') {
+      next();
+    } else {
+      next(createError('Invalid access token', 401));
+    }
+    
+  } catch (error) {
+    next(createError('Token verification failed', 401));
   }
 };

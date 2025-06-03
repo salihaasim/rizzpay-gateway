@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+import { z } from 'zod';
 import { PayoutController } from '../api/payout/payoutController';
 import { authenticateApiKey } from '../middleware/authMiddleware';
 import { validateBody, validateParams, validateQuery } from '../middleware/validation';
@@ -8,8 +9,10 @@ import {
   createPayoutSchema,
   payoutStatusSchema,
   merchantPayoutsQuerySchema,
-  uuidSchema
+  uuidSchema,
+  bulkUploadSchema
 } from '../validators/schemas';
+import { BulkPayoutService } from '../services/BulkPayoutService';
 
 const router = Router();
 
@@ -39,6 +42,48 @@ router.get('/merchant/:merchantId',
 router.post('/:payoutId/retry',
   validateParams(payoutStatusSchema),
   asyncHandler(PayoutController.retryPayout)
+);
+
+// Bulk payout upload
+router.post('/bulk',
+  validateBody(bulkUploadSchema),
+  asyncHandler(async (req, res) => {
+    const { file_content, file_name, merchant_id } = req.body;
+    
+    const result = await BulkPayoutService.processBulkFile(
+      merchant_id,
+      file_content,
+      file_name
+    );
+    
+    if (result.success) {
+      res.status(201).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  })
+);
+
+// Get bulk upload status
+router.get('/bulk/:uploadId',
+  validateParams(z.object({ uploadId: uuidSchema })),
+  asyncHandler(async (req, res) => {
+    const { uploadId } = req.params;
+    
+    const status = await BulkPayoutService.getBulkUploadStatus(uploadId);
+    
+    if (status) {
+      res.json({
+        success: true,
+        data: status
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Bulk upload not found'
+      });
+    }
+  })
 );
 
 export default router;
