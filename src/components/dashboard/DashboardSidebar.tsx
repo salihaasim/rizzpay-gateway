@@ -137,19 +137,19 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
   return (
     <div
       className={cn(
-        "flex flex-col fixed inset-y-0 z-50 h-full bg-[#111827] dark:bg-gray-900 text-white transition-all duration-300",
-        collapsed ? "w-20" : "w-[280px]"
+        "flex flex-col h-full bg-[#111827] dark:bg-gray-900 text-white transition-all duration-300 relative",
+        isMobile ? "w-[280px]" : (collapsed ? "w-20" : "w-[280px]")
       )}
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
         <Link to="/dashboard" className="flex items-center space-x-3">
-          {!collapsed && (
+          {(!collapsed || isMobile) && (
             <>
               <CircleDollarSign className="h-6 w-6 text-[#0052FF]" />
               <span className="font-bold text-lg text-white">RizzPay</span>
             </>
           )}
-          {collapsed && <CircleDollarSign className="h-6 w-6 mx-auto text-[#0052FF]" />}
+          {collapsed && !isMobile && <CircleDollarSign className="h-6 w-6 mx-auto text-[#0052FF]" />}
         </Link>
         {showToggle && (
           <Button
@@ -181,7 +181,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                     )}
                   >
                     {item.icon}
-                    {!collapsed && (
+                    {(!collapsed || isMobile) && (
                       <>
                         <span className="flex-1">{item.title}</span>
                         {walletDropdownOpen ? (
@@ -193,7 +193,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                     )}
                   </div>
                   
-                  {!collapsed && walletDropdownOpen && item.dropdownItems && (
+                  {(!collapsed || isMobile) && walletDropdownOpen && item.dropdownItems && (
                     <div className="ml-6 mt-1 space-y-1">
                       {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
                         <Link
@@ -220,7 +220,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                   )}
                 >
                   {item.icon}
-                  {!collapsed && <span>{item.title}</span>}
+                  {(!collapsed || isMobile) && <span>{item.title}</span>}
                 </Link>
               )}
             </div>
@@ -229,7 +229,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
       </ScrollArea>
 
       <div className="mt-auto border-t border-gray-800 dark:border-gray-700 p-4">
-        <div className={cn("flex items-center", collapsed ? "justify-center" : "space-x-3")}>
+        <div className={cn("flex items-center", (collapsed && !isMobile) ? "justify-center" : "space-x-3")}>
           <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
             {currentMerchant?.fullName ? (
               <span className="text-sm font-medium">
@@ -239,7 +239,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
               <span className="text-sm font-medium">M</span>
             )}
           </div>
-          {!collapsed && (
+          {(!collapsed || isMobile) && (
             <div className="space-y-1">
               <p className="text-sm font-medium leading-none truncate max-w-[180px]">
                 {currentMerchant?.fullName || "Merchant"}
@@ -256,12 +256,12 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
           variant="ghost" 
           className={cn(
             "w-full mt-4 text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
-            collapsed ? "justify-center px-0" : "justify-start"
+            (collapsed && !isMobile) ? "justify-center px-0" : "justify-start"
           )}
           onClick={handleLogout}
         >
           <LogOut className="h-5 w-5" />
-          {!collapsed && <span className="ml-3">Logout</span>}
+          {(!collapsed || isMobile) && <span className="ml-3">Logout</span>}
         </Button>
       </div>
     </div>
