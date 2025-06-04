@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -68,6 +69,7 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/pay" element={<PaymentPage />} />
+              <Route path="/pay/:paymentId" element={<PaymentPage />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/upi-payment/:transactionId" element={<UpiPaymentPage />} />
               <Route path="/webhook-payment/:transactionId" element={<WebhookPayment />} />
