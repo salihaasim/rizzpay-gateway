@@ -168,14 +168,33 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    // Generate payment link using the new /pay route
-    const currentDomain = window.location.origin;
-    const link = `${currentDomain}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description)}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    // Generate clean RizzPay payment link using rizz-pay.in domain
+    const rizzPayDomain = 'https://rizz-pay.in';
+    
+    // Create a short, clean payment ID
+    const paymentId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    // Generate clean payment link with short parameters
+    const link = `${rizzPayDomain}/pay/${paymentId}?amt=${linkForm.amount}&m=${encodeURIComponent(linkForm.merchantName)}${linkForm.description ? `&d=${encodeURIComponent(linkForm.description)}` : ''}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(link);
-    toast.success('Payment link generated successfully!', {
-      description: 'Share this link with your customers for easy payments'
+    toast.success('RizzPay payment link generated successfully!', {
+      description: 'Share this clean rizz-pay.in link with your customers'
     });
+  };
+  
+  const generateAlternativeLink = () => {
+    if (!linkForm.amount || !linkForm.merchantName) {
+      toast.error('Please fill in required fields');
+      return;
+    }
+    
+    // Alternative clean format without payment ID
+    const rizzPayDomain = 'https://rizz-pay.in';
+    const cleanLink = `${rizzPayDomain}/pay?amt=${linkForm.amount}&merchant=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description || 'Payment')}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    
+    setGeneratedLink(cleanLink);
+    toast.success('Clean RizzPay link generated!');
   };
   
   const saveSettings = () => {
@@ -194,7 +213,7 @@ const UpiLinkPaymentPage = () => {
   
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Link copied to clipboard!');
+    toast.success('RizzPay link copied to clipboard!');
   };
   
   const handleGoBack = () => {
@@ -303,15 +322,15 @@ const UpiLinkPaymentPage = () => {
           {activeSection === 'generate' && (
             <>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold">Generate Payment Link</h1>
-                <p className="text-muted-foreground">Create UPI payment links for easy collection via rizz-pay.in</p>
+                <h1 className="text-2xl font-bold">Generate RizzPay Payment Link</h1>
+                <p className="text-muted-foreground">Create clean UPI payment links using rizz-pay.in domain</p>
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Create New Link</CardTitle>
-                    <CardDescription>Fill in the details to generate a payment link</CardDescription>
+                    <CardTitle>Create New Payment Link</CardTitle>
+                    <CardDescription>Generate a clean rizz-pay.in payment link</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -355,37 +374,44 @@ const UpiLinkPaymentPage = () => {
                       />
                     </div>
                     
-                    <Button onClick={generatePaymentLink} className="w-full">
-                      <Link2 className="mr-2 h-4 w-4" />
-                      Generate Link
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button onClick={generatePaymentLink} className="w-full">
+                        <Link2 className="mr-2 h-4 w-4" />
+                        Generate Link
+                      </Button>
+                      <Button onClick={generateAlternativeLink} variant="outline" className="w-full">
+                        Alternative Format
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
                 
                 {generatedLink && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Generated Link</CardTitle>
-                      <CardDescription>Share this rizz-pay.in link to collect payment</CardDescription>
+                      <CardTitle>Generated RizzPay Link</CardTitle>
+                      <CardDescription>Your clean rizz-pay.in payment link</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="p-3 bg-muted rounded-lg break-all text-sm">
-                        {generatedLink}
+                      <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                        <p className="text-sm font-medium text-blue-800 mb-2">Clean Payment Link:</p>
+                        <div className="p-3 bg-white rounded-md border text-sm font-mono break-all">
+                          {generatedLink}
+                        </div>
                       </div>
                       
                       <div className="flex gap-2">
                         <Button 
                           onClick={() => copyToClipboard(generatedLink)}
-                          variant="outline"
-                          className="flex-1"
+                          className="flex-1 bg-primary"
                         >
                           <Copy className="mr-2 h-4 w-4" />
-                          Copy
+                          Copy Link
                         </Button>
                         <Button 
                           onClick={() => {
                             const subject = `Payment Request - ₹${linkForm.amount}`;
-                            const body = `Please complete your payment using this link: ${generatedLink}`;
+                            const body = `Complete your payment using this link: ${generatedLink}`;
                             window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
                           }}
                           variant="outline"
@@ -393,6 +419,17 @@ const UpiLinkPaymentPage = () => {
                         >
                           <Send className="mr-2 h-4 w-4" />
                           Email
+                        </Button>
+                      </div>
+                      
+                      <div className="text-center pt-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => window.open(generatedLink, '_blank')}
+                          className="text-primary hover:text-primary/80"
+                        >
+                          Test Payment Link →
                         </Button>
                       </div>
                     </CardContent>
