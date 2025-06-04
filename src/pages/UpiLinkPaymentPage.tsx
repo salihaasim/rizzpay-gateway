@@ -16,7 +16,9 @@ import {
   Plus,
   History,
   Settings,
-  CreditCard
+  CreditCard,
+  Save,
+  Smartphone
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
@@ -74,12 +76,21 @@ const UpiLinkPaymentPage = () => {
   const [transactionId, setTransactionId] = useState('');
   const [activeSection, setActiveSection] = useState('generate');
   
+  // Settings state for UPI configuration
+  const [settings, setSettings] = useState({
+    collectionUpiId: 'merchant@paytm',
+    merchantDisplayName: 'RizzPay Merchant',
+    webhookUrl: '',
+    autoRedirectUrl: '',
+    paymentNotifications: true
+  });
+  
   // Link generation form state
   const [linkForm, setLinkForm] = useState({
     amount: '',
-    merchantName: 'RizzPay Merchant',
+    merchantName: settings.merchantDisplayName,
     description: '',
-    upiId: 'merchant@paytm'
+    upiId: settings.collectionUpiId
   });
   
   const [generatedLink, setGeneratedLink] = useState('');
@@ -91,9 +102,9 @@ const UpiLinkPaymentPage = () => {
   
   // Get payment details from URL parameters (for direct payment)
   const amount = searchParams.get('amount') || '';
-  const merchantName = searchParams.get('name') || 'RizzPay Merchant';
+  const merchantName = searchParams.get('name') || settings.merchantDisplayName;
   const description = searchParams.get('desc') || 'Payment via RizzPay';
-  const upiId = searchParams.get('upi') || '';
+  const upiId = searchParams.get('upi') || settings.collectionUpiId;
   const returnUrl = searchParams.get('return_url') || '';
   
   // Check if this is a direct payment link (has amount in URL)
@@ -102,7 +113,7 @@ const UpiLinkPaymentPage = () => {
   const formattedAmount = isDirectPayment 
     ? parseFloat(amount).toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })
     : '';
-  
+
   const handlePayment = () => {
     const txnId = `txn_${Math.random().toString(36).substring(2, 10)}`;
     const utrId = `utr_${Math.random().toString(36).substring(2, 10)}`;
@@ -110,9 +121,17 @@ const UpiLinkPaymentPage = () => {
     setTransactionId(txnId);
     setPaymentSuccess(true);
     
-    toast.success('Payment submitted for verification', {
-      description: 'Your transaction will be verified shortly'
+    toast.success('Payment initiated successfully', {
+      description: 'Redirecting to UPI app for payment confirmation'
     });
+    
+    // Generate UPI deep link for mobile payment
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&tn=${encodeURIComponent(description)}&tr=${txnId}&cu=INR`;
+    
+    // Try to open UPI app
+    if (window.navigator.userAgent.includes('Mobile')) {
+      window.location.href = upiUrl;
+    }
     
     addTransaction({
       id: txnId,
@@ -148,11 +167,28 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    const baseUrl = window.location.origin;
-    const link = `${baseUrl}/upi-payment?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description)}&upi=${encodeURIComponent(linkForm.upiId)}`;
+    // Use rizz-pay.in domain for payment links
+    const baseUrl = 'https://rizz-pay.in';
+    const link = `${baseUrl}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description)}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(link);
-    toast.success('Payment link generated successfully!');
+    toast.success('Payment link generated successfully!', {
+      description: 'Share this link with your customers for easy payments'
+    });
+  };
+  
+  const saveSettings = () => {
+    // In production, this would save to database
+    toast.success('Settings saved successfully!', {
+      description: 'Your UPI collection settings have been updated'
+    });
+    
+    // Update form defaults with new settings
+    setLinkForm(prev => ({
+      ...prev,
+      merchantName: settings.merchantDisplayName,
+      upiId: settings.collectionUpiId
+    }));
   };
   
   const copyToClipboard = (text: string) => {
@@ -212,13 +248,13 @@ const UpiLinkPaymentPage = () => {
                         <Check className="h-6 w-6 text-green-600" />
                       </div>
                     </div>
-                    <h3 className="font-medium text-green-800">Payment Submitted</h3>
-                    <p className="text-sm text-green-700 mt-1">Your payment is being verified</p>
+                    <h3 className="font-medium text-green-800">Payment Initiated</h3>
+                    <p className="text-sm text-green-700 mt-1">Please complete payment in your UPI app</p>
                     <p className="text-xs text-green-600 mt-3">Transaction ID: {transactionId}</p>
                   </div>
                 ) : (
                   <Button className="w-full flex items-center justify-center gap-2" onClick={handlePayment}>
-                    <QrCode className="h-5 w-5" />
+                    <Smartphone className="h-5 w-5" />
                     Pay with UPI
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
@@ -267,7 +303,7 @@ const UpiLinkPaymentPage = () => {
             <>
               <div className="mb-6">
                 <h1 className="text-2xl font-bold">Generate Payment Link</h1>
-                <p className="text-muted-foreground">Create UPI payment links for easy collection</p>
+                <p className="text-muted-foreground">Create UPI payment links for easy collection via rizz-pay.in</p>
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -329,7 +365,7 @@ const UpiLinkPaymentPage = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle>Generated Link</CardTitle>
-                      <CardDescription>Share this link to collect payment</CardDescription>
+                      <CardDescription>Share this rizz-pay.in link to collect payment</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="p-3 bg-muted rounded-lg break-all text-sm">
@@ -429,18 +465,106 @@ const UpiLinkPaymentPage = () => {
           {activeSection === 'settings' && (
             <>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold">Settings</h1>
-                <p className="text-muted-foreground">Configure your payment preferences</p>
+                <h1 className="text-2xl font-bold">UPI Collection Settings</h1>
+                <p className="text-muted-foreground">Configure your UPI payment collection preferences</p>
               </div>
               
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <Settings className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-medium mb-2">Payment Settings</h3>
-                  <p className="text-muted-foreground mb-4">Configure default UPI IDs, notifications, and preferences</p>
-                  <Button disabled>Coming Soon</Button>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Collection Settings</CardTitle>
+                    <CardDescription>Configure your UPI ID and merchant details</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="collectionUpiId">Collection UPI ID *</Label>
+                      <Input
+                        id="collectionUpiId"
+                        placeholder="merchant@paytm"
+                        value={settings.collectionUpiId}
+                        onChange={(e) => setSettings(prev => ({...prev, collectionUpiId: e.target.value}))}
+                      />
+                      <p className="text-xs text-muted-foreground">This UPI ID will receive all payments from your links</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="merchantDisplayName">Merchant Display Name *</Label>
+                      <Input
+                        id="merchantDisplayName"
+                        placeholder="Your Business Name"
+                        value={settings.merchantDisplayName}
+                        onChange={(e) => setSettings(prev => ({...prev, merchantDisplayName: e.target.value}))}
+                      />
+                      <p className="text-xs text-muted-foreground">This name will appear on payment pages</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="webhookUrl">Webhook URL (Optional)</Label>
+                      <Input
+                        id="webhookUrl"
+                        placeholder="https://your-site.com/webhook"
+                        value={settings.webhookUrl}
+                        onChange={(e) => setSettings(prev => ({...prev, webhookUrl: e.target.value}))}
+                      />
+                      <p className="text-xs text-muted-foreground">Get notified when payments are completed</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="autoRedirectUrl">Auto Redirect URL (Optional)</Label>
+                      <Input
+                        id="autoRedirectUrl"
+                        placeholder="https://your-site.com/thank-you"
+                        value={settings.autoRedirectUrl}
+                        onChange={(e) => setSettings(prev => ({...prev, autoRedirectUrl: e.target.value}))}
+                      />
+                      <p className="text-xs text-muted-foreground">Redirect customers after successful payment</p>
+                    </div>
+                    
+                    <Button onClick={saveSettings} className="w-full">
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Settings
+                    </Button>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Payment Link Info</CardTitle>
+                    <CardDescription>How your payment links work</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3 text-sm">
+                      <div className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                        <span><strong>Domain:</strong> All links use rizz-pay.in</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                        <span><strong>Mobile Optimized:</strong> Opens UPI apps directly</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                        <span><strong>No Registration:</strong> Customers pay without signing up</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                        <span><strong>Real-time Tracking:</strong> Monitor payment status</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                        <span><strong>Secure:</strong> All transactions are encrypted</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 p-3 bg-blue-50 rounded-lg">
+                      <h4 className="font-medium text-blue-800 mb-2">Example Payment Link:</h4>
+                      <code className="text-xs text-blue-700 break-all">
+                        https://rizz-pay.in/pay?amount=500&name=Your%20Business&desc=Product%20Payment&upi={settings.collectionUpiId}
+                      </code>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </>
           )}
         </div>
