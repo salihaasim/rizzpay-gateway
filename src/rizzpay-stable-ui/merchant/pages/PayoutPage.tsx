@@ -38,7 +38,7 @@ const PayoutPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Payout</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Advanced Payout</h1>
           <p className="text-muted-foreground">Advanced bulk payout processing</p>
         </div>
         <div className="text-right">

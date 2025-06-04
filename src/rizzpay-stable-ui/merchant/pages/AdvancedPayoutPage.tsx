@@ -13,18 +13,67 @@ import {
   CheckCircle, 
   AlertTriangle,
   Clock,
-  IndianRupee
+  IndianRupee,
+  Loader2,
+  DollarSign,
+  CreditCard
 } from 'lucide-react';
 import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
+
+interface BulkPaymentEntry {
+  beneficiaryName: string;
+  accountNumber: string;
+  ifscCode: string;
+  amount: number;
+  payoutMethod: string;
+  description?: string;
+}
 
 const AdvancedPayoutPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [bulkEntries, setBulkEntries] = useState<BulkPaymentEntry[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
   const [bulkUploads] = useState([
     { id: 'BU001', fileName: 'bulk_payout_jan_2024.csv', records: 150, status: 'completed', uploadDate: '2024-01-15', processedAmount: 750000 },
     { id: 'BU002', fileName: 'salary_payout_feb.xlsx', records: 89, status: 'processing', uploadDate: '2024-01-14', processedAmount: 445000 },
     { id: 'BU003', fileName: 'vendor_payments.csv', records: 25, status: 'failed', uploadDate: '2024-01-13', processedAmount: 0 }
   ]);
+
+  const validateEntries = (data: BulkPaymentEntry[]): string[] => {
+    const newErrors: string[] = [];
+    
+    if (data.length === 0) {
+      newErrors.push('Excel file contains no valid entries.');
+      return newErrors;
+    }
+    
+    data.forEach((entry, index) => {
+      if (!entry.beneficiaryName || entry.beneficiaryName.trim() === '') {
+        newErrors.push(`Row ${index + 1}: Beneficiary name is required.`);
+      }
+      
+      if (!entry.accountNumber || !/^\d{9,18}$/.test(entry.accountNumber)) {
+        newErrors.push(`Row ${index + 1}: Invalid account number format.`);
+      }
+      
+      if (!entry.ifscCode || !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(entry.ifscCode)) {
+        newErrors.push(`Row ${index + 1}: Invalid IFSC code format.`);
+      }
+      
+      if (!entry.amount || entry.amount <= 0) {
+        newErrors.push(`Row ${index + 1}: Amount must be greater than zero.`);
+      }
+      
+      if (!entry.payoutMethod) {
+        newErrors.push(`Row ${index + 1}: Payout method is required.`);
+      }
+    });
+    
+    return newErrors;
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,60 +92,122 @@ const AdvancedPayoutPage = () => {
       }
       
       setSelectedFile(file);
+      processFile(file);
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      toast.error('Please select a file first');
-      return;
-    }
-
+  const processFile = (file: File) => {
     setIsUploading(true);
+    setErrors([]);
     
-    try {
-      // Simulate upload process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast.success('File uploaded successfully', {
-        description: 'Your bulk payout file is being processed.'
-      });
-      
-      setSelectedFile(null);
-      
-    } catch (error) {
-      toast.error('Upload failed', {
-        description: 'Please try again or contact support.'
-      });
-    } finally {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
+        
+        const parsedEntries: BulkPaymentEntry[] = jsonData.map(row => ({
+          beneficiaryName: row['Beneficiary Name'] || '',
+          accountNumber: row['Account Number']?.toString() || '',
+          ifscCode: row['IFSC Code'] || '',
+          amount: parseFloat(row['Amount'] || 0),
+          payoutMethod: row['Payout Method'] || 'bank_transfer',
+          description: row['Description'] || ''
+        }));
+        
+        const validationErrors = validateEntries(parsedEntries);
+        setErrors(validationErrors);
+        
+        if (validationErrors.length === 0) {
+          setBulkEntries(parsedEntries);
+          toast.success(`Uploaded ${parsedEntries.length} payment entries successfully.`);
+        }
+        
+      } catch (error) {
+        console.error('Error parsing file:', error);
+        setErrors(['Failed to parse file. Please ensure it is a valid Excel/CSV file with the correct format.']);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+    
+    reader.onerror = () => {
+      setErrors(['Error reading file.']);
       setIsUploading(false);
-    }
+    };
+    
+    reader.readAsArrayBuffer(file);
   };
 
   const downloadTemplate = (type: 'csv' | 'excel') => {
-    const headers = [
-      'beneficiary_name',
-      'account_number', 
-      'ifsc_code',
-      'amount',
-      'payout_method',
-      'description'
+    const sampleData = [
+      {
+        'Beneficiary Name': 'John Doe',
+        'Account Number': '1234567890',
+        'IFSC Code': 'SBIN0001234',
+        'Amount': 5000,
+        'Payout Method': 'bank_transfer',
+        'Description': 'Salary Payment'
+      },
+      {
+        'Beneficiary Name': 'Jane Smith',
+        'Account Number': '9876543210',
+        'IFSC Code': 'HDFC0001234',
+        'Amount': 3000,
+        'Payout Method': 'bank_transfer',
+        'Description': 'Freelance Payment'
+      }
     ];
     
     if (type === 'csv') {
+      const headers = Object.keys(sampleData[0]);
       const csvContent = headers.join(',') + '\n' + 
-        'John Doe,1234567890,SBIN0001234,5000,bank_transfer,Salary Payment\n' +
-        'Jane Smith,9876543210,HDFC0001234,3000,bank_transfer,Freelance Payment';
+        sampleData.map(row => Object.values(row).join(',')).join('\n');
       
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'bulk_payout_template.csv';
+      a.download = 'bulk_payment_template.csv';
       a.click();
       window.URL.revokeObjectURL(url);
     } else {
-      toast.info('Excel template download feature coming soon');
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(sampleData);
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Bulk Payments');
+      XLSX.writeFile(workbook, 'bulk_payment_template.xlsx');
+    }
+    
+    toast.success(`${type.toUpperCase()} template downloaded successfully`);
+  };
+
+  const processBulkPayments = async () => {
+    if (bulkEntries.length === 0 || errors.length > 0) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      // Simulate processing
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      toast.success(`Successfully processed ${bulkEntries.length} bulk payments`, {
+        description: 'All payments have been submitted for processing.'
+      });
+      
+      setBulkEntries([]);
+      setSelectedFile(null);
+      
+    } catch (error) {
+      toast.error('Bulk payment processing failed', {
+        description: 'Please try again or contact support.'
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -144,7 +255,7 @@ const AdvancedPayoutPage = () => {
 
       <Tabs defaultValue="bulk" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+          <TabsTrigger value="bulk">Bulk Payment Upload</TabsTrigger>
           <TabsTrigger value="history">Upload History</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
         </TabsList>
@@ -154,8 +265,8 @@ const AdvancedPayoutPage = () => {
             {/* Upload Section */}
             <Card>
               <CardHeader>
-                <CardTitle>Upload Bulk Payout File</CardTitle>
-                <CardDescription>Upload CSV or Excel file with payout details</CardDescription>
+                <CardTitle>Upload Bulk Payment File</CardTitle>
+                <CardDescription>Upload CSV or Excel file with payment details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -184,23 +295,52 @@ const AdvancedPayoutPage = () => {
                   </div>
                 )}
 
-                <Button 
-                  onClick={handleUpload} 
-                  disabled={!selectedFile || isUploading}
-                  className="w-full"
-                >
-                  {isUploading ? (
-                    <>
-                      <Clock className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload & Process
-                    </>
-                  )}
-                </Button>
+                {errors.length > 0 && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</p>
+                    <ul className="text-xs text-red-700 space-y-1">
+                      {errors.map((error, index) => (
+                        <li key={index}>• {error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {bulkEntries.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <h3 className="text-sm font-medium text-green-800 mb-2">Ready to Process</h3>
+                      <p className="text-xs text-green-700">
+                        {bulkEntries.length} payment entries • Total: {formatCurrency(bulkEntries.reduce((sum, entry) => sum + entry.amount, 0))}
+                      </p>
+                    </div>
+
+                    <Button 
+                      onClick={processBulkPayments} 
+                      disabled={isProcessing || errors.length > 0}
+                      className="w-full"
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing {bulkEntries.length} Payments...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          Process {bulkEntries.length} Bulk Payments
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+                {isUploading && (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    <span>Processing file...</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -242,7 +382,7 @@ const AdvancedPayoutPage = () => {
           <Card>
             <CardHeader>
               <CardTitle>Upload History</CardTitle>
-              <CardDescription>Track your bulk payout uploads</CardDescription>
+              <CardDescription>Track your bulk payment uploads</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

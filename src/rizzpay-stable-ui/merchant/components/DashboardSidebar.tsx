@@ -69,13 +69,13 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
           title: "Wallet Overview",
           href: "/wallet",
           icon: <Wallet className="h-4 w-4" />
-        },
-        {
-          title: "Payout",
-          href: "/payout",
-          icon: <ArrowUpRight className="h-4 w-4" />
         }
       ]
+    },
+    {
+      title: "Advanced Payout",
+      href: "/merchant/advanced-payout",
+      icon: <ArrowUpRight className="h-5 w-5" />
     },
     {
       title: "Transfers",
@@ -132,7 +132,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     }
   };
 
-  const isWalletActive = pathname === '/wallet' || pathname === '/payout';
+  const isWalletActive = pathname === '/wallet';
 
   return (
     <div
