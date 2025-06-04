@@ -18,7 +18,8 @@ import {
   Settings,
   CreditCard,
   Save,
-  Smartphone
+  Smartphone,
+  Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
@@ -76,10 +77,11 @@ const UpiLinkPaymentPage = () => {
   const [transactionId, setTransactionId] = useState('');
   const [activeSection, setActiveSection] = useState('generate');
   
-  // Settings state for UPI configuration
+  // Settings state for UPI configuration with custom domain
   const [settings, setSettings] = useState({
     collectionUpiId: 'merchant@paytm',
     merchantDisplayName: 'RizzPay Merchant',
+    customDomain: 'https://rizz-pay.in',
     webhookUrl: '',
     autoRedirectUrl: '',
     paymentNotifications: true
@@ -167,18 +169,18 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    // Use current domain dynamically
-    const currentDomain = window.location.origin;
+    // Use custom domain from settings
+    const customDomain = settings.customDomain || 'https://rizz-pay.in';
     
     // Create a short, clean payment ID
     const paymentId = Math.random().toString(36).substring(2, 8).toUpperCase();
     
     // Generate clean payment link using standard parameters that PaymentPage.tsx expects
-    const link = `${currentDomain}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}${linkForm.description ? `&desc=${encodeURIComponent(linkForm.description)}` : ''}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    const link = `${customDomain}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}${linkForm.description ? `&desc=${encodeURIComponent(linkForm.description)}` : ''}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(link);
     toast.success('RizzPay payment link generated successfully!', {
-      description: 'Clean payment link ready to share'
+      description: `Clean payment link ready to share with ${new URL(customDomain).hostname} domain`
     });
   };
   
@@ -188,13 +190,15 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    // Alternative format with payment ID
-    const currentDomain = window.location.origin;
+    // Use custom domain from settings
+    const customDomain = settings.customDomain || 'https://rizz-pay.in';
     const paymentId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const cleanLink = `${currentDomain}/pay/${paymentId}?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description || 'Payment')}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    const cleanLink = `${customDomain}/pay/${paymentId}?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description || 'Payment')}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(cleanLink);
-    toast.success('Alternative payment link generated!');
+    toast.success('Alternative payment link generated!', {
+      description: `Using ${new URL(customDomain).hostname} domain`
+    });
   };
   
   const saveSettings = () => {
@@ -515,6 +519,20 @@ const UpiLinkPaymentPage = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
+                      <Label htmlFor="customDomain">Custom Domain *</Label>
+                      <div className="flex items-center space-x-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="customDomain"
+                          placeholder="https://rizz-pay.in"
+                          value={settings.customDomain}
+                          onChange={(e) => setSettings(prev => ({...prev, customDomain: e.target.value}))}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">All payment links will use this domain. Default: https://rizz-pay.in</p>
+                    </div>
+                    
+                    <div className="space-y-2">
                       <Label htmlFor="collectionUpiId">Collection UPI ID *</Label>
                       <Input
                         id="collectionUpiId"
@@ -567,14 +585,14 @@ const UpiLinkPaymentPage = () => {
                 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Payment Link Info</CardTitle>
-                    <CardDescription>How your payment links work</CardDescription>
+                    <CardTitle>Payment Link Preview</CardTitle>
+                    <CardDescription>How your payment links will look</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3 text-sm">
                       <div className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-green-500 mt-0.5" />
-                        <span><strong>Domain:</strong> All links use rizz-pay.in</span>
+                        <span><strong>Domain:</strong> {new URL(settings.customDomain || 'https://rizz-pay.in').hostname}</span>
                       </div>
                       <div className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-green-500 mt-0.5" />
@@ -597,8 +615,21 @@ const UpiLinkPaymentPage = () => {
                     <div className="mt-6 p-3 bg-blue-50 rounded-lg">
                       <h4 className="font-medium text-blue-800 mb-2">Example Payment Link:</h4>
                       <code className="text-xs text-blue-700 break-all">
-                        https://rizz-pay.in/pay?amount=500&name=Your%20Business&desc=Product%20Payment&upi={settings.collectionUpiId}
+                        {settings.customDomain}/pay?amount=500&name={encodeURIComponent(settings.merchantDisplayName)}&desc=Product%20Payment&upi={settings.collectionUpiId}
                       </code>
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Globe className="h-4 w-4 text-green-600" />
+                        <h4 className="font-medium text-green-800">Domain Status</h4>
+                      </div>
+                      <p className="text-sm text-green-700">
+                        ✅ Using custom domain: <strong>{new URL(settings.customDomain || 'https://rizz-pay.in').hostname}</strong>
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        All generated payment links will use this branded domain
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
