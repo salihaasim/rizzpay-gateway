@@ -5,6 +5,7 @@ import { PayoutController } from '../api/payout/payoutController';
 import { authenticateApiKey } from '../middleware/authMiddleware';
 import { validateBody, validateParams, validateQuery } from '../middleware/validation';
 import { asyncHandler } from '../middleware/errorHandler';
+import { encryptionMiddleware, decryptionMiddleware, logEncryptedRequest } from '../middleware/encryptionMiddleware';
 import {
   createPayoutSchema,
   payoutStatusSchema,
@@ -19,8 +20,12 @@ const router = Router();
 // All payout routes require API key authentication
 router.use(authenticateApiKey);
 
-// Create payout request
+// Add encryption logging for all routes
+router.use(logEncryptedRequest);
+
+// Create payout request with encryption support
 router.post('/',
+  encryptionMiddleware(), // Auto-detect bank and encrypt if needed
   validateBody(createPayoutSchema),
   asyncHandler(PayoutController.createPayout)
 );
@@ -38,26 +43,32 @@ router.get('/merchant/:merchantId',
   asyncHandler(PayoutController.getMerchantPayouts)
 );
 
-// Retry failed payout
+// Retry failed payout with encryption
 router.post('/:payoutId/retry',
+  encryptionMiddleware(),
   validateParams(payoutStatusSchema),
   asyncHandler(PayoutController.retryPayout)
 );
 
-// Bulk payout upload
+// Bulk payout upload with encryption
 router.post('/bulk',
+  encryptionMiddleware(),
   validateBody(bulkUploadSchema),
   asyncHandler(async (req, res) => {
-    const { file_content, file_name, merchant_id } = req.body;
+    const { file_content, file_name, merchant_id, bank_code } = req.body;
     
     const result = await BulkPayoutService.processBulkFile(
       merchant_id,
       file_content,
-      file_name
+      file_name,
+      bank_code // Pass bank code for encryption
     );
     
     if (result.success) {
-      res.status(201).json(result);
+      res.status(201).json({
+        ...result,
+        encryption_applied: !!bank_code
+      });
     } else {
       res.status(400).json(result);
     }
