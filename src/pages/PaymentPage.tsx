@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet';
-import { generateUpiUrl, getUpiQrCodeUrl } from '@/utils/upiQrUtils';
+import { generateUpiUrl } from '@/utils/upiQrUtils';
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -99,22 +99,24 @@ const PaymentPage = () => {
           <title>RizzPay - Invalid Payment Link</title>
         </Helmet>
         
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
-          <Card className="max-w-md w-full border shadow-md">
-            <CardHeader className="text-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col items-center justify-center p-4">
+          <Card className="max-w-md w-full border-0 shadow-2xl bg-white/80 backdrop-blur-sm">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-600" />
+              </div>
               <CardTitle className="text-xl text-red-600">Invalid Payment Link</CardTitle>
-              <CardDescription>This payment link is missing required information</CardDescription>
+              <CardDescription className="text-gray-600">This payment link is missing required information</CardDescription>
             </CardHeader>
             
-            <CardContent className="text-center">
-              <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-              <p className="text-muted-foreground">
+            <CardContent className="text-center pb-6">
+              <p className="text-gray-600">
                 Please contact the merchant for a valid payment link.
               </p>
             </CardContent>
             
-            <CardFooter className="flex justify-center">
-              <p className="text-xs text-muted-foreground">Powered by RizzPay</p>
+            <CardFooter className="flex justify-center border-t pt-6">
+              <p className="text-xs text-gray-500">Powered by RizzPay</p>
             </CardFooter>
           </Card>
         </div>
@@ -128,38 +130,38 @@ const PaymentPage = () => {
         <title>RizzPay - Pay ₹{formattedAmount}</title>
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
-        <div className="flex justify-center mb-6 w-full">
-          <div className="bg-primary rounded-full h-12 w-12 flex items-center justify-center">
-            <IndianRupee className="h-6 w-6 text-white" />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col items-center justify-center p-4">
+        <div className="flex justify-center mb-8 w-full">
+          <div className="bg-primary rounded-full h-16 w-16 flex items-center justify-center shadow-lg">
+            <IndianRupee className="h-8 w-8 text-white" />
           </div>
         </div>
         
         <div className="max-w-md w-full">
-          <Card className="border shadow-md">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Payment Request</CardTitle>
-              <CardDescription>Pay to {merchantName}</CardDescription>
+          <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-xl font-semibold text-gray-800">Payment Request</CardTitle>
+              <CardDescription className="text-gray-600">Pay to {merchantName}</CardDescription>
             </CardHeader>
             
-            <CardContent className="space-y-6">
-              <div className="text-center">
-                <p className="text-muted-foreground text-sm">Amount to Pay</p>
-                <p className="text-3xl font-bold">₹{formattedAmount}</p>
+            <CardContent className="space-y-8 px-8">
+              <div className="text-center space-y-2">
+                <p className="text-sm text-gray-600 font-medium">Amount to Pay</p>
+                <p className="text-4xl font-bold text-gray-900">₹{formattedAmount}</p>
               </div>
               
               {description && (
-                <div className="bg-muted/50 p-3 rounded-md text-sm text-center">
+                <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg text-sm text-center text-gray-700">
                   {description}
                 </div>
               )}
               
               {/* QR Code Section */}
-              <div className="text-center">
-                <h3 className="text-sm font-medium mb-3">Scan QR Code to Pay</h3>
-                <div className="flex justify-center mb-4">
+              <div className="text-center space-y-4">
+                <h3 className="text-sm font-semibold text-gray-800">Scan QR Code to Pay</h3>
+                <div className="flex justify-center">
                   {qrCodeUrl ? (
-                    <div className="p-2 bg-white border rounded-lg">
+                    <div className="p-4 bg-white border-2 border-gray-200 rounded-xl shadow-inner">
                       <img 
                         src={qrCodeUrl} 
                         alt="UPI QR Code" 
@@ -167,76 +169,84 @@ const PaymentPage = () => {
                       />
                     </div>
                   ) : (
-                    <div className="h-48 w-48 flex items-center justify-center border rounded-lg">
-                      <QrCode className="h-8 w-8 text-muted-foreground" />
+                    <div className="h-56 w-56 flex items-center justify-center border-2 border-gray-200 rounded-xl bg-gray-50">
+                      <QrCode className="h-12 w-12 text-gray-400" />
                     </div>
                   )}
                 </div>
               </div>
               
               {/* UPI ID Section */}
-              <div className="space-y-2">
-                <Label>UPI ID</Label>
-                <div className="flex">
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-gray-700">UPI ID</Label>
+                <div className="flex items-center space-x-2">
                   <Input
                     value={upiId}
                     readOnly
-                    className="text-sm font-mono"
+                    className="text-sm font-mono bg-gray-50 border-gray-200 text-gray-800"
                   />
                   <Button 
                     variant="outline" 
                     size="icon" 
-                    className="ml-2"
+                    className="border-gray-200 hover:bg-gray-50"
                     onClick={() => copyToClipboard(upiId)}
                   >
-                    {linkCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {linkCopied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
               
               {/* Payment Success State */}
               {paymentSuccess ? (
-                <div className="bg-green-50 border border-green-100 rounded-md p-4 text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="bg-green-100 rounded-full p-2">
-                      <Check className="h-6 w-6 text-green-600" />
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center space-y-3">
+                  <div className="flex items-center justify-center">
+                    <div className="bg-green-100 rounded-full p-3">
+                      <Check className="h-8 w-8 text-green-600" />
                     </div>
                   </div>
-                  <h3 className="font-medium text-green-800">Payment Initiated</h3>
-                  <p className="text-sm text-green-700 mt-1">Complete payment in your UPI app</p>
+                  <div>
+                    <h3 className="font-semibold text-green-800 text-lg">Payment Initiated</h3>
+                    <p className="text-sm text-green-700 mt-1">Complete payment in your UPI app</p>
+                  </div>
                   {transactionId && (
-                    <p className="text-xs text-green-600 mt-3">Transaction ID: {transactionId}</p>
+                    <p className="text-xs text-green-600 font-mono bg-green-100 px-3 py-1 rounded-full inline-block">
+                      Transaction ID: {transactionId}
+                    </p>
                   )}
                   {returnUrl && (
-                    <p className="text-xs text-green-600 mt-1">You will be redirected shortly...</p>
+                    <p className="text-xs text-green-600">You will be redirected shortly...</p>
                   )}
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <Button 
-                    className="w-full flex items-center justify-center gap-2" 
+                    className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg" 
                     onClick={handlePayment}
                   >
-                    <Smartphone className="h-5 w-5" />
+                    <Smartphone className="h-5 w-5 mr-2" />
                     Pay with UPI App
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                   
-                  <div className="bg-amber-50 border border-amber-200 rounded-md p-3 flex items-start">
-                    <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <div className="text-xs text-amber-800">
-                      <p className="font-medium mb-1">How to pay:</p>
-                      <p>1. Scan QR code with any UPI app</p>
-                      <p>2. Or copy UPI ID and pay manually</p>
-                      <p>3. Or click "Pay with UPI App" on mobile</p>
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="flex items-start space-x-3">
+                      <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-amber-800 space-y-2">
+                        <p className="font-semibold">How to pay:</p>
+                        <div className="space-y-1 text-xs">
+                          <p>• Scan QR code with any UPI app</p>
+                          <p>• Or copy UPI ID and pay manually</p>
+                          <p>• Or click "Pay with UPI App" on mobile</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
             </CardContent>
             
-            <CardFooter className="flex justify-center">
-              <p className="text-xs text-muted-foreground">Secure payments powered by RizzPay</p>
+            <CardFooter className="flex justify-center border-t pt-6">
+              <p className="text-xs text-gray-500">Secure payments powered by RizzPay</p>
             </CardFooter>
           </Card>
         </div>
