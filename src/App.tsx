@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -20,6 +21,9 @@ import UpiPluginPage from '@/pages/UpiPluginPage';
 import DeveloperPage from '@/pages/DeveloperPage';
 import Settings from '@/pages/Settings';
 import MerchantWhitelist from '@/pages/MerchantWhitelist';
+
+// Merchant Pages
+import AdvancedPayoutPage from '@/rizzpay-stable-ui/merchant/pages/AdvancedPayoutPage';
 
 // Admin Pages
 import AdminDashboard from '@/pages/AdminDashboard';
@@ -72,6 +76,7 @@ function App() {
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/wallet" element={<WalletPage />} />
               <Route path="/payout" element={<PayoutPage />} />
+              <Route path="/merchant/advanced-payout" element={<AdvancedPayoutPage />} />
               <Route path="/payout-enhanced" element={<EnhancedPayoutPage />} />
               <Route path="/transfers" element={<TransfersPage />} />
               <Route path="/banking" element={<BankingPage />} />

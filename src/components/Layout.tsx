@@ -3,7 +3,7 @@ import React, { memo, useEffect, useState } from 'react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2, Menu } from 'lucide-react';
-import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import DashboardSidebar from '@/rizzpay-stable-ui/merchant/components/DashboardSidebar';
 import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Button } from '@/components/ui/button';

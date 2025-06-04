@@ -2,10 +2,11 @@
 import React, { memo, useEffect, useState } from 'react';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
 import DashboardSidebar from './DashboardSidebar';
 import { useMediaQuery, mediaQueries } from '@/hooks/use-media-query';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Button } from '@/components/ui/button';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
   const location = useLocation();
   const isMobile = useMediaQuery(mediaQueries.isMobile);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Show loading indicator if authentication is still being checked
   if (loading) {
@@ -39,22 +41,61 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
   // Update sidebar state when mobile status changes
   useEffect(() => {
     setSidebarCollapsed(isMobile);
+    if (!isMobile) {
+      setMobileMenuOpen(false);
+    }
   }, [isMobile]);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   // Display responsive layout for authenticated users with sidebar
   return (
     <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
       {!hideNavigation && (
-        <DashboardSidebar 
-          collapsed={sidebarCollapsed} 
-          setCollapsed={setSidebarCollapsed} 
-        />
+        <>
+          {/* Mobile Menu Button - Fixed positioned for easy access */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="fixed top-4 left-4 z-[60] bg-white/90 backdrop-blur-sm border border-border/40 shadow-sm md:hidden"
+              onClick={toggleMobileMenu}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+
+          {/* Sidebar with mobile overlay */}
+          <div className={`${isMobile ? 'fixed inset-0 z-50' : ''} ${isMobile && !mobileMenuOpen ? 'hidden' : ''}`}>
+            {/* Mobile overlay */}
+            {isMobile && mobileMenuOpen && (
+              <div 
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+            )}
+            
+            <DashboardSidebar 
+              collapsed={isMobile ? false : sidebarCollapsed} 
+              setCollapsed={setSidebarCollapsed} 
+            />
+          </div>
+        </>
       )}
       
       <div className={`flex-1 min-h-screen transition-all duration-300 ${
-        !hideNavigation ? (sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]") : ""
+        !hideNavigation ? (
+          isMobile ? "ml-0" : (sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]")
+        ) : ""
       }`}>
-        <main className="p-4 sm:p-6">
+        <main className={`p-4 sm:p-6 ${isMobile ? 'pt-16' : ''}`}>
           <div className="absolute top-4 right-4 z-50">
             <ThemeToggle />
           </div>
