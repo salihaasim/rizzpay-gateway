@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,18 +167,18 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    // Generate clean RizzPay payment link using rizz-pay.in domain
-    const rizzPayDomain = 'https://rizz-pay.in';
+    // Use current domain dynamically
+    const currentDomain = window.location.origin;
     
     // Create a short, clean payment ID
     const paymentId = Math.random().toString(36).substring(2, 8).toUpperCase();
     
-    // Generate clean payment link with short parameters
-    const link = `${rizzPayDomain}/pay/${paymentId}?amt=${linkForm.amount}&m=${encodeURIComponent(linkForm.merchantName)}${linkForm.description ? `&d=${encodeURIComponent(linkForm.description)}` : ''}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    // Generate clean payment link using standard parameters that PaymentPage.tsx expects
+    const link = `${currentDomain}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}${linkForm.description ? `&desc=${encodeURIComponent(linkForm.description)}` : ''}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(link);
     toast.success('RizzPay payment link generated successfully!', {
-      description: 'Share this clean rizz-pay.in link with your customers'
+      description: 'Clean payment link ready to share'
     });
   };
   
@@ -189,12 +188,13 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    // Alternative clean format without payment ID
-    const rizzPayDomain = 'https://rizz-pay.in';
-    const cleanLink = `${rizzPayDomain}/pay?amt=${linkForm.amount}&merchant=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description || 'Payment')}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    // Alternative format with payment ID
+    const currentDomain = window.location.origin;
+    const paymentId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const cleanLink = `${currentDomain}/pay/${paymentId}?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description || 'Payment')}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(cleanLink);
-    toast.success('Clean RizzPay link generated!');
+    toast.success('Alternative payment link generated!');
   };
   
   const saveSettings = () => {

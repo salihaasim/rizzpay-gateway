@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,15 +20,16 @@ import { generateUpiUrl } from '@/utils/upiQrUtils';
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();
+  const { paymentId } = useParams();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [transactionId, setTransactionId] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   
-  // Get payment details from URL parameters
-  const amount = searchParams.get('amount') || '';
-  const merchantName = searchParams.get('name') || 'RizzPay Merchant';
-  const description = searchParams.get('desc') || 'Payment via RizzPay';
+  // Get payment details from URL parameters - support both old and new formats
+  const amount = searchParams.get('amount') || searchParams.get('amt') || '';
+  const merchantName = searchParams.get('name') || searchParams.get('merchant') || searchParams.get('m') || 'RizzPay Merchant';
+  const description = searchParams.get('desc') || searchParams.get('description') || searchParams.get('d') || 'Payment via RizzPay';
   const upiId = searchParams.get('upi') || '';
   const returnUrl = searchParams.get('return_url') || '';
   
@@ -52,7 +53,7 @@ const PaymentPage = () => {
       return;
     }
 
-    const txnId = `txn_${Math.random().toString(36).substring(2, 10)}`;
+    const txnId = paymentId || `txn_${Math.random().toString(36).substring(2, 10)}`;
     setTransactionId(txnId);
     
     // Generate UPI deep link for mobile payment
@@ -113,6 +114,11 @@ const PaymentPage = () => {
               <p className="text-gray-600">
                 Please contact the merchant for a valid payment link.
               </p>
+              {paymentId && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Payment ID: {paymentId}
+                </p>
+              )}
             </CardContent>
             
             <CardFooter className="flex justify-center border-t pt-6">
@@ -127,7 +133,7 @@ const PaymentPage = () => {
   return (
     <>
       <Helmet>
-        <title>RizzPay - Pay ₹{formattedAmount}</title>
+        <title>RizzPay - Pay ₹{formattedAmount} to {merchantName}</title>
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col items-center justify-center p-4">
@@ -142,6 +148,9 @@ const PaymentPage = () => {
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-xl font-semibold text-gray-800">Payment Request</CardTitle>
               <CardDescription className="text-gray-600">Pay to {merchantName}</CardDescription>
+              {paymentId && (
+                <p className="text-xs text-gray-500 mt-1">Payment ID: {paymentId}</p>
+              )}
             </CardHeader>
             
             <CardContent className="space-y-8 px-8">
