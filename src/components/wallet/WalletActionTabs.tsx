@@ -5,7 +5,6 @@ import { Merchant } from '@/stores/profileStore';
 import DepositForm from './DepositForm';
 import WithdrawForm from './WithdrawForm';
 import TransferForm from './TransferForm';
-import BulkWithdrawalForm from './BulkWithdrawalForm';
 import StaticQrGenerator from './StaticQrGenerator';
 
 interface WalletActionTabsProps {
@@ -32,10 +31,9 @@ const WalletActionTabs: React.FC<WalletActionTabsProps> = ({
 }) => {
   return (
     <Tabs defaultValue="deposit" className="mt-4 sm:mt-6">
-      <TabsList className="grid grid-cols-5 mb-4 w-full overflow-x-auto">
+      <TabsList className="grid grid-cols-4 mb-4 w-full overflow-x-auto">
         <TabsTrigger value="deposit" className="text-xs sm:text-sm px-1 sm:px-2 py-1 sm:py-2 whitespace-nowrap">Deposit</TabsTrigger>
         <TabsTrigger value="withdraw" className="text-xs sm:text-sm px-1 sm:px-2 py-1 sm:py-2 whitespace-nowrap">Withdraw</TabsTrigger>
-        <TabsTrigger value="bulk-withdraw" className="text-xs sm:text-sm px-1 sm:px-2 py-1 sm:py-2 whitespace-nowrap">Bulk</TabsTrigger>
         <TabsTrigger value="transfer" className="text-xs sm:text-sm px-1 sm:px-2 py-1 sm:py-2 whitespace-nowrap">Transfer</TabsTrigger>
         <TabsTrigger value="static-qr" className="text-xs sm:text-sm px-1 sm:px-2 py-1 sm:py-2 whitespace-nowrap">QR</TabsTrigger>
       </TabsList>
@@ -47,10 +45,6 @@ const WalletActionTabs: React.FC<WalletActionTabsProps> = ({
         
         <TabsContent value="withdraw">
           <WithdrawForm onWithdraw={onWithdraw} isProcessing={isProcessing} />
-        </TabsContent>
-        
-        <TabsContent value="bulk-withdraw">
-          <BulkWithdrawalForm userEmail={userEmail} />
         </TabsContent>
         
         <TabsContent value="transfer">

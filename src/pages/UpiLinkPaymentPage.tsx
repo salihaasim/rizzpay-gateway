@@ -3,11 +3,68 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { IndianRupee, QrCode, ArrowRight, Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  IndianRupee, 
+  QrCode, 
+  ArrowRight, 
+  Check, 
+  Link2, 
+  Copy, 
+  Send,
+  Plus,
+  History,
+  Settings,
+  CreditCard
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
 import { Helmet } from 'react-helmet';
 import { goBack } from '@/utils/navigationUtils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Sidebar component for UPI Link management
+const UpiLinkSidebar = ({ activeItem, onItemClick }: { 
+  activeItem: string, 
+  onItemClick: (item: string) => void 
+}) => {
+  const items = [
+    { id: 'generate', label: 'Generate Link', icon: <Plus className="h-4 w-4 mr-2" /> },
+    { id: 'collect', label: 'Collect Payment', icon: <CreditCard className="h-4 w-4 mr-2" /> },
+    { id: 'history', label: 'Payment History', icon: <History className="h-4 w-4 mr-2" /> },
+    { id: 'settings', label: 'Settings', icon: <Settings className="h-4 w-4 mr-2" /> }
+  ];
+  
+  return (
+    <div className="w-full lg:w-64 bg-card border-r border-border/50">
+      <div className="p-4 border-b">
+        <h3 className="text-lg font-medium flex items-center">
+          <Link2 className="h-5 w-5 mr-2" />
+          UPI Payment
+        </h3>
+      </div>
+      <nav className="p-2">
+        <ul className="space-y-1">
+          {items.map(item => (
+            <li key={item.id}>
+              <button
+                onClick={() => onItemClick(item.id)}
+                className={`w-full flex items-center px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors ${
+                  activeItem === item.id ? 'bg-muted font-medium text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                {item.icon}
+                {item.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  );
+};
 
 const UpiLinkPaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -15,19 +72,36 @@ const UpiLinkPaymentPage = () => {
   const { addTransaction } = useTransactionStore();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [transactionId, setTransactionId] = useState('');
+  const [activeSection, setActiveSection] = useState('generate');
   
-  // Get payment details from URL parameters
-  const amount = searchParams.get('amount') || '0';
+  // Link generation form state
+  const [linkForm, setLinkForm] = useState({
+    amount: '',
+    merchantName: 'RizzPay Merchant',
+    description: '',
+    upiId: 'merchant@paytm'
+  });
+  
+  const [generatedLink, setGeneratedLink] = useState('');
+  const [recentLinks] = useState([
+    { id: '1', amount: '₹500', description: 'Product Payment', createdAt: '2024-01-15', clicks: 3, status: 'active' },
+    { id: '2', amount: '₹1,200', description: 'Service Fee', createdAt: '2024-01-14', clicks: 7, status: 'paid' },
+    { id: '3', amount: '₹750', description: 'Consultation', createdAt: '2024-01-13', clicks: 1, status: 'expired' }
+  ]);
+  
+  // Get payment details from URL parameters (for direct payment)
+  const amount = searchParams.get('amount') || '';
   const merchantName = searchParams.get('name') || 'RizzPay Merchant';
   const description = searchParams.get('desc') || 'Payment via RizzPay';
   const upiId = searchParams.get('upi') || '';
   const returnUrl = searchParams.get('return_url') || '';
   
-  // Format the amount for display
-  const formattedAmount = parseFloat(amount).toLocaleString('en-IN', {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2
-  });
+  // Check if this is a direct payment link (has amount in URL)
+  const isDirectPayment = Boolean(amount);
+  
+  const formattedAmount = isDirectPayment 
+    ? parseFloat(amount).toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })
+    : '';
   
   const handlePayment = () => {
     const txnId = `txn_${Math.random().toString(36).substring(2, 10)}`;
@@ -40,115 +114,337 @@ const UpiLinkPaymentPage = () => {
       description: 'Your transaction will be verified shortly'
     });
     
-    // Add the transaction to the store for tracking
     addTransaction({
       id: txnId,
-      amount,
+      amount: isDirectPayment ? amount : linkForm.amount,
       paymentMethod: 'upi',
       status: 'pending',
-      customer: merchantName,
+      customer: isDirectPayment ? merchantName : linkForm.merchantName,
       date: new Date().toISOString(),
       processingState: 'initiated',
       detailedStatus: 'Verification pending',
       paymentDetails: {
-        upiId,
+        upiId: isDirectPayment ? upiId : linkForm.upiId,
         upiTransactionId: utrId,
-        description
+        description: isDirectPayment ? description : linkForm.description
       }
     });
     
-    // If there's a return URL, append the transaction ID and redirect
     if (returnUrl) {
       const redirectUrl = new URL(returnUrl);
       redirectUrl.searchParams.append('txnId', txnId);
       redirectUrl.searchParams.append('utrId', utrId);
       redirectUrl.searchParams.append('status', 'pending');
       
-      // Delay redirect to allow toast to be seen
       setTimeout(() => {
         window.location.href = redirectUrl.toString();
       }, 2000);
     }
   };
   
+  const generatePaymentLink = () => {
+    if (!linkForm.amount || !linkForm.merchantName) {
+      toast.error('Please fill in required fields');
+      return;
+    }
+    
+    const baseUrl = window.location.origin;
+    const link = `${baseUrl}/upi-payment?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description)}&upi=${encodeURIComponent(linkForm.upiId)}`;
+    
+    setGeneratedLink(link);
+    toast.success('Payment link generated successfully!');
+  };
+  
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Link copied to clipboard!');
+  };
+  
   const handleGoBack = () => {
     goBack(navigate);
   };
-  
+
+  // If this is a direct payment link, show the payment interface
+  if (isDirectPayment) {
+    return (
+      <>
+        <Helmet>
+          <title>RizzPay - Pay ₹{formattedAmount}</title>
+        </Helmet>
+        
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
+          <div className="flex justify-center mb-6 w-full relative">
+            <Button 
+              variant="outline" 
+              onClick={handleGoBack} 
+              className="absolute top-4 left-4"
+            >
+              Back
+            </Button>
+            <div className="bg-primary rounded-full h-12 w-12 flex items-center justify-center">
+              <IndianRupee className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          
+          <div className="max-w-md w-full">
+            <Card className="border shadow-md">
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl">Payment Request</CardTitle>
+                <CardDescription>Pay to {merchantName}</CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <div className="text-center">
+                  <p className="text-muted-foreground text-sm">Amount to Pay</p>
+                  <p className="text-3xl font-bold">₹{formattedAmount}</p>
+                </div>
+                
+                {description && (
+                  <div className="bg-muted/50 p-3 rounded-md text-sm text-center">
+                    {description}
+                  </div>
+                )}
+                
+                {paymentSuccess ? (
+                  <div className="bg-green-50 border border-green-100 rounded-md p-4 text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="bg-green-100 rounded-full p-2">
+                        <Check className="h-6 w-6 text-green-600" />
+                      </div>
+                    </div>
+                    <h3 className="font-medium text-green-800">Payment Submitted</h3>
+                    <p className="text-sm text-green-700 mt-1">Your payment is being verified</p>
+                    <p className="text-xs text-green-600 mt-3">Transaction ID: {transactionId}</p>
+                  </div>
+                ) : (
+                  <Button className="w-full flex items-center justify-center gap-2" onClick={handlePayment}>
+                    <QrCode className="h-5 w-5" />
+                    Pay with UPI
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+              </CardContent>
+              
+              <CardFooter className="flex justify-center">
+                <p className="text-xs text-muted-foreground">Secure payments powered by RizzPay</p>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Show the full UPI management interface
   return (
     <>
       <Helmet>
-        <title>RizzPay - Pay ₹{formattedAmount}</title>
+        <title>RizzPay - UPI Payment Links</title>
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
-        <div className="flex justify-center mb-6 w-full relative">
-          <Button 
-            variant="outline" 
-            onClick={handleGoBack} 
-            className="absolute top-4 left-4"
-          >
-            Back
-          </Button>
-          <div className="bg-primary rounded-full h-12 w-12 flex items-center justify-center">
-            <IndianRupee className="h-6 w-6 text-white" />
+      <div className="bg-background min-h-screen">
+        <div className="flex flex-col lg:flex-row">
+          {/* Sidebar */}
+          <div className="hidden lg:block">
+            <UpiLinkSidebar activeItem={activeSection} onItemClick={setActiveSection} />
           </div>
-        </div>
-        
-        <div className="max-w-md w-full">
-          <Card className="border shadow-md">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Payment Request</CardTitle>
-              <CardDescription>
-                Pay to {merchantName}
-              </CardDescription>
-            </CardHeader>
+          
+          {/* Main content */}
+          <div className="flex-1 p-4 lg:p-6">
+            {/* Mobile navigation */}
+            <div className="block lg:hidden mb-4">
+              <Tabs value={activeSection} onValueChange={setActiveSection}>
+                <TabsList className="w-full grid grid-cols-4">
+                  <TabsTrigger value="generate">Generate</TabsTrigger>
+                  <TabsTrigger value="collect">Collect</TabsTrigger>
+                  <TabsTrigger value="history">History</TabsTrigger>
+                  <TabsTrigger value="settings">Settings</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
             
-            <CardContent className="space-y-6">
-              <div className="text-center">
-                <p className="text-muted-foreground text-sm">Amount to Pay</p>
-                <p className="text-3xl font-bold">₹{formattedAmount}</p>
-              </div>
-              
-              {description && (
-                <div className="bg-muted/50 p-3 rounded-md text-sm text-center">
-                  {description}
+            {/* Generate Link Section */}
+            {activeSection === 'generate' && (
+              <>
+                <div className="mb-6">
+                  <h1 className="text-2xl font-bold">Generate Payment Link</h1>
+                  <p className="text-muted-foreground">Create UPI payment links for easy collection</p>
                 </div>
-              )}
-              
-              {paymentSuccess ? (
-                <div className="bg-green-50 border border-green-100 rounded-md p-4 text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="bg-green-100 rounded-full p-2">
-                      <Check className="h-6 w-6 text-green-600" />
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Create New Link</CardTitle>
+                      <CardDescription>Fill in the details to generate a payment link</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="amount">Amount (₹) *</Label>
+                        <Input
+                          id="amount"
+                          type="number"
+                          placeholder="Enter amount"
+                          value={linkForm.amount}
+                          onChange={(e) => setLinkForm(prev => ({...prev, amount: e.target.value}))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="merchantName">Merchant Name *</Label>
+                        <Input
+                          id="merchantName"
+                          placeholder="Your business name"
+                          value={linkForm.merchantName}
+                          onChange={(e) => setLinkForm(prev => ({...prev, merchantName: e.target.value}))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Payment description"
+                          value={linkForm.description}
+                          onChange={(e) => setLinkForm(prev => ({...prev, description: e.target.value}))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="upiId">UPI ID</Label>
+                        <Input
+                          id="upiId"
+                          placeholder="merchant@paytm"
+                          value={linkForm.upiId}
+                          onChange={(e) => setLinkForm(prev => ({...prev, upiId: e.target.value}))}
+                        />
+                      </div>
+                      
+                      <Button onClick={generatePaymentLink} className="w-full">
+                        <Link2 className="mr-2 h-4 w-4" />
+                        Generate Link
+                      </Button>
+                    </CardContent>
+                  </Card>
+                  
+                  {generatedLink && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Generated Link</CardTitle>
+                        <CardDescription>Share this link to collect payment</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="p-3 bg-muted rounded-lg break-all text-sm">
+                          {generatedLink}
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={() => copyToClipboard(generatedLink)}
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            <Copy className="mr-2 h-4 w-4" />
+                            Copy
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              const subject = `Payment Request - ₹${linkForm.amount}`;
+                              const body = `Please complete your payment using this link: ${generatedLink}`;
+                              window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                            }}
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            <Send className="mr-2 h-4 w-4" />
+                            Email
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </>
+            )}
+            
+            {/* Collect Payment Section */}
+            {activeSection === 'collect' && (
+              <>
+                <div className="mb-6">
+                  <h1 className="text-2xl font-bold">Collect Payment</h1>
+                  <p className="text-muted-foreground">Quick payment collection interface</p>
+                </div>
+                
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <QrCode className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-medium mb-2">Quick Collection</h3>
+                    <p className="text-muted-foreground mb-4">Feature coming soon - QR code generation and instant collection</p>
+                    <Button disabled>Coming Soon</Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+            
+            {/* History Section */}
+            {activeSection === 'history' && (
+              <>
+                <div className="mb-6">
+                  <h1 className="text-2xl font-bold">Payment History</h1>
+                  <p className="text-muted-foreground">Track your payment links and collections</p>
+                </div>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Links</CardTitle>
+                    <CardDescription>Your generated payment links</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {recentLinks.map((link) => (
+                        <div key={link.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div>
+                            <p className="font-medium">{link.amount}</p>
+                            <p className="text-sm text-muted-foreground">{link.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Created: {link.createdAt} • {link.clicks} clicks
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                              link.status === 'paid' ? 'bg-green-100 text-green-800' :
+                              link.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {link.status}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  <h3 className="font-medium text-green-800">Payment Submitted</h3>
-                  <p className="text-sm text-green-700 mt-1">
-                    Your payment is being verified
-                  </p>
-                  <p className="text-xs text-green-600 mt-3">
-                    Transaction ID: {transactionId}
-                  </p>
-                </div>
-              ) : (
-                <Button 
-                  className="w-full flex items-center justify-center gap-2" 
-                  onClick={handlePayment}
-                >
-                  <QrCode className="h-5 w-5" />
-                  Pay with UPI
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              )}
-            </CardContent>
+                  </CardContent>
+                </Card>
+              </>
+            )}
             
-            <CardFooter className="flex justify-center">
-              <p className="text-xs text-muted-foreground">
-                Secure payments powered by RizzPay
-              </p>
-            </CardFooter>
-          </Card>
+            {/* Settings Section */}
+            {activeSection === 'settings' && (
+              <>
+                <div className="mb-6">
+                  <h1 className="text-2xl font-bold">Settings</h1>
+                  <p className="text-muted-foreground">Configure your payment preferences</p>
+                </div>
+                
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <Settings className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-medium mb-2">Payment Settings</h3>
+                    <p className="text-muted-foreground mb-4">Configure default UPI IDs, notifications, and preferences</p>
+                    <Button disabled>Coming Soon</Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </>
