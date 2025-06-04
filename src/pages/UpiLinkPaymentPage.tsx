@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +23,7 @@ import { useTransactionStore } from '@/stores/transactions';
 import { Helmet } from 'react-helmet';
 import { goBack } from '@/utils/navigationUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Layout from '@/components/Layout';
 
 // Sidebar component for UPI Link management
 const UpiLinkSidebar = ({ activeItem, onItemClick }: { 
@@ -164,7 +164,7 @@ const UpiLinkPaymentPage = () => {
     goBack(navigate);
   };
 
-  // If this is a direct payment link, show the payment interface
+  // If this is a direct payment link, show the payment interface without layout
   if (isDirectPayment) {
     return (
       <>
@@ -235,219 +235,217 @@ const UpiLinkPaymentPage = () => {
     );
   }
 
-  // Show the full UPI management interface
+  // Show the full UPI management interface with layout
   return (
-    <>
+    <Layout>
       <Helmet>
         <title>RizzPay - UPI Payment Links</title>
       </Helmet>
       
-      <div className="bg-background min-h-screen">
-        <div className="flex flex-col lg:flex-row">
-          {/* Sidebar */}
-          <div className="hidden lg:block">
-            <UpiLinkSidebar activeItem={activeSection} onItemClick={setActiveSection} />
+      <div className="flex flex-col lg:flex-row">
+        {/* Sidebar */}
+        <div className="hidden lg:block">
+          <UpiLinkSidebar activeItem={activeSection} onItemClick={setActiveSection} />
+        </div>
+        
+        {/* Main content */}
+        <div className="flex-1 p-4 lg:p-6">
+          {/* Mobile navigation */}
+          <div className="block lg:hidden mb-4">
+            <Tabs value={activeSection} onValueChange={setActiveSection}>
+              <TabsList className="w-full grid grid-cols-4">
+                <TabsTrigger value="generate">Generate</TabsTrigger>
+                <TabsTrigger value="collect">Collect</TabsTrigger>
+                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
           
-          {/* Main content */}
-          <div className="flex-1 p-4 lg:p-6">
-            {/* Mobile navigation */}
-            <div className="block lg:hidden mb-4">
-              <Tabs value={activeSection} onValueChange={setActiveSection}>
-                <TabsList className="w-full grid grid-cols-4">
-                  <TabsTrigger value="generate">Generate</TabsTrigger>
-                  <TabsTrigger value="collect">Collect</TabsTrigger>
-                  <TabsTrigger value="history">History</TabsTrigger>
-                  <TabsTrigger value="settings">Settings</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            
-            {/* Generate Link Section */}
-            {activeSection === 'generate' && (
-              <>
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold">Generate Payment Link</h1>
-                  <p className="text-muted-foreground">Create UPI payment links for easy collection</p>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Create New Link</CardTitle>
-                      <CardDescription>Fill in the details to generate a payment link</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="amount">Amount (₹) *</Label>
-                        <Input
-                          id="amount"
-                          type="number"
-                          placeholder="Enter amount"
-                          value={linkForm.amount}
-                          onChange={(e) => setLinkForm(prev => ({...prev, amount: e.target.value}))}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="merchantName">Merchant Name *</Label>
-                        <Input
-                          id="merchantName"
-                          placeholder="Your business name"
-                          value={linkForm.merchantName}
-                          onChange={(e) => setLinkForm(prev => ({...prev, merchantName: e.target.value}))}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea
-                          id="description"
-                          placeholder="Payment description"
-                          value={linkForm.description}
-                          onChange={(e) => setLinkForm(prev => ({...prev, description: e.target.value}))}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="upiId">UPI ID</Label>
-                        <Input
-                          id="upiId"
-                          placeholder="merchant@paytm"
-                          value={linkForm.upiId}
-                          onChange={(e) => setLinkForm(prev => ({...prev, upiId: e.target.value}))}
-                        />
-                      </div>
-                      
-                      <Button onClick={generatePaymentLink} className="w-full">
-                        <Link2 className="mr-2 h-4 w-4" />
-                        Generate Link
-                      </Button>
-                    </CardContent>
-                  </Card>
-                  
-                  {generatedLink && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Generated Link</CardTitle>
-                        <CardDescription>Share this link to collect payment</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="p-3 bg-muted rounded-lg break-all text-sm">
-                          {generatedLink}
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button 
-                            onClick={() => copyToClipboard(generatedLink)}
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copy
-                          </Button>
-                          <Button 
-                            onClick={() => {
-                              const subject = `Payment Request - ₹${linkForm.amount}`;
-                              const body = `Please complete your payment using this link: ${generatedLink}`;
-                              window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-                            }}
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            <Send className="mr-2 h-4 w-4" />
-                            Email
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              </>
-            )}
-            
-            {/* Collect Payment Section */}
-            {activeSection === 'collect' && (
-              <>
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold">Collect Payment</h1>
-                  <p className="text-muted-foreground">Quick payment collection interface</p>
-                </div>
-                
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <QrCode className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium mb-2">Quick Collection</h3>
-                    <p className="text-muted-foreground mb-4">Feature coming soon - QR code generation and instant collection</p>
-                    <Button disabled>Coming Soon</Button>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-            
-            {/* History Section */}
-            {activeSection === 'history' && (
-              <>
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold">Payment History</h1>
-                  <p className="text-muted-foreground">Track your payment links and collections</p>
-                </div>
-                
+          {/* Generate Link Section */}
+          {activeSection === 'generate' && (
+            <>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold">Generate Payment Link</h1>
+                <p className="text-muted-foreground">Create UPI payment links for easy collection</p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Recent Links</CardTitle>
-                    <CardDescription>Your generated payment links</CardDescription>
+                    <CardTitle>Create New Link</CardTitle>
+                    <CardDescription>Fill in the details to generate a payment link</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {recentLinks.map((link) => (
-                        <div key={link.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div>
-                            <p className="font-medium">{link.amount}</p>
-                            <p className="text-sm text-muted-foreground">{link.description}</p>
-                            <p className="text-xs text-muted-foreground">
-                              Created: {link.createdAt} • {link.clicks} clicks
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                              link.status === 'paid' ? 'bg-green-100 text-green-800' :
-                              link.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {link.status}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="amount">Amount (₹) *</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={linkForm.amount}
+                        onChange={(e) => setLinkForm(prev => ({...prev, amount: e.target.value}))}
+                      />
                     </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="merchantName">Merchant Name *</Label>
+                      <Input
+                        id="merchantName"
+                        placeholder="Your business name"
+                        value={linkForm.merchantName}
+                        onChange={(e) => setLinkForm(prev => ({...prev, merchantName: e.target.value}))}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Payment description"
+                        value={linkForm.description}
+                        onChange={(e) => setLinkForm(prev => ({...prev, description: e.target.value}))}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="upiId">UPI ID</Label>
+                      <Input
+                        id="upiId"
+                        placeholder="merchant@paytm"
+                        value={linkForm.upiId}
+                        onChange={(e) => setLinkForm(prev => ({...prev, upiId: e.target.value}))}
+                      />
+                    </div>
+                    
+                    <Button onClick={generatePaymentLink} className="w-full">
+                      <Link2 className="mr-2 h-4 w-4" />
+                      Generate Link
+                    </Button>
                   </CardContent>
                 </Card>
-              </>
-            )}
-            
-            {/* Settings Section */}
-            {activeSection === 'settings' && (
-              <>
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold">Settings</h1>
-                  <p className="text-muted-foreground">Configure your payment preferences</p>
-                </div>
                 
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <Settings className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium mb-2">Payment Settings</h3>
-                    <p className="text-muted-foreground mb-4">Configure default UPI IDs, notifications, and preferences</p>
-                    <Button disabled>Coming Soon</Button>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </div>
+                {generatedLink && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Generated Link</CardTitle>
+                      <CardDescription>Share this link to collect payment</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-3 bg-muted rounded-lg break-all text-sm">
+                        {generatedLink}
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => copyToClipboard(generatedLink)}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            const subject = `Payment Request - ₹${linkForm.amount}`;
+                            const body = `Please complete your payment using this link: ${generatedLink}`;
+                            window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                          }}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          Email
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </>
+          )}
+          
+          {/* Collect Payment Section */}
+          {activeSection === 'collect' && (
+            <>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold">Collect Payment</h1>
+                <p className="text-muted-foreground">Quick payment collection interface</p>
+              </div>
+              
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <QrCode className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-medium mb-2">Quick Collection</h3>
+                  <p className="text-muted-foreground mb-4">Feature coming soon - QR code generation and instant collection</p>
+                  <Button disabled>Coming Soon</Button>
+                </CardContent>
+              </Card>
+            </>
+          )}
+          
+          {/* History Section */}
+          {activeSection === 'history' && (
+            <>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold">Payment History</h1>
+                <p className="text-muted-foreground">Track your payment links and collections</p>
+              </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Links</CardTitle>
+                  <CardDescription>Your generated payment links</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {recentLinks.map((link) => (
+                      <div key={link.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <p className="font-medium">{link.amount}</p>
+                          <p className="text-sm text-muted-foreground">{link.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Created: {link.createdAt} • {link.clicks} clicks
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                            link.status === 'paid' ? 'bg-green-100 text-green-800' :
+                            link.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {link.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+          
+          {/* Settings Section */}
+          {activeSection === 'settings' && (
+            <>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold">Settings</h1>
+                <p className="text-muted-foreground">Configure your payment preferences</p>
+              </div>
+              
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <Settings className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-medium mb-2">Payment Settings</h3>
+                  <p className="text-muted-foreground mb-4">Configure default UPI IDs, notifications, and preferences</p>
+                  <Button disabled>Coming Soon</Button>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
       </div>
-    </>
+    </Layout>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
+import Layout from '@/components/Layout';
 
 interface BulkPaymentEntry {
   beneficiaryName: string;
@@ -241,229 +241,231 @@ const AdvancedPayoutPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Advanced Payout</h1>
-          <p className="text-muted-foreground">Bulk payouts with advanced features</p>
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Advanced Payout</h1>
+            <p className="text-muted-foreground">Bulk payouts with advanced features</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Available Balance</p>
+            <p className="text-2xl font-bold text-green-600">{formatCurrency(125000)}</p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-muted-foreground">Available Balance</p>
-          <p className="text-2xl font-bold text-green-600">{formatCurrency(125000)}</p>
-        </div>
-      </div>
 
-      <Tabs defaultValue="bulk" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="bulk">Bulk Payment Upload</TabsTrigger>
-          <TabsTrigger value="history">Upload History</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="bulk" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="bulk">Bulk Payment Upload</TabsTrigger>
+            <TabsTrigger value="history">Upload History</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="bulk" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Upload Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Upload Bulk Payment File</CardTitle>
-                <CardDescription>Upload CSV or Excel file with payment details</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="file-upload">Select File</Label>
-                  <Input
-                    id="file-upload"
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    onChange={handleFileSelect}
-                    className="cursor-pointer"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Supported formats: CSV, XLSX, XLS (Max 5MB)
-                  </p>
-                </div>
-
-                {selectedFile && (
-                  <div className="p-3 bg-muted rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="h-4 w-4" />
-                      <span className="text-sm font-medium">{selectedFile.name}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Size: {(selectedFile.size / 1024).toFixed(1)} KB
+          <TabsContent value="bulk" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Upload Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upload Bulk Payment File</CardTitle>
+                  <CardDescription>Upload CSV or Excel file with payment details</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="file-upload">Select File</Label>
+                    <Input
+                      id="file-upload"
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      onChange={handleFileSelect}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Supported formats: CSV, XLSX, XLS (Max 5MB)
                     </p>
                   </div>
-                )}
 
-                {errors.length > 0 && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</p>
-                    <ul className="text-xs text-red-700 space-y-1">
-                      {errors.map((error, index) => (
-                        <li key={index}>• {error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {bulkEntries.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <h3 className="text-sm font-medium text-green-800 mb-2">Ready to Process</h3>
-                      <p className="text-xs text-green-700">
-                        {bulkEntries.length} payment entries • Total: {formatCurrency(bulkEntries.reduce((sum, entry) => sum + entry.amount, 0))}
+                  {selectedFile && (
+                    <div className="p-3 bg-muted rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <FileSpreadsheet className="h-4 w-4" />
+                        <span className="text-sm font-medium">{selectedFile.name}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Size: {(selectedFile.size / 1024).toFixed(1)} KB
                       </p>
                     </div>
+                  )}
 
-                    <Button 
-                      onClick={processBulkPayments} 
-                      disabled={isProcessing || errors.length > 0}
-                      className="w-full"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing {bulkEntries.length} Payments...
-                        </>
-                      ) : (
-                        <>
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          Process {bulkEntries.length} Bulk Payments
-                        </>
-                      )}
-                    </Button>
+                  {errors.length > 0 && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</p>
+                      <ul className="text-xs text-red-700 space-y-1">
+                        {errors.map((error, index) => (
+                          <li key={index}>• {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {bulkEntries.length > 0 && (
+                    <div className="space-y-4">
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <h3 className="text-sm font-medium text-green-800 mb-2">Ready to Process</h3>
+                        <p className="text-xs text-green-700">
+                          {bulkEntries.length} payment entries • Total: {formatCurrency(bulkEntries.reduce((sum, entry) => sum + entry.amount, 0))}
+                        </p>
+                      </div>
+
+                      <Button 
+                        onClick={processBulkPayments} 
+                        disabled={isProcessing || errors.length > 0}
+                        className="w-full"
+                      >
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing {bulkEntries.length} Payments...
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            Process {bulkEntries.length} Bulk Payments
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
+                  {isUploading && (
+                    <div className="flex items-center justify-center p-4">
+                      <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                      <span>Processing file...</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Instructions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upload Instructions</CardTitle>
+                  <CardDescription>Follow these guidelines for successful uploads</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                      <span>Use the provided template format</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                      <span>Verify all account numbers and IFSC codes</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                      <span>Maximum 1000 records per file</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                      <span>Ensure sufficient wallet balance</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                      <span>Processing time: 5-10 minutes</span>
+                    </div>
                   </div>
-                )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-                {isUploading && (
-                  <div className="flex items-center justify-center p-4">
-                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                    <span>Processing file...</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Instructions */}
+          <TabsContent value="history" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Upload Instructions</CardTitle>
-                <CardDescription>Follow these guidelines for successful uploads</CardDescription>
+                <CardTitle>Upload History</CardTitle>
+                <CardDescription>Track your bulk payment uploads</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                    <span>Use the provided template format</span>
+                <div className="space-y-4">
+                  {bulkUploads.map((upload) => (
+                    <div key={upload.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                          <FileSpreadsheet className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{upload.fileName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {upload.records} records • {upload.uploadDate}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Amount: {formatCurrency(upload.processedAmount)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {getStatusBadge(upload.status)}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          ID: {upload.id}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="templates" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Download Templates</CardTitle>
+                <CardDescription>Get started with our pre-formatted templates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center gap-3 mb-3">
+                      <FileSpreadsheet className="h-8 w-8 text-green-500" />
+                      <div>
+                        <h3 className="font-medium">CSV Template</h3>
+                        <p className="text-sm text-muted-foreground">Standard CSV format</p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => downloadTemplate('csv')}
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download CSV
+                    </Button>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                    <span>Verify all account numbers and IFSC codes</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                    <span>Maximum 1000 records per file</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                    <span>Ensure sufficient wallet balance</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                    <span>Processing time: 5-10 minutes</span>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center gap-3 mb-3">
+                      <FileSpreadsheet className="h-8 w-8 text-blue-500" />
+                      <div>
+                        <h3 className="font-medium">Excel Template</h3>
+                        <p className="text-sm text-muted-foreground">Excel with validation</p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => downloadTemplate('excel')}
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Excel
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload History</CardTitle>
-              <CardDescription>Track your bulk payment uploads</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {bulkUploads.map((upload) => (
-                  <div key={upload.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <FileSpreadsheet className="h-6 w-6 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{upload.fileName}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {upload.records} records • {upload.uploadDate}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Amount: {formatCurrency(upload.processedAmount)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      {getStatusBadge(upload.status)}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        ID: {upload.id}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="templates" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Download Templates</CardTitle>
-              <CardDescription>Get started with our pre-formatted templates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-3 mb-3">
-                    <FileSpreadsheet className="h-8 w-8 text-green-500" />
-                    <div>
-                      <h3 className="font-medium">CSV Template</h3>
-                      <p className="text-sm text-muted-foreground">Standard CSV format</p>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => downloadTemplate('csv')}
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download CSV
-                  </Button>
-                </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-3 mb-3">
-                    <FileSpreadsheet className="h-8 w-8 text-blue-500" />
-                    <div>
-                      <h3 className="font-medium">Excel Template</h3>
-                      <p className="text-sm text-muted-foreground">Excel with validation</p>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => downloadTemplate('excel')}
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Excel
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
   );
 };
 
