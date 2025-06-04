@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -167,9 +168,9 @@ const UpiLinkPaymentPage = () => {
       return;
     }
     
-    // Use rizz-pay.in domain for payment links
-    const baseUrl = 'https://rizz-pay.in';
-    const link = `${baseUrl}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description)}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
+    // Generate payment link using the new /pay route
+    const currentDomain = window.location.origin;
+    const link = `${currentDomain}/pay?amount=${linkForm.amount}&name=${encodeURIComponent(linkForm.merchantName)}&desc=${encodeURIComponent(linkForm.description)}&upi=${encodeURIComponent(settings.collectionUpiId)}`;
     
     setGeneratedLink(link);
     toast.success('Payment link generated successfully!', {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -21,6 +20,7 @@ import UpiPluginPage from '@/pages/UpiPluginPage';
 import DeveloperPage from '@/pages/DeveloperPage';
 import Settings from '@/pages/Settings';
 import MerchantWhitelist from '@/pages/MerchantWhitelist';
+import PaymentPage from '@/pages/PaymentPage';
 
 // Merchant Pages
 import AdvancedPayoutPage from '@/rizzpay-stable-ui/merchant/pages/AdvancedPayoutPage';
@@ -67,6 +67,7 @@ function App() {
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/pay" element={<PaymentPage />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/upi-payment/:transactionId" element={<UpiPaymentPage />} />
               <Route path="/webhook-payment/:transactionId" element={<WebhookPayment />} />
