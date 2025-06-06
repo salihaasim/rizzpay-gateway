@@ -1,15 +1,15 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { useTransactionStore } from '@/stores/transactionStore';
-
 const HeroSection = () => {
-  const { isAuthenticated } = useMerchantAuth();
-  const { userRole } = useTransactionStore();
-
-  return (
-    <section className="relative w-full py-20 md:py-32">
+  const {
+    isAuthenticated
+  } = useMerchantAuth();
+  const {
+    userRole
+  } = useTransactionStore();
+  return <section className="relative w-full py-20 md:py-32">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/3 to-background z-[-1]" />
       
       <div className="container px-4 mx-auto">
@@ -22,14 +22,12 @@ const HeroSection = () => {
             Seamless Payments for Everyone
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 animate-fade-in">
+          <p className="text-lg text-muted-foreground mb-10 animate-fade-in md:text-xl font-semibold">
             Rizzpay provides a secure, fast and reliable payment gateway for businesses and consumers. 
             Integrate UPI, cards, and more with a single platform.
           </p>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default React.memo(HeroSection);
