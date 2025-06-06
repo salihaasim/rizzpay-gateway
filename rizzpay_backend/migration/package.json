@@ -1,0 +1,38 @@
+
+{
+  "name": "rizzpay-migration",
+  "version": "1.0.0",
+  "description": "RizzPay migration tools for moving from Supabase to AWS",
+  "main": "index.js",
+  "scripts": {
+    "export:supabase": "node database/export/supabase_export.js",
+    "import:data": "node database/migration/import_supabase_data.js",
+    "deploy:test": "cd deployment/scripts && ./deploy.sh test",
+    "deploy:uat": "cd deployment/scripts && ./deploy.sh uat",
+    "deploy:prod": "cd deployment/scripts && ./deploy.sh prod",
+    "terraform:init": "cd infrastructure/terraform && terraform init",
+    "terraform:plan:test": "cd infrastructure/terraform && terraform plan -var-file=environments/test.tfvars",
+    "terraform:plan:uat": "cd infrastructure/terraform && terraform plan -var-file=environments/uat.tfvars",
+    "terraform:plan:prod": "cd infrastructure/terraform && terraform plan -var-file=environments/prod.tfvars",
+    "terraform:apply:test": "cd infrastructure/terraform && terraform apply -var-file=environments/test.tfvars",
+    "terraform:apply:uat": "cd infrastructure/terraform && terraform apply -var-file=environments/uat.tfvars",
+    "terraform:apply:prod": "cd infrastructure/terraform && terraform apply -var-file=environments/prod.tfvars"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "pg": "^8.11.0",
+    "aws-sdk": "^2.1500.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "keywords": [
+    "rizzpay",
+    "migration",
+    "aws",
+    "supabase",
+    "devops"
+  ],
+  "author": "RizzPay Team",
+  "license": "ISC"
+}
