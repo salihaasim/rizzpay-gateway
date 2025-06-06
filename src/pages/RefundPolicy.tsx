@@ -120,9 +120,9 @@ const RefundPolicy = () => {
                   </div>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg mt-6">
-                  <h4 className="font-semibold mb-2">Refund Timeline</h4>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
+                <div className="bg-card border border-border p-4 rounded-lg mt-6">
+                  <h4 className="font-semibold mb-2 text-foreground">Refund Timeline</h4>
+                  <ul className="space-y-1 text-sm text-foreground">
                     <li><strong>UPI Refunds:</strong> Instant to 24 hours</li>
                     <li><strong>Card Refunds:</strong> 3-7 business days</li>
                     <li><strong>Bank Transfer Refunds:</strong> 2-5 business days</li>
