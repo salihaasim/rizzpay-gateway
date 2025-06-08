@@ -19,18 +19,18 @@ import {
   CheckCircle, 
   XCircle, 
   Clock, 
-  AlertTriangle,
   Play,
   Pause,
   RotateCcw,
   Eye,
-  Download
+  Send,
+  CreditCard,
+  Building2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import * as XLSX from 'xlsx';
 
 interface PayoutRequest {
   id: string;
@@ -197,6 +197,28 @@ const AdminPayoutManagement = () => {
     }
   };
 
+  const sendManualPayment = async (payoutId: string, method: 'bank' | 'upi') => {
+    try {
+      setIsProcessing(true);
+      
+      // Update status to processing first
+      await updatePayoutStatus(payoutId, 'processing', `Manual ${method} payment initiated by admin`);
+      
+      // Simulate manual payment processing
+      setTimeout(async () => {
+        const utrNumber = `UTR${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+        await updatePayoutStatus(payoutId, 'completed', `Manual ${method} payment completed`, utrNumber);
+      }, 2000);
+      
+      toast.success(`Manual ${method} payment initiated`);
+    } catch (error) {
+      console.error('Error sending manual payment:', error);
+      toast.error('Failed to send manual payment');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const getPriorityBadge = (priority: number) => {
     const variants = {
       5: 'bg-red-100 text-red-800',
@@ -219,35 +241,6 @@ const AdminPayoutManagement = () => {
         {labels[priority as keyof typeof labels] || 'Normal'}
       </Badge>
     );
-  };
-
-  const exportToExcel = () => {
-    const exportData = filteredPayouts.map(payout => ({
-      'Payout ID': payout.id,
-      'Merchant ID': payout.merchant_id,
-      'Date': format(new Date(payout.created_at), 'dd/MM/yyyy HH:mm'),
-      'Amount': payout.amount,
-      'Method': payout.payout_method,
-      'Status': payout.status,
-      'Priority': payout.priority,
-      'Beneficiary': payout.beneficiary_name || payout.upi_id || 'N/A',
-      'Account/UPI': payout.account_number || payout.upi_id || 'N/A',
-      'Processing Fee': payout.processing_fee,
-      'Net Amount': payout.net_amount || 'N/A',
-      'UTR': payout.utr_number || 'N/A',
-      'Retry Count': payout.retry_count,
-      'Failure Reason': payout.failure_reason || 'N/A',
-      'Internal Notes': payout.internal_notes || 'N/A'
-    }));
-    
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Admin_Payouts');
-    
-    const fileName = `Admin_Payouts_${format(new Date(), 'yyyyMMdd_HHmm')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
-    
-    toast.success('Admin payout data exported successfully!');
   };
 
   const filteredPayouts = payoutRequests.filter(payout => {
@@ -276,10 +269,6 @@ const AdminPayoutManagement = () => {
             <h1 className="text-2xl font-bold">Payout Management</h1>
             <p className="text-muted-foreground">Monitor and manage all merchant payout requests</p>
           </div>
-          <Button onClick={exportToExcel} variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -415,11 +404,36 @@ const AdminPayoutManagement = () => {
                                 <PayoutDetailsModal 
                                   payout={selectedPayout} 
                                   onStatusUpdate={updatePayoutStatus}
+                                  onManualPayment={sendManualPayment}
                                   isProcessing={isProcessing}
                                 />
                               )}
                             </DialogContent>
                           </Dialog>
+                          
+                          {/* Manual Payment Buttons */}
+                          {payout.status === 'pending' && (
+                            <>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => sendManualPayment(payout.id, 'bank')}
+                                disabled={isProcessing}
+                                title="Send Manual Bank Payment"
+                              >
+                                <Building2 className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => sendManualPayment(payout.id, 'upi')}
+                                disabled={isProcessing}
+                                title="Send Manual UPI Payment"
+                              >
+                                <CreditCard className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                           
                           {payout.status === 'failed' && payout.retry_count < payout.max_retries && (
                             <Button 
@@ -449,8 +463,9 @@ const AdminPayoutManagement = () => {
 const PayoutDetailsModal: React.FC<{
   payout: PayoutRequest;
   onStatusUpdate: (id: string, status: string, notes?: string, utr?: string) => void;
+  onManualPayment: (id: string, method: 'bank' | 'upi') => void;
   isProcessing: boolean;
-}> = ({ payout, onStatusUpdate, isProcessing }) => {
+}> = ({ payout, onStatusUpdate, onManualPayment, isProcessing }) => {
   const [newStatus, setNewStatus] = useState(payout.status);
   const [notes, setNotes] = useState(payout.internal_notes || '');
   const [utrNumber, setUtrNumber] = useState(payout.utr_number || '');
@@ -507,6 +522,31 @@ const PayoutDetailsModal: React.FC<{
         <div>
           <Label>UPI ID</Label>
           <div className="bg-muted p-2 rounded">{payout.upi_id}</div>
+        </div>
+      )}
+
+      {/* Manual Payment Buttons */}
+      {payout.status === 'pending' && (
+        <div className="space-y-2">
+          <Label>Manual Payment Options</Label>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => onManualPayment(payout.id, 'bank')}
+              disabled={isProcessing}
+              className="flex-1"
+            >
+              <Building2 className="mr-2 h-4 w-4" />
+              Send Bank Payment
+            </Button>
+            <Button 
+              onClick={() => onManualPayment(payout.id, 'upi')}
+              disabled={isProcessing}
+              className="flex-1"
+            >
+              <CreditCard className="mr-2 h-4 w-4" />
+              Send UPI Payment
+            </Button>
+          </div>
         </div>
       )}
 

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,9 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { CalendarIcon, FileSpreadsheet, Search } from "lucide-react";
-import * as XLSX from 'xlsx';
-import { toast } from "sonner";
+import { CalendarIcon, Search } from "lucide-react";
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Helmet } from 'react-helmet';
 
@@ -41,29 +40,6 @@ const AdminTransactionLog = () => {
     return inDateRange && matchesSearch;
   });
   
-  const exportToExcel = () => {
-    const data = filteredTransactions.map(t => ({
-      'Transaction ID': t.id,
-      'Date': format(new Date(t.date), 'dd/MM/yyyy HH:mm'),
-      'Amount': `₹${t.amount}`,
-      'Status': t.status,
-      'Payment Method': t.paymentMethod,
-      'Customer': t.customer || 'N/A',
-      'Email': t.paymentDetails?.buyerEmail || 'N/A',
-      'Merchant ID': t.createdBy || 'N/A',
-      'Description': t.description || 'N/A'
-    }));
-    
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
-    
-    const fileName = `RizzPay_Transactions_${format(startDate || new Date(), 'yyyyMMdd')}_${format(endDate || new Date(), 'yyyyMMdd')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
-    
-    toast.success('Transaction data exported successfully!');
-  };
-  
   return (
     <AdminLayout>
       <Helmet>
@@ -74,14 +50,9 @@ const AdminTransactionLog = () => {
           <div>
             <h1 className="text-2xl font-bold">Transaction Log</h1>
             <p className="text-muted-foreground mt-1">
-              View and export transaction records
+              View transaction records
             </p>
           </div>
-          
-          <Button onClick={exportToExcel} disabled={filteredTransactions.length === 0}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            Export to Excel
-          </Button>
         </div>
         
         <Card>
@@ -167,7 +138,7 @@ const AdminTransactionLog = () => {
           <CardContent className="p-0">
             {filteredTransactions.length === 0 ? (
               <div className="py-24 flex flex-col items-center justify-center text-center">
-                <FileSpreadsheet className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                <Search className="h-12 w-12 text-muted-foreground/30 mb-4" />
                 <h3 className="text-lg font-medium">No transactions found</h3>
                 <p className="text-sm text-muted-foreground max-w-md mt-1.5">
                   Try adjusting your search filters or selecting a different date range to find transactions.
