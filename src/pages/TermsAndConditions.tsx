@@ -171,8 +171,8 @@ const TermsAndConditions = () => {
                   For questions about these Terms & Conditions, please contact us:
                 </p>
                 <div className="space-y-2 text-muted-foreground">
-                  <p><strong>Email:</strong> legal@rizzpay.com</p>
-                  <p><strong>Phone:</strong> +91 75502 48887</p>
+                  <p><strong>Email:</strong> rizzpay1@gmail.com</p>
+                  <p><strong>Phone:</strong> +91 9080186106</p>
                   <p><strong>Address:</strong> First Floor, 11/6, Ramanathan St, Mahalingapuram, Nungambakkam, Chennai, Tamil Nadu 600034</p>
                 </div>
               </CardContent>

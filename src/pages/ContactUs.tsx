@@ -47,17 +47,17 @@ const ContactUs = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-2">Customer Support:</p>
-                <a href="tel:+917550248887" className="text-primary hover:underline block mb-2">
-                  +91 75502 48887
+                <a href="tel:+919080186106" className="text-primary hover:underline block mb-2">
+                  +91 9080186106
                 </a>
                 <p className="text-muted-foreground mb-2">WhatsApp Support:</p>
-                <a href="https://wa.me/917550248887" className="text-primary hover:underline">
-                  +91 75502 48887
+                <a href="https://wa.me/919080186106" className="text-primary hover:underline">
+                  +91 9080186106
                 </a>
               </CardContent>
             </Card>
 
-            {/* Address - NEW */}
+            {/* Address */}
             <Card className="shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center">

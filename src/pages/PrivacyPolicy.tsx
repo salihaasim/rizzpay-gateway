@@ -193,9 +193,9 @@ const PrivacyPolicy = () => {
               If you have any questions or concerns regarding our Privacy Policy, please contact our Data Protection Officer:
             </p>
             <div className="space-y-1">
-              <p><strong>Email:</strong> privacy@rizzpay.co.in</p>
-              <p><strong>Phone:</strong> +91-7550248887</p>
-              <p><strong>Address:</strong> RizzPay Headquarters, 123 Payment Street, Mumbai 400001, India</p>
+              <p><strong>Email:</strong> rizzpay1@gmail.com</p>
+              <p><strong>Phone:</strong> +91-9080186106</p>
+              <p><strong>Address:</strong> First Floor, 11/6, Ramanathan St, Mahalingapuram, Nungambakkam, Chennai, Tamil Nadu 600034, India</p>
             </div>
             <p className="text-sm text-muted-foreground mt-6">
               RizzPay reserves the right to update or modify this Privacy Policy at any time without prior notice. Any changes will be effective immediately upon posting on our website.
