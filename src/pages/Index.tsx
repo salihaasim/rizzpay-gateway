@@ -9,7 +9,7 @@ import logoSvg from '../assets/logo.svg';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <LandingNavbar />
       <HeroSection />
       <div id="features">
