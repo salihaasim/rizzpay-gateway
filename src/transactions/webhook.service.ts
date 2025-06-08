@@ -21,14 +21,17 @@ interface UpiWebhookPayload {
 export class WebhookService {
   static async logWebhookHit(webhookData: WebhookHit) {
     try {
+      // Use existing api_request_logs table instead of webhook_hits
       const { error } = await supabase
-        .from('webhook_hits')
+        .from('api_request_logs')
         .insert({
-          source: webhookData.source,
-          payload: webhookData.payload,
-          headers: webhookData.headers,
-          client_ip: webhookData.clientIP,
-          received_at: new Date().toISOString()
+          endpoint_url: '/webhook/' + webhookData.source,
+          request_id: `webhook_${Date.now()}`,
+          http_method: 'POST',
+          request_headers: webhookData.headers,
+          request_body: webhookData.payload,
+          ip_address: webhookData.clientIP,
+          created_at: new Date().toISOString()
         });
 
       if (error) {
@@ -47,13 +50,13 @@ export class WebhookService {
       throw new Error('Missing required webhook fields: utr_number, amount, status');
     }
 
-    // Check for duplicate webhook
+    // Check for duplicate webhook using api_request_logs
     const { data: existingWebhook } = await supabase
-      .from('webhook_hits')
+      .from('api_request_logs')
       .select('id')
-      .eq('payload->utr_number', utr_number)
-      .eq('source', 'upi')
-      .single();
+      .eq('request_body->utr_number', utr_number)
+      .limit(1)
+      .maybeSingle();
 
     if (existingWebhook) {
       console.log('Duplicate webhook detected for UTR:', utr_number);
@@ -82,7 +85,7 @@ export class WebhookService {
       status: status === 'success' ? 'successful' : 'failed',
       processing_state: status === 'success' ? 'completed' : 'failed',
       processing_timeline: [
-        ...(transaction.processing_timeline || []),
+        ...(Array.isArray(transaction.processing_timeline) ? transaction.processing_timeline : []),
         {
           stage: status === 'success' ? 'completed' : 'failed',
           timestamp: new Date().toISOString(),

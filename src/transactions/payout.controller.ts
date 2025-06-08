@@ -1,9 +1,45 @@
 
-import { Request, Response } from 'express';
-import { PayoutService } from './payout.service';
+interface PayoutRequest {
+  body: {
+    merchantId: string;
+    amount: number;
+    beneficiaryName?: string;
+    accountNumber?: string;
+    ifscCode?: string;
+    upiId?: string;
+    payoutMethod: 'bank_transfer' | 'upi';
+  };
+}
+
+interface PayoutResponse {
+  status: (code: number) => {
+    json: (data: any) => void;
+  };
+}
+
+interface PayoutQueryRequest {
+  query: {
+    merchantId?: string;
+    status?: string;
+    page?: string;
+    limit?: string;
+  };
+}
+
+interface PayoutUpdateRequest {
+  params: {
+    payoutId: string;
+  };
+  body: {
+    status: string;
+    utrNumber?: string;
+    failureReason?: string;
+    adminNotes?: string;
+  };
+}
 
 export class PayoutController {
-  static async createPayoutRequest(req: Request, res: Response) {
+  static async createPayoutRequest(req: PayoutRequest, res: PayoutResponse) {
     try {
       const { merchantId, amount, beneficiaryName, accountNumber, ifscCode, upiId, payoutMethod } = req.body;
 
@@ -45,7 +81,7 @@ export class PayoutController {
         message: 'Payout request created successfully',
         data: payoutRequest
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payout creation error:', error);
       res.status(500).json({
         success: false,
@@ -55,9 +91,9 @@ export class PayoutController {
     }
   }
 
-  static async getPayoutRequests(req: Request, res: Response) {
+  static async getPayoutRequests(req: PayoutQueryRequest, res: PayoutResponse) {
     try {
-      const { merchantId, status, page = 1, limit = 20 } = req.query;
+      const { merchantId, status, page = '1', limit = '20' } = req.query;
 
       const filters = {
         merchantId: merchantId as string,
@@ -72,7 +108,7 @@ export class PayoutController {
         success: true,
         data: result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Get payouts error:', error);
       res.status(500).json({
         success: false,
@@ -82,7 +118,7 @@ export class PayoutController {
     }
   }
 
-  static async updatePayoutStatus(req: Request, res: Response) {
+  static async updatePayoutStatus(req: PayoutUpdateRequest, res: PayoutResponse) {
     try {
       const { payoutId } = req.params;
       const { status, utrNumber, failureReason, adminNotes } = req.body;
@@ -106,7 +142,7 @@ export class PayoutController {
         message: 'Payout status updated successfully',
         data: result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update payout status error:', error);
       res.status(500).json({
         success: false,
@@ -116,3 +152,6 @@ export class PayoutController {
     }
   }
 }
+
+// Import after class definition to avoid circular dependency
+import { PayoutService } from './payout.service';

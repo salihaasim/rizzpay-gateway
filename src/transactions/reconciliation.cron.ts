@@ -32,7 +32,7 @@ export class ReconciliationService {
       const duplicateUTRs = await this.findDuplicateUTRs();
       issues.push(...duplicateUTRs);
 
-      // Log reconciliation results
+      // Log reconciliation results using existing table
       await this.logReconciliationResults(issues);
 
       // Send alerts for high severity issues
@@ -47,7 +47,7 @@ export class ReconciliationService {
         issuesFound: issues.length,
         issues: issues
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Reconciliation process failed:', error);
       
       await this.logReconciliationResults([], error.message);
@@ -73,7 +73,7 @@ export class ReconciliationService {
       return [];
     }
 
-    return stuckTxns.map(txn => ({
+    return (stuckTxns || []).map(txn => ({
       type: 'stuck_transaction' as const,
       transactionId: txn.id,
       description: `Transaction ${txn.id} stuck in pending for >30 minutes (Amount: ₹${txn.amount})`,
@@ -95,7 +95,7 @@ export class ReconciliationService {
       return [];
     }
 
-    return delayedPayouts.map(payout => ({
+    return (delayedPayouts || []).map(payout => ({
       type: 'delayed_payout' as const,
       payoutId: payout.id,
       description: `Payout ${payout.id} pending for >1 hour (Amount: ₹${payout.amount})`,
@@ -115,7 +115,7 @@ export class ReconciliationService {
       return [];
     }
 
-    return successfulTxns.map(txn => ({
+    return (successfulTxns || []).map(txn => ({
       type: 'missing_webhook' as const,
       transactionId: txn.id,
       description: `Successful transaction ${txn.id} missing UTR number (Amount: ₹${txn.amount})`,
@@ -131,14 +131,21 @@ export class ReconciliationService {
 
   private static async logReconciliationResults(issues: ReconciliationIssue[], error?: string) {
     try {
+      // Use api_request_logs table to store reconciliation logs
       await supabase
-        .from('reconciliation_log')
+        .from('api_request_logs')
         .insert({
-          run_at: new Date().toISOString(),
-          issues_found: issues.length,
-          issues: issues,
-          error_message: error,
-          status: error ? 'failed' : 'completed'
+          endpoint_url: '/reconciliation/run',
+          request_id: `reconciliation_${Date.now()}`,
+          http_method: 'POST',
+          request_body: {
+            issues_found: issues.length,
+            issues: issues,
+            error_message: error,
+            status: error ? 'failed' : 'completed'
+          },
+          response_status: error ? 500 : 200,
+          created_at: new Date().toISOString()
         });
     } catch (logError) {
       console.error('Failed to log reconciliation results:', logError);
