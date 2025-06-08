@@ -7,6 +7,7 @@ interface ReconciliationIssue {
   payoutId?: string;
   description: string;
   severity: 'low' | 'medium' | 'high';
+  [key: string]: any; // Index signature for JSON compatibility
 }
 
 export class ReconciliationService {
@@ -107,15 +108,19 @@ export class ReconciliationService {
     const { data: successfulTxns, error } = await supabase
       .from('transactions')
       .select('id, payment_details, amount')
-      .eq('status', 'successful')
-      .is('payment_details->utr_number', null);
+      .eq('status', 'successful');
 
     if (error) {
       console.error('Error finding missing webhooks:', error);
       return [];
     }
 
-    return (successfulTxns || []).map(txn => ({
+    const missingUtrTxns = (successfulTxns || []).filter(txn => {
+      const paymentDetails = txn.payment_details as any;
+      return !paymentDetails?.utr_number;
+    });
+
+    return missingUtrTxns.map(txn => ({
       type: 'missing_webhook' as const,
       transactionId: txn.id,
       description: `Successful transaction ${txn.id} missing UTR number (Amount: ₹${txn.amount})`,
@@ -140,7 +145,13 @@ export class ReconciliationService {
           http_method: 'POST',
           request_body: {
             issues_found: issues.length,
-            issues: issues,
+            issues: issues.map(issue => ({
+              type: issue.type,
+              transactionId: issue.transactionId,
+              payoutId: issue.payoutId,
+              description: issue.description,
+              severity: issue.severity
+            })),
             error_message: error,
             status: error ? 'failed' : 'completed'
           },

@@ -54,7 +54,7 @@ export class WebhookService {
     const { data: existingWebhook } = await supabase
       .from('api_request_logs')
       .select('id')
-      .eq('request_body->utr_number', utr_number)
+      .contains('request_body', { utr_number })
       .limit(1)
       .maybeSingle();
 
@@ -66,7 +66,7 @@ export class WebhookService {
     const { data: transactions, error } = await supabase
       .from('transactions')
       .select('*')
-      .eq('payment_details->utr_number', utr_number)
+      .contains('payment_details', { utr_number })
       .eq('amount', amount);
 
     if (error) {

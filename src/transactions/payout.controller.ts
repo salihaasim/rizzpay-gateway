@@ -66,6 +66,9 @@ export class PayoutController {
         });
       }
 
+      // Import PayoutService dynamically to avoid circular dependency
+      const { PayoutService } = await import('./payout.service');
+
       const payoutRequest = await PayoutService.createPayout({
         merchantId,
         amount,
@@ -102,6 +105,9 @@ export class PayoutController {
         limit: parseInt(limit as string)
       };
 
+      // Import PayoutService dynamically to avoid circular dependency
+      const { PayoutService } = await import('./payout.service');
+
       const result = await PayoutService.getPayouts(filters);
 
       res.status(200).json({
@@ -130,6 +136,9 @@ export class PayoutController {
         });
       }
 
+      // Import PayoutService dynamically to avoid circular dependency
+      const { PayoutService } = await import('./payout.service');
+
       const result = await PayoutService.updatePayoutStatus(payoutId, {
         status,
         utrNumber,
@@ -152,6 +161,3 @@ export class PayoutController {
     }
   }
 }
-
-// Import after class definition to avoid circular dependency
-import { PayoutService } from './payout.service';

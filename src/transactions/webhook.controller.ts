@@ -25,6 +25,9 @@ export class WebhookController {
         timestamp: new Date().toISOString()
       });
 
+      // Import WebhookService dynamically to avoid circular dependency
+      const { WebhookService } = await import('./webhook.service');
+
       // Log webhook hit to database (using existing api_request_logs table)
       await WebhookService.logWebhookHit({
         source: 'upi',
@@ -64,6 +67,9 @@ export class WebhookController {
         timestamp: new Date().toISOString()
       });
 
+      // Import WebhookService dynamically to avoid circular dependency
+      const { WebhookService } = await import('./webhook.service');
+
       // Log webhook hit
       await WebhookService.logWebhookHit({
         source: bankCode || 'unknown',
@@ -90,6 +96,3 @@ export class WebhookController {
     }
   }
 }
-
-// Import after class definition to avoid circular dependency
-import { WebhookService } from './webhook.service';
