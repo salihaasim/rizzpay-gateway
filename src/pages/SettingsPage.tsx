@@ -10,7 +10,8 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import { toast } from 'sonner';
-import { User, Shield, Bell, CreditCard } from 'lucide-react';
+import { User, Shield, Bell } from 'lucide-react';
+import SecuritySettings from '@/components/settings/SecuritySettings';
 
 const SettingsPage = () => {
   const { currentMerchant, updateMerchantDetails, changePassword } = useMerchantAuth();
@@ -18,12 +19,6 @@ const SettingsPage = () => {
     fullName: currentMerchant?.fullName || '',
     email: currentMerchant?.email || '',
     username: currentMerchant?.username || ''
-  });
-
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
   });
 
   const [notifications, setNotifications] = useState({
@@ -47,40 +42,6 @@ const SettingsPage = () => {
     toast.success('Profile updated successfully');
   };
 
-  const handlePasswordChange = () => {
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      toast.error('Please fill all password fields');
-      return;
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-
-    if (passwordData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
-      return;
-    }
-
-    const success = changePassword(
-      currentMerchant?.username || '',
-      passwordData.currentPassword,
-      passwordData.newPassword
-    );
-
-    if (success) {
-      toast.success('Password changed successfully');
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    } else {
-      toast.error('Current password is incorrect');
-    }
-  };
-
   return (
     <Layout>
       <div className="container max-w-screen-xl mx-auto p-4 lg:p-6">
@@ -102,10 +63,6 @@ const SettingsPage = () => {
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <Bell className="h-4 w-4" />
               Notifications
-            </TabsTrigger>
-            <TabsTrigger value="billing" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              Billing
             </TabsTrigger>
           </TabsList>
 
@@ -153,44 +110,7 @@ const SettingsPage = () => {
           </TabsContent>
 
           <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Change Password</CardTitle>
-                <CardDescription>Update your account password for better security</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                  />
-                </div>
-                <Button onClick={handlePasswordChange} className="bg-[#0052FF]">
-                  Change Password
-                </Button>
-              </CardContent>
-            </Card>
+            <SecuritySettings merchant={currentMerchant} />
           </TabsContent>
 
           <TabsContent value="notifications">
@@ -246,25 +166,6 @@ const SettingsPage = () => {
                 <Button className="bg-[#0052FF]">
                   Save Preferences
                 </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="billing">
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing Information</CardTitle>
-                <CardDescription>Manage your subscription and billing details</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-medium">Current Plan</h3>
-                    <p className="text-sm text-muted-foreground">Basic Plan - ₹499/month</p>
-                    <p className="text-sm text-muted-foreground">Next billing date: January 15, 2024</p>
-                  </div>
-                  <Button variant="outline">Manage Subscription</Button>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

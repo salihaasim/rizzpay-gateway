@@ -1,359 +1,223 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import KycUploadForm from '@/components/kyc/KycUploadForm';
+import { CheckCircle, Clock, AlertTriangle, FileText } from 'lucide-react';
 
 const KycPage = () => {
-  const [personalInfo, setPersonalInfo] = useState({
-    fullName: '',
-    dateOfBirth: '',
-    pan: '',
-    aadhaar: '',
-    address: ''
-  });
-
-  const [businessInfo, setBusinessInfo] = useState({
-    businessName: '',
-    businessType: '',
-    gst: '',
-    cin: '',
-    businessAddress: ''
-  });
-
-  const [documents, setDocuments] = useState({
-    panCard: null,
-    aadhaarCard: null,
-    businessRegistration: null,
-    gstCertificate: null
-  });
-
-  const kycStatus = {
-    personal: 'completed',
-    business: 'pending',
-    documents: 'in-review',
-    overall: 'in-progress'
-  };
-
+  const { currentMerchant } = useMerchantAuth();
+  
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'approved':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'pending':
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
-      case 'in-review':
-        return <Clock className="h-4 w-4 text-blue-500" />;
+        return <Clock className="h-5 w-5 text-yellow-600" />;
+      case 'rejected':
+        return <AlertTriangle className="h-5 w-5 text-red-600" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-500" />;
+        return <FileText className="h-5 w-5 text-gray-600" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'approved':
         return 'bg-green-100 text-green-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
-      case 'in-review':
-        return 'bg-blue-100 text-blue-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const handlePersonalInfoSubmit = () => {
-    if (!personalInfo.fullName || !personalInfo.pan || !personalInfo.aadhaar) {
-      toast.error('Please fill all required fields');
-      return;
-    }
-    toast.success('Personal information saved successfully');
-  };
-
-  const handleBusinessInfoSubmit = () => {
-    if (!businessInfo.businessName || !businessInfo.businessType) {
-      toast.error('Please fill all required fields');
-      return;
-    }
-    toast.success('Business information saved successfully');
-  };
-
-  const handleFileUpload = (type: string, file: File) => {
-    setDocuments({ ...documents, [type]: file });
-    toast.success(`${type} uploaded successfully`);
-  };
+  const kycStatus = currentMerchant?.kycStatus || 'not_started';
+  const kycLevel = currentMerchant?.kycLevel || 'basic';
 
   return (
     <Layout>
       <div className="container max-w-screen-xl mx-auto p-4 lg:p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">KYC Verification</h1>
-          <p className="text-sm text-muted-foreground">Complete your KYC verification to access all features</p>
+          <p className="text-sm text-muted-foreground">
+            Complete your Know Your Customer verification to unlock all features
+          </p>
         </div>
 
-        <div className="mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {getStatusIcon(kycStatus.overall)}
-                Verification Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Personal Info</p>
-                    <p className="text-sm text-muted-foreground">Basic details</p>
-                  </div>
-                  <Badge className={getStatusColor(kycStatus.personal)}>
-                    {kycStatus.personal}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Business Info</p>
-                    <p className="text-sm text-muted-foreground">Company details</p>
-                  </div>
-                  <Badge className={getStatusColor(kycStatus.business)}>
-                    {kycStatus.business}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Documents</p>
-                    <p className="text-sm text-muted-foreground">ID proofs</p>
-                  </div>
-                  <Badge className={getStatusColor(kycStatus.documents)}>
-                    {kycStatus.documents}
-                  </Badge>
+        {/* KYC Status Card */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  {getStatusIcon(kycStatus)}
+                  KYC Verification Status
+                </CardTitle>
+                <CardDescription>
+                  Current verification level and status of your account
+                </CardDescription>
+              </div>
+              <Badge className={getStatusColor(kycStatus)}>
+                {kycStatus.replace('_', ' ').toUpperCase()}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h4 className="font-medium mb-2">Verification Level</h4>
+                <Badge variant="outline" className="text-sm">
+                  {kycLevel.charAt(0).toUpperCase() + kycLevel.slice(1)} Level
+                </Badge>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-2">Current Limits</h4>
+                <div className="text-sm text-muted-foreground">
+                  {kycLevel === 'basic' ? (
+                    <ul className="space-y-1">
+                      <li>• Transaction limit: ₹10,000/day</li>
+                      <li>• Monthly limit: ₹50,000</li>
+                      <li>• Limited withdrawal options</li>
+                    </ul>
+                  ) : kycLevel === 'verified' ? (
+                    <ul className="space-y-1">
+                      <li>• Transaction limit: ₹1,00,000/day</li>
+                      <li>• Monthly limit: ₹20,00,000</li>
+                      <li>• All withdrawal options</li>
+                      <li>• Priority support</li>
+                    </ul>
+                  ) : (
+                    <ul className="space-y-1">
+                      <li>• Complete KYC to unlock limits</li>
+                      <li>• Access to all features</li>
+                    </ul>
+                  )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="personal" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="personal" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Personal Info
-            </TabsTrigger>
-            <TabsTrigger value="business" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Business Info
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="flex items-center gap-2">
-              <Upload className="h-4 w-4" />
-              Documents
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="personal">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>Provide your personal details for verification</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name *</Label>
-                    <Input
-                      id="fullName"
-                      value={personalInfo.fullName}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                    <Input
-                      id="dateOfBirth"
-                      type="date"
-                      value={personalInfo.dateOfBirth}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, dateOfBirth: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="pan">PAN Number *</Label>
-                    <Input
-                      id="pan"
-                      placeholder="ABCDE1234F"
-                      value={personalInfo.pan}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, pan: e.target.value.toUpperCase() })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="aadhaar">Aadhaar Number *</Label>
-                    <Input
-                      id="aadhaar"
-                      placeholder="1234 5678 9012"
-                      value={personalInfo.aadhaar}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, aadhaar: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    placeholder="Complete address"
-                    value={personalInfo.address}
-                    onChange={(e) => setPersonalInfo({ ...personalInfo, address: e.target.value })}
-                  />
-                </div>
-                <Button onClick={handlePersonalInfoSubmit} className="bg-[#0052FF]">
-                  Save Personal Information
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="business">
-            <Card>
-              <CardHeader>
-                <CardTitle>Business Information</CardTitle>
-                <CardDescription>Provide your business details for verification</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="businessName">Business Name *</Label>
-                    <Input
-                      id="businessName"
-                      value={businessInfo.businessName}
-                      onChange={(e) => setBusinessInfo({ ...businessInfo, businessName: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="businessType">Business Type *</Label>
-                    <select
-                      className="w-full p-2 border border-input rounded-md"
-                      value={businessInfo.businessType}
-                      onChange={(e) => setBusinessInfo({ ...businessInfo, businessType: e.target.value })}
-                    >
-                      <option value="">Select business type</option>
-                      <option value="sole-proprietorship">Sole Proprietorship</option>
-                      <option value="partnership">Partnership</option>
-                      <option value="private-limited">Private Limited</option>
-                      <option value="public-limited">Public Limited</option>
-                      <option value="llp">LLP</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gst">GST Number</Label>
-                    <Input
-                      id="gst"
-                      placeholder="22AAAAA0000A1Z5"
-                      value={businessInfo.gst}
-                      onChange={(e) => setBusinessInfo({ ...businessInfo, gst: e.target.value.toUpperCase() })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cin">CIN Number</Label>
-                    <Input
-                      id="cin"
-                      placeholder="U12345AB2021PTC123456"
-                      value={businessInfo.cin}
-                      onChange={(e) => setBusinessInfo({ ...businessInfo, cin: e.target.value.toUpperCase() })}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="businessAddress">Business Address</Label>
-                  <Input
-                    id="businessAddress"
-                    placeholder="Complete business address"
-                    value={businessInfo.businessAddress}
-                    onChange={(e) => setBusinessInfo({ ...businessInfo, businessAddress: e.target.value })}
-                  />
-                </div>
-                <Button onClick={handleBusinessInfoSubmit} className="bg-[#0052FF]">
-                  Save Business Information
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="documents">
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Personal Documents</CardTitle>
-                  <CardDescription>Upload your identity documents</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>PAN Card</Label>
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mt-2">Click to upload PAN card</p>
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={(e) => e.target.files && handleFileUpload('panCard', e.target.files[0])}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Aadhaar Card</Label>
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mt-2">Click to upload Aadhaar card</p>
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={(e) => e.target.files && handleFileUpload('aadhaarCard', e.target.files[0])}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Business Documents</CardTitle>
-                  <CardDescription>Upload your business documents</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Business Registration</Label>
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mt-2">Click to upload registration document</p>
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={(e) => e.target.files && handleFileUpload('businessRegistration', e.target.files[0])}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>GST Certificate (Optional)</Label>
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mt-2">Click to upload GST certificate</p>
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={(e) => e.target.files && handleFileUpload('gstCertificate', e.target.files[0])}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* KYC Benefits */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Benefits of KYC Verification</CardTitle>
+            <CardDescription>Unlock these features after completing your verification</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium">Higher Transaction Limits</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Increase your daily and monthly transaction limits significantly
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium">Fast Withdrawals</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Instant withdrawals to your verified bank accounts
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium">Priority Support</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Get dedicated support and faster query resolution
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Required Documents Info */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Required Documents</CardTitle>
+            <CardDescription>Documents needed for KYC verification</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  <h4 className="font-medium">Aadhaar Card</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Valid Aadhaar card for identity verification
+                </p>
+                <Badge variant="outline" className="mt-2">Required</Badge>
+              </div>
+              
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-5 w-5 text-green-600" />
+                  <h4 className="font-medium">PAN Card</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  PAN card for tax identification
+                </p>
+                <Badge variant="outline" className="mt-2">Required</Badge>
+              </div>
+              
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  <h4 className="font-medium">GST Certificate</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  GST registration certificate for business verification
+                </p>
+                <Badge className="bg-red-100 text-red-800 mt-2">Mandatory</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* KYC Upload Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Upload KYC Documents</CardTitle>
+            <CardDescription>
+              Please upload clear, readable copies of your documents. All fields marked with * are mandatory.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <KycUploadForm />
+          </CardContent>
+        </Card>
+
+        {/* Important Notes */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Important Notes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>• Documents should be clear and readable</p>
+              <p>• File size should not exceed 5MB per document</p>
+              <p>• Supported formats: JPG, PNG, PDF</p>
+              <p>• GST certificate is mandatory for all business accounts</p>
+              <p>• Verification process typically takes 1-2 business days</p>
+              <p>• You'll receive email notifications about status updates</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

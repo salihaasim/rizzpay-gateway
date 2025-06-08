@@ -1,465 +1,334 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import Layout from '@/components/Layout';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  CreditCard, 
-  IndianRupee, 
-  ArrowRight, 
-  Send, 
-  QrCode, 
-  Star,
-  Trash2,
-  Plus,
-  AlertCircle
-} from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import UpiQrPopup from '@/components/upi/UpiQrPopup';
-import { createRazorpayOrder, loadRazorpayScript } from '@/utils/razorpay';
+import React, { useState } from 'react';
+import { useTransactionStore } from '@/stores/transactions';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import Layout from '@/components/Layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Wallet, 
+  CreditCard, 
+  Users, 
+  BarChart3,
+  ArrowUpRight,
+  ArrowDownRight,
+  IndianRupee,
+  Eye,
+  Plus
+} from 'lucide-react';
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Bar, BarChart } from 'recharts';
 
 const Dashboard = () => {
+  const { transactions } = useTransactionStore();
   const { currentMerchant } = useMerchantAuth();
-  const transactionStore = useTransactionStore();
-  const [activeTab, setActiveTab] = useState(currentMerchant?.role === 'admin' ? 'admin' : 'merchant');
-  const navigate = useNavigate();
   
-  // Simplified merchant name - just use the email without GROUP suffix
-  const merchantName = useMemo(() => {
-    if (!currentMerchant?.email) return "MERCHANT";
-    return currentMerchant.email.split('@')[0].toUpperCase();
-  }, [currentMerchant?.email]);
+  // Sample chart data
+  const chartData = [
+    { name: 'Jan', transactions: 65, revenue: 85000 },
+    { name: 'Feb', transactions: 89, revenue: 125000 },
+    { name: 'Mar', transactions: 112, revenue: 165000 },
+    { name: 'Apr', transactions: 134, revenue: 195000 },
+    { name: 'May', transactions: 178, revenue: 245000 },
+    { name: 'Jun', transactions: 156, revenue: 215000 },
+  ];
 
-  // Payment method state
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const recentTransactions = transactions.slice(0, 5);
   
-  // Form states
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [amount, setAmount] = useState('');
-  const [customerUpiId, setCustomerUpiId] = useState('');
-  const [isUpiPopupOpen, setIsUpiPopupOpen] = useState(false);
-  const [showUpiQr, setShowUpiQr] = useState(false);
-  const [generatedUpiUrl, setGeneratedUpiUrl] = useState('');
+  const totalTransactions = transactions.length;
+  const successfulTransactions = transactions.filter(t => t.status === 'successful').length;
+  const pendingTransactions = transactions.filter(t => t.status === 'pending').length;
+  const failedTransactions = transactions.filter(t => t.status === 'failed').length;
   
-  // Bank account favorites
-  const [bankAccounts, setBankAccounts] = useState([
-    { id: '1', name: 'HDFC Primary', accountNumber: 'XXXX1234', ifscCode: 'HDFC0001234', isFavorite: true },
-    { id: '2', name: 'ICICI Business', accountNumber: 'XXXX5678', ifscCode: 'ICIC0005678', isFavorite: false }
-  ]);
-  
-  // UPI states
-  const [upiProvider, setUpiProvider] = useState('gpay');
-  
-  // Only access userRole and userEmail from the store after component mounts
-  const [userRole, setUserRole] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  
-  useEffect(() => {
-    if (transactionStore) {
-      setUserRole(transactionStore.userRole || (currentMerchant?.role === 'admin' ? 'admin' : 'merchant'));
-      setUserEmail(transactionStore.userEmail || currentMerchant?.email || '');
-    }
-  }, [transactionStore, currentMerchant]);
-  
-  const toggleFavorite = (id: string) => {
-    setBankAccounts(accounts => 
-      accounts.map(acc => 
-        acc.id === id ? { ...acc, isFavorite: !acc.isFavorite } : acc
-      )
-    );
-    toast.success('Favorite status updated');
+  const totalRevenue = transactions
+    .filter(t => t.status === 'successful')
+    .reduce((sum, t) => sum + (parseFloat(t.amount.replace(/[₹,]/g, '')) || 0), 0);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(amount);
   };
 
-  // Validate UPI ID format
-  const validateUpiId = (upiId: string): boolean => {
-    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
-    return upiRegex.test(upiId);
-  };
-
-  // Generate UPI QR code URL
-  const generateUpiQrCode = (upiId: string, amount: string) => {
-    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(customerName || 'Customer')}&am=${amount}&cu=INR&tn=${encodeURIComponent(`Payment via RizzPay`)}&tr=RIZZPAY${Date.now()}`;
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUrl)}`;
-    return { upiUrl, qrCodeUrl };
-  };
-  
-  const handlePaymentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!customerName || !customerEmail || !amount) {
-      toast.error('Please fill all required fields');
-      return;
-    }
-    
-    const amountValue = parseFloat(amount);
-    
-    if (isNaN(amountValue) || amountValue <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
-    
-    // Handle based on payment method
-    switch(paymentMethod) {
-      case 'card':
-      case 'neft':
-        try {
-          // Load Razorpay script
-          const isLoaded = await loadRazorpayScript();
-          
-          if (!isLoaded) {
-            toast.error('Failed to load payment gateway');
-            return;
-          }
-          
-          // Create order
-          const orderResult = await createRazorpayOrder(
-            amountValue,
-            'INR',
-            paymentMethod,
-            customerName,
-            customerEmail,
-            `Payment via ${paymentMethod === 'card' ? 'Card' : 'NEFT'}`
-          );
-          
-          if (!orderResult) {
-            toast.error('Failed to create payment order');
-            return;
-          }
-          
-          // Configure Razorpay options
-          const options = {
-            key: "rzp_test_JXIkZl2p0iUbRw",
-            amount: amountValue * 100, // Convert to paise
-            currency: 'INR',
-            name: "RizzPay",
-            description: paymentMethod === 'card' ? "Card Payment" : "NEFT Payment",
-            order_id: orderResult.orderId,
-            prefill: {
-              name: customerName,
-              email: customerEmail,
-            },
-            theme: {
-              color: "#0052FF",
-            },
-            handler: function(response: any) {
-              console.log('Payment successful:', response);
-              toast.success('Payment successful!', {
-                description: `Payment ID: ${response.razorpay_payment_id}`
-              });
-              
-              // Clear form
-              setCustomerName('');
-              setCustomerEmail('');
-              setAmount('');
-            }
-          };
-          
-          // Open Razorpay payment form
-          const razorpay = new window.Razorpay(options);
-          razorpay.open();
-        } catch (error) {
-          console.error('Error processing payment:', error);
-          toast.error('Payment processing failed');
-        }
-        break;
-      
-      case 'upi':
-        if (customerUpiId && validateUpiId(customerUpiId)) {
-          // Generate UPI QR code for custom UPI ID
-          const { upiUrl, qrCodeUrl } = generateUpiQrCode(customerUpiId, amount);
-          setGeneratedUpiUrl(qrCodeUrl);
-          setShowUpiQr(true);
-          
-          toast.success('UPI QR code generated', {
-            description: 'Customer can scan the QR code to make payment'
-          });
-        } else if (upiProvider) {
-          // Open UPI QR popup for merchant UPI
-          setIsUpiPopupOpen(true);
-        } else {
-          toast.error('Please enter a valid UPI ID or select a provider');
-        }
-        break;
-      
+  const getTransactionStatusColor = (status: string) => {
+    switch (status) {
+      case 'successful':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
       default:
-        toast.error('Please select a valid payment method');
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
     <Layout>
-      <div className="container max-w-7xl mx-auto px-4 py-6">
-        <DashboardHeader 
-          merchantName={merchantName}
-          userRole={userRole || (currentMerchant?.role === 'admin' ? 'admin' : 'merchant')}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-        
-        <div className="my-8">
-          <DashboardStatCards />
+      <div className="container max-w-screen-xl mx-auto p-4 lg:p-6">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Welcome back, {currentMerchant?.fullName || 'Merchant'}!</h1>
+          <p className="text-muted-foreground mt-2">Here's an overview of your RizzPay account performance</p>
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Quick Payment Card - Redesigned with modern UI */}
-          <Card className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-semibold text-primary flex items-center gap-2">
-                <Send className="h-5 w-5" />
-                Quick Payment
-              </CardTitle>
+
+        {/* Key Metrics Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <IndianRupee className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="card" value={paymentMethod} onValueChange={setPaymentMethod}>
-                <TabsList className="grid grid-cols-3 mb-4 bg-muted/50">
-                  <TabsTrigger value="card" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Card
-                  </TabsTrigger>
-                  <TabsTrigger value="neft" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    <IndianRupee className="mr-2 h-4 w-4" />
-                    NEFT
-                  </TabsTrigger>
-                  <TabsTrigger value="upi" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    <QrCode className="mr-2 h-4 w-4" />
-                    UPI
-                  </TabsTrigger>
-                </TabsList>
-                
-                <form onSubmit={handlePaymentSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">Customer Name*</Label>
-                    <Input
-                      type="text"
-                      id="name"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="Enter customer name"
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium">Email Address*</Label>
-                    <Input
-                      type="email"
-                      id="email"
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder="customer@email.com"
-                      className="w-full"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">Required for payment receipt</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="amount" className="text-sm font-medium">Amount (₹)*</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
-                      <Input
-                        type="number"
-                        id="amount"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="0.00"
-                        className="pl-8 w-full"
-                      />
-                    </div>
-                  </div>
-                  
-                  {paymentMethod === 'upi' && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="upiId" className="text-sm font-medium">Customer UPI ID</Label>
-                        <Input
-                          type="text"
-                          id="upiId"
-                          value={customerUpiId}
-                          onChange={(e) => setCustomerUpiId(e.target.value)}
-                          placeholder="customer@upi (e.g. john@paytm)"
-                          className="w-full"
-                        />
-                        {customerUpiId && !validateUpiId(customerUpiId) && (
-                          <p className="text-xs text-destructive flex items-center mt-1">
-                            <AlertCircle className="h-3 w-3 mr-1" />
-                            Please enter a valid UPI ID (e.g. name@bank)
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Enter customer's UPI ID to generate QR code for them, or select provider below for merchant QR
-                        </p>
-                      </div>
-                      
-                      {!customerUpiId && (
-                        <div className="space-y-2 p-4 bg-muted/20 rounded-md">
-                          <Label className="text-sm font-medium">Or use Merchant UPI Provider</Label>
-                          <RadioGroup value={upiProvider} onValueChange={setUpiProvider} className="grid grid-cols-2 gap-2 mt-2">
-                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                              <RadioGroupItem value="gpay" id="gpay" />
-                              <Label htmlFor="gpay" className="cursor-pointer">Google Pay</Label>
-                            </div>
-                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                              <RadioGroupItem value="phonepe" id="phonepe" />
-                              <Label htmlFor="phonepe" className="cursor-pointer">PhonePe</Label>
-                            </div>
-                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                              <RadioGroupItem value="paytm" id="paytm" />
-                              <Label htmlFor="paytm" className="cursor-pointer">Paytm</Label>
-                            </div>
-                            <div className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-muted/20">
-                              <RadioGroupItem value="other" id="other" />
-                              <Label htmlFor="other" className="cursor-pointer">Other UPI</Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-                      )}
-
-                      {/* Display generated QR code */}
-                      {showUpiQr && generatedUpiUrl && (
-                        <div className="border rounded-md p-4 bg-white">
-                          <div className="text-center">
-                            <h4 className="text-sm font-medium mb-2">UPI QR Code for {customerUpiId}</h4>
-                            <img 
-                              src={generatedUpiUrl} 
-                              alt="UPI QR Code" 
-                              className="mx-auto border rounded"
-                              width="200" 
-                              height="200"
-                            />
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Customer can scan this QR code to pay ₹{amount}
-                            </p>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="mt-2"
-                              onClick={() => setShowUpiQr(false)}
-                            >
-                              Close QR Code
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {paymentMethod === 'neft' && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label className="text-sm font-medium">Saved Bank Accounts</Label>
-                          <Button variant="ghost" size="sm" className="h-7 text-xs">
-                            <Plus className="h-3 w-3 mr-1" /> Add New
-                          </Button>
-                        </div>
-                        <div className="space-y-2 max-h-40 overflow-y-auto">
-                          {bankAccounts.map((account) => (
-                            <div 
-                              key={account.id} 
-                              className="flex items-center justify-between border rounded-md p-2 hover:bg-muted/20"
-                            >
-                              <div className="flex items-center space-x-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className={`p-0 h-6 w-6 ${account.isFavorite ? 'text-amber-500' : 'text-muted-foreground'}`}
-                                  onClick={() => toggleFavorite(account.id)}
-                                >
-                                  <Star className="h-4 w-4 fill-current" />
-                                </Button>
-                                <div>
-                                  <p className="text-sm font-medium">{account.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {account.accountNumber} • {account.ifscCode}
-                                  </p>
-                                </div>
-                              </div>
-                              <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive">
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-                    {paymentMethod === 'card' && <CreditCard className="mr-2 h-4 w-4" />}
-                    {paymentMethod === 'neft' && <IndianRupee className="mr-2 h-4 w-4" />}
-                    {paymentMethod === 'upi' && <QrCode className="mr-2 h-4 w-4" />}
-                    {paymentMethod === 'upi' && customerUpiId ? 'Generate QR Code' : `Generate ${paymentMethod.toUpperCase()} Payment`}
-                  </Button>
-                </form>
-              </Tabs>
+              <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-600 flex items-center gap-1">
+                  <ArrowUpRight className="h-3 w-3" />
+                  +12.5%
+                </span>
+                from last month
+              </p>
             </CardContent>
           </Card>
-          
-          {/* Account Overview Card */}
-          <Card className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-semibold text-primary">
-                Account Overview
-              </CardTitle>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Available Balance</h4>
-                  <p className="text-3xl font-bold">₹24,500.00</p>
+              <div className="text-2xl font-bold">{totalTransactions}</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-600 flex items-center gap-1">
+                  <ArrowUpRight className="h-3 w-3" />
+                  +8.2%
+                </span>
+                from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {totalTransactions > 0 ? ((successfulTransactions / totalTransactions) * 100).toFixed(1) : 0}%
+              </div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-600 flex items-center gap-1">
+                  <ArrowUpRight className="h-3 w-3" />
+                  +2.1%
+                </span>
+                from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(15247)}</div>
+              <p className="text-xs text-muted-foreground">
+                Ready for withdrawal
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid gap-6 lg:grid-cols-2 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Trend</CardTitle>
+              <CardDescription>Monthly revenue overview</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip formatter={(value, name) => [formatCurrency(Number(value)), 'Revenue']} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#0052FF" 
+                    strokeWidth={2}
+                    dot={{ fill: '#0052FF' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Transaction Volume</CardTitle>
+              <CardDescription>Monthly transaction count</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="transactions" fill="#0052FF" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Transaction Overview & Recent Transactions */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Transaction Status Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Transaction Overview</CardTitle>
+              <CardDescription>Current transaction status breakdown</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Successful</span>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-muted/20 rounded-lg">
-                    <h4 className="text-sm font-medium text-muted-foreground">Today's Transactions</h4>
-                    <p className="text-xl font-semibold mt-1">12</p>
-                  </div>
-                  <div className="p-4 bg-muted/20 rounded-lg">
-                    <h4 className="text-sm font-medium text-muted-foreground">Pending Approvals</h4>
-                    <p className="text-xl font-semibold mt-1">3</p>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{successfulTransactions}</span>
+                  <Badge className="bg-green-100 text-green-800">
+                    {totalTransactions > 0 ? ((successfulTransactions / totalTransactions) * 100).toFixed(0) : 0}%
+                  </Badge>
                 </div>
-                
-                <div className="pt-4">
-                  <Button 
-                    variant="outline" 
-                    className="w-full flex items-center justify-center" 
-                    onClick={() => navigate('/transfers')}
-                  >
-                    Manage Transfers & Withdrawals
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <span className="text-sm">Pending</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{pendingTransactions}</span>
+                  <Badge className="bg-yellow-100 text-yellow-800">
+                    {totalTransactions > 0 ? ((pendingTransactions / totalTransactions) * 100).toFixed(0) : 0}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span className="text-sm">Failed</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{failedTransactions}</span>
+                  <Badge className="bg-red-100 text-red-800">
+                    {totalTransactions > 0 ? ((failedTransactions / totalTransactions) * 100).toFixed(0) : 0}%
+                  </Badge>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Recent Transactions */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Recent Transactions</CardTitle>
+                <CardDescription>Latest payment activities</CardDescription>
+              </div>
+              <Button variant="outline" size="sm">
+                <Eye className="h-4 w-4 mr-2" />
+                View All
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentTransactions.length > 0 ? (
+                  recentTransactions.map((transaction) => (
+                    <div key={transaction.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          transaction.status === 'successful' ? 'bg-green-100' : 
+                          transaction.status === 'failed' ? 'bg-red-100' : 
+                          'bg-yellow-100'
+                        }`}>
+                          <CreditCard className={`h-4 w-4 ${
+                            transaction.status === 'successful' ? 'text-green-600' : 
+                            transaction.status === 'failed' ? 'text-red-600' : 
+                            'text-yellow-600'
+                          }`} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {transaction.description || `Payment ${transaction.id.substring(0, 8)}`}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(transaction.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{transaction.amount}</p>
+                        <Badge className={`text-xs ${getTransactionStatusColor(transaction.status)}`}>
+                          {transaction.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <CreditCard className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">No transactions yet</p>
+                    <Button className="mt-2" size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Transaction
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Quick Actions */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common tasks and shortcuts</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-4">
+              <Button className="h-auto flex-col gap-2 p-4">
+                <Plus className="h-6 w-6" />
+                <span>Create Payment Link</span>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col gap-2 p-4">
+                <Wallet className="h-6 w-6" />
+                <span>Withdraw Funds</span>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col gap-2 p-4">
+                <BarChart3 className="h-6 w-6" />
+                <span>View Analytics</span>
+              </Button>
+              <Button variant="outline" className="h-auto flex-col gap-2 p-4">
+                <Users className="h-6 w-6" />
+                <span>Manage API</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-      
-      {/* UPI QR Payment Popup */}
-      <UpiQrPopup 
-        isOpen={isUpiPopupOpen}
-        setIsOpen={setIsUpiPopupOpen}
-        amount={parseFloat(amount) || 0}
-        merchantName={merchantName}
-        onSuccess={(transactionId) => {
-          setCustomerName('');
-          setCustomerEmail('');
-          setAmount('');
-          setCustomerUpiId('');
-        }}
-      />
     </Layout>
   );
 };

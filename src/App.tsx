@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -16,6 +15,7 @@ import DeveloperPage from '@/pages/DeveloperPage';
 import LinkPaymentPage from '@/pages/LinkPaymentPage';
 import PluginPage from '@/pages/PluginPage';
 import TransfersPage from '@/pages/TransfersPage';
+import AdvancedPayoutPage from '@/pages/AdvancedPayoutPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import AdminDashboard from '@/pages/AdminDashboard';
 import AdminMerchants from '@/pages/admin/AdminMerchants';
@@ -50,6 +50,7 @@ function App() {
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/banking" element={<BankingPage />} />
             <Route path="/transfers" element={<TransfersPage />} />
+            <Route path="/advanced-payout" element={<AdvancedPayoutPage />} />
             <Route path="/kyc" element={<KycPage />} />
             <Route path="/link-payment" element={<LinkPaymentPage />} />
             <Route path="/plugin" element={<PluginPage />} />
