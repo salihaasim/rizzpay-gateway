@@ -15,20 +15,33 @@ export interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentMerchant, logout } = useMerchantAuth();
+  const { currentMerchant, logout, isAuthenticated } = useMerchantAuth();
   const isMobile = useMediaQuery('(max-width: 1024px)');
   
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hiddenOnMobile, setHiddenOnMobile] = useState(false);
   
-  // Check if user is admin, if not redirect to login
+  // Check authentication and admin role
   useEffect(() => {
-    if (!currentMerchant || currentMerchant.role !== 'admin') {
+    console.log('AdminLayout - Auth check:', { isAuthenticated, currentMerchant });
+    
+    if (!isAuthenticated || !currentMerchant) {
+      console.log('Not authenticated, redirecting to auth');
+      toast.error('Please login to access admin panel');
+      navigate('/auth', { replace: true });
+      return;
+    }
+    
+    if (currentMerchant.role !== 'admin') {
+      console.log('Not admin role, redirecting');
       toast.error('Access denied. Admin privileges required.');
       navigate('/auth', { replace: true });
+      return;
     }
-  }, [currentMerchant, navigate]);
+    
+    console.log('Admin access granted');
+  }, [isAuthenticated, currentMerchant, navigate]);
 
   // Auto-hide mobile menu when route changes
   useEffect(() => {
@@ -55,17 +68,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
     navigate('/', { replace: true });
   };
 
-  // If not admin, don't render anything
-  if (!currentMerchant || currentMerchant.role !== 'admin') {
+  // Show loading or return null while checking authentication
+  if (!isAuthenticated || !currentMerchant || currentMerchant.role !== 'admin') {
     return null;
   }
   
-  // Only hide navigation if explicitly requested
-  const shouldHideNavigation = hideNavigation;
-  
   return (
     <div className="flex h-screen bg-gray-50 w-full overflow-hidden">
-      {!shouldHideNavigation && (
+      {!hideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
@@ -79,11 +89,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
       )}
       
       <div className="flex flex-col flex-1 overflow-hidden">
-        {!shouldHideNavigation && (
+        {!hideNavigation && (
           <AdminHeader 
             onLogout={handleLogout} 
             setMobileMenuOpen={setMobileMenuOpen} 
-            hideNavigation={shouldHideNavigation}
+            hideNavigation={hideNavigation}
             userEmail={currentMerchant?.email || ''}
             collapsed={sidebarCollapsed}
             setCollapsed={setSidebarCollapsed}
@@ -92,7 +102,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           />
         )}
         
-        <main className={`flex-1 overflow-auto bg-gray-50 ${shouldHideNavigation ? '' : 'p-4 md:p-6'}`}>
+        <main className={`flex-1 overflow-auto bg-gray-50 ${hideNavigation ? '' : 'p-4 md:p-6'}`}>
           {children || <Outlet />}
         </main>
       </div>
