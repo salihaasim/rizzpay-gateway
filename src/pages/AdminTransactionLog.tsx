@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { CalendarIcon, Search } from "lucide-react";
+import { CalendarIcon, Search, FileSpreadsheet, Download } from "lucide-react";
 import { useTransactionStore } from '@/stores/transactionStore';
 import { Helmet } from 'react-helmet';
+import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 
 const AdminTransactionLog = () => {
   // Date range state
@@ -39,6 +40,128 @@ const AdminTransactionLog = () => {
     
     return inDateRange && matchesSearch;
   });
+
+  const downloadAdvancedExcel = () => {
+    try {
+      // Prepare comprehensive transaction log data
+      const excelData = filteredTransactions.map(transaction => ({
+        'Transaction ID': transaction.id,
+        'Date': format(new Date(transaction.date), 'dd/MM/yyyy'),
+        'Time': format(new Date(transaction.date), 'HH:mm:ss'),
+        'Amount': transaction.amount,
+        'Raw Amount': transaction.rawAmount || 0,
+        'Customer': transaction.customer || 'N/A',
+        'Customer Email': transaction.customerEmail || 'N/A',
+        'Payment Method': transaction.paymentMethod,
+        'Status': transaction.status.toUpperCase(),
+        'Processing State': transaction.processingState || 'N/A',
+        'Description': transaction.description || 'N/A',
+        'Merchant ID': transaction.createdBy || 'N/A',
+        'UTR Number': transaction.paymentDetails?.utr_number || 'N/A',
+        'Bank Reference': transaction.paymentDetails?.bankReference || 'N/A',
+        'Payment Gateway': transaction.paymentDetails?.gateway || 'RizzPay',
+        'Transaction Type': transaction.paymentDetails?.transactionType || 'Payment',
+        'Processing Fee': transaction.paymentDetails?.processingFee || 'N/A',
+        'Settlement Status': transaction.status === 'successful' ? 'SETTLED' : 'PENDING',
+        'Created At': new Date(transaction.date).toISOString(),
+        'Timeline Count': Array.isArray(transaction.processingTimeline) ? transaction.processingTimeline.length : 0,
+        'Last Updated': transaction.processingTimeline && Array.isArray(transaction.processingTimeline) && transaction.processingTimeline.length > 0 
+          ? transaction.processingTimeline[transaction.processingTimeline.length - 1].timestamp 
+          : new Date(transaction.date).toISOString(),
+      }));
+
+      // Create workbook with multiple sheets
+      const wb = XLSX.utils.book_new();
+
+      // Main transaction log sheet
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      // Set column widths
+      const columnWidths = [
+        { wch: 20 }, // Transaction ID
+        { wch: 12 }, // Date
+        { wch: 10 }, // Time
+        { wch: 15 }, // Amount
+        { wch: 12 }, // Raw Amount
+        { wch: 20 }, // Customer
+        { wch: 25 }, // Customer Email
+        { wch: 15 }, // Payment Method
+        { wch: 12 }, // Status
+        { wch: 15 }, // Processing State
+        { wch: 30 }, // Description
+        { wch: 15 }, // Merchant ID
+        { wch: 20 }, // UTR Number
+        { wch: 20 }, // Bank Reference
+        { wch: 15 }, // Payment Gateway
+        { wch: 15 }, // Transaction Type
+        { wch: 15 }, // Processing Fee
+        { wch: 15 }, // Settlement Status
+        { wch: 20 }, // Created At
+        { wch: 12 }, // Timeline Count
+        { wch: 20 }, // Last Updated
+      ];
+      ws['!cols'] = columnWidths;
+
+      XLSX.utils.book_append_sheet(wb, ws, "Transaction Log");
+
+      // Analytics summary sheet
+      const totalAmount = filteredTransactions.reduce((sum, t) => sum + (t.rawAmount || 0), 0);
+      const successfulTransactions = filteredTransactions.filter(t => t.status === 'successful');
+      const failedTransactions = filteredTransactions.filter(t => t.status === 'failed');
+      const pendingTransactions = filteredTransactions.filter(t => t.status === 'pending');
+
+      const analytics = [
+        { Metric: 'Report Period', Value: `${startDate ? format(startDate, 'dd MMM yyyy') : 'All time'} to ${endDate ? format(endDate, 'dd MMM yyyy') : 'Present'}` },
+        { Metric: 'Total Transactions', Value: filteredTransactions.length },
+        { Metric: 'Successful Transactions', Value: successfulTransactions.length },
+        { Metric: 'Failed Transactions', Value: failedTransactions.length },
+        { Metric: 'Pending Transactions', Value: pendingTransactions.length },
+        { Metric: 'Success Rate', Value: filteredTransactions.length > 0 ? `${((successfulTransactions.length / filteredTransactions.length) * 100).toFixed(2)}%` : '0%' },
+        { Metric: 'Total Transaction Value', Value: `₹${totalAmount.toLocaleString('en-IN')}` },
+        { Metric: 'Average Transaction Value', Value: filteredTransactions.length > 0 ? `₹${(totalAmount / filteredTransactions.length).toFixed(2)}` : '₹0' },
+        { Metric: 'UPI Transactions', Value: filteredTransactions.filter(t => t.paymentMethod === 'upi').length },
+        { Metric: 'Card Transactions', Value: filteredTransactions.filter(t => t.paymentMethod === 'card').length },
+        { Metric: 'Net Banking Transactions', Value: filteredTransactions.filter(t => t.paymentMethod === 'netbanking').length },
+        { Metric: 'Report Generated By', Value: 'RizzPay Admin' },
+        { Metric: 'Export Date & Time', Value: new Date().toLocaleString('en-IN') },
+        { Metric: 'Data Source', Value: 'RizzPay Transaction Database' },
+      ];
+
+      const analyticsWs = XLSX.utils.json_to_sheet(analytics);
+      analyticsWs['!cols'] = [{ wch: 30 }, { wch: 40 }];
+      XLSX.utils.book_append_sheet(wb, analyticsWs, "Analytics");
+
+      // Payment method breakdown
+      const paymentMethods = ['upi', 'card', 'netbanking', 'wallet'];
+      const methodBreakdown = paymentMethods.map(method => {
+        const methodTransactions = filteredTransactions.filter(t => t.paymentMethod === method);
+        const methodAmount = methodTransactions.reduce((sum, t) => sum + (t.rawAmount || 0), 0);
+        return {
+          'Payment Method': method.toUpperCase(),
+          'Transaction Count': methodTransactions.length,
+          'Total Amount': `₹${methodAmount.toLocaleString('en-IN')}`,
+          'Success Rate': methodTransactions.length > 0 ? `${((methodTransactions.filter(t => t.status === 'successful').length / methodTransactions.length) * 100).toFixed(2)}%` : '0%',
+          'Average Amount': methodTransactions.length > 0 ? `₹${(methodAmount / methodTransactions.length).toFixed(2)}` : '₹0'
+        };
+      });
+
+      const methodWs = XLSX.utils.json_to_sheet(methodBreakdown);
+      methodWs['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 15 }];
+      XLSX.utils.book_append_sheet(wb, methodWs, "Payment Methods");
+
+      // Generate filename
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `RizzPay_Transaction_Log_${timestamp}_${filteredTransactions.length}records.xlsx`;
+
+      // Download the file
+      XLSX.writeFile(wb, filename);
+      
+      toast.success(`Advanced transaction log exported: ${filename}`);
+    } catch (error) {
+      console.error('Error generating transaction log Excel:', error);
+      toast.error('Failed to generate transaction log Excel');
+    }
+  };
   
   return (
     <AdminLayout>
@@ -53,6 +176,14 @@ const AdminTransactionLog = () => {
               View transaction records
             </p>
           </div>
+          <Button 
+            onClick={downloadAdvancedExcel}
+            className="flex items-center gap-2"
+            variant="outline"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            Download Advanced Report
+          </Button>
         </div>
         
         <Card>
@@ -128,12 +259,23 @@ const AdminTransactionLog = () => {
         </Card>
         
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle>Transaction Records</CardTitle>
-            <CardDescription>
-              Showing {filteredTransactions.length} transactions
-              {startDate && endDate && ` from ${format(startDate, 'dd MMM yyyy')} to ${format(endDate, 'dd MMM yyyy')}`}
-            </CardDescription>
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Transaction Records</CardTitle>
+              <CardDescription>
+                Showing {filteredTransactions.length} transactions
+                {startDate && endDate && ` from ${format(startDate, 'dd MMM yyyy')} to ${format(endDate, 'dd MMM yyyy')}`}
+              </CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={downloadAdvancedExcel}
+              className="flex items-center gap-2"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Export Excel
+            </Button>
           </CardHeader>
           <CardContent className="p-0">
             {filteredTransactions.length === 0 ? (
