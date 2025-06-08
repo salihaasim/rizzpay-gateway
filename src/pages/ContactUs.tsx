@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone, MapPin, Globe, MessageSquare } from 'lucide-react';
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
+import logoSvg from '../assets/logo.svg';
 
 const ContactUs = () => {
   return (
@@ -11,7 +13,7 @@ const ContactUs = () => {
       <Helmet>
         <title>Contact Us | RizzPay</title>
       </Helmet>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <LandingNavbar />
         <div className="container mx-auto px-4 py-12 flex-grow">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">Contact Us</h1>
@@ -49,6 +51,9 @@ const ContactUs = () => {
                 <p className="text-muted-foreground mb-2">Customer Support:</p>
                 <a href="tel:+919080186106" className="text-primary hover:underline block mb-2">
                   +91 9080186106
+                </a>
+                <a href="tel:+917550248887" className="text-primary hover:underline block mb-2">
+                  +91 7550248887
                 </a>
                 <p className="text-muted-foreground mb-2">WhatsApp Support:</p>
                 <a href="https://wa.me/919080186106" className="text-primary hover:underline">
@@ -114,6 +119,38 @@ const ContactUs = () => {
             </CardContent>
           </Card>
         </div>
+        
+        <footer className="bg-background py-8 border-t mt-auto">
+          <div className="container px-4 mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center mb-4 md:mb-0">
+                <img src={logoSvg} alt="RizzPay Logo" className="h-8 w-8 mr-2" />
+                <span className="font-bold text-xl bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent">
+                  RizzPay
+                </span>
+              </div>
+              
+              <div className="flex flex-wrap gap-4 md:gap-8 justify-center">
+                <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Terms & Conditions
+                </Link>
+                <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link to="/refund-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Refund Policy
+                </Link>
+                <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Contact Us
+                </Link>
+              </div>
+              
+              <div className="text-sm text-muted-foreground mt-4 md:mt-0">
+                © {new Date().getFullYear()} RizzPay. All rights reserved.
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
