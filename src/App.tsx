@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './components/theme-provider';
+import Index from '@/pages/Index';
 import AuthPage from '@/pages/AuthPage';
 import Dashboard from '@/pages/Dashboard';
 import TransactionsPage from '@/pages/TransactionsPage';
@@ -40,11 +42,11 @@ function App() {
         <Router>
           <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="*" element={<NotFoundPage />} />
 
             {/* Merchant Routes */}
-            <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/wallet" element={<WalletPage />} />

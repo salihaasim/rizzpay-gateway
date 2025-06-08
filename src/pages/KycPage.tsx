@@ -36,8 +36,9 @@ const KycPage = () => {
     }
   };
 
-  const kycStatus = currentMerchant?.kycStatus || 'not_started';
-  const kycLevel = currentMerchant?.kycLevel || 'basic';
+  // Provide default values if properties don't exist
+  const kycStatus = (currentMerchant as any)?.kycStatus || 'not_started';
+  const kycLevel = (currentMerchant as any)?.kycLevel || 'basic';
 
   return (
     <Layout>
@@ -194,7 +195,7 @@ const KycPage = () => {
           <CardHeader>
             <CardTitle>Upload KYC Documents</CardTitle>
             <CardDescription>
-              Please upload clear, readable copies of your documents. All fields marked with * are mandatory.
+              Please upload clear, readable copies of your documents. GST certificate is mandatory for all business accounts.
             </CardDescription>
           </CardHeader>
           <CardContent>
