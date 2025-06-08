@@ -39,12 +39,13 @@ export default function MerchantRegistrationForm() {
       return;
     }
     
-    // Register the merchant
+    // Register the merchant with default role
     addMerchant({
       username: formData.username,
       password: formData.password,
       fullName: formData.fullName,
-      email: formData.email
+      email: formData.email,
+      role: 'merchant'
     });
     
     // Redirect to login

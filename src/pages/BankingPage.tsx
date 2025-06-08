@@ -91,10 +91,11 @@ const BankingPage = () => {
     // Add the new account
     const newAccount = {
       id: `bank_${Date.now()}`,
-      accountName,
+      accountHolderName: accountName,
       accountNumber,
       ifscCode,
       bankName,
+      isVerified: false,
       isPrimary
     };
     
@@ -250,7 +251,7 @@ const BankingPage = () => {
                         >
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-medium">{account.accountName}</span>
+                              <span className="font-medium">{account.accountHolderName}</span>
                               {account.isPrimary && (
                                 <span className="bg-[#0052FF]/10 text-[#0052FF] text-xs px-2 py-0.5 rounded-full">
                                   Primary

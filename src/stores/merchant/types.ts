@@ -1,4 +1,3 @@
-
 export interface Merchant {
   username: string;
   password: string;
@@ -17,6 +16,7 @@ export interface UpiSettings {
   name: string;
   enabled: boolean;
   allowManualVerification: boolean;
+  customWebhookUrl?: string;
 }
 
 export interface BankAccount {
@@ -26,6 +26,7 @@ export interface BankAccount {
   bankName: string;
   accountHolderName: string;
   isVerified: boolean;
+  isPrimary?: boolean;
 }
 
 export interface PricingStructure {
