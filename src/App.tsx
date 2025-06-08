@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -16,9 +17,15 @@ import AdminTransactions from '@/pages/admin/AdminTransactions';
 import AdminTransactionLog from '@/pages/AdminTransactionLog';
 import AdminPayoutManagement from '@/pages/admin/AdminPayoutManagement';
 import AdminKYC from '@/pages/admin/AdminKYC';
-import AdminWhitelist from '@/pages/admin/AdminWhitelist';
+import AdminWhitelist from '@/pages/AdminWhitelist';
 import AdminSupport from '@/pages/admin/AdminSupport';
 import AdminPaymentRecon from '@/pages/admin/AdminPaymentRecon';
+import AdminSettings from '@/pages/AdminSettings';
+import AdminActivityLog from '@/pages/AdminActivityLog';
+import AdminMonitoring from '@/pages/AdminMonitoring';
+import AdminApiManagement from '@/pages/AdminApiManagement';
+import AdminEscrow from '@/pages/AdminEscrow';
+import AdminUpiManagement from '@/pages/AdminUpiManagement';
 
 function App() {
   return (
@@ -50,6 +57,12 @@ function App() {
             <Route path="/admin/kyc" element={<AdminKYC />} />
             <Route path="/admin/whitelist" element={<AdminWhitelist />} />
             <Route path="/admin/support" element={<AdminSupport />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/activity-log" element={<AdminActivityLog />} />
+            <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+            <Route path="/admin/api-management" element={<AdminApiManagement />} />
+            <Route path="/admin/escrow" element={<AdminEscrow />} />
+            <Route path="/admin/upi-management" element={<AdminUpiManagement />} />
           </Routes>
         </Router>
       </ThemeProvider>

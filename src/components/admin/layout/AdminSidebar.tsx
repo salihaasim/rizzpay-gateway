@@ -23,7 +23,10 @@ import {
   Send,
   RefreshCw,
   List,
-  HelpCircle
+  HelpCircle,
+  Database,
+  BarChart3,
+  Key
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -66,6 +69,12 @@ export function AdminSidebar({
     { name: 'KYC Management', href: '/admin/kyc', icon: Shield },
     { name: 'Whitelist', href: '/admin/whitelist', icon: List },
     { name: 'Support', href: '/admin/support', icon: HelpCircle },
+    { name: 'Settings', href: '/admin/settings', icon: Settings },
+    { name: 'Activity Log', href: '/admin/activity-log', icon: Activity },
+    { name: 'Monitoring', href: '/admin/monitoring', icon: Monitor },
+    { name: 'API Management', href: '/admin/api-management', icon: Key },
+    { name: 'Escrow', href: '/admin/escrow', icon: Database },
+    { name: 'UPI Management', href: '/admin/upi-management', icon: Smartphone },
   ];
   
   const isActiveRoute = (href: string) => {
