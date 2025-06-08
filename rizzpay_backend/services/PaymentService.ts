@@ -1,7 +1,13 @@
 
 import { supabase } from '../config/supabase';
-import { v4 as uuidv4 } from 'uuid';
 import { BankIntegrationService } from './BankIntegrationService';
+
+// Generate unique RizzPay transaction ID
+const generateRizzPayTransactionId = (): string => {
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substring(2, 8);
+  return `RP${timestamp}${randomPart}`.toUpperCase();
+};
 
 export class PaymentService {
   static async createPayment(data: {
@@ -13,7 +19,7 @@ export class PaymentService {
     description?: string;
     merchantId: string;
   }) {
-    const transactionId = `txn_${uuidv4()}`;
+    const transactionId = generateRizzPayTransactionId();
     
     // Create transaction record
     const { data: transaction, error } = await supabase

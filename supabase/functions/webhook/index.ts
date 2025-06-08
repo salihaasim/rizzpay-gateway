@@ -13,6 +13,13 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || ''
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+// Generate unique transaction ID with RP prefix
+const generateRizzPayTransactionId = (): string => {
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substring(2, 8);
+  return `RP${timestamp}${randomPart}`.toUpperCase();
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -90,8 +97,8 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Generate a unique transaction ID
-    const transactionId = `wh_${Math.random().toString(36).substring(2, 10)}`
+    // Generate a unique RizzPay transaction ID
+    const transactionId = generateRizzPayTransactionId()
     
     // Create a payment URL
     const baseUrl = Deno.env.get('PUBLIC_URL') || req.headers.get('origin') || 'https://yourdomain.com'

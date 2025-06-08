@@ -1,6 +1,9 @@
 
 export const generateTransactionId = (): string => {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  // Generate unique transaction ID starting with RP
+  const timestamp = Date.now().toString(36); // Base36 timestamp
+  const randomPart = Math.random().toString(36).substring(2, 8); // 6 random characters
+  return `RP${timestamp}${randomPart}`.toUpperCase();
 };
 
 export const formatDate = (): string => {
