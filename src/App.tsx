@@ -37,6 +37,7 @@ import AdminUpiManagement from '@/pages/AdminUpiManagement';
 import TermsAndConditions from '@/pages/TermsAndConditions';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import RefundPolicy from '@/pages/RefundPolicy';
+import ContactUs from '@/pages/ContactUs';
 
 function App() {
   return (
@@ -46,10 +47,10 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/contact" element={<ContactUs />} />
             <Route path="*" element={<NotFoundPage />} />
 
             {/* Merchant Routes */}
