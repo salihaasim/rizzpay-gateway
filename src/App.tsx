@@ -10,8 +10,14 @@ import WalletPage from '@/pages/WalletPage';
 import SettingsPage from '@/pages/SettingsPage';
 import ActivityLogPage from '@/pages/ActivityLogPage';
 import SupportPage from '@/pages/SupportPage';
+import BankingPage from '@/pages/BankingPage';
+import KycPage from '@/pages/KycPage';
+import DeveloperPage from '@/pages/DeveloperPage';
+import LinkPaymentPage from '@/pages/LinkPaymentPage';
+import PluginPage from '@/pages/PluginPage';
+import TransfersPage from '@/pages/TransfersPage';
 import NotFoundPage from '@/pages/NotFoundPage';
-import AdminDashboard from '@/pages/admin/AdminDashboard';
+import AdminDashboard from '@/pages/AdminDashboard';
 import AdminMerchants from '@/pages/admin/AdminMerchants';
 import AdminTransactions from '@/pages/admin/AdminTransactions';
 import AdminTransactionLog from '@/pages/AdminTransactionLog';
@@ -42,6 +48,12 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/banking" element={<BankingPage />} />
+            <Route path="/transfers" element={<TransfersPage />} />
+            <Route path="/kyc" element={<KycPage />} />
+            <Route path="/link-payment" element={<LinkPaymentPage />} />
+            <Route path="/plugin" element={<PluginPage />} />
+            <Route path="/developer" element={<DeveloperPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/activity-log" element={<ActivityLogPage />} />
             <Route path="/support" element={<SupportPage />} />

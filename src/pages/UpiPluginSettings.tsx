@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
-import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -78,117 +77,115 @@ const UpiPluginSettings: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="container max-w-7xl mx-auto p-4 sm:p-6">
-        <Helmet>
-          <title>UPI QR Plugin Settings | RizzPay</title>
-        </Helmet>
-        
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">UPI QR Popup Plugin</h1>
-            <p className="text-muted-foreground">Configure and integrate UPI payments on your website</p>
-          </div>
-          
-          <Button onClick={handleTestPopup} className="flex items-center gap-2 bg-[#0052FF]">
-            <QrCode className="h-4 w-4" />
-            <span className="hidden sm:inline">Test QR Popup</span>
-          </Button>
+    <div className="container max-w-7xl mx-auto p-4 sm:p-6">
+      <Helmet>
+        <title>UPI QR Plugin Settings | RizzPay</title>
+      </Helmet>
+      
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">UPI QR Popup Plugin</h1>
+          <p className="text-muted-foreground">Configure and integrate UPI payments on your website</p>
         </div>
         
-        <Tabs defaultValue="settings">
-          <TabsList className="mb-6">
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-            <TabsTrigger value="integration">QR Integration</TabsTrigger>
-            <TabsTrigger value="payment-links">Payment Links</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>UPI Payment Settings</CardTitle>
-                <CardDescription>Configure your UPI payment options for the popup plugin</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="upiId">UPI ID</Label>
-                  <Input 
-                    id="upiId" 
-                    name="upiId" 
-                    placeholder="yourname@ybl" 
-                    value={formState.upiId} 
-                    onChange={handleInputChange}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Enter your UPI ID where customers will send payments
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="enabled" 
-                    checked={formState.enabled} 
-                    onCheckedChange={(checked) => handleSwitchChange('enabled', checked)}
-                  />
-                  <Label htmlFor="enabled">Enable UPI Plugin</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="allowManualVerification" 
-                    checked={formState.allowManualVerification} 
-                    onCheckedChange={(checked) => handleSwitchChange('allowManualVerification', checked)}
-                  />
-                  <Label htmlFor="allowManualVerification">Allow Manual UPI ID Verification</Label>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="customWebhookUrl">Custom Webhook URL (Optional)</Label>
-                  <Input 
-                    id="customWebhookUrl" 
-                    name="customWebhookUrl" 
-                    placeholder="https://yoursite.com/webhook" 
-                    value={formState.customWebhookUrl} 
-                    onChange={handleInputChange}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Receive payment status updates to your custom endpoint
-                  </p>
-                </div>
-                
-                <Button onClick={handleSaveSettings} className="w-full sm:w-auto bg-[#0052FF]">Save Settings</Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="integration">
-            <UpiPluginCode />
-            
-            <div className="mt-8">
-              <h3 className="text-lg font-medium mb-4">Test Your UPI Popup</h3>
-              <div className="flex items-end gap-4">
-                <div className="w-full sm:w-1/3">
-                  <Label htmlFor="testAmount">Test Amount (₹)</Label>
-                  <Input 
-                    id="testAmount" 
-                    type="number" 
-                    value={testAmount}
-                    onChange={(e) => setTestAmount(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <Button onClick={handleTestPopup} className="bg-[#0052FF]">Launch Test Popup</Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="payment-links">
-            <UpiPaymentLinkGenerator />
-          </TabsContent>
-        </Tabs>
+        <Button onClick={handleTestPopup} className="flex items-center gap-2 bg-[#0052FF]">
+          <QrCode className="h-4 w-4" />
+          <span className="hidden sm:inline">Test QR Popup</span>
+        </Button>
       </div>
+      
+      <Tabs defaultValue="settings">
+        <TabsList className="mb-6">
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="integration">QR Integration</TabsTrigger>
+          <TabsTrigger value="payment-links">Payment Links</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>UPI Payment Settings</CardTitle>
+              <CardDescription>Configure your UPI payment options for the popup plugin</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="upiId">UPI ID</Label>
+                <Input 
+                  id="upiId" 
+                  name="upiId" 
+                  placeholder="yourname@ybl" 
+                  value={formState.upiId} 
+                  onChange={handleInputChange}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Enter your UPI ID where customers will send payments
+                </p>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="enabled" 
+                  checked={formState.enabled} 
+                  onCheckedChange={(checked) => handleSwitchChange('enabled', checked)}
+                />
+                <Label htmlFor="enabled">Enable UPI Plugin</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="allowManualVerification" 
+                  checked={formState.allowManualVerification} 
+                  onCheckedChange={(checked) => handleSwitchChange('allowManualVerification', checked)}
+                />
+                <Label htmlFor="allowManualVerification">Allow Manual UPI ID Verification</Label>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <Label htmlFor="customWebhookUrl">Custom Webhook URL (Optional)</Label>
+                <Input 
+                  id="customWebhookUrl" 
+                  name="customWebhookUrl" 
+                  placeholder="https://yoursite.com/webhook" 
+                  value={formState.customWebhookUrl} 
+                  onChange={handleInputChange}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Receive payment status updates to your custom endpoint
+                </p>
+              </div>
+              
+              <Button onClick={handleSaveSettings} className="w-full sm:w-auto bg-[#0052FF]">Save Settings</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="integration">
+          <UpiPluginCode />
+          
+          <div className="mt-8">
+            <h3 className="text-lg font-medium mb-4">Test Your UPI Popup</h3>
+            <div className="flex items-end gap-4">
+              <div className="w-full sm:w-1/3">
+                <Label htmlFor="testAmount">Test Amount (₹)</Label>
+                <Input 
+                  id="testAmount" 
+                  type="number" 
+                  value={testAmount}
+                  onChange={(e) => setTestAmount(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <Button onClick={handleTestPopup} className="bg-[#0052FF]">Launch Test Popup</Button>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="payment-links">
+          <UpiPaymentLinkGenerator />
+        </TabsContent>
+      </Tabs>
       
       {isTestPopupOpen && (
         <UpiQrPopup 
@@ -199,7 +196,7 @@ const UpiPluginSettings: React.FC = () => {
           onSuccess={(txnId) => toast.success(`Test transaction created: ${txnId}`)}
         />
       )}
-    </Layout>
+    </div>
   );
 };
 

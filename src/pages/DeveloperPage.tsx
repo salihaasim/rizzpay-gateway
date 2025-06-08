@@ -1,320 +1,390 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import Layout from '@/components/Layout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import WebhookIntegration from '@/components/webhook/WebhookIntegration';
-import { useTransactionStore } from '@/stores/transactionStore';
-import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Code, ExternalLink } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Copy, Eye, EyeOff, RefreshCw, Key, Code, Book, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import MerchantUrlBank from '@/components/developer/MerchantUrlBank';
+import { useMerchantAuth } from '@/stores/merchantAuthStore';
 
 const DeveloperPage = () => {
   const { currentMerchant } = useMerchantAuth();
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [apiDocumentContent, setApiDocumentContent] = useState<string | null>(null);
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [webhookUrl, setWebhookUrl] = useState('');
 
-  useEffect(() => {
-    // Simulate API key fetch or generation
-    const fetchApiKey = () => {
-      // In a real app, this would come from your backend
-      const mockApiKey = currentMerchant?.apiKey || "rzp_test_" + Math.random().toString(36).substring(2, 15);
-      setApiKey(mockApiKey);
-    };
-    
-    // Load API documentation from the text file
-    const loadApiDocumentation = async () => {
-      try {
-        const response = await fetch('/src/rizzpay_live/RIZZPAY_API.txt');
-        const text = await response.text();
-        setApiDocumentContent(text);
-      } catch (error) {
-        console.error('Error loading API documentation:', error);
-      }
-    };
-    
-    fetchApiKey();
-    loadApiDocumentation();
-  }, [currentMerchant]);
+  const apiKey = currentMerchant?.apiKey || 'rizz_api_key_demo_merchant';
 
-  const handleRegenerateApiKey = () => {
-    setIsGenerating(true);
-    
-    // Simulate API call to regenerate key
-    setTimeout(() => {
-      const newApiKey = "rzp_test_" + Math.random().toString(36).substring(2, 15);
-      setApiKey(newApiKey);
-      setIsGenerating(false);
-    }, 1000);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard');
   };
 
-  const handleDownloadDocumentation = () => {
-    if (!apiDocumentContent) return;
-    
-    // Create a Blob with the content
-    const blob = new Blob([apiDocumentContent], { type: 'text/plain' });
-    
-    // Create a download link
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'RizzPay_API_Documentation.txt');
-    
-    // Append link to body, trigger click, and clean up
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    
-    toast.success('Documentation downloaded successfully');
+  const regenerateApiKey = () => {
+    toast.success('API key regenerated successfully');
   };
-  
-  // Example API endpoints for documentation
+
+  const testWebhook = () => {
+    if (!webhookUrl) {
+      toast.error('Please enter a webhook URL');
+      return;
+    }
+    toast.success('Test webhook sent successfully');
+  };
+
   const apiEndpoints = [
     {
-      name: "Create Payment",
-      endpoint: "/v1/payments",
-      method: "POST",
-      description: "Create a new payment and generate payment link",
-      parameters: "amount, currency, description, customer_email, customer_name",
-      responseExample: `{
-  "id": "pay_12345abcde",
+      method: 'POST',
+      endpoint: '/api/v1/payments',
+      description: 'Create a new payment',
+      example: `{
   "amount": 1000,
   "currency": "INR",
-  "status": "created",
-  "payment_url": "https://api.rizzpay.co.in/pay/12345abcde"
+  "description": "Payment for order #123",
+  "customer_email": "customer@example.com"
 }`
     },
     {
-      name: "Get Payment Status",
-      endpoint: "/v1/payments/{id}",
-      method: "GET",
-      description: "Check the status of an existing payment",
-      parameters: "id (in URL)",
-      responseExample: `{
-  "id": "pay_12345abcde",
-  "amount": 1000,
-  "currency": "INR",
-  "status": "completed",
-  "transaction_id": "txn_98765zyxwv"
-}`
+      method: 'GET',
+      endpoint: '/api/v1/payments/{id}',
+      description: 'Get payment details',
+      example: 'GET /api/v1/payments/pay_12345'
     },
     {
-      name: "Create Refund",
-      endpoint: "/v1/refunds",
-      method: "POST",
-      description: "Initiate a refund for a completed payment",
-      parameters: "payment_id, amount, reason",
-      responseExample: `{
-  "id": "ref_12345abcde",
-  "payment_id": "pay_12345abcde",
-  "amount": 1000,
-  "status": "processing"
-}`
-    },
-    {
-      name: "Generate UPI QR Code",
-      endpoint: "/v1/upi/qr",
-      method: "POST",
-      description: "Generate a UPI QR code for payment",
-      parameters: "amount, upi_id, description",
-      responseExample: `{
-  "id": "qr_12345abcde",
-  "qr_image_url": "https://api.rizzpay.co.in/qr/12345abcde.png",
-  "upi_url": "upi://pay?pa=merchant@rizzpay&pn=RizzPay&am=1000.00"
+      method: 'POST',
+      endpoint: '/api/v1/refunds',
+      description: 'Create a refund',
+      example: `{
+  "payment_id": "pay_12345",
+  "amount": 500,
+  "reason": "Customer request"
 }`
     }
   ];
-  
+
+  const webhookEvents = [
+    {
+      event: 'payment.created',
+      description: 'Triggered when a new payment is created'
+    },
+    {
+      event: 'payment.completed',
+      description: 'Triggered when a payment is successfully completed'
+    },
+    {
+      event: 'payment.failed',
+      description: 'Triggered when a payment fails'
+    },
+    {
+      event: 'refund.created',
+      description: 'Triggered when a refund is created'
+    }
+  ];
+
   return (
     <Layout>
-      <div className="container py-8">
-        <div className="flex flex-col space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Developer Integration</h1>
-            <p className="text-muted-foreground mt-2">
-              Integrate RizzPay's payment solutions into your applications.
-            </p>
-          </div>
+      <div className="container max-w-screen-xl mx-auto p-4 lg:p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Developer Center</h1>
+          <p className="text-sm text-muted-foreground">API keys, documentation, and integration tools</p>
+        </div>
 
-          <Tabs defaultValue="url-bank" className="space-y-6">
-            <TabsList className="grid grid-cols-4 w-full md:w-auto">
-              <TabsTrigger value="url-bank">URL Bank</TabsTrigger>
-              <TabsTrigger value="api">API</TabsTrigger>
-              <TabsTrigger value="webhook">Webhook</TabsTrigger>
-              <TabsTrigger value="docs">Documentation</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="url-bank">
-              <MerchantUrlBank />
-            </TabsContent>
-            
-            <TabsContent value="api">
+        <Tabs defaultValue="api-keys" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="api-keys" className="flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              API Keys
+            </TabsTrigger>
+            <TabsTrigger value="webhooks" className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Webhooks
+            </TabsTrigger>
+            <TabsTrigger value="documentation" className="flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              API Documentation
+            </TabsTrigger>
+            <TabsTrigger value="testing" className="flex items-center gap-2">
+              <Code className="h-4 w-4" />
+              Testing
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="api-keys">
+            <div className="grid gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>API Reference</CardTitle>
-                  <CardDescription>
-                    Access our RESTful API endpoints for payment processing
-                  </CardDescription>
+                  <CardTitle>API Keys</CardTitle>
+                  <CardDescription>Manage your API keys for secure integration</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="bg-muted p-4 rounded-md">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold">Your API Key</h3>
-                        <p className="text-sm font-mono mt-1">{apiKey}</p>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Live API Key</Label>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 relative">
+                        <Input
+                          type={showApiKey ? 'text' : 'password'}
+                          value={apiKey}
+                          readOnly
+                          className="pr-20"
+                        />
+                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowApiKey(!showApiKey)}
+                            className="h-6 w-6"
+                          >
+                            {showApiKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => copyToClipboard(apiKey)}
+                            className="h-6 w-6"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        onClick={handleRegenerateApiKey}
-                        disabled={isGenerating}
-                      >
-                        {isGenerating ? 'Generating...' : 'Regenerate'}
+                      <Button variant="outline" onClick={regenerateApiKey}>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Regenerate
                       </Button>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Keep this key secret. Use it to authenticate all API requests.
+                    <p className="text-xs text-muted-foreground">
+                      Keep your API key secure. Do not share it in publicly accessible areas.
                     </p>
                   </div>
-                  
-                  <div>
-                    <h3 className="font-semibold mb-4">API Endpoints</h3>
-                    <Accordion type="single" collapsible className="w-full">
-                      {apiEndpoints.map((endpoint, index) => (
-                        <AccordionItem key={index} value={`item-${index}`}>
-                          <AccordionTrigger>
-                            <div className="flex items-center gap-2">
-                              <span className={`px-2 py-0.5 text-xs rounded-md ${
-                                endpoint.method === "GET" ? "bg-blue-100 text-blue-800" : 
-                                "bg-green-100 text-green-800"
-                              }`}>
-                                {endpoint.method}
-                              </span>
-                              <span>{endpoint.name}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="space-y-2 pl-2">
-                              <div>
-                                <span className="font-semibold">Endpoint:</span> 
-                                <code className="ml-2 px-2 py-0.5 bg-muted rounded font-mono text-sm">
-                                  {endpoint.endpoint}
-                                </code>
-                              </div>
-                              <div>
-                                <span className="font-semibold">Description:</span> 
-                                <span className="ml-2">{endpoint.description}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold">Parameters:</span> 
-                                <span className="ml-2">{endpoint.parameters}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold">Example Response:</span>
-                                <pre className="mt-1 p-2 bg-muted rounded text-xs overflow-x-auto">
-                                  {endpoint.responseExample}
-                                </pre>
-                              </div>
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
+
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 className="font-medium text-yellow-800">Security Best Practices</h4>
+                    <ul className="text-sm text-yellow-700 mt-1 space-y-1">
+                      <li>• Never expose API keys in client-side code</li>
+                      <li>• Use environment variables to store API keys</li>
+                      <li>• Regenerate keys if compromised</li>
+                      <li>• Restrict API access by IP whitelist</li>
+                    </ul>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end">
-                  <Button onClick={handleDownloadDocumentation} variant="outline" className="gap-2">
-                    <Download className="h-4 w-4" />
-                    Download Full API Docs
-                  </Button>
-                </CardFooter>
               </Card>
-            </TabsContent>
-            
-            <TabsContent value="webhook">
+
               <Card>
                 <CardHeader>
-                  <CardTitle>Webhook Integration</CardTitle>
-                  <CardDescription>
-                    Set up webhooks to receive real-time payment notifications
-                  </CardDescription>
+                  <CardTitle>Quick Integration</CardTitle>
+                  <CardDescription>Basic example to get started</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <WebhookIntegration 
-                    apiKey={apiKey} 
-                    onRegenerateApiKey={handleRegenerateApiKey}
-                    isRegenerating={isGenerating}
-                  />
+                  <div className="bg-gray-950 text-gray-100 p-4 rounded-lg text-sm font-mono">
+                    <div className="text-green-400"># Using cURL</div>
+                    <div className="mt-2">
+                      curl -X POST https://api.rizzpay.com/v1/payments \<br/>
+                      &nbsp;&nbsp;-H "Authorization: Bearer {apiKey}" \<br/>
+                      &nbsp;&nbsp;-H "Content-Type: application/json" \<br/>
+                      &nbsp;&nbsp;-d '{`{`}<br/>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"amount": 1000,<br/>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"currency": "INR",<br/>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"description": "Test payment"<br/>
+                      &nbsp;&nbsp;{`}`}'
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-            
-            <TabsContent value="docs">
+            </div>
+          </TabsContent>
+
+          <TabsContent value="webhooks">
+            <div className="grid gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Documentation</CardTitle>
-                  <CardDescription>
-                    Comprehensive guides to help you integrate our payment solutions
-                  </CardDescription>
+                  <CardTitle>Webhook Configuration</CardTitle>
+                  <CardDescription>Configure webhooks to receive real-time event notifications</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="border rounded-lg p-4 hover:border-primary transition-colors">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FileText className="h-5 w-5 text-primary" />
-                        <h3 className="font-semibold">Getting Started Guide</h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Step-by-step guide to integrate RizzPay into your application
-                      </p>
-                      <Button variant="outline" size="sm" className="w-full">View Guide</Button>
-                    </div>
-                    
-                    <div className="border rounded-lg p-4 hover:border-primary transition-colors">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Code className="h-5 w-5 text-primary" />
-                        <h3 className="font-semibold">Code Samples</h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Example code in various languages for integrating RizzPay
-                      </p>
-                      <Button variant="outline" size="sm" className="w-full">View Samples</Button>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="webhook-url">Webhook URL</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="webhook-url"
+                        placeholder="https://your-site.com/webhook"
+                        value={webhookUrl}
+                        onChange={(e) => setWebhookUrl(e.target.value)}
+                      />
+                      <Button onClick={testWebhook} variant="outline">
+                        Test
+                      </Button>
                     </div>
                   </div>
-                  
-                  <div className="border rounded-lg p-4">
-                    <h3 className="font-semibold mb-2">Full Documentation</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Download our comprehensive API documentation for offline reference
-                    </p>
-                    <Button 
-                      variant="default" 
-                      className="gap-2" 
-                      onClick={handleDownloadDocumentation}
-                    >
-                      <Download className="h-4 w-4" />
-                      Download Documentation
-                    </Button>
+
+                  <div className="space-y-2">
+                    <Label>Webhook Events</Label>
+                    <div className="space-y-2">
+                      {webhookEvents.map((event, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <Badge variant="outline" className="mb-1">{event.event}</Badge>
+                            <p className="text-sm text-muted-foreground">{event.description}</p>
+                          </div>
+                          <input type="checkbox" defaultChecked className="h-4 w-4" />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <h3 className="font-semibold mb-2">Need Help?</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Our support team is available to help you with integration questions
-                    </p>
-                    <Button variant="outline" className="gap-2">
-                      <ExternalLink className="h-4 w-4" />
-                      Contact Support
-                    </Button>
+
+                  <Button className="bg-[#0052FF]">Save Webhook Configuration</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Webhook Security</CardTitle>
+                  <CardDescription>Verify webhook authenticity</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gray-950 text-gray-100 p-4 rounded-lg text-sm font-mono">
+                    <div className="text-green-400"># Webhook signature verification (Node.js)</div>
+                    <div className="mt-2">
+                      const crypto = require('crypto');<br/>
+                      const signature = req.headers['x-rizzpay-signature'];<br/>
+                      const payload = JSON.stringify(req.body);<br/>
+                      const secret = 'your_webhook_secret';<br/><br/>
+                      const expectedSignature = crypto<br/>
+                      &nbsp;&nbsp;.createHmac('sha256', secret)<br/>
+                      &nbsp;&nbsp;.update(payload)<br/>
+                      &nbsp;&nbsp;.digest('hex');
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="documentation">
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>API Endpoints</CardTitle>
+                  <CardDescription>Available API endpoints and their usage</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {apiEndpoints.map((endpoint, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant={endpoint.method === 'POST' ? 'default' : 'secondary'}>
+                            {endpoint.method}
+                          </Badge>
+                          <code className="text-sm bg-muted px-2 py-1 rounded">{endpoint.endpoint}</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{endpoint.description}</p>
+                        <div className="bg-gray-950 text-gray-100 p-3 rounded text-xs font-mono">
+                          <pre>{endpoint.example}</pre>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>SDKs & Libraries</CardTitle>
+                  <CardDescription>Official SDKs for popular programming languages</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Node.js</h4>
+                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
+                        npm install rizzpay-node
+                      </code>
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Documentation
+                      </Button>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Python</h4>
+                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
+                        pip install rizzpay-python
+                      </code>
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Documentation
+                      </Button>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">PHP</h4>
+                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
+                        composer require rizzpay/rizzpay-php
+                      </code>
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Documentation
+                      </Button>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Java</h4>
+                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
+                        com.rizzpay:rizzpay-java
+                      </code>
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Documentation
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="testing">
+            <Card>
+              <CardHeader>
+                <CardTitle>API Testing</CardTitle>
+                <CardDescription>Test your integration with our sandbox environment</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-medium text-blue-800 mb-2">Test Mode</h4>
+                    <p className="text-sm text-blue-700">
+                      Use the sandbox environment for testing. No real money will be processed.
+                    </p>
+                    <div className="mt-2">
+                      <Badge variant="outline">Sandbox Base URL</Badge>
+                      <code className="ml-2 text-sm">https://sandbox-api.rizzpay.com</code>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Test API Call</Label>
+                    <div className="bg-gray-950 text-gray-100 p-4 rounded-lg text-sm font-mono">
+                      <div className="text-green-400"># Test payment creation</div>
+                      <div className="mt-2">
+                        curl -X POST https://sandbox-api.rizzpay.com/v1/payments \<br/>
+                        &nbsp;&nbsp;-H "Authorization: Bearer test_api_key" \<br/>
+                        &nbsp;&nbsp;-H "Content-Type: application/json" \<br/>
+                        &nbsp;&nbsp;-d '{`{`}<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;"amount": 100,<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;"currency": "INR",<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;"description": "Test payment"<br/>
+                        &nbsp;&nbsp;{`}`}'
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button className="bg-[#0052FF]">
+                    Run Test
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );
