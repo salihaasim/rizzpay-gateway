@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,13 +12,13 @@ const AdminTransactions: React.FC = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [filterStatus, setFilterStatus] = React.useState('all');
 
-  // Sample transaction data (in a real app, fetch from API)
+  // Sample transaction data with RP prefix
   const transactions = [
-    { id: 'TXN123456', date: '2023-09-15T10:34:23Z', amount: '₹1,200.00', merchant: 'Acme Inc', customer: 'John Doe', status: 'successful', paymentMethod: 'UPI', customerEmail: 'john@example.com', merchantId: 'MERCH001', processingFee: '₹24.00', netAmount: '₹1,176.00', utrNumber: 'UTR123456789' },
-    { id: 'TXN123455', date: '2023-09-14T14:12:45Z', amount: '₹450.50', merchant: 'XYZ Corp', customer: 'Jane Smith', status: 'successful', paymentMethod: 'Net Banking', customerEmail: 'jane@example.com', merchantId: 'MERCH002', processingFee: '₹9.01', netAmount: '₹441.49', utrNumber: 'UTR123456788' },
-    { id: 'TXN123454', date: '2023-09-13T08:23:11Z', amount: '₹5,000.00', merchant: 'ABC Ltd', customer: 'Mike Brown', status: 'failed', paymentMethod: 'Card', customerEmail: 'mike@example.com', merchantId: 'MERCH003', processingFee: '₹0.00', netAmount: '₹0.00', utrNumber: '' },
-    { id: 'TXN123453', date: '2023-09-12T19:45:32Z', amount: '₹750.25', merchant: 'Tech Solutions', customer: 'Sarah Lee', status: 'pending', paymentMethod: 'UPI', customerEmail: 'sarah@example.com', merchantId: 'MERCH004', processingFee: '₹15.01', netAmount: '₹735.24', utrNumber: '' },
-    { id: 'TXN123452', date: '2023-09-10T11:22:09Z', amount: '₹3,200.00', merchant: 'Acme Inc', customer: 'Robert White', status: 'successful', paymentMethod: 'UPI', customerEmail: 'robert@example.com', merchantId: 'MERCH001', processingFee: '₹64.00', netAmount: '₹3,136.00', utrNumber: 'UTR123456787' }
+    { id: 'RP123456', date: '2023-09-15T10:34:23Z', amount: '₹1,200.00', merchant: 'Acme Inc', customer: 'John Doe', status: 'successful', paymentMethod: 'UPI', customerEmail: 'john@example.com', merchantId: 'MERCH001', processingFee: '₹24.00', netAmount: '₹1,176.00', utrNumber: 'UTR123456789' },
+    { id: 'RP123455', date: '2023-09-14T14:12:45Z', amount: '₹450.50', merchant: 'XYZ Corp', customer: 'Jane Smith', status: 'successful', paymentMethod: 'Net Banking', customerEmail: 'jane@example.com', merchantId: 'MERCH002', processingFee: '₹9.01', netAmount: '₹441.49', utrNumber: 'UTR123456788' },
+    { id: 'RP123454', date: '2023-09-13T08:23:11Z', amount: '₹5,000.00', merchant: 'ABC Ltd', customer: 'Mike Brown', status: 'failed', paymentMethod: 'Card', customerEmail: 'mike@example.com', merchantId: 'MERCH003', processingFee: '₹0.00', netAmount: '₹0.00', utrNumber: '' },
+    { id: 'RP123453', date: '2023-09-12T19:45:32Z', amount: '₹750.25', merchant: 'Tech Solutions', customer: 'Sarah Lee', status: 'pending', paymentMethod: 'UPI', customerEmail: 'sarah@example.com', merchantId: 'MERCH004', processingFee: '₹15.01', netAmount: '₹735.24', utrNumber: '' },
+    { id: 'RP123452', date: '2023-09-10T11:22:09Z', amount: '₹3,200.00', merchant: 'Acme Inc', customer: 'Robert White', status: 'successful', paymentMethod: 'UPI', customerEmail: 'robert@example.com', merchantId: 'MERCH001', processingFee: '₹64.00', netAmount: '₹3,136.00', utrNumber: 'UTR123456787' }
   ];
 
   // Filter transactions based on search term and status
@@ -65,23 +64,10 @@ const AdminTransactions: React.FC = () => {
       
       // Set column widths for better readability
       const columnWidths = [
-        { wch: 15 }, // Transaction ID
-        { wch: 12 }, // Date
-        { wch: 10 }, // Time
-        { wch: 20 }, // Merchant Name
-        { wch: 15 }, // Merchant ID
-        { wch: 20 }, // Customer Name
-        { wch: 25 }, // Customer Email
-        { wch: 15 }, // Payment Method
-        { wch: 15 }, // Transaction Amount
-        { wch: 15 }, // Processing Fee
-        { wch: 15 }, // Net Amount
-        { wch: 12 }, // Status
-        { wch: 20 }, // UTR Number
-        { wch: 15 }, // Payment Gateway
-        { wch: 8 },  // Currency
-        { wch: 15 }, // Settlement Status
-        { wch: 20 }, // Created At
+        { wch: 15 }, { wch: 12 }, { wch: 10 }, { wch: 20 }, { wch: 15 },
+        { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
+        { wch: 15 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 8 },
+        { wch: 15 }, { wch: 20 }
       ];
       ws['!cols'] = columnWidths;
 

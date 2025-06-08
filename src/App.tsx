@@ -1,120 +1,56 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from '@/components/ui/sonner';
-import { ThemeProvider } from '@/context/ThemeContext';
-
-// Pages
-import Index from '@/pages/Index';
-import Auth from '@/pages/Auth';
+import { ThemeProvider } from './components/theme-provider';
+import AuthPage from '@/pages/AuthPage';
 import Dashboard from '@/pages/Dashboard';
-import Transactions from '@/pages/Transactions';
+import TransactionsPage from '@/pages/TransactionsPage';
 import WalletPage from '@/pages/WalletPage';
-import PayoutPage from '@/pages/PayoutPage';
-import EnhancedPayoutPage from '@/pages/EnhancedPayoutPage';
-import TransfersPage from '@/pages/TransfersPage';
-import BankingPage from '@/pages/BankingPage';
-import KycPage from '@/pages/KycPage';
-import UpiLinkPaymentPage from '@/pages/UpiLinkPaymentPage';
-import UpiPluginPage from '@/pages/UpiPluginPage';
-import DeveloperPage from '@/pages/DeveloperPage';
-import Settings from '@/pages/Settings';
-import MerchantWhitelist from '@/pages/MerchantWhitelist';
-import PaymentPage from '@/pages/PaymentPage';
-import TermsAndConditions from '@/pages/TermsAndConditions';
-import RefundPolicy from '@/pages/RefundPolicy';
-import ContactUs from '@/pages/ContactUs';
-
-// Merchant Pages
-import AdvancedPayoutPage from '@/rizzpay-stable-ui/merchant/pages/AdvancedPayoutPage';
-
-// Admin Pages
-import AdminDashboard from '@/pages/AdminDashboard';
-import AdminMonitoring from '@/pages/AdminMonitoring';
-import AdminApiManagement from '@/pages/AdminApiManagement';
-import AdminProductionApiManagement from '@/pages/AdminProductionApiManagement';
-import AdminEscrow from '@/pages/AdminEscrow';
+import SettingsPage from '@/pages/SettingsPage';
+import ActivityLogPage from '@/pages/ActivityLogPage';
+import SupportPage from '@/pages/SupportPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import AdminDashboard from '@/pages/admin/AdminDashboard';
+import AdminMerchants from '@/pages/admin/AdminMerchants';
 import AdminTransactions from '@/pages/admin/AdminTransactions';
 import AdminTransactionLog from '@/pages/AdminTransactionLog';
-import AdminActivityLog from '@/pages/AdminActivityLog';
-import AdminUpiManagement from '@/pages/AdminUpiManagement';
-import AdminMerchants from '@/pages/admin/AdminMerchants';
-import AdminKYC from '@/pages/admin/AdminKYC';
-import AdminWhitelist from '@/pages/AdminWhitelist';
-import AdminSettings from '@/pages/AdminSettings';
-import AdminSupport from '@/pages/admin/AdminSupport';
 import AdminPayoutManagement from '@/pages/admin/AdminPayoutManagement';
-
-// Other Pages
-import Profile from '@/pages/Profile';
-import UpiPaymentPage from '@/pages/UpiPaymentPage';
-import WebhookPayment from '@/pages/WebhookPayment';
-import NotFound from '@/pages/NotFound';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+import AdminKYC from '@/pages/admin/AdminKYC';
+import AdminWhitelist from '@/pages/admin/AdminWhitelist';
+import AdminSupport from '@/pages/admin/AdminSupport';
+import AdminPaymentRecon from '@/pages/admin/AdminPaymentRecon';
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+    <QueryClientProvider client={new QueryClient()}>
+      <ThemeProvider defaultTheme="system" storageKey="vite-react-theme">
         <Router>
-          <div className="min-h-screen bg-background">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/terms" element={<TermsAndConditions />} />
-              <Route path="/refund-policy" element={<RefundPolicy />} />
-              <Route path="/contact" element={<ContactUs />} />
-              <Route path="/pay" element={<PaymentPage />} />
-              <Route path="/pay/:paymentId" element={<PaymentPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/upi-payment/:transactionId" element={<UpiPaymentPage />} />
-              <Route path="/webhook-payment/:transactionId" element={<WebhookPayment />} />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="*" element={<NotFoundPage />} />
 
-              {/* Merchant Dashboard Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/wallet" element={<WalletPage />} />
-              <Route path="/payout" element={<PayoutPage />} />
-              <Route path="/merchant/advanced-payout" element={<AdvancedPayoutPage />} />
-              <Route path="/payout-enhanced" element={<EnhancedPayoutPage />} />
-              <Route path="/transfers" element={<TransfersPage />} />
-              <Route path="/banking" element={<BankingPage />} />
-              <Route path="/kyc" element={<KycPage />} />
-              <Route path="/link-payment" element={<UpiLinkPaymentPage />} />
-              <Route path="/plugin" element={<UpiPluginPage />} />
-              <Route path="/developer" element={<DeveloperPage />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/whitelist" element={<MerchantWhitelist />} />
-
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/monitoring" element={<AdminMonitoring />} />
-              <Route path="/admin/api-management" element={<AdminApiManagement />} />
-              <Route path="/admin/escrow" element={<AdminEscrow />} />
-              <Route path="/admin/transactions" element={<AdminTransactions />} />
-              <Route path="/admin/activity-log" element={<AdminActivityLog />} />
-              <Route path="/admin/upi-management" element={<AdminUpiManagement />} />
-              <Route path="/admin/merchants" element={<AdminMerchants />} />
-              <Route path="/admin/kyc" element={<AdminKYC />} />
-              <Route path="/admin/whitelist" element={<AdminWhitelist />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
-              <Route path="/admin/support" element={<AdminSupport />} />
-              <Route path="/admin/payout-management" element={<AdminPayoutManagement />} />
-
-              {/* 404 Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </div>
+            {/* Merchant Routes */}
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/activity-log" element={<ActivityLogPage />} />
+            <Route path="/support" element={<SupportPage />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/merchants" element={<AdminMerchants />} />
+            <Route path="/admin/transactions" element={<AdminTransactions />} />
+            <Route path="/admin/transaction-log" element={<AdminTransactionLog />} />
+            <Route path="/admin/payout-management" element={<AdminPayoutManagement />} />
+            <Route path="/admin/payment-recon" element={<AdminPaymentRecon />} />
+            <Route path="/admin/kyc" element={<AdminKYC />} />
+            <Route path="/admin/whitelist" element={<AdminWhitelist />} />
+            <Route path="/admin/support" element={<AdminSupport />} />
+          </Routes>
         </Router>
       </ThemeProvider>
     </QueryClientProvider>

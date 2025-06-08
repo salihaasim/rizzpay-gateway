@@ -16,7 +16,14 @@ import {
   Wallet,
   Globe,
   Headphones,
-  ArrowUpRight
+  ArrowUpRight,
+  Users,
+  FileText,
+  Send,
+  RefreshCw,
+  Shield,
+  List,
+  HelpCircle
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -50,76 +57,15 @@ export function AdminSidebar({
   const location = useLocation();
   
   const navigationItems = [
-    {
-      title: "Dashboard",
-      href: "/admin",
-      icon: <LayoutDashboard className="h-5 w-5" />
-    },
-    {
-      title: "Monitoring",
-      href: "/admin/monitoring",
-      icon: <Monitor className="h-5 w-5" />
-    },
-    {
-      title: "API Management",
-      href: "/admin/api-management",
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      title: "Production APIs",
-      href: "/admin/production-api",
-      icon: <CreditCard className="h-5 w-5" />
-    },
-    {
-      title: "Escrow Management",
-      href: "/admin/escrow",
-      icon: <Wallet className="h-5 w-5" />
-    },
-    {
-      title: "Payout Management",
-      href: "/admin/payout-management",
-      icon: <ArrowUpRight className="h-5 w-5" />
-    },
-    {
-      title: "Transactions",
-      href: "/admin/transactions",
-      icon: <ShoppingCart className="h-5 w-5" />
-    },
-    {
-      title: "Activity Log",
-      href: "/admin/activity-log",
-      icon: <Activity className="h-5 w-5" />
-    },
-    {
-      title: "UPI Management",
-      href: "/admin/upi-management",
-      icon: <Smartphone className="h-5 w-5" />
-    },
-    {
-      title: "Merchants",
-      href: "/admin/merchants",
-      icon: <UserPlus className="h-5 w-5" />
-    },
-    {
-      title: "KYC",
-      href: "/admin/kyc",
-      icon: <User className="h-5 w-5" />
-    },
-    {
-      title: "Support",
-      href: "/admin/support",
-      icon: <Headphones className="h-5 w-5" />
-    },
-    {
-      title: "Whitelist",
-      href: "/admin/whitelist",
-      icon: <Shield className="h-5 w-5" />
-    },
-    {
-      title: "Settings",
-      href: "/admin/settings",
-      icon: <Settings className="h-5 w-5" />
-    }
+    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Merchants', href: '/admin/merchants', icon: Users },
+    { name: 'Transactions', href: '/admin/transactions', icon: CreditCard },
+    { name: 'Transaction Log', href: '/admin/transaction-log', icon: FileText },
+    { name: 'Payout Management', href: '/admin/payout-management', icon: Send },
+    { name: 'Payment Recon', href: '/admin/payment-recon', icon: RefreshCw },
+    { name: 'KYC Management', href: '/admin/kyc', icon: Shield },
+    { name: 'Whitelist', href: '/admin/whitelist', icon: List },
+    { name: 'Support', href: '/admin/support', icon: HelpCircle },
   ];
   
   const isActiveRoute = (href: string) => {
