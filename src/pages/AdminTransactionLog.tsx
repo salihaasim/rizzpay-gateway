@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -57,11 +58,11 @@ const AdminTransactionLog = () => {
         'Processing State': transaction.processingState || 'N/A',
         'Description': transaction.description || 'N/A',
         'Merchant ID': transaction.createdBy || 'N/A',
-        'UTR Number': transaction.paymentDetails?.utr_number || 'N/A',
-        'Bank Reference': transaction.paymentDetails?.bankReference || 'N/A',
-        'Payment Gateway': transaction.paymentDetails?.gateway || 'RizzPay',
-        'Transaction Type': transaction.paymentDetails?.transactionType || 'Payment',
-        'Processing Fee': transaction.paymentDetails?.processingFee || 'N/A',
+        'UTR Number': transaction.paymentDetails?.upiTransactionId || transaction.paymentDetails?.razorpay_payment_id || 'N/A',
+        'Bank Reference': transaction.paymentDetails?.bankReferenceId || 'N/A',
+        'Payment Gateway': transaction.paymentDetails?.paymentGateway || 'RizzPay',
+        'Transaction Type': transaction.paymentDetails?.paymentMethod || 'Payment',
+        'Processing Fee': 'N/A',
         'Settlement Status': transaction.status === 'successful' ? 'SETTLED' : 'PENDING',
         'Created At': new Date(transaction.date).toISOString(),
         'Timeline Count': Array.isArray(transaction.processingTimeline) ? transaction.processingTimeline.length : 0,
