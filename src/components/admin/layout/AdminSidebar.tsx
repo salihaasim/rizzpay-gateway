@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -21,7 +22,6 @@ import {
   FileText,
   Send,
   RefreshCw,
-  Shield,
   List,
   HelpCircle
 } from "lucide-react";
@@ -151,10 +151,10 @@ export function AdminSidebar({
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                   collapsed && "justify-center px-2"
                 )}
-                title={collapsed ? item.title : undefined}
+                title={collapsed ? item.name : undefined}
               >
-                {item.icon}
-                {!collapsed && <span className="truncate">{item.title}</span>}
+                <item.icon className="h-4 w-4" />
+                {!collapsed && <span className="truncate">{item.name}</span>}
               </Link>
             ))}
           </nav>
