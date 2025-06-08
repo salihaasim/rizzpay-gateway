@@ -8,7 +8,6 @@ import {
   ShoppingCart,
   CreditCard,
   Smartphone,
-  FileText,
   Activity,
   LogOut,
   Shield,
@@ -85,11 +84,6 @@ export function AdminSidebar({
       title: "Transactions",
       href: "/admin/transactions",
       icon: <ShoppingCart className="h-5 w-5" />
-    },
-    {
-      title: "Transaction Log",
-      href: "/admin/transactions-log",
-      icon: <FileText className="h-5 w-5" />
     },
     {
       title: "Activity Log",

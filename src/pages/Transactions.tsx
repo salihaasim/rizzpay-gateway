@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import { Search, FileText, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 
 const TransactionItem = ({ transaction }: { transaction: any }) => {
   return (
@@ -77,6 +79,34 @@ const Transactions = () => {
     // Sort by date (newest first)
     return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [transactions, activeTab, searchTerm]);
+
+  const exportToExcel = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error('No transactions to export');
+      return;
+    }
+
+    const data = filteredTransactions.map(t => ({
+      'Transaction ID': t.id,
+      'Date': new Date(t.date).toLocaleDateString(),
+      'Time': new Date(t.date).toLocaleTimeString(),
+      'Amount': t.amount,
+      'Status': t.status,
+      'Payment Method': t.paymentMethod,
+      'Customer': t.customer || 'N/A',
+      'Description': t.description || 'N/A',
+      'Created By': t.createdBy || 'N/A'
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+    
+    const fileName = `RizzPay_Transactions_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    toast.success(`${filteredTransactions.length} transactions exported successfully!`);
+  };
   
   return (
     <Layout>
@@ -91,8 +121,8 @@ const Transactions = () => {
             <p className="text-sm text-muted-foreground">View and manage your transaction history</p>
           </div>
           
-          <div className="flex items-center mt-4 sm:mt-0 w-full sm:w-auto">
-            <div className="relative w-full sm:w-64 mr-2">
+          <div className="flex items-center mt-4 sm:mt-0 w-full sm:w-auto gap-2">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
@@ -102,9 +132,14 @@ const Transactions = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline" size="icon">
+            <Button 
+              variant="outline" 
+              onClick={exportToExcel}
+              disabled={filteredTransactions.length === 0}
+              className="gap-2"
+            >
               <Download className="h-4 w-4" />
-              <span className="sr-only">Download</span>
+              Export
             </Button>
           </div>
         </div>
