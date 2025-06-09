@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -23,7 +22,8 @@ import {
   IndianRupee,
   LogOut,
   IdCard,
-  ArrowUpRight
+  ArrowUpRight,
+  Code
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';

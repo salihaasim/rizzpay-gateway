@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Eye, EyeOff, RefreshCw, Key, Code, Book, ExternalLink } from 'lucide-react';
+import { Copy, Eye, EyeOff, RefreshCw, Key, Code, Book, ExternalLink, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
+import MerchantUrlBank from '@/components/developer/MerchantUrlBank';
 
 const DeveloperPage = () => {
   const { currentMerchant } = useMerchantAuth();
@@ -101,6 +101,10 @@ const DeveloperPage = () => {
             <TabsTrigger value="webhooks" className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4" />
               Webhooks
+            </TabsTrigger>
+            <TabsTrigger value="url-callback" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              URL Callback
             </TabsTrigger>
             <TabsTrigger value="documentation" className="flex items-center gap-2">
               <Book className="h-4 w-4" />
@@ -259,6 +263,10 @@ const DeveloperPage = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="url-callback">
+            <MerchantUrlBank />
           </TabsContent>
 
           <TabsContent value="documentation">

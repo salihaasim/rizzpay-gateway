@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -38,6 +37,7 @@ import TermsAndConditions from '@/pages/TermsAndConditions';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import RefundPolicy from '@/pages/RefundPolicy';
 import ContactUs from '@/pages/ContactUs';
+import PayoutApiPage from '@/pages/PayoutApiPage';
 
 function App() {
   return (
@@ -67,7 +67,8 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/activity-log" element={<ActivityLogPage />} />
             <Route path="/support" element={<SupportPage />} />
-            
+            <Route path="/payout-api" element={<PayoutApiPage />} />
+
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
