@@ -9,7 +9,6 @@ export * from './commonUtils';
 export * from './paymentProcessingUtils';
 export * from './webhookUtils';
 export * from './transactionCreateUtils';
-export * from './supabaseClient';
 export * from './upiQrUtils';
 export * from './analyticsUtils';
 export * from './notificationUtils';
@@ -23,3 +22,6 @@ export * from './hdfcBankApi';
 
 // Re-export from razorpay utilities
 export * from './razorpay';
+
+// Export supabaseClient separately to avoid conflicts
+export { supabase } from './supabaseClient';

@@ -1,3 +1,4 @@
+
 /**
  * System monitoring and crash prevention utilities
  */
@@ -12,7 +13,7 @@ interface CrashReport {
   context?: Record<string, any>;
 }
 
-interface SystemHealth {
+export interface SystemHealth {
   status: 'healthy' | 'warning' | 'critical';
   checks: {
     api: boolean;
@@ -99,7 +100,7 @@ export const clearCrashReports = () => {
   localStorage.removeItem('rizzpay_crashes');
 };
 
-// System health check
+// System health check with AbortController for timeout
 export const performHealthCheck = async (): Promise<SystemHealth> => {
   const health: SystemHealth = {
     status: 'healthy',
@@ -113,42 +114,63 @@ export const performHealthCheck = async (): Promise<SystemHealth> => {
   };
 
   try {
-    // Check API connectivity
-    const apiResponse = await fetch('/api/health', { 
-      method: 'GET',
-      timeout: 5000 
-    });
-    health.checks.api = apiResponse.ok;
-
-    // Check database connectivity (if available)
+    // Check API connectivity with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
     try {
+      const apiResponse = await fetch('/api/health', { 
+        method: 'GET',
+        signal: controller.signal
+      });
+      health.checks.api = apiResponse.ok;
+    } catch {
+      health.checks.api = false;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    // Check database connectivity
+    try {
+      const controller2 = new AbortController();
+      const timeoutId2 = setTimeout(() => controller2.abort(), 5000);
+      
       const dbResponse = await fetch('/api/db-health', { 
         method: 'GET',
-        timeout: 5000 
+        signal: controller2.signal
       });
       health.checks.database = dbResponse.ok;
+      clearTimeout(timeoutId2);
     } catch {
       health.checks.database = false;
     }
 
     // Check authentication service
     try {
+      const controller3 = new AbortController();
+      const timeoutId3 = setTimeout(() => controller3.abort(), 5000);
+      
       const authResponse = await fetch('/api/auth/health', { 
         method: 'GET',
-        timeout: 5000 
+        signal: controller3.signal
       });
       health.checks.authentication = authResponse.ok;
+      clearTimeout(timeoutId3);
     } catch {
       health.checks.authentication = false;
     }
 
     // Check payment service
     try {
+      const controller4 = new AbortController();
+      const timeoutId4 = setTimeout(() => controller4.abort(), 5000);
+      
       const paymentResponse = await fetch('/api/payments/health', { 
         method: 'GET',
-        timeout: 5000 
+        signal: controller4.signal
       });
       health.checks.payments = paymentResponse.ok;
+      clearTimeout(timeoutId4);
     } catch {
       health.checks.payments = false;
     }
