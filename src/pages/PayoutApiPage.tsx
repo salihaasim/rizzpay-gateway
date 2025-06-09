@@ -273,7 +273,8 @@ const PayoutApiPage = () => {
                       variant="ghost"
                       size="sm"
                       className="absolute top-2 right-2 text-gray-400 hover:text-white"
-                      onClick={() => copyToClipboard(`curl -X POST https://api.rizzpay.com/v1/payouts \\
+                      onClick={() => {
+                        const curlCommand = `curl -X POST https://api.rizzpay.com/v1/payouts \\
   -H "Authorization: Bearer ${currentMerchant?.apiKey || 'your-api-key'}" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -281,37 +282,39 @@ const PayoutApiPage = () => {
     "amount": ${payoutData.amount || 1000},
     "currency": "INR",
     "payout_method": "${payoutData.payoutMethod}",
-    ${payoutData.payoutMethod === 'bank_transfer' ? 
-      `"beneficiary_name": "${payoutData.beneficiaryName || 'John Doe'}",
+    ${payoutData.payoutMethod === 'bank_transfer' 
+      ? `"beneficiary_name": "${payoutData.beneficiaryName || 'John Doe'}",
     "account_number": "${payoutData.accountNumber || '1234567890'}",
-    "ifsc_code": "${payoutData.ifscCode || 'HDFC0001234'}"` :
-      `"upi_id": "${payoutData.upiId || 'user@paytm'}"`
+    "ifsc_code": "${payoutData.ifscCode || 'HDFC0001234'}"` 
+      : `"upi_id": "${payoutData.upiId || 'user@paytm'}"`
     }
-  }'`)}
+  }'`;
+                        copyToClipboard(curlCommand);
+                      }}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
                     <div>
                       <div className="text-green-400"># cURL Example</div>
                       <div className="mt-2">
-                        curl -X POST https://api.rizzpay.com/v1/payouts \<br/>
-                        &nbsp;&nbsp;-H "Authorization: Bearer {currentMerchant?.apiKey || 'your-api-key'}" \<br/>
-                        &nbsp;&nbsp;-H "Content-Type: application/json" \<br/>
-                        &nbsp;&nbsp;-d '{`{`}<br/>
-                        &nbsp;&nbsp;&nbsp;&nbsp;"merchant_id": "{currentMerchant?.id || 'merchant_123'}",<br/>
-                        &nbsp;&nbsp;&nbsp;&nbsp;"amount": {payoutData.amount || 1000},<br/>
-                        &nbsp;&nbsp;&nbsp;&nbsp;"currency": "INR",<br/>
-                        &nbsp;&nbsp;&nbsp;&nbsp;"payout_method": "{payoutData.payoutMethod}",<br/>
+                        <div>curl -X POST https://api.rizzpay.com/v1/payouts \</div>
+                        <div>&nbsp;&nbsp;-H "Authorization: Bearer {currentMerchant?.apiKey || 'your-api-key'}" \</div>
+                        <div>&nbsp;&nbsp;-H "Content-Type: application/json" \</div>
+                        <div>&nbsp;&nbsp;-d '{'{'}</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;"merchant_id": "{currentMerchant?.id || 'merchant_123'}",</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;"amount": {payoutData.amount || 1000},</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;"currency": "INR",</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;"payout_method": "{payoutData.payoutMethod}",</div>
                         {payoutData.payoutMethod === 'bank_transfer' ? (
                           <>
-                            &nbsp;&nbsp;&nbsp;&nbsp;"beneficiary_name": "{payoutData.beneficiaryName || 'John Doe'}",<br/>
-                            &nbsp;&nbsp;&nbsp;&nbsp;"account_number": "{payoutData.accountNumber || '1234567890'}",<br/>
-                            &nbsp;&nbsp;&nbsp;&nbsp;"ifsc_code": "{payoutData.ifscCode || 'HDFC0001234'}"<br/>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;"beneficiary_name": "{payoutData.beneficiaryName || 'John Doe'}",</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;"account_number": "{payoutData.accountNumber || '1234567890'}",</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;"ifsc_code": "{payoutData.ifscCode || 'HDFC0001234'}"</div>
                           </>
                         ) : (
-                          &nbsp;&nbsp;&nbsp;&nbsp;"upi_id": "{payoutData.upiId || 'user@paytm'}"<br/>
+                          <div>&nbsp;&nbsp;&nbsp;&nbsp;"upi_id": "{payoutData.upiId || 'user@paytm'}"</div>
                         )}
-                        &nbsp;&nbsp;{`}`}'
+                        <div>&nbsp;&nbsp;{'}'}'</div>
                       </div>
                     </div>
                   </div>
@@ -503,21 +506,21 @@ const PayoutApiPage = () => {
                       </Button>
                     </div>
                     <div className="space-y-2">
-                      <div>app.post('/callback/payout', (req, res) =&gt; {`{`}</div>
-                      <div>&nbsp;&nbsp;const {`{`} status, payout_id, utr, reason {`}`} = req.query;</div>
+                      <div>app.post('/callback/payout', (req, res) =&gt; {'{'}</div>
+                      <div>&nbsp;&nbsp;const {'{'} status, payout_id, utr, reason {'}'} = req.query;</div>
                       <div className="mt-2"></div>
-                      <div>&nbsp;&nbsp;if (status === 'success') {`{`}</div>
+                      <div>&nbsp;&nbsp;if (status === 'success') {'{'}</div>
                       <div>&nbsp;&nbsp;&nbsp;&nbsp;// Handle successful payout</div>
-                      <div>&nbsp;&nbsp;&nbsp;&nbsp;console.log(`Payout ${{`{`}}payout_id{`}`}} completed with UTR: ${{`{`}}utr{`}`}}`);</div>
+                      <div>&nbsp;&nbsp;&nbsp;&nbsp;console.log(`Payout ${'${payout_id}'} completed with UTR: ${'${utr}'}`);</div>
                       <div>&nbsp;&nbsp;&nbsp;&nbsp;updatePayoutStatus(payout_id, 'completed', utr);</div>
-                      <div>&nbsp;&nbsp;{`}`} else if (status === 'failed') {`{`}</div>
+                      <div>&nbsp;&nbsp;{'}'} else if (status === 'failed') {'{'}</div>
                       <div>&nbsp;&nbsp;&nbsp;&nbsp;// Handle failed payout</div>
-                      <div>&nbsp;&nbsp;&nbsp;&nbsp;console.log(`Payout ${{`{`}}payout_id{`}`}} failed: ${{`{`}}reason{`}`}}`);</div>
+                      <div>&nbsp;&nbsp;&nbsp;&nbsp;console.log(`Payout ${'${payout_id}'} failed: ${'${reason}'}`);</div>
                       <div>&nbsp;&nbsp;&nbsp;&nbsp;updatePayoutStatus(payout_id, 'failed', null, reason);</div>
-                      <div>&nbsp;&nbsp;{`}`}</div>
+                      <div>&nbsp;&nbsp;{'}'}</div>
                       <div className="mt-2"></div>
                       <div>&nbsp;&nbsp;res.status(200).send('Callback received');</div>
-                      <div>{`}`});</div>
+                      <div>{'}'});</div>
                     </div>
                   </div>
                 </CardContent>
