@@ -6,6 +6,8 @@ import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -17,13 +19,19 @@ import {
   ArrowDownRight,
   IndianRupee,
   Eye,
-  Plus
+  Plus,
+  QrCode,
+  Copy
 } from 'lucide-react';
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Bar, BarChart } from 'recharts';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const { transactions } = useTransactionStore();
   const { currentMerchant } = useMerchantAuth();
+  const [quickPayAmount, setQuickPayAmount] = useState('');
+  const [quickPayDescription, setQuickPayDescription] = useState('');
+  const [generatedQR, setGeneratedQR] = useState<string | null>(null);
   
   // Sample chart data
   const chartData = [
@@ -65,6 +73,36 @@ const Dashboard = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const generateQuickPayQR = () => {
+    if (!quickPayAmount || parseFloat(quickPayAmount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    // Generate UPI payment URL
+    const merchantName = currentMerchant?.fullName || 'RizzPay Merchant';
+    const description = quickPayDescription || 'Quick Payment';
+    const amount = parseFloat(quickPayAmount);
+    
+    const upiUrl = `upi://pay?pa=rizzpay@ybl&pn=${encodeURIComponent(merchantName)}&am=${amount}&tn=${encodeURIComponent(description)}&cu=INR`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+    
+    setGeneratedQR(qrCodeUrl);
+    toast.success('QR Code generated successfully');
+  };
+
+  const copyUpiLink = () => {
+    if (!quickPayAmount) return;
+    
+    const merchantName = currentMerchant?.fullName || 'RizzPay Merchant';
+    const description = quickPayDescription || 'Quick Payment';
+    const amount = parseFloat(quickPayAmount);
+    
+    const upiUrl = `upi://pay?pa=rizzpay@ybl&pn=${encodeURIComponent(merchantName)}&am=${amount}&tn=${encodeURIComponent(description)}&cu=INR`;
+    navigator.clipboard.writeText(upiUrl);
+    toast.success('UPI link copied to clipboard');
   };
 
   return (
@@ -141,6 +179,79 @@ const Dashboard = () => {
               <p className="text-xs text-muted-foreground">
                 Ready for withdrawal
               </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Payment Section */}
+        <div className="grid gap-6 lg:grid-cols-2 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <QrCode className="h-5 w-5 text-[#0052FF]" />
+                Quick Payment QR Generator
+              </CardTitle>
+              <CardDescription>Generate UPI QR code for instant payments</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  placeholder="Enter amount"
+                  value={quickPayAmount}
+                  onChange={(e) => setQuickPayAmount(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">Description (Optional)</Label>
+                <Input
+                  id="description"
+                  placeholder="Payment description"
+                  value={quickPayDescription}
+                  onChange={(e) => setQuickPayDescription(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Button onClick={generateQuickPayQR} className="flex-1 bg-[#0052FF]">
+                  <QrCode className="h-4 w-4 mr-2" />
+                  Generate QR
+                </Button>
+                <Button variant="outline" onClick={copyUpiLink} disabled={!quickPayAmount}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* QR Code Display */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Generated QR Code</CardTitle>
+              <CardDescription>Show this QR code to customers for payment</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              {generatedQR ? (
+                <div className="text-center">
+                  <img src={generatedQR} alt="UPI QR Code" className="mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Amount: ₹{quickPayAmount}
+                  </p>
+                  {quickPayDescription && (
+                    <p className="text-sm text-muted-foreground">
+                      {quickPayDescription}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  <QrCode className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p>Enter amount and generate QR code</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

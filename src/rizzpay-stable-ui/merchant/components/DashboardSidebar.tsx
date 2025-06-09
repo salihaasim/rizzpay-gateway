@@ -23,7 +23,9 @@ import {
   IndianRupee,
   LogOut,
   IdCard,
-  ArrowUpRight
+  ArrowUpRight,
+  Code,
+  Send
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
@@ -69,13 +71,13 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
           title: "Wallet Overview",
           href: "/wallet",
           icon: <Wallet className="h-4 w-4" />
+        },
+        {
+          title: "Advanced Payout",
+          href: "/advanced-payout",
+          icon: <ArrowUpRight className="h-4 w-4" />
         }
       ]
-    },
-    {
-      title: "Advanced Payout",
-      href: "/merchant/advanced-payout",
-      icon: <ArrowUpRight className="h-5 w-5" />
     },
     {
       title: "Transfers",
@@ -105,7 +107,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     {
       title: "Developer",
       href: "/developer",
-      icon: <Globe className="h-5 w-5" />
+      icon: <Code className="h-5 w-5" />
     },
     // Only show Whitelist for admin users
     ...(isAdmin ? [{
@@ -132,7 +134,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     }
   };
 
-  const isWalletActive = pathname === '/wallet';
+  const isWalletActive = pathname === '/wallet' || pathname === '/advanced-payout';
 
   return (
     <div
