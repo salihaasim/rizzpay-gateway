@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Eye, EyeOff, RefreshCw, Key, Code, Book, ExternalLink, Globe } from 'lucide-react';
+import { Copy, Eye, EyeOff, RefreshCw, Key, Code, Book, ExternalLink, Globe, Download, FileText, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import MerchantUrlBank from '@/components/developer/MerchantUrlBank';
@@ -89,11 +89,17 @@ const DeveloperPage = () => {
       <div className="container max-w-screen-xl mx-auto p-4 lg:p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">Developer Center</h1>
-          <p className="text-sm text-muted-foreground">API keys, documentation, and integration tools</p>
+          <p className="text-sm text-muted-foreground">
+            Integrate RizzPay's payment solutions into your applications.
+          </p>
         </div>
 
-        <Tabs defaultValue="api-keys" className="space-y-6">
+        <Tabs defaultValue="documentation" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="documentation" className="flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              Documentation
+            </TabsTrigger>
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="h-4 w-4" />
               API Keys
@@ -106,15 +112,97 @@ const DeveloperPage = () => {
               <Globe className="h-4 w-4" />
               URL Callback
             </TabsTrigger>
-            <TabsTrigger value="documentation" className="flex items-center gap-2">
-              <Book className="h-4 w-4" />
-              API Documentation
-            </TabsTrigger>
             <TabsTrigger value="testing" className="flex items-center gap-2">
               <Code className="h-4 w-4" />
               Testing
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="documentation">
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <h2 className="text-lg font-semibold mb-2">Documentation</h2>
+                <p className="text-muted-foreground">
+                  Comprehensive guides to help you integrate our payment solutions
+                </p>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <FileText className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-2">Getting Started Guide</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Step-by-step guide to integrate RizzPay into your application
+                        </p>
+                        <Button variant="outline" className="w-full">
+                          View Guide
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <Code className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-2">Code Samples</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Example code in various languages for integrating RizzPay
+                        </p>
+                        <Button variant="outline" className="w-full">
+                          View Samples
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Download className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-2">Full Documentation</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Download our comprehensive API documentation for offline reference
+                      </p>
+                      <Button className="bg-[#0052FF] hover:bg-[#0041CC]">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download Documentation
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <h3 className="font-semibold mb-2">Need Help?</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Our support team is available to help you with integration questions
+                    </p>
+                    <Button variant="outline">
+                      <HelpCircle className="h-4 w-4 mr-2" />
+                      Contact Support
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           <TabsContent value="api-keys">
             <div className="grid gap-6">
@@ -267,86 +355,6 @@ const DeveloperPage = () => {
 
           <TabsContent value="url-callback">
             <MerchantUrlBank />
-          </TabsContent>
-
-          <TabsContent value="documentation">
-            <div className="grid gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>API Endpoints</CardTitle>
-                  <CardDescription>Available API endpoints and their usage</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {apiEndpoints.map((endpoint, index) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={endpoint.method === 'POST' ? 'default' : 'secondary'}>
-                            {endpoint.method}
-                          </Badge>
-                          <code className="text-sm bg-muted px-2 py-1 rounded">{endpoint.endpoint}</code>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">{endpoint.description}</p>
-                        <div className="bg-gray-950 text-gray-100 p-3 rounded text-xs font-mono">
-                          <pre>{endpoint.example}</pre>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>SDKs & Libraries</CardTitle>
-                  <CardDescription>Official SDKs for popular programming languages</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Node.js</h4>
-                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
-                        npm install rizzpay-node
-                      </code>
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Documentation
-                      </Button>
-                    </div>
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Python</h4>
-                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
-                        pip install rizzpay-python
-                      </code>
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Documentation
-                      </Button>
-                    </div>
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">PHP</h4>
-                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
-                        composer require rizzpay/rizzpay-php
-                      </code>
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Documentation
-                      </Button>
-                    </div>
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Java</h4>
-                      <code className="text-sm bg-muted px-2 py-1 rounded block mb-2">
-                        com.rizzpay:rizzpay-java
-                      </code>
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Documentation
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
 
           <TabsContent value="testing">

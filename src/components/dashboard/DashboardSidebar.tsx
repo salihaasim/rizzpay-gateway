@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -23,7 +24,8 @@ import {
   LogOut,
   IdCard,
   ArrowUpRight,
-  Code
+  Code,
+  Send
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
@@ -40,6 +42,7 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
   const isMobile = useMediaQuery("(max-width: 768px)");
   const navigate = useNavigate();
   const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
+  const [developerDropdownOpen, setDeveloperDropdownOpen] = useState(false);
   
   // Only show sidebar toggle on desktop
   const showToggle = !isMobile;
@@ -105,7 +108,20 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     {
       title: "Developer",
       href: "/developer",
-      icon: <Globe className="h-5 w-5" />
+      icon: <Code className="h-5 w-5" />,
+      hasDropdown: true,
+      dropdownItems: [
+        {
+          title: "API Documentation",
+          href: "/developer",
+          icon: <Code className="h-4 w-4" />
+        },
+        {
+          title: "Payout API",
+          href: "/payout-api",
+          icon: <Send className="h-4 w-4" />
+        }
+      ]
     },
     // Only show Whitelist for admin users
     ...(isAdmin ? [{
@@ -132,7 +148,14 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
     }
   };
 
+  const handleDeveloperDropdownToggle = () => {
+    if (!collapsed) {
+      setDeveloperDropdownOpen(!developerDropdownOpen);
+    }
+  };
+
   const isWalletActive = pathname === '/wallet' || pathname === '/payout';
+  const isDeveloperActive = pathname === '/developer' || pathname === '/payout-api';
 
   return (
     <div
@@ -174,17 +197,17 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
               {item.hasDropdown ? (
                 <div>
                   <div
-                    onClick={handleWalletDropdownToggle}
+                    onClick={item.title === 'Wallet' ? handleWalletDropdownToggle : handleDeveloperDropdownToggle}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer",
-                      isWalletActive && "bg-gray-800 dark:bg-gray-700 text-white"
+                      (item.title === 'Wallet' ? isWalletActive : isDeveloperActive) && "bg-gray-800 dark:bg-gray-700 text-white"
                     )}
                   >
                     {item.icon}
                     {(!collapsed || isMobile) && (
                       <>
                         <span className="flex-1">{item.title}</span>
-                        {walletDropdownOpen ? (
+                        {(item.title === 'Wallet' ? walletDropdownOpen : developerDropdownOpen) ? (
                           <ChevronUp className="h-4 w-4" />
                         ) : (
                           <ChevronDown className="h-4 w-4" />
@@ -193,7 +216,9 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                     )}
                   </div>
                   
-                  {(!collapsed || isMobile) && walletDropdownOpen && item.dropdownItems && (
+                  {(!collapsed || isMobile) && 
+                   ((item.title === 'Wallet' && walletDropdownOpen) || (item.title === 'Developer' && developerDropdownOpen)) && 
+                   item.dropdownItems && (
                     <div className="ml-6 mt-1 space-y-1">
                       {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
                         <Link
