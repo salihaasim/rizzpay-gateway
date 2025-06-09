@@ -5,7 +5,7 @@ import UpiPluginSettings from './UpiPluginSettings';
 
 const PluginPage = () => {
   return (
-    <Layout hideNavigation={true}>
+    <Layout>
       <UpiPluginSettings />
     </Layout>
   );
