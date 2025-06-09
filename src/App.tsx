@@ -1,95 +1,108 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from './components/theme-provider';
-import Index from '@/pages/Index';
-import AuthPage from '@/pages/AuthPage';
-import Dashboard from '@/pages/Dashboard';
+import { Toaster } from 'sonner';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+
+import Layout from '@/components/Layout';
+import DashboardPage from '@/pages/DashboardPage';
 import TransactionsPage from '@/pages/TransactionsPage';
 import WalletPage from '@/pages/WalletPage';
-import SettingsPage from '@/pages/SettingsPage';
-import ActivityLogPage from '@/pages/ActivityLogPage';
-import SupportPage from '@/pages/SupportPage';
-import BankingPage from '@/pages/BankingPage';
-import KycPage from '@/pages/KycPage';
-import DeveloperPage from '@/pages/DeveloperPage';
-import LinkPaymentPage from '@/pages/LinkPaymentPage';
-import PluginPage from '@/pages/PluginPage';
 import TransfersPage from '@/pages/TransfersPage';
-import AdvancedPayoutPage from '@/pages/AdvancedPayoutPage';
-import NotFoundPage from '@/pages/NotFoundPage';
+import BankingPage from '@/pages/BankingPage';
+import KycVerificationPage from '@/pages/KycVerificationPage';
+import UpiPaymentLinkGenerator from '@/components/upi/UpiPaymentLinkGenerator';
+import UpiPluginPage from '@/pages/UpiPluginPage';
+import DeveloperPage from '@/pages/DeveloperPage';
+import SettingsPage from '@/pages/SettingsPage';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/ResetPasswordPage';
+import WhitelistPage from '@/pages/WhitelistPage';
+import PayoutPage from '@/pages/PayoutPage';
 import AdminDashboard from '@/pages/AdminDashboard';
-import AdminMerchants from '@/pages/admin/AdminMerchants';
-import AdminTransactions from '@/pages/admin/AdminTransactions';
-import AdminTransactionLog from '@/pages/AdminTransactionLog';
-import AdminPayoutManagement from '@/pages/admin/AdminPayoutManagement';
-import AdminKYC from '@/pages/admin/AdminKYC';
-import AdminWhitelist from '@/pages/AdminWhitelist';
-import AdminSupport from '@/pages/admin/AdminSupport';
-import AdminPaymentRecon from '@/pages/admin/AdminPaymentRecon';
-import AdminSettings from '@/pages/AdminSettings';
-import AdminActivityLog from '@/pages/AdminActivityLog';
-import AdminMonitoring from '@/pages/AdminMonitoring';
-import AdminApiManagement from '@/pages/AdminApiManagement';
+import AdminTransactions from '@/pages/AdminTransactions';
+import AdminMerchants from '@/pages/AdminMerchants';
+import AdminSettlements from '@/pages/AdminSettlements';
 import AdminEscrow from '@/pages/AdminEscrow';
-import AdminUpiManagement from '@/pages/AdminUpiManagement';
-import TermsAndConditions from '@/pages/TermsAndConditions';
-import PrivacyPolicy from '@/pages/PrivacyPolicy';
-import RefundPolicy from '@/pages/RefundPolicy';
-import ContactUs from '@/pages/ContactUs';
-import PayoutApiPage from '@/pages/PayoutApiPage';
+import AdminWhitelist from '@/pages/AdminWhitelist';
+import AdminMonitoring from '@/pages/AdminMonitoring';
+import AdminMonitoringDetail from '@/pages/AdminMonitoringDetail';
+import AdminUsers from '@/pages/AdminUsers';
+import AdminRoles from '@/pages/AdminRoles';
+import AdminLogs from '@/pages/AdminLogs';
+import AdminSettings from '@/pages/AdminSettings';
+import { ThemeProvider } from './components/theme-provider';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminProtectedRoute } from './components/AdminProtectedRoute';
+import UpiLinkPaymentPage from './pages/UpiLinkPaymentPage';
+import ErrorPage from './pages/ErrorPage';
+import { useMerchantAuth } from './stores/merchantAuthStore';
+import { useEffect } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { initializeErrorMonitoring } from '@/utils/monitoringUtils';
+
+const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    // Initialize error monitoring when app starts
+    initializeErrorMonitoring();
+    console.log('RizzPay Error Monitoring Initialized');
+  }, []);
+
+  const { currentMerchant } = useMerchantAuth();
+  const isAdmin = currentMerchant?.role === 'admin';
+
   return (
-    <QueryClientProvider client={new QueryClient()}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-react-theme">
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
         <Router>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/terms" element={<TermsAndConditions />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/refund-policy" element={<RefundPolicy />} />
-            <Route path="/contact" element={<ContactUs />} />
-            <Route path="*" element={<NotFoundPage />} />
+          <ThemeProvider>
+            <Toaster />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+              <Route path="/upi-link-payment" element={<UpiLinkPaymentPage />} />
+              <Route path="*" element={<ErrorPage />} />
 
-            {/* Merchant Routes */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<TransactionsPage />} />
-            <Route path="/wallet" element={<WalletPage />} />
-            <Route path="/banking" element={<BankingPage />} />
-            <Route path="/transfers" element={<TransfersPage />} />
-            <Route path="/advanced-payout" element={<AdvancedPayoutPage />} />
-            <Route path="/kyc" element={<KycPage />} />
-            <Route path="/link-payment" element={<LinkPaymentPage />} />
-            <Route path="/plugin" element={<PluginPage />} />
-            <Route path="/developer" element={<DeveloperPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/activity-log" element={<ActivityLogPage />} />
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/payout-api" element={<PayoutApiPage />} />
+              {/* Protected Merchant Routes */}
+              <Route path="/" element={<ProtectedRoute><Layout><DashboardPage /></Layout></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Layout><DashboardPage /></Layout></ProtectedRoute>} />
+              <Route path="/transactions" element={<ProtectedRoute><Layout><TransactionsPage /></Layout></ProtectedRoute>} />
+              <Route path="/wallet" element={<ProtectedRoute><Layout><WalletPage /></Layout></ProtectedRoute>} />
+              <Route path="/payout" element={<ProtectedRoute><Layout><PayoutPage /></Layout></ProtectedRoute>} />
+              <Route path="/transfers" element={<ProtectedRoute><Layout><TransfersPage /></Layout></ProtectedRoute>} />
+              <Route path="/banking" element={<ProtectedRoute><Layout><BankingPage /></Layout></ProtectedRoute>} />
+              <Route path="/kyc" element={<ProtectedRoute><Layout><KycVerificationPage /></Layout></ProtectedRoute>} />
+              <Route path="/link-payment" element={<ProtectedRoute><Layout><UpiPaymentLinkGenerator /></Layout></ProtectedRoute>} />
+              <Route path="/plugin" element={<ProtectedRoute><Layout><UpiPluginPage /></Layout></ProtectedRoute>} />
+              <Route path="/developer" element={<ProtectedRoute><Layout><DeveloperPage /></Layout></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Layout><SettingsPage /></Layout></ProtectedRoute>} />
+              <Route path="/whitelist" element={<ProtectedRoute><Layout><WhitelistPage /></Layout></ProtectedRoute>} />
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/merchants" element={<AdminMerchants />} />
-            <Route path="/admin/transactions" element={<AdminTransactions />} />
-            <Route path="/admin/transaction-log" element={<AdminTransactionLog />} />
-            <Route path="/admin/payout-management" element={<AdminPayoutManagement />} />
-            <Route path="/admin/payment-recon" element={<AdminPaymentRecon />} />
-            <Route path="/admin/kyc" element={<AdminKYC />} />
-            <Route path="/admin/whitelist" element={<AdminWhitelist />} />
-            <Route path="/admin/support" element={<AdminSupport />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/admin/activity-log" element={<AdminActivityLog />} />
-            <Route path="/admin/monitoring" element={<AdminMonitoring />} />
-            <Route path="/admin/api-management" element={<AdminApiManagement />} />
-            <Route path="/admin/escrow" element={<AdminEscrow />} />
-            <Route path="/admin/upi-management" element={<AdminUpiManagement />} />
-          </Routes>
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+              <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+              <Route path="/admin/transactions" element={<AdminProtectedRoute><AdminTransactions /></AdminProtectedRoute>} />
+              <Route path="/admin/merchants" element={<AdminProtectedRoute><AdminMerchants /></AdminProtectedRoute>} />
+              <Route path="/admin/settlements" element={<AdminProtectedRoute><AdminSettlements /></AdminProtectedRoute>} />
+              <Route path="/admin/escrow" element={<AdminProtectedRoute><AdminEscrow /></AdminProtectedRoute>} />
+              <Route path="/admin/whitelist" element={<AdminProtectedRoute><AdminWhitelist /></AdminProtectedRoute>} />
+              <Route path="/admin/monitoring" element={<AdminProtectedRoute><AdminMonitoring /></AdminProtectedRoute>} />
+              <Route path="/admin/monitoring/:dashboardId" element={<AdminProtectedRoute><AdminMonitoringDetail /></AdminProtectedRoute>} />
+              <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
+              <Route path="/admin/roles" element={<AdminProtectedRoute><AdminRoles /></AdminProtectedRoute>} />
+              <Route path="/admin/logs" element={<AdminProtectedRoute><AdminLogs /></AdminProtectedRoute>} />
+              <Route path="/admin/settings" element={<AdminProtectedRoute><AdminSettings /></AdminProtectedRoute>} />
+            </Routes>
+          </ThemeProvider>
         </Router>
-      </ThemeProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
