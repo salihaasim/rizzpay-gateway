@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -33,6 +34,7 @@ import AdminMonitoring from '@/pages/AdminMonitoring';
 import AdminApiManagement from '@/pages/AdminApiManagement';
 import AdminEscrow from '@/pages/AdminEscrow';
 import AdminUpiManagement from '@/pages/AdminUpiManagement';
+import AdminPricing from '@/pages/admin/AdminPricing';
 import TermsAndConditions from '@/pages/TermsAndConditions';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import RefundPolicy from '@/pages/RefundPolicy';
@@ -80,6 +82,7 @@ function App() {
             <Route path="/admin/kyc" element={<AdminKYC />} />
             <Route path="/admin/whitelist" element={<AdminWhitelist />} />
             <Route path="/admin/support" element={<AdminSupport />} />
+            <Route path="/admin/pricing" element={<AdminPricing />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/activity-log" element={<AdminActivityLog />} />
             <Route path="/admin/monitoring" element={<AdminMonitoring />} />

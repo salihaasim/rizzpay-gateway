@@ -3,6 +3,7 @@ import React from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import RevenueChart from '@/components/admin/dashboard/RevenueChart';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -51,9 +52,10 @@ const AdminDashboard: React.FC = () => {
           <Tabs defaultValue="overview">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="revenue">Revenue Analytics</TabsTrigger>
               <TabsTrigger value="reports">Reports</TabsTrigger>
             </TabsList>
+            
             <TabsContent value="overview" className="mt-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <Card>
@@ -94,18 +96,9 @@ const AdminDashboard: React.FC = () => {
                 </Card>
               </div>
             </TabsContent>
-            
-            <TabsContent value="analytics" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Analytics Data</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px] flex items-center justify-center bg-muted/20">
-                    Analytics charts would display here
-                  </div>
-                </CardContent>
-              </Card>
+
+            <TabsContent value="revenue" className="mt-6">
+              <RevenueChart />
             </TabsContent>
             
             <TabsContent value="reports" className="mt-6">
