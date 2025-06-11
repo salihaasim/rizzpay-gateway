@@ -91,7 +91,7 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-sm text-slate-600">Month-to-date transaction performance</p>
               </CardHeader>
               <CardContent>
-                <div className="h-80 w-full bg-slate-50 rounded-lg flex items-center justify-center">
+                <div className="h-80 w-full bg-white rounded-lg flex items-center justify-center border border-slate-200">
                   <p className="text-slate-500">Transaction chart would be displayed here</p>
                 </div>
               </CardContent>
@@ -130,10 +130,10 @@ const AdminDashboard: React.FC = () => {
         
         <div className="mt-6">
           <Tabs defaultValue="overview">
-            <TabsList className="bg-slate-100">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-white">Overview</TabsTrigger>
-              <TabsTrigger value="revenue" className="data-[state=active]:bg-white">Revenue Analytics</TabsTrigger>
-              <TabsTrigger value="reports" className="data-[state=active]:bg-white">Reports</TabsTrigger>
+            <TabsList className="admin-tabs-list">
+              <TabsTrigger value="overview" className="admin-tabs-trigger">Overview</TabsTrigger>
+              <TabsTrigger value="revenue" className="admin-tabs-trigger">Revenue Analytics</TabsTrigger>
+              <TabsTrigger value="reports" className="admin-tabs-trigger">Reports</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="mt-6">
@@ -188,19 +188,19 @@ const AdminDashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors">
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">Daily Transaction Summary</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors">
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">Monthly Revenue Report</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors">
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">Merchant Activity Log</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors">
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">System Performance</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>

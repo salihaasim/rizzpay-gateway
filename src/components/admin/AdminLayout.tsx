@@ -99,7 +99,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           />
         )}
         
-        <main className={`flex-1 overflow-auto bg-slate-50 ${hideNavigation ? '' : 'p-4 md:p-6'}`}>
+        <main className={`flex-1 overflow-auto admin-main-content ${hideNavigation ? '' : 'p-4 md:p-6'}`}>
           {children || <Outlet />}
         </main>
       </div>
