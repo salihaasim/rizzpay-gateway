@@ -160,11 +160,15 @@
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
 }
 
-/* Force white backgrounds for all admin elements - Remove ALL yellow colors */
-.admin-theme * {
+/* NUCLEAR OPTION - Remove ALL yellow/amber/orange colors from admin theme */
+.admin-theme *,
+.admin-theme *:before,
+.admin-theme *:after {
+  /* Remove any yellow/amber/orange backgrounds */
   background-color: transparent;
 }
 
+/* Force white backgrounds for specific elements */
 .admin-theme .bg-yellow-50,
 .admin-theme .bg-yellow-100,
 .admin-theme .bg-yellow-200,
@@ -179,10 +183,12 @@
 .admin-theme .bg-slate-50,
 .admin-theme .bg-slate-100,
 .admin-theme .bg-slate-200,
-.admin-theme .bg-muted {
-  background-color: hsl(var(--admin-content-bg)) !important;
+.admin-theme .bg-muted,
+.admin-theme .bg-secondary {
+  background-color: white !important;
 }
 
+/* Force dark text for yellow/amber text colors */
 .admin-theme .text-yellow-600,
 .admin-theme .text-yellow-700,
 .admin-theme .text-yellow-800,
@@ -191,10 +197,12 @@
 .admin-theme .text-slate-600,
 .admin-theme .text-slate-700,
 .admin-theme .text-slate-800,
-.admin-theme .text-slate-900 {
+.admin-theme .text-slate-900,
+.admin-theme .text-muted-foreground {
   color: hsl(var(--admin-foreground)) !important;
 }
 
+/* Force gray borders instead of yellow/amber */
 .admin-theme .border-yellow-200,
 .admin-theme .border-amber-200,
 .admin-theme .border-orange-200,
@@ -203,18 +211,25 @@
   border-color: hsl(var(--admin-border)) !important;
 }
 
+/* Override any card styling */
 .admin-theme .card,
 .admin-theme [data-radix-scroll-area-viewport] {
-  background-color: hsl(var(--admin-card)) !important;
+  background-color: white !important;
 }
 
 /* Tabs specific overrides */
 .admin-theme [role="tablist"] {
-  background-color: hsl(var(--admin-tabs-bg)) !important;
+  background-color: white !important;
 }
 
 .admin-theme [role="tab"] {
   background-color: transparent !important;
+  color: hsl(var(--admin-foreground)) !important;
+}
+
+.admin-theme [role="tab"]:hover {
+  background-color: hsl(var(--admin-blue-light)) !important;
+  color: hsl(var(--admin-blue-hover)) !important;
 }
 
 .admin-theme [role="tab"][data-state="active"] {
@@ -222,10 +237,26 @@
   color: white !important;
 }
 
-/* Force all admin content to white background */
+/* Force all containers to white */
 .admin-theme .space-y-6,
 .admin-theme .space-y-4,
 .admin-theme .grid,
 .admin-theme .flex {
   background-color: transparent !important;
+}
+
+/* Override any component with yellow/amber classes */
+.admin-theme [class*="yellow"],
+.admin-theme [class*="amber"],
+.admin-theme [class*="orange"] {
+  background-color: white !important;
+  color: hsl(var(--admin-foreground)) !important;
+  border-color: hsl(var(--admin-border)) !important;
+}
+
+/* Force specific component backgrounds */
+.admin-theme .CardContent,
+.admin-theme .CardHeader,
+.admin-theme .TabsContent {
+  background-color: white !important;
 }
