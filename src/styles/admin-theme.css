@@ -1,18 +1,18 @@
 
-/* Admin-specific theme overrides */
+/* Admin-specific theme overrides - Clean White/Blue Theme */
 :root {
-  /* Admin color scheme - Clean white/light theme with blue accents */
+  /* Admin color scheme - Pure white background with blue accents */
   --admin-background: 255 255 255;
-  --admin-foreground: 51 65 85;
+  --admin-foreground: 15 23 42;
   --admin-card: 255 255 255;
-  --admin-card-foreground: 51 65 85;
+  --admin-card-foreground: 15 23 42;
   --admin-popover: 255 255 255;
-  --admin-popover-foreground: 51 65 85;
+  --admin-popover-foreground: 15 23 42;
   --admin-primary: 59 130 246;
   --admin-primary-foreground: 255 255 255;
   --admin-secondary: 255 255 255;
-  --admin-secondary-foreground: 51 65 85;
-  --admin-muted: 248 250 252;
+  --admin-secondary-foreground: 15 23 42;
+  --admin-muted: 255 255 255;
   --admin-muted-foreground: 100 116 139;
   --admin-accent: 239 246 255;
   --admin-accent-foreground: 59 130 246;
@@ -37,142 +37,173 @@
 
 /* Admin-specific component styles */
 .admin-theme {
-  background-color: hsl(var(--admin-background));
-  color: hsl(var(--admin-foreground));
+  background-color: hsl(var(--admin-background)) !important;
+  color: hsl(var(--admin-foreground)) !important;
 }
 
 .admin-main-content {
-  background-color: hsl(var(--admin-content-bg));
+  background-color: hsl(var(--admin-content-bg)) !important;
 }
 
 .admin-sidebar {
-  background-color: hsl(var(--admin-sidebar-bg));
-  color: hsl(var(--admin-sidebar-text));
-  border-right: 1px solid hsl(var(--admin-border));
+  background-color: hsl(var(--admin-sidebar-bg)) !important;
+  color: hsl(var(--admin-sidebar-text)) !important;
+  border-right: 1px solid hsl(var(--admin-border)) !important;
 }
 
 .admin-sidebar-item {
-  color: hsl(var(--admin-sidebar-text));
+  color: hsl(var(--admin-sidebar-text)) !important;
   transition: all 0.2s ease;
   border-radius: 8px;
 }
 
 .admin-sidebar-item:hover {
-  background-color: hsl(var(--admin-blue-light));
-  color: hsl(var(--admin-blue-hover));
+  background-color: hsl(var(--admin-blue-light)) !important;
+  color: hsl(var(--admin-blue-hover)) !important;
 }
 
 .admin-sidebar-item.active {
-  background-color: hsl(var(--admin-blue-hover));
-  color: hsl(var(--admin-sidebar-active-text));
+  background-color: hsl(var(--admin-blue-hover)) !important;
+  color: hsl(var(--admin-sidebar-active-text)) !important;
   font-weight: 500;
 }
 
 .admin-header {
-  background-color: hsl(var(--admin-header-bg));
-  border-bottom: 1px solid hsl(var(--admin-header-border));
+  background-color: hsl(var(--admin-header-bg)) !important;
+  border-bottom: 1px solid hsl(var(--admin-header-border)) !important;
 }
 
 .admin-card {
-  background-color: hsl(var(--admin-card));
-  border: 1px solid hsl(var(--admin-border));
+  background-color: hsl(var(--admin-card)) !important;
+  border: 1px solid hsl(var(--admin-border)) !important;
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 .admin-button-primary {
-  background-color: hsl(var(--admin-primary));
-  color: hsl(var(--admin-primary-foreground));
+  background-color: hsl(var(--admin-primary)) !important;
+  color: hsl(var(--admin-primary-foreground)) !important;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .admin-button-primary:hover {
-  background-color: hsl(var(--admin-primary) / 0.9);
+  background-color: hsl(var(--admin-primary) / 0.9) !important;
   transform: translateY(-1px);
 }
 
 .admin-button-secondary {
-  background-color: hsl(var(--admin-secondary));
-  color: hsl(var(--admin-secondary-foreground));
-  border: 1px solid hsl(var(--admin-border));
+  background-color: hsl(var(--admin-secondary)) !important;
+  color: hsl(var(--admin-secondary-foreground)) !important;
+  border: 1px solid hsl(var(--admin-border)) !important;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .admin-button-secondary:hover {
-  background-color: hsl(var(--admin-blue-light));
-  color: hsl(var(--admin-blue-hover));
-  border-color: hsl(var(--admin-blue-hover));
+  background-color: hsl(var(--admin-blue-light)) !important;
+  color: hsl(var(--admin-blue-hover)) !important;
+  border-color: hsl(var(--admin-blue-hover)) !important;
 }
 
 .admin-stat-card {
-  background: hsl(var(--admin-card));
-  border: 1px solid hsl(var(--admin-border));
+  background: hsl(var(--admin-card)) !important;
+  border: 1px solid hsl(var(--admin-border)) !important;
   border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 .admin-stat-card:hover {
-  border-color: hsl(var(--admin-blue-hover));
-  box-shadow: 0 4px 12px 0 hsl(var(--admin-blue-hover) / 0.1);
+  border-color: hsl(var(--admin-blue-hover)) !important;
+  box-shadow: 0 4px 12px 0 hsl(var(--admin-blue-hover) / 0.1) !important;
 }
 
 .admin-nav-item {
-  color: hsl(var(--admin-sidebar-text));
+  color: hsl(var(--admin-sidebar-text)) !important;
   transition: all 0.2s ease;
   border-radius: 8px;
   margin: 2px 0;
 }
 
 .admin-nav-item:hover {
-  background-color: hsl(var(--admin-blue-light));
-  color: hsl(var(--admin-blue-hover));
+  background-color: hsl(var(--admin-blue-light)) !important;
+  color: hsl(var(--admin-blue-hover)) !important;
 }
 
 .admin-nav-item.active {
-  background-color: hsl(var(--admin-blue-hover));
-  color: hsl(var(--admin-sidebar-active-text));
+  background-color: hsl(var(--admin-blue-hover)) !important;
+  color: hsl(var(--admin-sidebar-active-text)) !important;
 }
 
 /* Admin tabs styling */
 .admin-tabs-list {
-  background-color: hsl(var(--admin-tabs-bg));
-  border: 1px solid hsl(var(--admin-tabs-border));
+  background-color: hsl(var(--admin-tabs-bg)) !important;
+  border: 1px solid hsl(var(--admin-tabs-border)) !important;
   border-radius: 8px;
 }
 
 .admin-tabs-trigger {
-  background-color: transparent;
-  color: hsl(var(--admin-foreground));
+  background-color: transparent !important;
+  color: hsl(var(--admin-foreground)) !important;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .admin-tabs-trigger:hover {
-  background-color: hsl(var(--admin-blue-light));
-  color: hsl(var(--admin-blue-hover));
+  background-color: hsl(var(--admin-blue-light)) !important;
+  color: hsl(var(--admin-blue-hover)) !important;
 }
 
 .admin-tabs-trigger[data-state="active"] {
-  background-color: hsl(var(--admin-blue-hover));
-  color: hsl(var(--admin-primary-foreground));
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  background-color: hsl(var(--admin-blue-hover)) !important;
+  color: hsl(var(--admin-primary-foreground)) !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
 }
 
-/* Override any conflicting styles */
+/* Override any conflicting styles - Remove all yellow/slate colors */
 .admin-theme .bg-slate-50,
 .admin-theme .bg-slate-100,
-.admin-theme .bg-muted {
+.admin-theme .bg-slate-200,
+.admin-theme .bg-muted,
+.admin-theme .bg-yellow-50,
+.admin-theme .bg-yellow-100,
+.admin-theme .bg-amber-50,
+.admin-theme .bg-orange-50 {
   background-color: hsl(var(--admin-content-bg)) !important;
 }
 
 .admin-theme .text-slate-600,
 .admin-theme .text-slate-700,
-.admin-theme .text-slate-800 {
+.admin-theme .text-slate-800,
+.admin-theme .text-slate-900 {
   color: hsl(var(--admin-foreground)) !important;
 }
 
-.admin-theme .border-slate-200 {
+.admin-theme .border-slate-200,
+.admin-theme .border-slate-300 {
   border-color: hsl(var(--admin-border)) !important;
+}
+
+/* Force white backgrounds for all admin elements */
+.admin-theme * {
+  background-color: transparent;
+}
+
+.admin-theme .card,
+.admin-theme [data-radix-scroll-area-viewport] {
+  background-color: hsl(var(--admin-card)) !important;
+}
+
+/* Tabs specific overrides */
+.admin-theme [role="tablist"] {
+  background-color: hsl(var(--admin-tabs-bg)) !important;
+}
+
+.admin-theme [role="tab"] {
+  background-color: transparent !important;
+}
+
+.admin-theme [role="tab"][data-state="active"] {
+  background-color: hsl(var(--admin-blue-hover)) !important;
+  color: white !important;
 }
