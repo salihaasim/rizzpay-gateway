@@ -1,32 +1,35 @@
 
 /* Admin-specific theme overrides */
 :root {
-  /* Admin color scheme - Clean white/light theme */
+  /* Admin color scheme - Clean white/light theme with blue accents */
   --admin-background: 255 255 255;
-  --admin-foreground: 15 23 42;
+  --admin-foreground: 51 65 85;
   --admin-card: 255 255 255;
-  --admin-card-foreground: 15 23 42;
+  --admin-card-foreground: 51 65 85;
   --admin-popover: 255 255 255;
-  --admin-popover-foreground: 15 23 42;
-  --admin-primary: 71 85 105;
-  --admin-primary-foreground: 248 250 252;
-  --admin-secondary: 241 245 249;
-  --admin-secondary-foreground: 15 23 42;
+  --admin-popover-foreground: 51 65 85;
+  --admin-primary: 59 130 246;
+  --admin-primary-foreground: 255 255 255;
+  --admin-secondary: 248 250 252;
+  --admin-secondary-foreground: 51 65 85;
   --admin-muted: 248 250 252;
   --admin-muted-foreground: 100 116 139;
-  --admin-accent: 241 245 249;
-  --admin-accent-foreground: 15 23 42;
+  --admin-accent: 239 246 255;
+  --admin-accent-foreground: 59 130 246;
   --admin-destructive: 239 68 68;
-  --admin-destructive-foreground: 248 250 252;
+  --admin-destructive-foreground: 255 255 255;
   --admin-border: 226 232 240;
-  --admin-input: 226 232 240;
-  --admin-ring: 148 163 184;
+  --admin-input: 255 255 255;
+  --admin-ring: 59 130 246;
   --admin-sidebar-bg: 255 255 255;
-  --admin-sidebar-text: 51 65 85;
-  --admin-sidebar-hover: 248 250 252;
-  --admin-sidebar-active: 241 245 249;
+  --admin-sidebar-text: 71 85 105;
+  --admin-sidebar-hover: 239 246 255;
+  --admin-sidebar-active: 59 130 246;
+  --admin-sidebar-active-text: 255 255 255;
   --admin-header-bg: 255 255 255;
   --admin-header-border: 226 232 240;
+  --admin-blue-hover: 59 130 246;
+  --admin-blue-light: 239 246 255;
 }
 
 /* Admin-specific component styles */
@@ -43,16 +46,18 @@
 
 .admin-sidebar-item {
   color: hsl(var(--admin-sidebar-text));
+  transition: all 0.2s ease;
+  border-radius: 8px;
 }
 
 .admin-sidebar-item:hover {
-  background-color: hsl(var(--admin-sidebar-hover));
-  color: hsl(var(--admin-foreground));
+  background-color: hsl(var(--admin-blue-light));
+  color: hsl(var(--admin-blue-hover));
 }
 
 .admin-sidebar-item.active {
-  background-color: hsl(var(--admin-sidebar-active));
-  color: hsl(var(--admin-foreground));
+  background-color: hsl(var(--admin-blue-hover));
+  color: hsl(var(--admin-sidebar-active-text));
   font-weight: 500;
 }
 
@@ -64,23 +69,61 @@
 .admin-card {
   background-color: hsl(var(--admin-card));
   border: 1px solid hsl(var(--admin-border));
+  border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 .admin-button-primary {
   background-color: hsl(var(--admin-primary));
   color: hsl(var(--admin-primary-foreground));
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .admin-button-primary:hover {
   background-color: hsl(var(--admin-primary) / 0.9);
+  transform: translateY(-1px);
 }
 
 .admin-button-secondary {
   background-color: hsl(var(--admin-secondary));
   color: hsl(var(--admin-secondary-foreground));
+  border: 1px solid hsl(var(--admin-border));
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .admin-button-secondary:hover {
-  background-color: hsl(var(--admin-secondary) / 0.8);
+  background-color: hsl(var(--admin-blue-light));
+  color: hsl(var(--admin-blue-hover));
+  border-color: hsl(var(--admin-blue-hover));
+}
+
+.admin-stat-card {
+  background: linear-gradient(135deg, hsl(var(--admin-card)) 0%, hsl(var(--admin-blue-light)) 100%);
+  border: 1px solid hsl(var(--admin-border));
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.admin-stat-card:hover {
+  border-color: hsl(var(--admin-blue-hover));
+  box-shadow: 0 4px 12px 0 hsl(var(--admin-blue-hover) / 0.1);
+}
+
+.admin-nav-item {
+  color: hsl(var(--admin-sidebar-text));
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 2px 0;
+}
+
+.admin-nav-item:hover {
+  background-color: hsl(var(--admin-blue-light));
+  color: hsl(var(--admin-blue-hover));
+}
+
+.admin-nav-item.active {
+  background-color: hsl(var(--admin-blue-hover));
+  color: hsl(var(--admin-sidebar-active-text));
 }

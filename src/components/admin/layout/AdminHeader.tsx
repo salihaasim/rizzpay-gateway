@@ -73,13 +73,13 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   }
   
   return (
-    <header className="admin-header px-4 py-3 flex items-center justify-between">
+    <header className="admin-header px-6 py-4 flex items-center justify-between bg-white border-b border-slate-200">
       <div className="flex items-center gap-4">
         {/* Desktop sidebar toggle */}
         <Button
           variant="ghost"
           size="icon"
-          className="hidden lg:flex h-8 w-8 text-slate-500 hover:bg-slate-100"
+          className="hidden lg:flex h-8 w-8 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
           onClick={() => setCollapsed && setCollapsed(!collapsed)}
         >
           {collapsed ? (
@@ -95,7 +95,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-slate-500 hover:bg-slate-100"
+              className="h-8 w-8 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
               onClick={() => setMobileMenuOpen && setMobileMenuOpen(true)}
               title="Open navigation menu"
             >
@@ -106,7 +106,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-slate-500 hover:bg-slate-100"
+            className="h-8 w-8 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
             onClick={toggleMobileNavVisibility}
             title={hiddenOnMobile ? "Show navigation" : "Hide navigation"}
           >
@@ -126,11 +126,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
       
       <div className="flex items-center gap-3">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative hidden sm:flex text-slate-500 hover:bg-slate-100">
+        <Button variant="ghost" size="icon" className="relative hidden sm:flex text-slate-500 hover:bg-blue-50 hover:text-blue-600">
           <Bell className="h-5 w-5" />
           <Badge 
             variant="destructive" 
-            className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+            className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-red-500"
           >
             3
           </Badge>
@@ -139,14 +139,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         {/* User Profile */}
         <div className="flex items-center gap-3">
           <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-slate-800 truncate max-w-32">
-              {userEmail?.split('@')[0] || 'Admin'}
-            </p>
+            <p className="text-sm font-medium text-slate-800 truncate max-w-32">admin</p>
             <p className="text-xs text-slate-500">Administrator</p>
           </div>
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-slate-200 text-slate-700 text-sm">
-              {userEmail ? userEmail.charAt(0).toUpperCase() : 'A'}
+            <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+              A
             </AvatarFallback>
           </Avatar>
         </div>

@@ -145,41 +145,47 @@ const AdminSidebar = ({
       )}
       
       <div className={sidebarClasses}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <Link to="/admin/dashboard" className="flex items-center space-x-3">
             {(!collapsed || isMobile) && (
               <>
-                <CircleDollarSign className="h-6 w-6 text-slate-600" />
-                <span className="font-semibold text-lg text-slate-800">RizzPay Admin</span>
+                <div className="h-8 w-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <CircleDollarSign className="h-5 w-5 text-white" />
+                </div>
+                <span className="font-semibold text-lg text-slate-800">RizzPay</span>
               </>
             )}
-            {collapsed && !isMobile && <CircleDollarSign className="h-6 w-6 mx-auto text-slate-600" />}
+            {collapsed && !isMobile && (
+              <div className="h-8 w-8 bg-blue-500 rounded-lg flex items-center justify-center mx-auto">
+                <CircleDollarSign className="h-5 w-5 text-white" />
+              </div>
+            )}
           </Link>
           {showToggle && (
             <Button
               variant="ghost"
               size="icon"
-              className="ml-auto h-8 w-8 text-slate-500 hover:bg-slate-100"
+              className="ml-auto h-8 w-8 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
               onClick={() => setCollapsed(!collapsed)}
             >
               {collapsed ? (
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-4 w-4" />
               ) : (
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-4 w-4" />
               )}
             </Button>
           )}
         </div>
 
-        <ScrollArea className="flex-1 py-2">
-          <nav className="grid gap-1 px-2">
+        <ScrollArea className="flex-1 py-4">
+          <nav className="grid gap-2 px-4">
             {navigationItems.map((item, index) => (
               <Link
                 key={index}
                 to={item.href}
                 className={cn(
-                  "admin-sidebar-item flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
-                  pathname === item.href && "admin-sidebar-item active"
+                  "admin-nav-item flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === item.href && "admin-nav-item active"
                 )}
                 onClick={() => isMobile && setMobileMenuOpen(false)}
               >
@@ -191,13 +197,13 @@ const AdminSidebar = ({
         </ScrollArea>
 
         <div className="mt-auto border-t border-slate-200 p-4">
-          <div className={cn("flex items-center", (collapsed && !isMobile) ? "justify-center" : "space-x-3")}>
-            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
-              <span className="text-sm font-medium text-slate-700">A</span>
+          <div className={cn("flex items-center", (collapsed && !isMobile) ? "justify-center" : "space-x-3 mb-4")}>
+            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-sm font-medium text-blue-600">A</span>
             </div>
             {(!collapsed || isMobile) && (
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-slate-800">Admin</p>
+                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-slate-800">Administrator</p>
                 <p className="text-xs leading-none text-slate-500 truncate max-w-[180px]">{userEmail}</p>
               </div>
             )}
@@ -206,12 +212,12 @@ const AdminSidebar = ({
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full mt-4 text-slate-600 hover:text-slate-800 hover:bg-slate-100",
+              "w-full text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all",
               (collapsed && !isMobile) ? "justify-center px-0" : "justify-start"
             )}
             onClick={handleLogout}
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-4 w-4" />
             {(!collapsed || isMobile) && <span className="ml-3">Logout</span>}
           </Button>
         </div>
