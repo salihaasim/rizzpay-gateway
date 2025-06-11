@@ -160,18 +160,34 @@
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
 }
 
-/* Override any conflicting styles - Remove all yellow/slate colors */
+/* Force white backgrounds for all admin elements - Remove ALL yellow colors */
+.admin-theme * {
+  background-color: transparent;
+}
+
+.admin-theme .bg-yellow-50,
+.admin-theme .bg-yellow-100,
+.admin-theme .bg-yellow-200,
+.admin-theme .bg-yellow-300,
+.admin-theme .bg-yellow-400,
+.admin-theme .bg-yellow-500,
+.admin-theme .bg-amber-50,
+.admin-theme .bg-amber-100,
+.admin-theme .bg-amber-200,
+.admin-theme .bg-orange-50,
+.admin-theme .bg-orange-100,
 .admin-theme .bg-slate-50,
 .admin-theme .bg-slate-100,
 .admin-theme .bg-slate-200,
-.admin-theme .bg-muted,
-.admin-theme .bg-yellow-50,
-.admin-theme .bg-yellow-100,
-.admin-theme .bg-amber-50,
-.admin-theme .bg-orange-50 {
+.admin-theme .bg-muted {
   background-color: hsl(var(--admin-content-bg)) !important;
 }
 
+.admin-theme .text-yellow-600,
+.admin-theme .text-yellow-700,
+.admin-theme .text-yellow-800,
+.admin-theme .text-amber-600,
+.admin-theme .text-orange-600,
 .admin-theme .text-slate-600,
 .admin-theme .text-slate-700,
 .admin-theme .text-slate-800,
@@ -179,14 +195,12 @@
   color: hsl(var(--admin-foreground)) !important;
 }
 
+.admin-theme .border-yellow-200,
+.admin-theme .border-amber-200,
+.admin-theme .border-orange-200,
 .admin-theme .border-slate-200,
 .admin-theme .border-slate-300 {
   border-color: hsl(var(--admin-border)) !important;
-}
-
-/* Force white backgrounds for all admin elements */
-.admin-theme * {
-  background-color: transparent;
 }
 
 .admin-theme .card,
@@ -206,4 +220,12 @@
 .admin-theme [role="tab"][data-state="active"] {
   background-color: hsl(var(--admin-blue-hover)) !important;
   color: white !important;
+}
+
+/* Force all admin content to white background */
+.admin-theme .space-y-6,
+.admin-theme .space-y-4,
+.admin-theme .grid,
+.admin-theme .flex {
+  background-color: transparent !important;
 }
