@@ -1,0 +1,86 @@
+
+/* Admin-specific theme overrides */
+:root {
+  /* Admin color scheme - Clean white/light theme */
+  --admin-background: 255 255 255;
+  --admin-foreground: 15 23 42;
+  --admin-card: 255 255 255;
+  --admin-card-foreground: 15 23 42;
+  --admin-popover: 255 255 255;
+  --admin-popover-foreground: 15 23 42;
+  --admin-primary: 71 85 105;
+  --admin-primary-foreground: 248 250 252;
+  --admin-secondary: 241 245 249;
+  --admin-secondary-foreground: 15 23 42;
+  --admin-muted: 248 250 252;
+  --admin-muted-foreground: 100 116 139;
+  --admin-accent: 241 245 249;
+  --admin-accent-foreground: 15 23 42;
+  --admin-destructive: 239 68 68;
+  --admin-destructive-foreground: 248 250 252;
+  --admin-border: 226 232 240;
+  --admin-input: 226 232 240;
+  --admin-ring: 148 163 184;
+  --admin-sidebar-bg: 255 255 255;
+  --admin-sidebar-text: 51 65 85;
+  --admin-sidebar-hover: 248 250 252;
+  --admin-sidebar-active: 241 245 249;
+  --admin-header-bg: 255 255 255;
+  --admin-header-border: 226 232 240;
+}
+
+/* Admin-specific component styles */
+.admin-theme {
+  background-color: hsl(var(--admin-background));
+  color: hsl(var(--admin-foreground));
+}
+
+.admin-sidebar {
+  background-color: hsl(var(--admin-sidebar-bg));
+  color: hsl(var(--admin-sidebar-text));
+  border-right: 1px solid hsl(var(--admin-border));
+}
+
+.admin-sidebar-item {
+  color: hsl(var(--admin-sidebar-text));
+}
+
+.admin-sidebar-item:hover {
+  background-color: hsl(var(--admin-sidebar-hover));
+  color: hsl(var(--admin-foreground));
+}
+
+.admin-sidebar-item.active {
+  background-color: hsl(var(--admin-sidebar-active));
+  color: hsl(var(--admin-foreground));
+  font-weight: 500;
+}
+
+.admin-header {
+  background-color: hsl(var(--admin-header-bg));
+  border-bottom: 1px solid hsl(var(--admin-header-border));
+}
+
+.admin-card {
+  background-color: hsl(var(--admin-card));
+  border: 1px solid hsl(var(--admin-border));
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.admin-button-primary {
+  background-color: hsl(var(--admin-primary));
+  color: hsl(var(--admin-primary-foreground));
+}
+
+.admin-button-primary:hover {
+  background-color: hsl(var(--admin-primary) / 0.9);
+}
+
+.admin-button-secondary {
+  background-color: hsl(var(--admin-secondary));
+  color: hsl(var(--admin-secondary-foreground));
+}
+
+.admin-button-secondary:hover {
+  background-color: hsl(var(--admin-secondary) / 0.8);
+}

@@ -43,13 +43,9 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
   const navigate = useNavigate();
   const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
   
-  // Only show sidebar toggle on desktop
   const showToggle = !isMobile;
-  
-  // Check if the user is an admin
   const isAdmin = currentMerchant?.role === 'admin';
   
-  // Filter navigation items based on role
   const navigationItems = [
     {
       title: "Dashboard",
@@ -109,7 +105,6 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
       href: "/developer",
       icon: <Code className="h-5 w-5" />
     },
-    // Only show Whitelist for admin users
     ...(isAdmin ? [{
       title: "Whitelist",
       href: "/whitelist",
@@ -139,25 +134,25 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
   return (
     <div
       className={cn(
-        "flex flex-col fixed inset-y-0 z-50 h-full bg-[#111827] dark:bg-gray-900 text-white transition-all duration-300",
+        "merchant-sidebar flex flex-col fixed inset-y-0 z-50 h-full text-white transition-all duration-300",
         collapsed ? "w-20" : "w-[280px]"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-blue-400/20">
         <Link to="/dashboard" className="flex items-center space-x-3">
           {!collapsed && (
             <>
-              <CircleDollarSign className="h-6 w-6 text-[#0052FF]" />
+              <CircleDollarSign className="h-6 w-6 text-blue-400" />
               <span className="font-bold text-lg text-white">RizzPay</span>
             </>
           )}
-          {collapsed && <CircleDollarSign className="h-6 w-6 mx-auto text-[#0052FF]" />}
+          {collapsed && <CircleDollarSign className="h-6 w-6 mx-auto text-blue-400" />}
         </Link>
         {showToggle && (
           <Button
             variant="ghost"
             size="icon"
-            className="ml-auto h-8 w-8 text-muted-foreground hover:bg-gray-800 dark:hover:bg-gray-700"
+            className="ml-auto h-8 w-8 text-blue-300 hover:bg-blue-800/50"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? (
@@ -178,8 +173,8 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                   <div
                     onClick={handleWalletDropdownToggle}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer",
-                      isWalletActive && "bg-gray-800 dark:bg-gray-700 text-white"
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-blue-200 transition-all hover:text-white hover:bg-blue-800/50 cursor-pointer",
+                      isWalletActive && "bg-blue-700/50 text-white"
                     )}
                   >
                     {item.icon}
@@ -202,8 +197,8 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                           key={dropdownIndex}
                           to={dropdownItem.href}
                           className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
-                            pathname === dropdownItem.href && "bg-gray-800 dark:bg-gray-700 text-white"
+                            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-blue-300 transition-all hover:text-white hover:bg-blue-800/50",
+                            pathname === dropdownItem.href && "bg-blue-700/50 text-white"
                           )}
                         >
                           {dropdownItem.icon}
@@ -217,8 +212,8 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
                 <Link
                   to={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
-                    pathname === item.href && "bg-gray-800 dark:bg-gray-700 text-white"
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-blue-200 transition-all hover:text-white hover:bg-blue-800/50",
+                    pathname === item.href && "bg-blue-700/50 text-white"
                   )}
                 >
                   {item.icon}
@@ -230,34 +225,33 @@ const DashboardSidebar = ({ collapsed, setCollapsed }: DashboardSidebarProps) =>
         </nav>
       </ScrollArea>
 
-      <div className="mt-auto border-t border-gray-800 dark:border-gray-700 p-4">
+      <div className="mt-auto border-t border-blue-400/20 p-4">
         <div className={cn("flex items-center", collapsed ? "justify-center" : "space-x-3")}>
-          <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
+          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
             {currentMerchant?.fullName ? (
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium text-white">
                 {currentMerchant.fullName.charAt(0).toUpperCase()}
               </span>
             ) : (
-              <span className="text-sm font-medium">M</span>
+              <span className="text-sm font-medium text-white">M</span>
             )}
           </div>
           {!collapsed && (
             <div className="space-y-1">
-              <p className="text-sm font-medium leading-none truncate max-w-[180px]">
+              <p className="text-sm font-medium leading-none truncate max-w-[180px] text-white">
                 {currentMerchant?.fullName || "Merchant"}
               </p>
-              <p className="text-xs leading-none text-gray-400 truncate max-w-[180px]">
+              <p className="text-xs leading-none text-blue-300 truncate max-w-[180px]">
                 {currentMerchant?.email || "merchant@example.com"}
               </p>
             </div>
           )}
         </div>
         
-        {/* Logout Button */}
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full mt-4 text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
+            "w-full mt-4 text-blue-200 hover:text-white hover:bg-blue-800/50",
             collapsed ? "justify-center px-0" : "justify-start"
           )}
           onClick={handleLogout}

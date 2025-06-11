@@ -6,6 +6,7 @@ import AdminSidebar from './layout/AdminSidebar';
 import AdminHeader from './layout/AdminHeader';
 import { toast } from 'sonner';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import '@/styles/admin-theme.css';
 
 export interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -22,7 +23,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hiddenOnMobile, setHiddenOnMobile] = useState(false);
   
-  // Check authentication and admin role
   useEffect(() => {
     console.log('AdminLayout - Auth check:', { isAuthenticated, currentMerchant });
     
@@ -43,14 +43,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
     console.log('Admin access granted');
   }, [isAuthenticated, currentMerchant, navigate]);
 
-  // Auto-hide mobile menu when route changes
   useEffect(() => {
     if (mobileMenuOpen) {
       setMobileMenuOpen(false);
     }
   }, [location.pathname]);
 
-  // Close mobile menu when clicking outside (handled by overlay in AdminSidebar)
   useEffect(() => {
     const handleResize = () => {
       if (!isMobile && mobileMenuOpen) {
@@ -68,13 +66,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
     navigate('/', { replace: true });
   };
 
-  // Show loading or return null while checking authentication
   if (!isAuthenticated || !currentMerchant || currentMerchant.role !== 'admin') {
     return null;
   }
   
   return (
-    <div className="flex h-screen bg-gray-50 w-full overflow-hidden">
+    <div className="admin-theme flex h-screen w-full overflow-hidden">
       {!hideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
@@ -102,7 +99,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           />
         )}
         
-        <main className={`flex-1 overflow-auto bg-gray-50 ${hideNavigation ? '' : 'p-4 md:p-6'}`}>
+        <main className={`flex-1 overflow-auto bg-slate-50 ${hideNavigation ? '' : 'p-4 md:p-6'}`}>
           {children || <Outlet />}
         </main>
       </div>

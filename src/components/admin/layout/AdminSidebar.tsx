@@ -53,7 +53,6 @@ const AdminSidebar = ({
   const { pathname } = useLocation();
   const isMobile = useMediaQuery("(max-width: 1024px)");
   
-  // Only show sidebar toggle on desktop
   const showToggle = !isMobile;
   
   const navigationItems = [
@@ -130,7 +129,7 @@ const AdminSidebar = ({
   ];
 
   const sidebarClasses = cn(
-    "flex flex-col h-full bg-[#111827] dark:bg-gray-900 text-white transition-all duration-300",
+    "flex flex-col h-full admin-sidebar transition-all duration-300",
     isMobile ? (mobileMenuOpen ? "fixed inset-y-0 left-0 z-50 w-[280px]" : "hidden") : (collapsed ? "w-20" : "w-[280px]"),
     hiddenOnMobile && isMobile && "hidden"
   );
@@ -146,21 +145,21 @@ const AdminSidebar = ({
       )}
       
       <div className={sidebarClasses}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <Link to="/admin/dashboard" className="flex items-center space-x-3">
             {(!collapsed || isMobile) && (
               <>
-                <CircleDollarSign className="h-6 w-6 text-[#0052FF]" />
-                <span className="font-bold text-lg text-white">RizzPay Admin</span>
+                <CircleDollarSign className="h-6 w-6 text-slate-600" />
+                <span className="font-semibold text-lg text-slate-800">RizzPay Admin</span>
               </>
             )}
-            {collapsed && !isMobile && <CircleDollarSign className="h-6 w-6 mx-auto text-[#0052FF]" />}
+            {collapsed && !isMobile && <CircleDollarSign className="h-6 w-6 mx-auto text-slate-600" />}
           </Link>
           {showToggle && (
             <Button
               variant="ghost"
               size="icon"
-              className="ml-auto h-8 w-8 text-muted-foreground hover:bg-gray-800 dark:hover:bg-gray-700"
+              className="ml-auto h-8 w-8 text-slate-500 hover:bg-slate-100"
               onClick={() => setCollapsed(!collapsed)}
             >
               {collapsed ? (
@@ -179,8 +178,8 @@ const AdminSidebar = ({
                 key={index}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 transition-all hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
-                  pathname === item.href && "bg-gray-800 dark:bg-gray-700 text-white"
+                  "admin-sidebar-item flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                  pathname === item.href && "admin-sidebar-item active"
                 )}
                 onClick={() => isMobile && setMobileMenuOpen(false)}
               >
@@ -191,15 +190,15 @@ const AdminSidebar = ({
           </nav>
         </ScrollArea>
 
-        <div className="mt-auto border-t border-gray-800 dark:border-gray-700 p-4">
+        <div className="mt-auto border-t border-slate-200 p-4">
           <div className={cn("flex items-center", (collapsed && !isMobile) ? "justify-center" : "space-x-3")}>
-            <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
-              <span className="text-sm font-medium">A</span>
+            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
+              <span className="text-sm font-medium text-slate-700">A</span>
             </div>
             {(!collapsed || isMobile) && (
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none truncate max-w-[180px]">Admin</p>
-                <p className="text-xs leading-none text-gray-400 truncate max-w-[180px]">{userEmail}</p>
+                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-slate-800">Admin</p>
+                <p className="text-xs leading-none text-slate-500 truncate max-w-[180px]">{userEmail}</p>
               </div>
             )}
           </div>
@@ -207,7 +206,7 @@ const AdminSidebar = ({
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full mt-4 text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700",
+              "w-full mt-4 text-slate-600 hover:text-slate-800 hover:bg-slate-100",
               (collapsed && !isMobile) ? "justify-center px-0" : "justify-start"
             )}
             onClick={handleLogout}

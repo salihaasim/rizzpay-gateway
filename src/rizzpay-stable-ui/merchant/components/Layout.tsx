@@ -21,7 +21,6 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
   const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Show loading indicator if authentication is still being checked
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
@@ -33,12 +32,10 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
     );
   }
 
-  // If not authenticated, redirect to auth page instead of home
   if (!isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Update sidebar state when mobile status changes
   useEffect(() => {
     setSidebarCollapsed(isMobile);
     if (!isMobile) {
@@ -46,7 +43,6 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
     }
   }, [isMobile]);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
@@ -55,26 +51,22 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Display responsive layout for authenticated users with sidebar
   return (
-    <div className="min-h-screen flex bg-[#f5f5f7] transition-colors duration-200">
+    <div className="merchant-theme min-h-screen flex transition-colors duration-200" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
       {!hideNavigation && (
         <>
-          {/* Mobile Menu Button - Fixed positioned for easy access */}
           {isMobile && (
             <Button
               variant="ghost"
               size="icon"
-              className="fixed top-4 left-4 z-[60] bg-white/90 backdrop-blur-sm border border-border/40 shadow-sm md:hidden"
+              className="fixed top-4 left-4 z-[60] bg-white/90 backdrop-blur-sm border border-blue-200 shadow-sm md:hidden hover:bg-blue-50"
               onClick={toggleMobileMenu}
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5 text-blue-600" />
             </Button>
           )}
 
-          {/* Sidebar with mobile overlay */}
           <div className={`${isMobile ? 'fixed inset-0 z-50' : ''} ${isMobile && !mobileMenuOpen ? 'hidden' : ''}`}>
-            {/* Mobile overlay */}
             {isMobile && mobileMenuOpen && (
               <div 
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -102,7 +94,7 @@ const Layout: React.FC<LayoutProps> = memo(({ children, hideNavigation = false }
           {children}
         </main>
         
-        <footer className="py-3 text-center text-xs text-muted-foreground border-t">
+        <footer className="py-3 text-center text-xs text-muted-foreground border-t border-blue-100">
           <div className="max-w-screen-2xl mx-auto px-4">
             <p>© 2025 RizzPay Payment Technologies. All rights reserved.</p>
             <p className="mt-1">Version 1.0.0</p>

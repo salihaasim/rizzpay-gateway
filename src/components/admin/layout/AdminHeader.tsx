@@ -51,7 +51,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     if (path.includes('/admin/transactions')) return 'Transactions';
     if (path.includes('/admin/upi-management')) return 'UPI Management';
     if (path.includes('/admin/whitelist')) return 'Access Control';
-    if (path === '/admin') return 'Admin Dashboard';
+    if (path.includes('/admin/pricing')) return 'Pricing Management';
+    if (path === '/admin' || path === '/admin/dashboard') return 'Admin Dashboard';
     return 'Admin Panel';
   };
 
@@ -67,19 +68,18 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     }
   };
 
-  // Don't render if navigation should be hidden
   if (hideNavigation) {
     return null;
   }
   
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <header className="admin-header px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-4">
         {/* Desktop sidebar toggle */}
         <Button
           variant="ghost"
           size="icon"
-          className="hidden lg:flex h-8 w-8"
+          className="hidden lg:flex h-8 w-8 text-slate-500 hover:bg-slate-100"
           onClick={() => setCollapsed && setCollapsed(!collapsed)}
         >
           {collapsed ? (
@@ -91,12 +91,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         
         {/* Mobile controls */}
         <div className="lg:hidden flex items-center gap-2">
-          {/* Mobile menu toggle - only show if nav is not hidden */}
           {!hiddenOnMobile && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-500 hover:bg-slate-100"
               onClick={() => setMobileMenuOpen && setMobileMenuOpen(true)}
               title="Open navigation menu"
             >
@@ -104,11 +103,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             </Button>
           )}
           
-          {/* Mobile navigation visibility toggle */}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 text-slate-500 hover:bg-slate-100"
             onClick={toggleMobileNavVisibility}
             title={hiddenOnMobile ? "Show navigation" : "Hide navigation"}
           >
@@ -121,14 +119,14 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         </div>
         
         <div>
-          <h1 className="text-xl font-semibold text-gray-900 truncate">{getPageTitle()}</h1>
-          <p className="text-sm text-gray-500 hidden sm:block">Manage your platform from here</p>
+          <h1 className="text-xl font-semibold text-slate-800 truncate">{getPageTitle()}</h1>
+          <p className="text-sm text-slate-600 hidden sm:block">Manage your platform from here</p>
         </div>
       </div>
       
       <div className="flex items-center gap-3">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative hidden sm:flex">
+        <Button variant="ghost" size="icon" className="relative hidden sm:flex text-slate-500 hover:bg-slate-100">
           <Bell className="h-5 w-5" />
           <Badge 
             variant="destructive" 
@@ -141,13 +139,13 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         {/* User Profile */}
         <div className="flex items-center gap-3">
           <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-gray-900 truncate max-w-32">
+            <p className="text-sm font-medium text-slate-800 truncate max-w-32">
               {userEmail?.split('@')[0] || 'Admin'}
             </p>
-            <p className="text-xs text-gray-500">Administrator</p>
+            <p className="text-xs text-slate-500">Administrator</p>
           </div>
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary text-white text-sm">
+            <AvatarFallback className="bg-slate-200 text-slate-700 text-sm">
               {userEmail ? userEmail.charAt(0).toUpperCase() : 'A'}
             </AvatarFallback>
           </Avatar>
@@ -158,7 +156,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
           variant="ghost" 
           size="sm"
           onClick={handleLogout}
-          className="text-gray-600 hover:text-red-600 hover:bg-red-50"
+          className="text-slate-600 hover:text-red-600 hover:bg-red-50"
         >
           <LogOut className="h-4 w-4 mr-2" />
           <span className="hidden sm:inline">Logout</span>
