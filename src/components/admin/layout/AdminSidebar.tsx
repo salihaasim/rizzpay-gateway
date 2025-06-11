@@ -25,7 +25,8 @@ import {
   Coins,
   Code,
   Lock,
-  IndianRupee
+  IndianRupee,
+  RefreshCw
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
@@ -85,6 +86,11 @@ const AdminSidebar = ({
       title: "Payout Management",
       href: "/admin/payout-management",
       icon: <DollarSign className="h-5 w-5" />
+    },
+    {
+      title: "Payment Reconciliation",
+      href: "/admin/payment-reconciliation",
+      icon: <RefreshCw className="h-5 w-5" />
     },
     {
       title: "Transactions",
