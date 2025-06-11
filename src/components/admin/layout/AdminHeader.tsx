@@ -35,7 +35,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     const path = location.pathname;
     if (path.includes('/admin/production-api')) return 'Production API Management';
     if (path.includes('/admin/api-management')) return 'API Management';
-    if (path.includes('/admin/payment-reconciliation')) return 'Payment Reconciliation';
     if (path.includes('/admin/monitoring')) {
       if (path.includes('/admin/monitoring/')) {
         const dashboardType = path.split('/admin/monitoring/')[1];
@@ -46,12 +45,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     if (path.includes('/admin/escrow')) return 'Escrow Management';
     if (path.includes('/admin/settings')) return 'Admin Settings';
     if (path.includes('/admin/activity-log')) return 'Activity Log';
-    if (path.includes('/admin/transaction-log')) return 'Transaction Log';
+    if (path.includes('/admin/transactions-log')) return 'Transaction Log';
     if (path.includes('/admin/kyc')) return 'KYC Management';
     if (path.includes('/admin/merchants')) return 'Merchants Management';
     if (path.includes('/admin/transactions')) return 'Transactions';
     if (path.includes('/admin/upi-management')) return 'UPI Management';
-    if (path.includes('/admin/payout-management')) return 'Payout Management';
     if (path.includes('/admin/whitelist')) return 'Access Control';
     if (path.includes('/admin/pricing')) return 'Pricing Management';
     if (path === '/admin' || path === '/admin/dashboard') return 'Admin Dashboard';

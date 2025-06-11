@@ -131,9 +131,9 @@ const AdminDashboard: React.FC = () => {
         <div className="mt-6 bg-white">
           <Tabs defaultValue="overview" className="bg-white">
             <TabsList className="admin-tabs-list bg-white">
-              <TabsTrigger value="overview" className="admin-tabs-trigger text-slate-700">Overview</TabsTrigger>
-              <TabsTrigger value="revenue" className="admin-tabs-trigger text-slate-700">Revenue Analytics</TabsTrigger>
-              <TabsTrigger value="reports" className="admin-tabs-trigger text-slate-700">Reports</TabsTrigger>
+              <TabsTrigger value="overview" className="admin-tabs-trigger">Overview</TabsTrigger>
+              <TabsTrigger value="revenue" className="admin-tabs-trigger">Revenue Analytics</TabsTrigger>
+              <TabsTrigger value="reports" className="admin-tabs-trigger">Reports</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="mt-6 bg-white">
