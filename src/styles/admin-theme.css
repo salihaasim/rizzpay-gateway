@@ -1,23 +1,19 @@
 
-/* Admin-specific theme overrides - Clean White/Blue Theme */
+/* Admin-specific theme overrides - Clean Blue Theme */
 :root {
-  /* Admin color scheme - Pure white background with blue accents */
+  /* Admin color scheme - Clean blue with white background */
   --admin-background: 255 255 255;
-  --admin-foreground: 15 23 42;
+  --admin-foreground: 51 65 85;
   --admin-card: 255 255 255;
-  --admin-card-foreground: 15 23 42;
-  --admin-popover: 255 255 255;
-  --admin-popover-foreground: 15 23 42;
+  --admin-card-foreground: 51 65 85;
   --admin-primary: 59 130 246;
   --admin-primary-foreground: 255 255 255;
-  --admin-secondary: 255 255 255;
-  --admin-secondary-foreground: 15 23 42;
-  --admin-muted: 255 255 255;
+  --admin-secondary: 248 250 252;
+  --admin-secondary-foreground: 51 65 85;
+  --admin-muted: 248 250 252;
   --admin-muted-foreground: 100 116 139;
   --admin-accent: 239 246 255;
   --admin-accent-foreground: 59 130 246;
-  --admin-destructive: 239 68 68;
-  --admin-destructive-foreground: 255 255 255;
   --admin-border: 226 232 240;
   --admin-input: 255 255 255;
   --admin-ring: 59 130 246;
@@ -28,235 +24,95 @@
   --admin-sidebar-active-text: 255 255 255;
   --admin-header-bg: 255 255 255;
   --admin-header-border: 226 232 240;
-  --admin-blue-hover: 59 130 246;
-  --admin-blue-light: 239 246 255;
-  --admin-content-bg: 255 255 255;
-  --admin-tabs-bg: 255 255 255;
-  --admin-tabs-border: 226 232 240;
 }
 
-/* Admin-specific component styles */
+/* Admin theme application */
 .admin-theme {
-  background-color: hsl(var(--admin-background)) !important;
-  color: hsl(var(--admin-foreground)) !important;
-}
-
-.admin-main-content {
-  background-color: hsl(var(--admin-content-bg)) !important;
+  background-color: hsl(var(--admin-background));
+  color: hsl(var(--admin-foreground));
 }
 
 .admin-sidebar {
-  background-color: hsl(var(--admin-sidebar-bg)) !important;
-  color: hsl(var(--admin-sidebar-text)) !important;
-  border-right: 1px solid hsl(var(--admin-border)) !important;
+  background-color: hsl(var(--admin-sidebar-bg));
+  color: hsl(var(--admin-sidebar-text));
+  border-right: 1px solid hsl(var(--admin-border));
 }
 
 .admin-sidebar-item {
-  color: hsl(var(--admin-sidebar-text)) !important;
+  color: hsl(var(--admin-sidebar-text));
   transition: all 0.2s ease;
   border-radius: 8px;
 }
 
 .admin-sidebar-item:hover {
-  background-color: hsl(var(--admin-blue-light)) !important;
-  color: hsl(var(--admin-blue-hover)) !important;
+  background-color: hsl(var(--admin-sidebar-hover));
+  color: hsl(var(--admin-primary));
 }
 
 .admin-sidebar-item.active {
-  background-color: hsl(var(--admin-blue-hover)) !important;
-  color: hsl(var(--admin-sidebar-active-text)) !important;
-  font-weight: 500;
+  background-color: hsl(var(--admin-primary));
+  color: hsl(var(--admin-sidebar-active-text));
 }
 
 .admin-header {
-  background-color: hsl(var(--admin-header-bg)) !important;
-  border-bottom: 1px solid hsl(var(--admin-header-border)) !important;
+  background-color: hsl(var(--admin-header-bg));
+  border-bottom: 1px solid hsl(var(--admin-header-border));
 }
 
 .admin-card {
-  background-color: hsl(var(--admin-card)) !important;
-  border: 1px solid hsl(var(--admin-border)) !important;
+  background-color: hsl(var(--admin-card));
+  border: 1px solid hsl(var(--admin-border));
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 .admin-button-primary {
-  background-color: hsl(var(--admin-primary)) !important;
-  color: hsl(var(--admin-primary-foreground)) !important;
+  background-color: hsl(var(--admin-primary));
+  color: hsl(var(--admin-primary-foreground));
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .admin-button-primary:hover {
-  background-color: hsl(var(--admin-primary) / 0.9) !important;
-  transform: translateY(-1px);
-}
-
-.admin-button-secondary {
-  background-color: hsl(var(--admin-secondary)) !important;
-  color: hsl(var(--admin-secondary-foreground)) !important;
-  border: 1px solid hsl(var(--admin-border)) !important;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.admin-button-secondary:hover {
-  background-color: hsl(var(--admin-blue-light)) !important;
-  color: hsl(var(--admin-blue-hover)) !important;
-  border-color: hsl(var(--admin-blue-hover)) !important;
-}
-
-.admin-stat-card {
-  background: hsl(var(--admin-card)) !important;
-  border: 1px solid hsl(var(--admin-border)) !important;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.admin-stat-card:hover {
-  border-color: hsl(var(--admin-blue-hover)) !important;
-  box-shadow: 0 4px 12px 0 hsl(var(--admin-blue-hover) / 0.1) !important;
+  background-color: hsl(var(--admin-primary) / 0.9);
 }
 
 .admin-nav-item {
-  color: hsl(var(--admin-sidebar-text)) !important;
+  color: hsl(var(--admin-sidebar-text));
   transition: all 0.2s ease;
   border-radius: 8px;
-  margin: 2px 0;
 }
 
 .admin-nav-item:hover {
-  background-color: hsl(var(--admin-blue-light)) !important;
-  color: hsl(var(--admin-blue-hover)) !important;
+  background-color: hsl(var(--admin-sidebar-hover));
+  color: hsl(var(--admin-primary));
 }
 
 .admin-nav-item.active {
-  background-color: hsl(var(--admin-blue-hover)) !important;
-  color: hsl(var(--admin-sidebar-active-text)) !important;
+  background-color: hsl(var(--admin-primary));
+  color: hsl(var(--admin-sidebar-active-text));
 }
 
-/* Admin tabs styling */
+/* Tabs styling */
 .admin-tabs-list {
-  background-color: hsl(var(--admin-tabs-bg)) !important;
-  border: 1px solid hsl(var(--admin-tabs-border)) !important;
+  background-color: hsl(var(--admin-background));
+  border: 1px solid hsl(var(--admin-border));
   border-radius: 8px;
 }
 
 .admin-tabs-trigger {
-  background-color: transparent !important;
-  color: hsl(var(--admin-foreground)) !important;
+  background-color: transparent;
+  color: hsl(var(--admin-foreground));
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .admin-tabs-trigger:hover {
-  background-color: hsl(var(--admin-blue-light)) !important;
-  color: hsl(var(--admin-blue-hover)) !important;
+  background-color: hsl(var(--admin-accent));
+  color: hsl(var(--admin-primary));
 }
 
 .admin-tabs-trigger[data-state="active"] {
-  background-color: hsl(var(--admin-blue-hover)) !important;
-  color: hsl(var(--admin-primary-foreground)) !important;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
-}
-
-/* NUCLEAR OPTION - Remove ALL yellow/amber/orange colors from admin theme */
-.admin-theme *,
-.admin-theme *:before,
-.admin-theme *:after {
-  /* Remove any yellow/amber/orange backgrounds */
-  background-color: transparent;
-}
-
-/* Force white backgrounds for specific elements */
-.admin-theme .bg-yellow-50,
-.admin-theme .bg-yellow-100,
-.admin-theme .bg-yellow-200,
-.admin-theme .bg-yellow-300,
-.admin-theme .bg-yellow-400,
-.admin-theme .bg-yellow-500,
-.admin-theme .bg-amber-50,
-.admin-theme .bg-amber-100,
-.admin-theme .bg-amber-200,
-.admin-theme .bg-orange-50,
-.admin-theme .bg-orange-100,
-.admin-theme .bg-slate-50,
-.admin-theme .bg-slate-100,
-.admin-theme .bg-slate-200,
-.admin-theme .bg-muted,
-.admin-theme .bg-secondary {
-  background-color: white !important;
-}
-
-/* Force dark text for yellow/amber text colors */
-.admin-theme .text-yellow-600,
-.admin-theme .text-yellow-700,
-.admin-theme .text-yellow-800,
-.admin-theme .text-amber-600,
-.admin-theme .text-orange-600,
-.admin-theme .text-slate-600,
-.admin-theme .text-slate-700,
-.admin-theme .text-slate-800,
-.admin-theme .text-slate-900,
-.admin-theme .text-muted-foreground {
-  color: hsl(var(--admin-foreground)) !important;
-}
-
-/* Force gray borders instead of yellow/amber */
-.admin-theme .border-yellow-200,
-.admin-theme .border-amber-200,
-.admin-theme .border-orange-200,
-.admin-theme .border-slate-200,
-.admin-theme .border-slate-300 {
-  border-color: hsl(var(--admin-border)) !important;
-}
-
-/* Override any card styling */
-.admin-theme .card,
-.admin-theme [data-radix-scroll-area-viewport] {
-  background-color: white !important;
-}
-
-/* Tabs specific overrides */
-.admin-theme [role="tablist"] {
-  background-color: white !important;
-}
-
-.admin-theme [role="tab"] {
-  background-color: transparent !important;
-  color: hsl(var(--admin-foreground)) !important;
-}
-
-.admin-theme [role="tab"]:hover {
-  background-color: hsl(var(--admin-blue-light)) !important;
-  color: hsl(var(--admin-blue-hover)) !important;
-}
-
-.admin-theme [role="tab"][data-state="active"] {
-  background-color: hsl(var(--admin-blue-hover)) !important;
-  color: white !important;
-}
-
-/* Force all containers to white */
-.admin-theme .space-y-6,
-.admin-theme .space-y-4,
-.admin-theme .grid,
-.admin-theme .flex {
-  background-color: transparent !important;
-}
-
-/* Override any component with yellow/amber classes */
-.admin-theme [class*="yellow"],
-.admin-theme [class*="amber"],
-.admin-theme [class*="orange"] {
-  background-color: white !important;
-  color: hsl(var(--admin-foreground)) !important;
-  border-color: hsl(var(--admin-border)) !important;
-}
-
-/* Force specific component backgrounds */
-.admin-theme .CardContent,
-.admin-theme .CardHeader,
-.admin-theme .TabsContent {
-  background-color: white !important;
+  background-color: hsl(var(--admin-primary));
+  color: hsl(var(--admin-primary-foreground));
 }

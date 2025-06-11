@@ -9,23 +9,23 @@ import { Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react';
 const AdminDashboard: React.FC = () => {
   return (
     <AdminLayout>
-      <div className="space-y-6" style={{ backgroundColor: 'white' }}>
-        <div style={{ backgroundColor: 'white' }}>
+      <div className="space-y-6 bg-white">
+        <div className="bg-white">
           <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
           <p className="text-slate-600 mt-1">
             Manage merchants and monitor platform performance
           </p>
         </div>
         
-        <div className="grid gap-6 md:grid-cols-4" style={{ backgroundColor: 'white' }}>
-          <Card className="admin-stat-card" style={{ backgroundColor: 'white' }}>
-            <CardHeader className="pb-3" style={{ backgroundColor: 'white' }}>
+        <div className="grid gap-6 md:grid-cols-4 bg-white">
+          <Card className="admin-card bg-white">
+            <CardHeader className="pb-3 bg-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Total Merchants</CardTitle>
                 <Users className="h-5 w-5 text-blue-500" />
               </div>
             </CardHeader>
-            <CardContent style={{ backgroundColor: 'white' }}>
+            <CardContent className="bg-white">
               <div className="text-2xl font-bold text-slate-800">4</div>
               <p className="text-xs text-green-600 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
@@ -34,14 +34,14 @@ const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card className="admin-stat-card" style={{ backgroundColor: 'white' }}>
-            <CardHeader className="pb-3" style={{ backgroundColor: 'white' }}>
+          <Card className="admin-card bg-white">
+            <CardHeader className="pb-3 bg-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Total Revenue</CardTitle>
                 <DollarSign className="h-5 w-5 text-green-500" />
               </div>
             </CardHeader>
-            <CardContent style={{ backgroundColor: 'white' }}>
+            <CardContent className="bg-white">
               <div className="text-2xl font-bold text-slate-800">₹1.2M</div>
               <p className="text-xs text-green-600 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
@@ -50,14 +50,14 @@ const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card className="admin-stat-card" style={{ backgroundColor: 'white' }}>
-            <CardHeader className="pb-3" style={{ backgroundColor: 'white' }}>
+          <Card className="admin-card bg-white">
+            <CardHeader className="pb-3 bg-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Transactions</CardTitle>
                 <CreditCard className="h-5 w-5 text-blue-500" />
               </div>
             </CardHeader>
-            <CardContent style={{ backgroundColor: 'white' }}>
+            <CardContent className="bg-white">
               <div className="text-2xl font-bold text-slate-800">5,698</div>
               <p className="text-xs text-green-600 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
@@ -66,14 +66,14 @@ const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card className="admin-stat-card" style={{ backgroundColor: 'white' }}>
-            <CardHeader className="pb-3" style={{ backgroundColor: 'white' }}>
+          <Card className="admin-card bg-white">
+            <CardHeader className="pb-3 bg-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Success Rate</CardTitle>
                 <TrendingUp className="h-5 w-5 text-green-500" />
               </div>
             </CardHeader>
-            <CardContent style={{ backgroundColor: 'white' }}>
+            <CardContent className="bg-white">
               <div className="text-2xl font-bold text-slate-800">98.2%</div>
               <p className="text-xs text-green-600 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
@@ -83,27 +83,27 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </div>
         
-        <div className="grid gap-6 lg:grid-cols-3" style={{ backgroundColor: 'white' }}>
+        <div className="grid gap-6 lg:grid-cols-3 bg-white">
           <div className="lg:col-span-2">
-            <Card className="admin-card" style={{ backgroundColor: 'white' }}>
-              <CardHeader className="pb-4" style={{ backgroundColor: 'white' }}>
+            <Card className="admin-card bg-white">
+              <CardHeader className="pb-4 bg-white">
                 <CardTitle className="text-lg font-semibold text-slate-800">Transaction Overview</CardTitle>
                 <p className="text-sm text-slate-600">Month-to-date transaction performance</p>
               </CardHeader>
-              <CardContent style={{ backgroundColor: 'white' }}>
-                <div className="h-80 w-full rounded-lg flex items-center justify-center border border-slate-200" style={{ backgroundColor: 'white' }}>
+              <CardContent className="bg-white">
+                <div className="h-80 w-full rounded-lg flex items-center justify-center border border-slate-200 bg-white">
                   <p className="text-slate-500">Transaction chart would be displayed here</p>
                 </div>
               </CardContent>
             </Card>
           </div>
           
-          <Card className="admin-card" style={{ backgroundColor: 'white' }}>
-            <CardHeader className="pb-4" style={{ backgroundColor: 'white' }}>
+          <Card className="admin-card bg-white">
+            <CardHeader className="pb-4 bg-white">
               <CardTitle className="text-lg font-semibold text-slate-800">Payment Methods</CardTitle>
               <p className="text-sm text-slate-600">Distribution by payment type</p>
             </CardHeader>
-            <CardContent style={{ backgroundColor: 'white' }}>
+            <CardContent className="bg-white">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -128,32 +128,32 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </div>
         
-        <div className="mt-6" style={{ backgroundColor: 'white' }}>
-          <Tabs defaultValue="overview" style={{ backgroundColor: 'white' }}>
-            <TabsList className="admin-tabs-list" style={{ backgroundColor: 'white' }}>
+        <div className="mt-6 bg-white">
+          <Tabs defaultValue="overview" className="bg-white">
+            <TabsList className="admin-tabs-list bg-white">
               <TabsTrigger value="overview" className="admin-tabs-trigger">Overview</TabsTrigger>
               <TabsTrigger value="revenue" className="admin-tabs-trigger">Revenue Analytics</TabsTrigger>
               <TabsTrigger value="reports" className="admin-tabs-trigger">Reports</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="overview" className="mt-6" style={{ backgroundColor: 'white' }}>
-              <div className="grid gap-6 md:grid-cols-2" style={{ backgroundColor: 'white' }}>
-                <Card className="admin-card" style={{ backgroundColor: 'white' }}>
-                  <CardHeader style={{ backgroundColor: 'white' }}>
+            <TabsContent value="overview" className="mt-6 bg-white">
+              <div className="grid gap-6 md:grid-cols-2 bg-white">
+                <Card className="admin-card bg-white">
+                  <CardHeader className="bg-white">
                     <CardTitle className="text-lg font-semibold text-slate-800">Recent Transactions</CardTitle>
                   </CardHeader>
-                  <CardContent style={{ backgroundColor: 'white' }}>
+                  <CardContent className="bg-white">
                     <div className="space-y-4">
                       <p className="text-slate-600">Transaction data would be displayed here</p>
                     </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="admin-card" style={{ backgroundColor: 'white' }}>
-                  <CardHeader style={{ backgroundColor: 'white' }}>
+                <Card className="admin-card bg-white">
+                  <CardHeader className="bg-white">
                     <CardTitle className="text-lg font-semibold text-slate-800">System Status</CardTitle>
                   </CardHeader>
-                  <CardContent style={{ backgroundColor: 'white' }}>
+                  <CardContent className="bg-white">
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <span className="text-slate-700">API Gateway</span>
@@ -177,32 +177,32 @@ const AdminDashboard: React.FC = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="revenue" className="mt-6" style={{ backgroundColor: 'white' }}>
-              <div style={{ backgroundColor: 'white' }}>
+            <TabsContent value="revenue" className="mt-6 bg-white">
+              <div className="bg-white">
                 <RevenueChart />
               </div>
             </TabsContent>
             
-            <TabsContent value="reports" className="mt-6" style={{ backgroundColor: 'white' }}>
-              <Card className="admin-card" style={{ backgroundColor: 'white' }}>
-                <CardHeader style={{ backgroundColor: 'white' }}>
+            <TabsContent value="reports" className="mt-6 bg-white">
+              <Card className="admin-card bg-white">
+                <CardHeader className="bg-white">
                   <CardTitle className="text-lg font-semibold text-slate-800">Reports</CardTitle>
                 </CardHeader>
-                <CardContent style={{ backgroundColor: 'white' }}>
+                <CardContent className="bg-white">
                   <div className="space-y-4">
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors" style={{ backgroundColor: 'white' }}>
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">Daily Transaction Summary</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors" style={{ backgroundColor: 'white' }}>
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">Monthly Revenue Report</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors" style={{ backgroundColor: 'white' }}>
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">Merchant Activity Log</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
-                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors" style={{ backgroundColor: 'white' }}>
+                    <div className="p-4 border border-slate-200 rounded-lg flex justify-between items-center hover:border-blue-300 transition-colors bg-white">
                       <span className="font-medium text-slate-800">System Performance</span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">Download</button>
                     </div>
