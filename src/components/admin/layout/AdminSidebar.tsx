@@ -62,52 +62,7 @@ const AdminSidebar = ({
       icon: <BarChart3 className="h-5 w-5" />
     },
     {
-      title: "Merchants",
-      href: "/admin/merchants",
-      icon: <Users className="h-5 w-5" />
-    },
-    {
-      title: "Transactions",
-      href: "/admin/transactions",
-      icon: <CreditCard className="h-5 w-5" />
-    },
-    {
-      title: "Payout Management",
-      href: "/admin/payout-management",
-      icon: <DollarSign className="h-5 w-5" />
-    },
-    {
-      title: "KYC Management",
-      href: "/admin/kyc",
-      icon: <UserCheck className="h-5 w-5" />
-    },
-    {
-      title: "Pricing Management",
-      href: "/admin/pricing",
-      icon: <IndianRupee className="h-5 w-5" />
-    },
-    {
-      title: "Escrow Management",
-      href: "/admin/escrow",
-      icon: <Coins className="h-5 w-5" />
-    },
-    {
-      title: "Payment Recon",
-      href: "/admin/payment-recon",
-      icon: <FileText className="h-5 w-5" />
-    },
-    {
-      title: "Whitelist Management",
-      href: "/admin/whitelist",
-      icon: <Shield className="h-5 w-5" />
-    },
-    {
-      title: "Support Center",
-      href: "/admin/support",
-      icon: <HeadphonesIcon className="h-5 w-5" />
-    },
-    {
-      title: "System Monitoring",
+      title: "Monitoring",
       href: "/admin/monitoring",
       icon: <Monitor className="h-5 w-5" />
     },
@@ -117,19 +72,59 @@ const AdminSidebar = ({
       icon: <Code className="h-5 w-5" />
     },
     {
-      title: "Activity Logs",
+      title: "Production APIs",
+      href: "/admin/production-api",
+      icon: <Database className="h-5 w-5" />
+    },
+    {
+      title: "Escrow Management",
+      href: "/admin/escrow",
+      icon: <Coins className="h-5 w-5" />
+    },
+    {
+      title: "Payout Management",
+      href: "/admin/payout-management",
+      icon: <DollarSign className="h-5 w-5" />
+    },
+    {
+      title: "Transactions",
+      href: "/admin/transactions",
+      icon: <CreditCard className="h-5 w-5" />
+    },
+    {
+      title: "Transaction Log",
+      href: "/admin/transaction-log",
+      icon: <FileText className="h-5 w-5" />
+    },
+    {
+      title: "Activity Log",
       href: "/admin/activity-log",
       icon: <Activity className="h-5 w-5" />
     },
     {
-      title: "Settings",
-      href: "/admin/settings",
-      icon: <Settings className="h-5 w-5" />
+      title: "UPI Management",
+      href: "/admin/upi-management",
+      icon: <IndianRupee className="h-5 w-5" />
+    },
+    {
+      title: "Merchants",
+      href: "/admin/merchants",
+      icon: <Users className="h-5 w-5" />
+    },
+    {
+      title: "KYC",
+      href: "/admin/kyc",
+      icon: <UserCheck className="h-5 w-5" />
+    },
+    {
+      title: "Support",
+      href: "/admin/support",
+      icon: <HeadphonesIcon className="h-5 w-5" />
     }
   ];
 
   const sidebarClasses = cn(
-    "flex flex-col h-full admin-sidebar transition-all duration-300",
+    "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
     isMobile ? (mobileMenuOpen ? "fixed inset-y-0 left-0 z-50 w-[280px]" : "hidden") : (collapsed ? "w-20" : "w-[280px]"),
     hiddenOnMobile && isMobile && "hidden"
   );
@@ -145,14 +140,14 @@ const AdminSidebar = ({
       )}
       
       <div className={sidebarClasses}>
-        <div className="flex items-center justify-between p-6 border-b border-slate-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <Link to="/admin/dashboard" className="flex items-center space-x-3">
             {(!collapsed || isMobile) && (
               <>
                 <div className="h-8 w-8 bg-blue-500 rounded-lg flex items-center justify-center">
                   <CircleDollarSign className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-semibold text-lg text-slate-800">RizzPay</span>
+                <span className="font-bold text-lg text-blue-500">RizzPay</span>
               </>
             )}
             {collapsed && !isMobile && (
@@ -165,7 +160,7 @@ const AdminSidebar = ({
             <Button
               variant="ghost"
               size="icon"
-              className="ml-auto h-8 w-8 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
+              className="ml-auto h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               onClick={() => setCollapsed(!collapsed)}
             >
               {collapsed ? (
@@ -178,14 +173,16 @@ const AdminSidebar = ({
         </div>
 
         <ScrollArea className="flex-1 py-4">
-          <nav className="grid gap-2 px-4">
+          <nav className="grid gap-1 px-4">
             {navigationItems.map((item, index) => (
               <Link
                 key={index}
                 to={item.href}
                 className={cn(
-                  "admin-nav-item flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all",
-                  pathname === item.href && "admin-nav-item active"
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all rounded-lg",
+                  pathname === item.href 
+                    ? "bg-blue-50 text-blue-600" 
+                    : "text-gray-700 hover:bg-gray-50 hover:text-black"
                 )}
                 onClick={() => isMobile && setMobileMenuOpen(false)}
               >
@@ -196,15 +193,15 @@ const AdminSidebar = ({
           </nav>
         </ScrollArea>
 
-        <div className="mt-auto border-t border-slate-200 p-4">
+        <div className="mt-auto border-t border-gray-200 p-4">
           <div className={cn("flex items-center", (collapsed && !isMobile) ? "justify-center" : "space-x-3 mb-4")}>
             <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-sm font-medium text-blue-600">A</span>
             </div>
             {(!collapsed || isMobile) && (
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-slate-800">Administrator</p>
-                <p className="text-xs leading-none text-slate-500 truncate max-w-[180px]">{userEmail}</p>
+                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-gray-900">admin</p>
+                <p className="text-xs leading-none text-gray-500 truncate max-w-[180px]">Administrator</p>
               </div>
             )}
           </div>
@@ -212,7 +209,7 @@ const AdminSidebar = ({
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all",
+              "w-full text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all",
               (collapsed && !isMobile) ? "justify-center px-0" : "justify-start"
             )}
             onClick={handleLogout}
