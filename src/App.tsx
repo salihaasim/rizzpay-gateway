@@ -35,6 +35,7 @@ import AdminApiManagement from '@/pages/AdminApiManagement';
 import AdminEscrow from '@/pages/AdminEscrow';
 import AdminUpiManagement from '@/pages/AdminUpiManagement';
 import AdminPricing from '@/pages/admin/AdminPricing';
+import AdminProductionApi from '@/pages/admin/AdminProductionApi';
 import TermsAndConditions from '@/pages/TermsAndConditions';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import RefundPolicy from '@/pages/RefundPolicy';
@@ -87,6 +88,7 @@ function App() {
             <Route path="/admin/activity-log" element={<AdminActivityLog />} />
             <Route path="/admin/monitoring" element={<AdminMonitoring />} />
             <Route path="/admin/api-management" element={<AdminApiManagement />} />
+            <Route path="/admin/production-api" element={<AdminProductionApi />} />
             <Route path="/admin/escrow" element={<AdminEscrow />} />
             <Route path="/admin/upi-management" element={<AdminUpiManagement />} />
           </Routes>

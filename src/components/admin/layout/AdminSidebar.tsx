@@ -26,7 +26,8 @@ import {
   Code,
   Lock,
   IndianRupee,
-  RefreshCw
+  RefreshCw,
+  List
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
@@ -126,6 +127,16 @@ const AdminSidebar = ({
       title: "Support",
       href: "/admin/support",
       icon: <HeadphonesIcon className="h-5 w-5" />
+    },
+    {
+      title: "Whitelist",
+      href: "/admin/whitelist",
+      icon: <List className="h-5 w-5" />
+    },
+    {
+      title: "Settings",
+      href: "/admin/settings",
+      icon: <Settings className="h-5 w-5" />
     }
   ];
 
@@ -187,8 +198,8 @@ const AdminSidebar = ({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all rounded-lg",
                   pathname === item.href 
-                    ? "bg-black text-white border-2 border-black" 
-                    : "text-gray-700 hover:bg-gray-50 hover:text-black"
+                    ? "bg-blue-500 text-white" 
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
                 )}
                 onClick={() => isMobile && setMobileMenuOpen(false)}
               >
