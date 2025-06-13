@@ -20,10 +20,12 @@
   --admin-sidebar-bg: 255 255 255;
   --admin-sidebar-text: 71 85 105;
   --admin-sidebar-hover: 239 246 255;
-  --admin-sidebar-active: 59 130 246;
+  --admin-sidebar-active: 0 0 0;
   --admin-sidebar-active-text: 255 255 255;
   --admin-header-bg: 255 255 255;
   --admin-header-border: 226 232 240;
+  --admin-highlight: 0 0 0;
+  --admin-highlight-text: 255 255 255;
 }
 
 /* Admin theme application */
@@ -50,8 +52,9 @@
 }
 
 .admin-sidebar-item.active {
-  background-color: hsl(var(--admin-primary));
-  color: hsl(var(--admin-sidebar-active-text));
+  background-color: hsl(var(--admin-highlight));
+  color: hsl(var(--admin-highlight-text));
+  border: 2px solid hsl(var(--admin-highlight));
 }
 
 .admin-header {
@@ -61,7 +64,7 @@
 
 .admin-card {
   background-color: hsl(var(--admin-card));
-  border: 1px solid hsl(var(--admin-border));
+  border: 2px solid hsl(var(--admin-highlight));
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
@@ -89,14 +92,15 @@
 }
 
 .admin-nav-item.active {
-  background-color: hsl(var(--admin-primary));
-  color: hsl(var(--admin-sidebar-active-text));
+  background-color: hsl(var(--admin-highlight));
+  color: hsl(var(--admin-highlight-text));
+  border: 2px solid hsl(var(--admin-highlight));
 }
 
 /* Tabs styling */
 .admin-tabs-list {
   background-color: hsl(var(--admin-background));
-  border: 1px solid hsl(var(--admin-border));
+  border: 2px solid hsl(var(--admin-highlight));
   border-radius: 8px;
 }
 
@@ -113,6 +117,6 @@
 }
 
 .admin-tabs-trigger[data-state="active"] {
-  background-color: hsl(var(--admin-primary));
-  color: hsl(var(--admin-primary-foreground));
+  background-color: hsl(var(--admin-highlight));
+  color: hsl(var(--admin-highlight-text));
 }
