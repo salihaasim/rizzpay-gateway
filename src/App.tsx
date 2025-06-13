@@ -36,6 +36,7 @@ import AdminEscrow from '@/pages/AdminEscrow';
 import AdminUpiManagement from '@/pages/AdminUpiManagement';
 import AdminPricing from '@/pages/admin/AdminPricing';
 import AdminProductionApi from '@/pages/admin/AdminProductionApi';
+import MonitoringDashboard from '@/components/admin/monitoring/MonitoringDashboard';
 import TermsAndConditions from '@/pages/TermsAndConditions';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import RefundPolicy from '@/pages/RefundPolicy';
@@ -87,6 +88,7 @@ function App() {
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/activity-log" element={<AdminActivityLog />} />
             <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+            <Route path="/admin/monitoring/:dashboardType" element={<MonitoringDashboard />} />
             <Route path="/admin/api-management" element={<AdminApiManagement />} />
             <Route path="/admin/production-api" element={<AdminProductionApi />} />
             <Route path="/admin/escrow" element={<AdminEscrow />} />

@@ -74,7 +74,7 @@ const AdminMonitoring = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'operational': return 'bg-green-500/10 text-green-600 border-green-200';
-      case 'warning': return 'bg-yellow-500/10 text-yellow-600 border-yellow-200';
+      case 'warning': return 'bg-blue-500/10 text-blue-600 border-blue-200';
       case 'error': return 'bg-red-500/10 text-red-600 border-red-200';
       default: return 'bg-gray-500/10 text-gray-600 border-gray-200';
     }
@@ -86,7 +86,7 @@ const AdminMonitoring = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="admin-theme space-y-6">
         <div>
           <h1 className="text-2xl font-bold">System Monitoring</h1>
           <p className="text-muted-foreground mt-1">
@@ -96,7 +96,7 @@ const AdminMonitoring = () => {
 
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
+          <Card className="admin-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -108,7 +108,7 @@ const AdminMonitoring = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="admin-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -120,26 +120,26 @@ const AdminMonitoring = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="admin-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Avg Response</p>
                   <p className="text-2xl font-bold">120ms</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-purple-600" />
+                <TrendingUp className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="admin-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Incidents</p>
-                  <p className="text-2xl font-bold text-yellow-600">1</p>
+                  <p className="text-2xl font-bold text-blue-600">1</p>
                 </div>
-                <AlertCircle className="h-8 w-8 text-yellow-600" />
+                <AlertCircle className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -152,12 +152,12 @@ const AdminMonitoring = () => {
             {monitoringDashboards.map((dashboard) => (
               <Card 
                 key={dashboard.id} 
-                className="cursor-pointer hover:shadow-md transition-shadow"
+                className="admin-card cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => handleDashboardClick(dashboard.id)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <dashboard.icon className="h-6 w-6 text-primary" />
+                    <dashboard.icon className="h-6 w-6 text-blue-600" />
                     <Badge className={getStatusColor(dashboard.status)}>
                       {dashboard.status}
                     </Badge>
@@ -174,7 +174,7 @@ const AdminMonitoring = () => {
                       </div>
                     ))}
                   </div>
-                  <Button variant="outline" size="sm" className="w-full mt-4">
+                  <Button variant="outline" size="sm" className="admin-button-primary w-full mt-4 hover:bg-blue-600 hover:text-white">
                     View Dashboard
                   </Button>
                 </CardContent>
@@ -184,19 +184,19 @@ const AdminMonitoring = () => {
         </div>
 
         {/* Recent Alerts */}
-        <Card>
+        <Card className="admin-card">
           <CardHeader>
             <CardTitle>Recent Alerts</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
+              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <AlertCircle className="h-5 w-5 text-blue-600" />
                 <div className="flex-1">
-                  <p className="font-medium text-yellow-800">Database connection pool usage high</p>
-                  <p className="text-sm text-yellow-600">Connection pool at 68% capacity</p>
+                  <p className="font-medium text-blue-800">Database connection pool usage high</p>
+                  <p className="text-sm text-blue-600">Connection pool at 68% capacity</p>
                 </div>
-                <span className="text-xs text-yellow-600">2 min ago</span>
+                <span className="text-xs text-blue-600">2 min ago</span>
               </div>
               
               <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
