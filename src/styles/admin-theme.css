@@ -120,3 +120,27 @@
   background-color: hsl(var(--admin-highlight));
   color: hsl(var(--admin-highlight-text));
 }
+
+/* Remove all yellow header styling */
+.admin-section-header {
+  background-color: hsl(var(--admin-background));
+  color: hsl(var(--admin-foreground));
+}
+
+/* Ensure no yellow backgrounds in admin pages */
+.admin-theme .bg-yellow-50,
+.admin-theme .bg-yellow-100,
+.admin-theme .bg-yellow-200 {
+  background-color: hsl(var(--admin-background)) !important;
+}
+
+.admin-theme .text-yellow-600,
+.admin-theme .text-yellow-700,
+.admin-theme .text-yellow-800 {
+  color: hsl(var(--admin-foreground)) !important;
+}
+
+.admin-theme .border-yellow-200,
+.admin-theme .border-yellow-300 {
+  border-color: hsl(var(--admin-border)) !important;
+}
