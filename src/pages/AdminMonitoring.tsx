@@ -88,7 +88,7 @@ const AdminMonitoring = () => {
     <AdminLayout>
       <div className="admin-theme space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">System Monitoring</h1>
+          <h1 className="text-2xl font-bold text-blue-600">System Monitoring</h1>
           <p className="text-muted-foreground mt-1">
             Monitor system health and performance metrics across all services
           </p>
@@ -147,12 +147,12 @@ const AdminMonitoring = () => {
 
         {/* Monitoring Dashboards */}
         <div>
-          <h2 className="text-lg font-semibold mb-4">Monitoring Dashboards</h2>
+          <h2 className="text-lg font-semibold mb-4 text-blue-600">Monitoring Dashboards</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {monitoringDashboards.map((dashboard) => (
               <Card 
                 key={dashboard.id} 
-                className="admin-card cursor-pointer hover:shadow-md transition-shadow"
+                className="admin-card cursor-pointer hover:shadow-md transition-shadow hover:border-blue-600"
                 onClick={() => handleDashboardClick(dashboard.id)}
               >
                 <CardHeader className="pb-3">
@@ -162,7 +162,7 @@ const AdminMonitoring = () => {
                       {dashboard.status}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg">{dashboard.title}</CardTitle>
+                  <CardTitle className="text-lg text-blue-600">{dashboard.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">{dashboard.description}</p>
                 </CardHeader>
                 <CardContent>
@@ -186,7 +186,7 @@ const AdminMonitoring = () => {
         {/* Recent Alerts */}
         <Card className="admin-card">
           <CardHeader>
-            <CardTitle>Recent Alerts</CardTitle>
+            <CardTitle className="text-blue-600">Recent Alerts</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

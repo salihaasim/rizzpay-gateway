@@ -39,21 +39,21 @@ const AdminSectionHeader: React.FC<AdminSectionHeaderProps> = ({ section }) => {
   
   const icon = () => {
     switch (section) {
-      case 'merchants': return <Users className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'escrow': return <Wallet className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'pricing': return <Percent className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'transactions': return <CreditCard className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'analytics': return <BarChart3 className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'settings': return <Settings className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      case 'whitelist': return <ShieldCheck className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
-      default: return <ShieldCheck className="h-6 w-6 inline-block mr-2 text-[#9970e2]" />;
+      case 'merchants': return <Users className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      case 'escrow': return <Wallet className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      case 'pricing': return <Percent className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      case 'transactions': return <CreditCard className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      case 'analytics': return <BarChart3 className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      case 'settings': return <Settings className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      case 'whitelist': return <ShieldCheck className="h-6 w-6 inline-block mr-2 text-blue-600" />;
+      default: return <ShieldCheck className="h-6 w-6 inline-block mr-2 text-blue-600" />;
     }
   };
 
   return (
     <div className="flex items-center justify-between mb-8">
       <div>
-        <h1 className="text-2xl font-bold flex items-center">
+        <h1 className="text-2xl font-bold flex items-center text-blue-600">
           {icon()}
           {title()}
         </h1>
