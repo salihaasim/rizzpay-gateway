@@ -30,204 +30,160 @@
 
 /* Admin theme application */
 .admin-theme {
-  background-color: hsl(var(--admin-background));
-  color: hsl(var(--admin-foreground));
+  background-color: hsl(var(--admin-background)) !important;
+  color: hsl(var(--admin-foreground)) !important;
 }
 
+/* NUCLEAR OPTION: Override ALL yellow colors in admin context */
+.admin-theme *,
+.admin-theme *:before,
+.admin-theme *:after {
+  /* Override yellow backgrounds */
+  background-color: var(--admin-background) !important;
+}
+
+.admin-theme .bg-yellow-50,
+.admin-theme .bg-yellow-100,
+.admin-theme .bg-yellow-200,
+.admin-theme .bg-yellow-300,
+.admin-theme .bg-yellow-400,
+.admin-theme .bg-yellow-500 {
+  background-color: hsl(var(--admin-background)) !important;
+}
+
+.admin-theme .text-yellow-500,
+.admin-theme .text-yellow-600,
+.admin-theme .text-yellow-700,
+.admin-theme .text-yellow-800,
+.admin-theme .text-yellow-900 {
+  color: hsl(var(--admin-primary)) !important;
+}
+
+.admin-theme .border-yellow-200,
+.admin-theme .border-yellow-300,
+.admin-theme .border-yellow-400 {
+  border-color: hsl(var(--admin-border)) !important;
+}
+
+/* Admin sidebar styling */
 .admin-sidebar {
-  background-color: hsl(var(--admin-sidebar-bg));
-  color: hsl(var(--admin-sidebar-text));
-  border-right: 1px solid hsl(var(--admin-border));
+  background-color: hsl(var(--admin-sidebar-bg)) !important;
+  color: hsl(var(--admin-sidebar-text)) !important;
+  border-right: 1px solid hsl(var(--admin-border)) !important;
 }
 
 .admin-sidebar-item {
-  color: hsl(var(--admin-sidebar-text));
+  color: hsl(var(--admin-sidebar-text)) !important;
   transition: all 0.2s ease;
   border-radius: 8px;
 }
 
 .admin-sidebar-item:hover {
-  background-color: hsl(var(--admin-sidebar-hover));
-  color: hsl(var(--admin-primary));
+  background-color: hsl(var(--admin-sidebar-hover)) !important;
+  color: hsl(var(--admin-primary)) !important;
 }
 
 .admin-sidebar-item.active {
-  background-color: hsl(var(--admin-highlight));
-  color: hsl(var(--admin-highlight-text));
+  background-color: hsl(var(--admin-highlight)) !important;
+  color: hsl(var(--admin-highlight-text)) !important;
 }
 
+/* Admin header styling */
 .admin-header {
-  background-color: hsl(var(--admin-header-bg));
-  border-bottom: 1px solid hsl(var(--admin-header-border));
+  background-color: hsl(var(--admin-header-bg)) !important;
+  border-bottom: 1px solid hsl(var(--admin-header-border)) !important;
 }
 
+.admin-header h1,
+.admin-header .page-title {
+  color: hsl(var(--admin-primary)) !important;
+}
+
+/* Admin cards */
 .admin-card {
-  background-color: hsl(var(--admin-card));
-  border: 2px solid hsl(var(--admin-border));
+  background-color: hsl(var(--admin-card)) !important;
+  border: 2px solid hsl(var(--admin-border)) !important;
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
+/* Admin buttons */
 .admin-button-primary {
-  background-color: hsl(var(--admin-primary));
-  color: hsl(var(--admin-primary-foreground));
+  background-color: hsl(var(--admin-primary)) !important;
+  color: hsl(var(--admin-primary-foreground)) !important;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .admin-button-primary:hover {
-  background-color: hsl(var(--admin-primary) / 0.9);
+  background-color: hsl(var(--admin-primary) / 0.9) !important;
 }
 
+/* Navigation items */
 .admin-nav-item {
-  color: hsl(var(--admin-sidebar-text));
+  color: hsl(var(--admin-sidebar-text)) !important;
   transition: all 0.2s ease;
   border-radius: 8px;
 }
 
 .admin-nav-item:hover {
-  background-color: hsl(var(--admin-sidebar-hover));
-  color: hsl(var(--admin-primary));
+  background-color: hsl(var(--admin-sidebar-hover)) !important;
+  color: hsl(var(--admin-primary)) !important;
 }
 
 .admin-nav-item.active {
-  background-color: hsl(var(--admin-highlight));
-  color: hsl(var(--admin-highlight-text));
-}
-
-/* Tabs styling */
-.admin-tabs-list {
-  background-color: hsl(var(--admin-background));
-  border: 2px solid hsl(var(--admin-border));
-  border-radius: 8px;
-}
-
-.admin-tabs-trigger {
-  background-color: transparent;
-  color: hsl(var(--admin-foreground));
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.admin-tabs-trigger:hover {
-  background-color: hsl(var(--admin-accent));
-  color: hsl(var(--admin-primary));
-}
-
-.admin-tabs-trigger[data-state="active"] {
-  background-color: hsl(var(--admin-highlight));
-  color: hsl(var(--admin-highlight-text));
-}
-
-/* Remove all yellow header styling */
-.admin-section-header {
-  background-color: hsl(var(--admin-background));
-  color: hsl(var(--admin-foreground));
-}
-
-/* Ensure no yellow backgrounds in admin pages */
-.admin-theme .bg-yellow-50,
-.admin-theme .bg-yellow-100,
-.admin-theme .bg-yellow-200 {
-  background-color: hsl(var(--admin-background)) !important;
-}
-
-.admin-theme .text-yellow-600,
-.admin-theme .text-yellow-700,
-.admin-theme .text-yellow-800 {
-  color: hsl(var(--admin-foreground)) !important;
-}
-
-.admin-theme .border-yellow-200,
-.admin-theme .border-yellow-300 {
-  border-color: hsl(var(--admin-border)) !important;
-}
-
-/* Blue active state for sidebar navigation */
-.admin-sidebar .bg-blue-500 {
   background-color: hsl(var(--admin-highlight)) !important;
   color: hsl(var(--admin-highlight-text)) !important;
 }
 
-/* Blue hover state for sidebar navigation */
-.admin-sidebar .hover\:bg-blue-50:hover {
-  background-color: hsl(var(--admin-sidebar-hover)) !important;
-}
-
-.admin-sidebar .hover\:text-blue-600:hover {
-  color: hsl(var(--admin-primary)) !important;
-}
-
-/* Enhanced hover effects for admin interface */
-.admin-theme .hover\:text-blue-600:hover {
-  color: hsl(var(--admin-primary)) !important;
-}
-
-.admin-theme .hover\:bg-blue-600:hover {
-  background-color: hsl(var(--admin-primary)) !important;
-}
-
-.admin-theme .hover\:text-white:hover {
-  color: hsl(var(--admin-primary-foreground)) !important;
-}
-
-/* Alert styling - convert yellow to blue */
-.admin-theme .bg-yellow-50 {
-  background-color: rgb(239 246 255) !important;
-}
-
-.admin-theme .border-yellow-200 {
-  border-color: rgb(191 219 254) !important;
-}
-
-.admin-theme .text-yellow-600 {
-  color: rgb(37 99 235) !important;
-}
-
-.admin-theme .text-yellow-800 {
-  color: rgb(30 64 175) !important;
-}
-
-/* Fix page headers to use blue color */
+/* Page headers - Force blue color */
 .admin-theme h1,
 .admin-theme h2,
-.admin-theme h3 {
+.admin-theme h3,
+.admin-theme .page-header,
+.admin-theme .section-title {
   color: hsl(var(--admin-primary)) !important;
 }
 
-/* Fix hover text colors in admin UI */
-.admin-theme .text-muted-foreground:hover,
-.admin-theme .hover\:text-foreground:hover {
+/* Text colors - Force blue for important text */
+.admin-theme .text-primary {
   color: hsl(var(--admin-primary)) !important;
 }
 
-/* Fix button hover states */
+/* Hover states */
+.admin-theme .hover\:text-blue-600:hover,
+.admin-theme .hover\:text-primary:hover {
+  color: hsl(var(--admin-primary)) !important;
+}
+
+.admin-theme .hover\:bg-blue-50:hover,
 .admin-theme .hover\:bg-muted:hover {
   background-color: hsl(var(--admin-accent)) !important;
+}
+
+/* Force all navigation active states to blue */
+.admin-theme .bg-blue-500,
+.admin-theme .bg-primary {
+  background-color: hsl(var(--admin-highlight)) !important;
+  color: hsl(var(--admin-highlight-text)) !important;
+}
+
+/* Force all text to blue where needed */
+.admin-theme .text-blue-600,
+.admin-theme .text-blue-500 {
   color: hsl(var(--admin-primary)) !important;
 }
 
-/* Fix card hover effects */
-.admin-theme .hover\:shadow-md:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  border-color: hsl(var(--admin-primary)) !important;
+/* Comprehensive yellow elimination */
+.admin-theme [class*="yellow"] {
+  background-color: hsl(var(--admin-background)) !important;
+  color: hsl(var(--admin-primary)) !important;
+  border-color: hsl(var(--admin-border)) !important;
 }
 
-/* Fix text colors throughout admin interface */
-.admin-theme .text-gray-600,
-.admin-theme .text-gray-700,
-.admin-theme .text-gray-800 {
-  color: hsl(var(--admin-foreground)) !important;
-}
-
-/* Fix monitoring dashboard specific styling */
+/* Status colors - keep functional colors but remove yellow */
 .admin-theme .text-green-600 {
   color: rgb(34 197 94) !important;
-}
-
-.admin-theme .text-orange-500,
-.admin-theme .text-orange-600 {
-  color: hsl(var(--admin-primary)) !important;
 }
 
 .admin-theme .text-red-500,
@@ -235,7 +191,12 @@
   color: rgb(239 68 68) !important;
 }
 
-/* Fix background colors for status badges */
+.admin-theme .text-orange-500,
+.admin-theme .text-orange-600 {
+  color: hsl(var(--admin-primary)) !important;
+}
+
+/* Background status colors */
 .admin-theme .bg-green-500\/20 {
   background-color: rgba(34, 197, 94, 0.1) !important;
 }
@@ -247,4 +208,46 @@
 
 .admin-theme .bg-red-500\/20 {
   background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Tabs styling */
+.admin-tabs-list {
+  background-color: hsl(var(--admin-background)) !important;
+  border: 2px solid hsl(var(--admin-border)) !important;
+  border-radius: 8px;
+}
+
+.admin-tabs-trigger {
+  background-color: transparent !important;
+  color: hsl(var(--admin-foreground)) !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.admin-tabs-trigger:hover {
+  background-color: hsl(var(--admin-accent)) !important;
+  color: hsl(var(--admin-primary)) !important;
+}
+
+.admin-tabs-trigger[data-state="active"] {
+  background-color: hsl(var(--admin-highlight)) !important;
+  color: hsl(var(--admin-highlight-text)) !important;
+}
+
+/* Force override any remaining default colors */
+.admin-theme .text-gray-600,
+.admin-theme .text-gray-700,
+.admin-theme .text-gray-800,
+.admin-theme .text-slate-600,
+.admin-theme .text-slate-700,
+.admin-theme .text-slate-800 {
+  color: hsl(var(--admin-foreground)) !important;
+}
+
+.admin-theme .text-muted-foreground {
+  color: hsl(var(--admin-muted-foreground)) !important;
+}
+
+.admin-theme .text-muted-foreground:hover {
+  color: hsl(var(--admin-primary)) !important;
 }

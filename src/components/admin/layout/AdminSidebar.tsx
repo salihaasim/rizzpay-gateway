@@ -141,7 +141,7 @@ const AdminSidebar = ({
   ];
 
   const sidebarClasses = cn(
-    "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
+    "admin-sidebar flex flex-col h-full transition-all duration-300",
     isMobile ? (mobileMenuOpen ? "fixed inset-y-0 left-0 z-50 w-[280px]" : "hidden") : (collapsed ? "w-20" : "w-[280px]"),
     hiddenOnMobile && isMobile && "hidden"
   );
@@ -157,7 +157,7 @@ const AdminSidebar = ({
       )}
       
       <div className={sidebarClasses}>
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <Link to="/admin/dashboard" className="flex items-center space-x-3">
             {(!collapsed || isMobile) && (
               <>
@@ -177,7 +177,7 @@ const AdminSidebar = ({
             <Button
               variant="ghost"
               size="icon"
-              className="ml-auto h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="ml-auto h-8 w-8 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
               onClick={() => setCollapsed(!collapsed)}
             >
               {collapsed ? (
@@ -196,10 +196,10 @@ const AdminSidebar = ({
                 key={index}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all rounded-lg",
+                  "admin-nav-item flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all rounded-lg",
                   pathname === item.href 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                    ? "admin-nav-item active" 
+                    : ""
                 )}
                 onClick={() => isMobile && setMobileMenuOpen(false)}
               >
@@ -210,15 +210,15 @@ const AdminSidebar = ({
           </nav>
         </ScrollArea>
 
-        <div className="mt-auto border-t border-gray-200 p-4">
+        <div className="mt-auto border-t border-slate-200 p-4">
           <div className={cn("flex items-center", (collapsed && !isMobile) ? "justify-center" : "space-x-3 mb-4")}>
             <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-sm font-medium text-blue-600">A</span>
             </div>
             {(!collapsed || isMobile) && (
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-gray-900">admin</p>
-                <p className="text-xs leading-none text-gray-500 truncate max-w-[180px]">Administrator</p>
+                <p className="text-sm font-medium leading-none truncate max-w-[180px] text-slate-900">admin</p>
+                <p className="text-xs leading-none text-slate-500 truncate max-w-[180px]">Administrator</p>
               </div>
             )}
           </div>
@@ -226,7 +226,7 @@ const AdminSidebar = ({
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all",
+              "w-full text-slate-600 hover:text-slate-900 hover:bg-blue-50 transition-all",
               (collapsed && !isMobile) ? "justify-center px-0" : "justify-start"
             )}
             onClick={handleLogout}

@@ -51,19 +51,24 @@ const AdminSectionHeader: React.FC<AdminSectionHeaderProps> = ({ section }) => {
   };
 
   return (
-    <div className="flex items-center justify-between mb-8">
+    <div className="admin-section-header flex items-center justify-between mb-8 p-4 bg-white rounded-lg border border-slate-200">
       <div>
-        <h1 className="text-2xl font-bold flex items-center text-blue-600">
+        <h1 className="section-title text-2xl font-bold flex items-center text-blue-600">
           {icon()}
           {title()}
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-slate-600 mt-1">
           {description()}
         </p>
       </div>
       
       <div className="hidden md:flex items-center gap-3">
-        <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/dashboard')}
+          className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+        >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Merchant View
         </Button>

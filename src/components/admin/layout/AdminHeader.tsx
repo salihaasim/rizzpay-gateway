@@ -73,7 +73,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   }
   
   return (
-    <header className="admin-header px-6 py-4 flex items-center justify-between bg-white border-b border-slate-200">
+    <header className="admin-header px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
         {/* Desktop sidebar toggle */}
         <Button
@@ -119,7 +119,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         </div>
         
         <div>
-          <h1 className="text-xl font-semibold text-slate-800 truncate">{getPageTitle()}</h1>
+          <h1 className="page-title text-xl font-semibold text-blue-600 truncate">{getPageTitle()}</h1>
           <p className="text-sm text-slate-600 hidden sm:block">Manage your platform from here</p>
         </div>
       </div>
