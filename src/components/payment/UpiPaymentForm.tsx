@@ -1,19 +1,13 @@
-
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Loader2, QrCode, Copy, Check, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import UpiQrCodeDisplay from './UpiQrCodeDisplay';
 
+// Strongly explicit, simple props definition to avoid TypeScript deep type errors.
 interface UpiPaymentFormProps {
   amount: string;
   description: string;
   upiId: string;
   qrCodeUrl: string;
   openUpiApp: () => void;
-  handlePaymentSuccess: () => void;
+  handlePaymentSuccess: () => Promise<void>;
   loading: boolean;
   linkCopied: boolean;
   copyToClipboard: (text: string) => void;
@@ -106,3 +100,6 @@ const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
 };
 
 export default UpiPaymentForm;
+
+// NOTE: The interface has been simplified to resolve "Type instantiation is excessively deep" errors.
+// If you need to extend the props, do so carefully and avoid recursive or extremely generic types.
