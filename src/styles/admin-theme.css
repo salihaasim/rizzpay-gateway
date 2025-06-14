@@ -417,3 +417,100 @@
 .admin-theme .border {
   border-color: hsl(var(--admin-border)) !important;
 }
+
+/* --- ADMIN SIDEBAR STYLING AS PER PROVIDED IMAGE --- */
+
+/* SIDEBAR BACKGROUND AND BORDER */
+.admin-sidebar {
+  background-color: #fff !important;
+  color: hsl(var(--admin-sidebar-text)) !important;
+  border-right: 1px solid hsl(var(--admin-border)) !important;
+}
+
+/* SIDEBAR BRAND LOGO TEXT */
+.admin-sidebar .font-bold.text-lg {
+  color: #2563eb !important;
+}
+
+/* NAV ITEM DEFAULT STATE (unselected) */
+.admin-nav-item,
+.admin-sidebar-item {
+  background: none !important;
+  color: #334155 !important;   /* slate-800 */
+  font-weight: 400 !important;
+  border-radius: 8px;
+}
+
+/* NAV ITEM HOVER (not active): Only text turns blue, no bg, no underline, no bold */
+.admin-nav-item:hover,
+.admin-sidebar-item:hover {
+  background: none !important;
+  color: #2563eb !important; /* blue-600 */
+  font-weight: 400 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+/* ICON COLOR IN ITEMS */
+.admin-nav-item svg,
+.admin-sidebar-item svg {
+  color: #9ca3af !important; /* slate-400, default */
+  transition: color 0.2s;
+}
+.admin-nav-item:hover svg,
+.admin-sidebar-item:hover svg {
+  color: #2563eb !important; /* blue-600 on hover or active */
+}
+
+/* ACTIVE NAV ITEM: rounded bg blue-100/pill, text and icon blue */
+.admin-nav-item.active,
+.admin-sidebar-item.active {
+  background: #e8f0fe !important;  /* blue-50/blue-100 */
+  color: #2563eb !important;
+  font-weight: 400 !important;
+}
+.admin-nav-item.active svg,
+.admin-sidebar-item.active svg {
+  color: #2563eb !important;
+}
+
+/* REMOVE HOVER/ACTIVE BACKGROUND FROM TABS & OTHER AREAS */
+.admin-tabs-trigger:hover,
+.admin-tabs-trigger[data-state="active"] {
+  background-color: transparent !important;
+  color: #2563eb !important;
+}
+
+/* SIDEBAR BOTTOM USER BOX */
+.admin-sidebar .h-9.w-9.rounded-full,
+.admin-sidebar .h-8.w-8.rounded-full {
+  background-color: #2563eb !important; /* blue avatar */
+  color: #fff !important;
+}
+.admin-sidebar .text-sm.font-medium.text-blue-600 {
+  color: #2563eb !important;
+}
+.admin-sidebar .text-xs.text-slate-500 {
+  color: #64748b !important; /* slate-500 for subtitle */
+}
+.admin-sidebar .admin-sidebar-user-box {
+  background-color: #fff !important;
+}
+
+/* Remove all bold/underline/shadow on sidebar/nav items (including overrides) */
+.admin-sidebar-item,
+.admin-nav-item,
+.admin-sidebar-item:hover,
+.admin-nav-item:hover,
+.admin-sidebar-item.active,
+.admin-nav-item.active {
+  font-weight: 400 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+/* FINAL SANITY: Prevent any blue/gray bg on hover EXCEPT for .active */
+.admin-sidebar-item:not(.active):hover,
+.admin-nav-item:not(.active):hover {
+  background: none !important;
+}
