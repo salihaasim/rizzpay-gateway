@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +23,7 @@ import { toast } from 'sonner';
 const AdminEscrow = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   
   // Mock escrow data
   const [escrowData] = useState({
@@ -51,14 +51,41 @@ const AdminEscrow = () => {
   });
 
   const handleConnect = async () => {
+    if (!connectionForm.accountNumber || !connectionForm.apiKey || !connectionForm.apiSecret) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     setIsLoading(true);
-    
-    // Simulate connection process
-    setTimeout(() => {
-      setIsConnected(true);
+    setSaving(true);
+
+    try {
+      const res = await fetch('/api/admin/escrow/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accountNumber: connectionForm.accountNumber,
+          ifscCode: connectionForm.ifscCode,
+          accountHolderName: connectionForm.accountHolderName,
+          apiKey: connectionForm.apiKey,
+          apiSecret: connectionForm.apiSecret,
+          bank: 'sbm',
+        })
+      });
+      const json = await res.json();
+
+      if (json.success) {
+        setIsConnected(true);
+        toast.success('Successfully connected to SBM Bank escrow account');
+      } else {
+        toast.error(json.message || 'Failed to connect to SBM Bank');
+      }
+    } catch (err: any) {
+      toast.error('Failed to connect: ' + (err.message || err));
+    } finally {
       setIsLoading(false);
-      toast.success('Successfully connected to SBM Bank escrow account');
-    }, 2000);
+      setSaving(false);
+    }
   };
 
   const formatCurrency = (amount: number) => {
