@@ -1,4 +1,3 @@
-
 # RizzPay Payment Gateway
 
 RizzPay is a secure, fast, and reliable payment gateway solution for businesses and consumers.
@@ -96,6 +95,13 @@ RizzPay provides comprehensive payment capabilities:
 - **Real-time Notifications**: Get instant payment confirmations
 - **Customizable Payment Pages**: Branded payment experience for customers
 - **Developer Tools**: API keys, documentation and integration code for developers
+
+## Bank API Integration Plan
+
+- All live/production bank integrations use the unified API in `src/services/BankApiGateway.ts`
+- To enable a new bank, implement its API call in the appropriate method (see TODO comments)
+- DO NOT hardcode production secrets – connect through the environment/secrets tooling
+- Keep the UI and navigation unchanged—only backend service needs direct edits for bank integrations
 
 ## Legal Documents
 
