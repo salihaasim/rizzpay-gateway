@@ -30,20 +30,20 @@ const UpiPaymentPage: React.FC = () => {
   useEffect(() => {
     // Create UPI payment URL and QR code
     if (upiId && amount) {
-      const upiPaymentUrl =
+      const upiPaymentUrl: string =
         `upi://pay?pa=${upiId}&pn=${encodeURIComponent('RizzPay')}` +
         `&am=${amount}&cu=INR&tn=${encodeURIComponent(description)}`;
 
       setUpiUrl(upiPaymentUrl);
 
       // Generate QR code URL using a third-party service
-      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPaymentUrl)}`;
+      const qrCodeApiUrl: string = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPaymentUrl)}`;
       setQrCodeUrl(qrCodeApiUrl);
     }
   }, [upiId, amount, description]);
 
   // Explicit type for copyToClipboard function
-  const copyToClipboard = (text: string): void => {
+  const copyToClipboard: (text: string) => void = (text) => {
     navigator.clipboard.writeText(text);
     setLinkCopied(true);
     toast.success('UPI ID copied to clipboard!');
@@ -54,7 +54,7 @@ const UpiPaymentPage: React.FC = () => {
   };
 
   // Explicit type for handlePaymentSuccess function
-  const handlePaymentSuccess = async (): Promise<void> => {
+  const handlePaymentSuccess: () => Promise<void> = async () => {
     setLoading(true);
 
     try {
@@ -104,7 +104,7 @@ const UpiPaymentPage: React.FC = () => {
   };
 
   // Explicit type for openUpiApp function
-  const openUpiApp = (): void => {
+  const openUpiApp: () => void = () => {
     // Try to open the UPI app
     window.location.href = upiUrl;
 
@@ -112,6 +112,29 @@ const UpiPaymentPage: React.FC = () => {
     toast.info('Opening UPI app...', {
       description: "If the app doesn't open, try copying the UPI ID manually"
     });
+  };
+
+  // Explicitly typed props for UpiPaymentForm (ONLY shallow/primitive types and functions)
+  const formProps: {
+    amount: string;
+    description: string;
+    upiId: string;
+    qrCodeUrl: string;
+    openUpiApp: () => void;
+    handlePaymentSuccess: () => Promise<void>;
+    loading: boolean;
+    linkCopied: boolean;
+    copyToClipboard: (text: string) => void;
+  } = {
+    amount,
+    description,
+    upiId,
+    qrCodeUrl,
+    openUpiApp,
+    handlePaymentSuccess,
+    loading,
+    linkCopied,
+    copyToClipboard,
   };
 
   return (
@@ -131,17 +154,7 @@ const UpiPaymentPage: React.FC = () => {
           {success ? (
             <UpiPaymentSuccess amount={amount} />
           ) : (
-            <UpiPaymentForm
-              amount={amount} // string
-              description={description} // string
-              upiId={upiId} // string
-              qrCodeUrl={qrCodeUrl} // string
-              openUpiApp={openUpiApp} // () => void
-              handlePaymentSuccess={handlePaymentSuccess} // () => Promise<void>
-              loading={loading} // boolean
-              linkCopied={linkCopied} // boolean
-              copyToClipboard={copyToClipboard} // (text: string) => void
-            />
+            <UpiPaymentForm {...formProps} />
           )}
         </CardContent>
 
