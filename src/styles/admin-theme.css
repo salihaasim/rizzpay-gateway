@@ -175,12 +175,57 @@
   transition: all 0.2s ease;
 }
 
+/* --- SIDEBAR/HEADER/NAV Hover Styles Fixed for User Spec --- */
+
+/* HOVER: light gray background, blue text (not bold), NO blue background */
+.admin-sidebar-item:hover,
+.admin-nav-item:hover,
+.admin-tabs-trigger:hover {
+  background-color: hsl(210, 25%, 98%) !important; /* ultra-light gray */
+  color: hsl(var(--admin-primary)) !important;      /* blue text */
+  box-shadow: none !important;
+  border: none !important;
+  font-weight: 400 !important;
+  text-decoration: none !important;
+}
+
+/* ACTIVE: blue background, white text */
+.admin-sidebar-item.active,
+.admin-nav-item.active,
+.admin-tabs-trigger[data-state="active"] {
+  background-color: hsl(var(--admin-highlight)) !important;     /* blue bg */
+  color: hsl(var(--admin-highlight-text)) !important;           /* white */
+  font-weight: 500 !important;
+}
+
 /* Remove blue hover for outline/ghost buttons in admin */
 .admin-theme .admin-button-primary:hover,
 .admin-theme .admin-button-primary:focus,
 .admin-theme .admin-button-primary:active {
-  background-color: hsl(var(--admin-primary) / 0.97) !important; /* If you want, make it more subtle */
+  background-color: hsl(var(--admin-primary) / 0.97) !important;
   /* But keep buttons as close as possible to the screenshot */
+}
+
+/* Remove any other blue hover for admin classes */
+.admin-theme .hover\:bg-blue-50:hover,
+.admin-theme .hover\:bg-muted:hover {
+  background-color: hsl(210, 25%, 98%) !important;
+}
+
+/* Remove shadow, bold, underline, etc. on hover for admin nav/items */
+.admin-theme .admin-sidebar-item:hover,
+.admin-theme .admin-nav-item:hover,
+.admin-theme .admin-tabs-trigger:hover {
+  box-shadow: none !important;
+  font-weight: 400 !important;
+  text-decoration: none !important;
+}
+
+/* For legacy/accidentally blue or yellow text: force correct on hover */
+.admin-theme .admin-sidebar-item:hover,
+.admin-theme .admin-nav-item:hover,
+.admin-theme .admin-tabs-trigger:hover {
+  color: hsl(var(--admin-primary)) !important;
 }
 
 .admin-button-primary:hover {
@@ -229,12 +274,6 @@
 .admin-theme .hover\:text-blue-600:hover,
 .admin-theme .hover\:text-primary:hover {
   color: hsl(var(--admin-primary)) !important;
-}
-
-/* Remove any other blue hover for admin classes */
-.admin-theme .hover\:bg-blue-50:hover,
-.admin-theme .hover\:bg-muted:hover {
-  background-color: hsl(210, 25%, 98%) !important;
 }
 
 /* Force all active states to blue */
