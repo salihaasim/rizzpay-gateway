@@ -556,10 +556,14 @@ export type Database = {
           gst_number: string | null
           id: string
           is_active: boolean | null
+          merchant_vpa: string | null
           pan_number: string
+          qr_code_url: string | null
           verification_status:
             | Database["public"]["Enums"]["merchant_verification_status"]
             | null
+          vpa_created_at: string | null
+          vpa_status: string | null
         }
         Insert: {
           api_key?: string | null
@@ -572,10 +576,14 @@ export type Database = {
           gst_number?: string | null
           id: string
           is_active?: boolean | null
+          merchant_vpa?: string | null
           pan_number: string
+          qr_code_url?: string | null
           verification_status?:
             | Database["public"]["Enums"]["merchant_verification_status"]
             | null
+          vpa_created_at?: string | null
+          vpa_status?: string | null
         }
         Update: {
           api_key?: string | null
@@ -588,10 +596,14 @@ export type Database = {
           gst_number?: string | null
           id?: string
           is_active?: boolean | null
+          merchant_vpa?: string | null
           pan_number?: string
+          qr_code_url?: string | null
           verification_status?:
             | Database["public"]["Enums"]["merchant_verification_status"]
             | null
+          vpa_created_at?: string | null
+          vpa_status?: string | null
         }
         Relationships: []
       }
@@ -818,6 +830,7 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
+          assigned_vpa: string | null
           currency: string
           customer_email: string | null
           customer_name: string | null
@@ -827,12 +840,15 @@ export type Database = {
           merchant_id: string | null
           payment_details: Json | null
           payment_method: string
+          payment_source: string | null
           processing_state: string | null
           processing_timeline: Json | null
           status: string
+          vpa_payment_ref: string | null
         }
         Insert: {
           amount: number
+          assigned_vpa?: string | null
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
@@ -842,12 +858,15 @@ export type Database = {
           merchant_id?: string | null
           payment_details?: Json | null
           payment_method: string
+          payment_source?: string | null
           processing_state?: string | null
           processing_timeline?: Json | null
           status: string
+          vpa_payment_ref?: string | null
         }
         Update: {
           amount?: number
+          assigned_vpa?: string | null
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
@@ -857,9 +876,11 @@ export type Database = {
           merchant_id?: string | null
           payment_details?: Json | null
           payment_method?: string
+          payment_source?: string | null
           processing_state?: string | null
           processing_timeline?: Json | null
           status?: string
+          vpa_payment_ref?: string | null
         }
         Relationships: [
           {
@@ -941,6 +962,92 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vpa_mappings: {
+        Row: {
+          bank_provider: string
+          created_at: string | null
+          deactivated_at: string | null
+          id: string
+          merchant_id: string
+          metadata: Json | null
+          status: string
+          vpa_address: string
+        }
+        Insert: {
+          bank_provider?: string
+          created_at?: string | null
+          deactivated_at?: string | null
+          id?: string
+          merchant_id: string
+          metadata?: Json | null
+          status?: string
+          vpa_address: string
+        }
+        Update: {
+          bank_provider?: string
+          created_at?: string | null
+          deactivated_at?: string | null
+          id?: string
+          merchant_id?: string
+          metadata?: Json | null
+          status?: string
+          vpa_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vpa_mappings_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vpa_payment_logs: {
+        Row: {
+          amount: number
+          bank_reference: string | null
+          created_at: string | null
+          id: string
+          matched_transaction_id: string | null
+          merchant_id: string | null
+          processed_at: string | null
+          processing_status: string | null
+          sender_vpa: string | null
+          transaction_ref: string | null
+          vpa_address: string
+          webhook_payload: Json | null
+        }
+        Insert: {
+          amount: number
+          bank_reference?: string | null
+          created_at?: string | null
+          id?: string
+          matched_transaction_id?: string | null
+          merchant_id?: string | null
+          processed_at?: string | null
+          processing_status?: string | null
+          sender_vpa?: string | null
+          transaction_ref?: string | null
+          vpa_address: string
+          webhook_payload?: Json | null
+        }
+        Update: {
+          amount?: number
+          bank_reference?: string | null
+          created_at?: string | null
+          id?: string
+          matched_transaction_id?: string | null
+          merchant_id?: string | null
+          processed_at?: string | null
+          processing_status?: string | null
+          sender_vpa?: string | null
+          transaction_ref?: string | null
+          vpa_address?: string
+          webhook_payload?: Json | null
+        }
+        Relationships: []
       }
       webhook_whitelist: {
         Row: {
