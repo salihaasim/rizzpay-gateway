@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
@@ -6,6 +5,7 @@ import DashboardAnalyticsSection from '@/components/dashboard/DashboardAnalytics
 import DashboardTransactionsSection from '@/components/dashboard/DashboardTransactionsSection';
 import VpaDashboardSection from '@/components/dashboard/VpaDashboardSection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -41,15 +41,8 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Simple header without the complex DashboardHeader component */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">
-              Your merchant dashboard and overview.
-            </p>
-          </div>
-        </div>
+        {/* Use new DashboardHeader with mock values for now */}
+        <DashboardHeader merchantName="Test Merchant" userRole="merchant" />
 
         <DashboardStatCards />
 
