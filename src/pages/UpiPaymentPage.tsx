@@ -131,15 +131,15 @@ const UpiPaymentPage: React.FC = () => {
             <UpiPaymentSuccess amount={amount} />
           ) : (
             <UpiPaymentForm
-              amount={amount}
-              description={description}
-              upiId={upiId}
-              qrCodeUrl={qrCodeUrl}
-              openUpiApp={openUpiApp}
-              handlePaymentSuccess={handlePaymentSuccess}
-              loading={loading}
-              linkCopied={linkCopied}
-              copyToClipboard={copyToClipboard}
+              amount={amount as string}
+              description={description as string}
+              upiId={upiId as string}
+              qrCodeUrl={qrCodeUrl as string}
+              openUpiApp={openUpiApp as () => void}
+              handlePaymentSuccess={handlePaymentSuccess as () => Promise<void>}
+              loading={loading as boolean}
+              linkCopied={linkCopied as boolean}
+              copyToClipboard={copyToClipboard as (text: string) => void}
             />
           )}
         </CardContent>
