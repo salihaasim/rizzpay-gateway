@@ -71,7 +71,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
   }
   
   return (
-    <div className="admin-theme flex h-screen w-full overflow-hidden">
+    <div className="admin-theme flex h-screen w-full overflow-hidden" style={{ backgroundColor: 'white', color: '#334155' }}>
       {!hideNavigation && (
         <AdminSidebar 
           collapsed={sidebarCollapsed}
@@ -99,8 +99,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, hideNavigation = fa
           />
         )}
         
-        <main className={`flex-1 overflow-auto admin-theme ${hideNavigation ? '' : 'p-4 md:p-6'}`}>
-          {children || <Outlet />}
+        <main className={`admin-theme flex-1 overflow-auto bg-white ${hideNavigation ? '' : 'p-4 md:p-6'}`} style={{ backgroundColor: 'white' }}>
+          <div className="admin-theme w-full h-full" style={{ backgroundColor: 'white', color: '#334155' }}>
+            {children || <Outlet />}
+          </div>
         </main>
       </div>
     </div>
