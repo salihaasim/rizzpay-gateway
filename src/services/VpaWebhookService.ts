@@ -16,7 +16,7 @@ export class VpaWebhookService {
     try {
       console.log('Processing VPA payment webhook:', webhook);
 
-      // Log the incoming payment
+      // Log the incoming payment - fix the column names and types
       const { data: logData, error: logError } = await supabase
         .from('vpa_payment_logs')
         .insert({
@@ -25,7 +25,7 @@ export class VpaWebhookService {
           amount: webhook.amount,
           sender_vpa: webhook.senderVpa,
           bank_reference: webhook.bankReference,
-          webhook_payload: webhook,
+          webhook_payload: webhook as any, // Cast to any to match Json type
           processing_status: 'received'
         })
         .select()

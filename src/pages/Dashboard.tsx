@@ -1,6 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
 import DashboardAnalyticsSection from '@/components/dashboard/DashboardAnalyticsSection';
 import DashboardTransactionsSection from '@/components/dashboard/DashboardTransactionsSection';
@@ -41,7 +41,16 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <DashboardHeader />
+        {/* Simple header without the complex DashboardHeader component */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Your merchant dashboard and overview.
+            </p>
+          </div>
+        </div>
+
         <DashboardStatCards />
 
         {/* Add VPA Tab */}
