@@ -6,8 +6,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'react-router-dom';
 import { useMediaQuery } from '@/hooks/use-media-query';
-// Import admin logo using ES module!
-import rizzpayAdminLogo from '@/assets/rizzpay-admin-logo.png';
+// Use relative import for static images
+import rizzpayAdminLogo from '../../assets/rizzpay-admin-logo.png';
 
 export interface AdminHeaderProps {
   onLogout?: () => void;
@@ -77,14 +77,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   return (
     <header className="admin-header px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        {/* Admin Logo ES import */}
         <img
           src={rizzpayAdminLogo}
           alt="RizzPay Admin Logo"
           className="h-9 w-9 rounded bg-white shadow mr-3"
           style={{ objectFit: 'contain' }}
         />
-        {/* Desktop sidebar toggle */}
         <Button
           variant="ghost"
           size="icon"
@@ -97,8 +95,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             <ChevronLeft className="h-4 w-4" />
           )}
         </Button>
-        
-        {/* Mobile controls */}
         <div className="lg:hidden flex items-center gap-2">
           {!hiddenOnMobile && (
             <Button
@@ -134,7 +130,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
       </div>
       
       <div className="flex items-center gap-3">
-        {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative hidden sm:flex text-slate-500 hover:bg-blue-50 hover:text-blue-600">
           <Bell className="h-5 w-5" />
           <Badge 
@@ -144,8 +139,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             3
           </Badge>
         </Button>
-        
-        {/* User Profile */}
         <div className="flex items-center gap-3">
           <div className="hidden md:block text-right">
             <p className="text-sm font-medium text-slate-800 truncate max-w-32">admin</p>
@@ -157,8 +150,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             </AvatarFallback>
           </Avatar>
         </div>
-        
-        {/* Logout Button */}
         <Button 
           variant="ghost" 
           size="sm"
