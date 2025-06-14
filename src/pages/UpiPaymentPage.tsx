@@ -113,19 +113,6 @@ const UpiPaymentPage: React.FC = () => {
     });
   };
 
-  // Explicitly typed props for UpiPaymentForm (ONLY shallow/primitive types and functions)
-  const formProps: UpiPaymentFormProps = {
-    amount,
-    description,
-    upiId,
-    qrCodeUrl,
-    openUpiApp,
-    handlePaymentSuccess,
-    loading,
-    linkCopied,
-    copyToClipboard,
-  };
-
   return (
     <div className="container max-w-md mx-auto p-4">
       <Card>
@@ -143,7 +130,17 @@ const UpiPaymentPage: React.FC = () => {
           {success ? (
             <UpiPaymentSuccess amount={amount} />
           ) : (
-            <UpiPaymentForm {...formProps} />
+            <UpiPaymentForm
+              amount={amount}
+              description={description}
+              upiId={upiId}
+              qrCodeUrl={qrCodeUrl}
+              openUpiApp={openUpiApp}
+              handlePaymentSuccess={handlePaymentSuccess}
+              loading={loading}
+              linkCopied={linkCopied}
+              copyToClipboard={copyToClipboard}
+            />
           )}
         </CardContent>
 
