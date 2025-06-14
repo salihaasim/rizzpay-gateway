@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { LogOut, Bell, Menu, ChevronLeft, ChevronRight, EyeOff, Eye } from 'lucide-react';
@@ -6,8 +5,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'react-router-dom';
 import { useMediaQuery } from '@/hooks/use-media-query';
-// Use relative import for static images
-import rizzpayAdminLogo from '../../assets/rizzpay-admin-logo.png';
+// Use alias import for static images (fixes vite path issue)
+import rizzpayAdminLogo from '@/assets/rizzpay-admin-logo.png';
 
 export interface AdminHeaderProps {
   onLogout?: () => void;

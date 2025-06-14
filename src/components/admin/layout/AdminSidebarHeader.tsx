@@ -5,8 +5,8 @@ import { CreditCard, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
-// Use relative import for static images
-import rizzpayAdminLogo from '../../assets/rizzpay-admin-logo.png';
+// Use alias import for static images (fixes vite path issue)
+import rizzpayAdminLogo from '@/assets/rizzpay-admin-logo.png';
 
 interface AdminSidebarHeaderProps {
   collapsed: boolean;
