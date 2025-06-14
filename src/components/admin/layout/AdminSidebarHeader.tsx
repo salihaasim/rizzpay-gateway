@@ -5,6 +5,8 @@ import { CreditCard, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
+// Import admin logo using ES module for asset compatibility
+import rizzpayAdminLogo from '@/assets/rizzpay-admin-logo.png';
 
 interface AdminSidebarHeaderProps {
   collapsed: boolean;
@@ -24,8 +26,9 @@ export function AdminSidebarHeader({ collapsed, setMobileMenuOpen }: AdminSideba
         )}
         style={{ minWidth: collapsed ? '48px' : 'auto' }}
       >
+        {/* Use ES module import for the logo */}
         <img
-          src={require('@/assets/rizzpay-admin-logo.png')}
+          src={rizzpayAdminLogo}
           alt="RizzPay Admin Logo"
           className={collapsed ? "h-8 w-8 mx-auto mb-1" : "h-10 w-10 inline mb-2"}
           style={{ objectFit: 'contain', borderRadius: 8, background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}

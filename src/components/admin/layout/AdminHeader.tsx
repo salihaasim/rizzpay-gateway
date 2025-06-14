@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'react-router-dom';
 import { useMediaQuery } from '@/hooks/use-media-query';
+// Import admin logo using ES module!
+import rizzpayAdminLogo from '@/assets/rizzpay-admin-logo.png';
 
 export interface AdminHeaderProps {
   onLogout?: () => void;
@@ -75,9 +77,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   return (
     <header className="admin-header px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        {/* Admin Logo */}
+        {/* Admin Logo ES import */}
         <img
-          src={require('@/assets/rizzpay-admin-logo.png')}
+          src={rizzpayAdminLogo}
           alt="RizzPay Admin Logo"
           className="h-9 w-9 rounded bg-white shadow mr-3"
           style={{ objectFit: 'contain' }}
