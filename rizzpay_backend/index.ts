@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -14,6 +13,7 @@ import merchantRoutes from './routes/merchantRoutes';
 import payoutRoutes from './routes/payoutRoutes';
 import webhookRoutes from './routes/webhookRoutes';
 import adminRoutes from './routes/adminRoutes';
+import reconciliationRoutes from './routes/reconciliationRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -65,6 +65,7 @@ app.use('/api/merchants', merchantRoutes);
 app.use('/api/payouts', payoutRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/reconcile', reconciliationRoutes);
 
 // WebSocket endpoint for real-time updates
 app.get('/api/ws/:merchantId', (req, res) => {

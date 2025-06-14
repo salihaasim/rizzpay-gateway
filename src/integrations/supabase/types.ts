@@ -857,6 +857,45 @@ export type Database = {
           },
         ]
       }
+      reconciliation_logs: {
+        Row: {
+          admin_id: string
+          export_link: string | null
+          file_name: string
+          id: string
+          manual_overrides: Json | null
+          match_results: Json | null
+          matched_count: number | null
+          total_records: number
+          unmatched_count: number | null
+          upload_time: string | null
+        }
+        Insert: {
+          admin_id: string
+          export_link?: string | null
+          file_name: string
+          id?: string
+          manual_overrides?: Json | null
+          match_results?: Json | null
+          matched_count?: number | null
+          total_records: number
+          unmatched_count?: number | null
+          upload_time?: string | null
+        }
+        Update: {
+          admin_id?: string
+          export_link?: string | null
+          file_name?: string
+          id?: string
+          manual_overrides?: Json | null
+          match_results?: Json | null
+          matched_count?: number | null
+          total_records?: number
+          unmatched_count?: number | null
+          upload_time?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
