@@ -231,6 +231,36 @@ export type Database = {
         }
         Relationships: []
       }
+      escrow_bank_configs: {
+        Row: {
+          account_holder_name: string
+          account_number: string
+          api_key: string
+          api_secret: string
+          bank: string
+          ifsc_code: string
+          updated_at: string
+        }
+        Insert: {
+          account_holder_name: string
+          account_number: string
+          api_key: string
+          api_secret: string
+          bank: string
+          ifsc_code: string
+          updated_at?: string
+        }
+        Update: {
+          account_holder_name?: string
+          account_number?: string
+          api_key?: string
+          api_secret?: string
+          bank?: string
+          ifsc_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fund_transfer_jobs: {
         Row: {
           bank_reference: string | null
