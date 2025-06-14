@@ -19,18 +19,24 @@ export function AdminSidebarHeader({ collapsed, setMobileMenuOpen }: AdminSideba
       <button
         onClick={() => navigate("/")}
         className={cn(
-          "flex items-center gap-2 font-bold text-lg text-primary",
+          "flex flex-col items-center gap-2 font-bold text-lg text-primary focus:outline-none",
           collapsed && "justify-center"
         )}
+        style={{ minWidth: collapsed ? '48px' : 'auto' }}
       >
+        <img
+          src={require('@/assets/rizzpay-admin-logo.png')}
+          alt="RizzPay Admin Logo"
+          className={collapsed ? "h-8 w-8 mx-auto mb-1" : "h-10 w-10 inline mb-2"}
+          style={{ objectFit: 'contain', borderRadius: 8, background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
+        />
         {collapsed ? (
           <span className="text-xl">RP</span>
         ) : (
-          <>
-            <CreditCard className="h-6 w-6" />
+          <span>
             <span className="hidden sm:inline">{siteConfig.name}</span>
             <span className="sm:hidden">RP</span>
-          </>
+          </span>
         )}
       </button>
       

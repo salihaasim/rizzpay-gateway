@@ -75,6 +75,13 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   return (
     <header className="admin-header px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
+        {/* Admin Logo */}
+        <img
+          src={require('@/assets/rizzpay-admin-logo.png')}
+          alt="RizzPay Admin Logo"
+          className="h-9 w-9 rounded bg-white shadow mr-3"
+          style={{ objectFit: 'contain' }}
+        />
         {/* Desktop sidebar toggle */}
         <Button
           variant="ghost"
