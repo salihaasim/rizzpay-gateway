@@ -1,34 +1,33 @@
-
 /* Admin-specific theme overrides - Clean Blue Theme */
 :root {
-  /* Admin color scheme - Clean blue with white background */
-  --admin-background: 255 255 255;
-  --admin-foreground: 51 65 85;
-  --admin-card: 255 255 255;
-  --admin-card-foreground: 51 65 85;
-  --admin-primary: 59 130 246;
-  --admin-primary-foreground: 255 255 255;
-  --admin-secondary: 248 250 252;
-  --admin-secondary-foreground: 51 65 85;
-  --admin-muted: 248 250 252;
-  --admin-muted-foreground: 100 116 139;
-  --admin-accent: 239 246 255;
-  --admin-accent-foreground: 59 130 246;
-  --admin-border: 226 232 240;
-  --admin-input: 255 255 255;
-  --admin-ring: 59 130 246;
-  --admin-sidebar-bg: 255 255 255;
-  --admin-sidebar-text: 71 85 105;
-  --admin-sidebar-hover: 239 246 255;
-  --admin-sidebar-active: 59 130 246;
-  --admin-sidebar-active-text: 255 255 255;
-  --admin-header-bg: 255 255 255;
-  --admin-header-border: 226 232 240;
-  --admin-highlight: 59 130 246;
-  --admin-highlight-text: 255 255 255;
+  /* FIX: Use CSS color values with commas for hsl()! */
+  --admin-background: 0, 0%, 100%;            /* white */
+  --admin-foreground: 222, 47%, 23%;          /* slate-800 */
+  --admin-card: 0, 0%, 100%;                  /* white */
+  --admin-card-foreground: 222, 47%, 23%;
+  --admin-primary: 220, 84%, 56%;             /* blue-600, #2563eb */
+  --admin-primary-foreground: 0, 0%, 100%;    /* white */
+  --admin-secondary: 210, 25%, 98%;           /* blue-gray-50 */
+  --admin-secondary-foreground: 222, 47%, 23%;
+  --admin-muted: 210, 25%, 98%;
+  --admin-muted-foreground: 215, 20%, 51%;    /* slate-500 */
+  --admin-accent: 210, 100%, 97%;             /* blue-50 */
+  --admin-accent-foreground: 220, 84%, 56%;
+  --admin-border: 214, 32%, 91%;              /* slate-200 */
+  --admin-input: 0, 0%, 100%;
+  --admin-ring: 220, 84%, 56%;
+  --admin-sidebar-bg: 0, 0%, 100%;            /* white */
+  --admin-sidebar-text: 215, 19%, 35%;        /* slate-600 */
+  --admin-sidebar-hover: 210, 100%, 97%;      /* blue-50 */
+  --admin-sidebar-active: 220, 84%, 56%;      /* blue-600 */
+  --admin-sidebar-active-text: 0, 0%, 100%;   /* white */
+  --admin-header-bg: 0, 0%, 100%;             /* white */
+  --admin-header-border: 214, 32%, 91%;
+  --admin-highlight: 220, 84%, 56%;           /* blue-600 */
+  --admin-highlight-text: 0, 0%, 100%;
 }
 
-/* NUCLEAR OPTION: Override ALL colors in admin context */
+/* NUCLEAR OPTION: Override ALL yellow/amber backgrounds */
 .admin-theme,
 .admin-theme *,
 .admin-theme *:before,
