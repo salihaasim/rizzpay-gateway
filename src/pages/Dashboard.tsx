@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import DashboardStatCards from '@/components/dashboard/DashboardStatCards';
@@ -11,8 +12,10 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Active tab for header component, default to 'merchant'
+  const [activeTab, setActiveTab] = useState('merchant');
+
   useEffect(() => {
-    // Simulate loading data
     setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -41,12 +44,16 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Use new DashboardHeader with mock values for now */}
-        <DashboardHeader merchantName="Test Merchant" userRole="merchant" />
+        {/* Pass all required props to DashboardHeader */}
+        <DashboardHeader
+          merchantName="Test Merchant"
+          userRole="merchant"
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
 
         <DashboardStatCards />
 
-        {/* Add VPA Tab */}
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>

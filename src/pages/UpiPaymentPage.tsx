@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,8 +42,8 @@ const UpiPaymentPage: React.FC = () => {
     }
   }, [upiId, amount, description]);
 
-  // Explicit type for copyToClipboard function
-  const copyToClipboard: (text: string) => void = (text) => {
+  // Copy to clipboard
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setLinkCopied(true);
     toast.success('UPI ID copied to clipboard!');
@@ -52,8 +53,7 @@ const UpiPaymentPage: React.FC = () => {
     }, 3000);
   };
 
-  // Explicit type for handlePaymentSuccess function
-  const handlePaymentSuccess: () => Promise<void> = async () => {
+  const handlePaymentSuccess = async () => {
     setLoading(true);
 
     try {
@@ -86,7 +86,7 @@ const UpiPaymentPage: React.FC = () => {
           .eq('id', linkId);
       } catch (error) {
         console.error('Error updating payment link status:', error);
-        // Continue anyway since we've created the transaction
+        // Continue anyway since transaction already added locally
       }
 
       setSuccess(true);
@@ -102,12 +102,9 @@ const UpiPaymentPage: React.FC = () => {
     }
   };
 
-  // Explicit type for openUpiApp function
-  const openUpiApp: () => void = () => {
-    // Try to open the UPI app
+  const openUpiApp = () => {
     window.location.href = upiUrl;
 
-    // Show guidance toast
     toast.info('Opening UPI app...', {
       description: "If the app doesn't open, try copying the UPI ID manually"
     });
@@ -131,15 +128,15 @@ const UpiPaymentPage: React.FC = () => {
             <UpiPaymentSuccess amount={amount} />
           ) : (
             <UpiPaymentForm
-              amount={amount as string}
-              description={description as string}
-              upiId={upiId as string}
-              qrCodeUrl={qrCodeUrl as string}
-              openUpiApp={openUpiApp as () => void}
-              handlePaymentSuccess={handlePaymentSuccess as () => Promise<void>}
-              loading={loading as boolean}
-              linkCopied={linkCopied as boolean}
-              copyToClipboard={copyToClipboard as (text: string) => void}
+              amount={amount}
+              description={description}
+              upiId={upiId}
+              qrCodeUrl={qrCodeUrl}
+              openUpiApp={openUpiApp}
+              handlePaymentSuccess={handlePaymentSuccess}
+              loading={loading}
+              linkCopied={linkCopied}
+              copyToClipboard={copyToClipboard}
             />
           )}
         </CardContent>
