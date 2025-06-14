@@ -1,37 +1,25 @@
+import React, { useState, useCallback } from "react";
+import AdminLayout from "@/components/admin/AdminLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Tabs, TabsContent, TabsList, TabsTrigger 
+} from "@/components/ui/tabs";
+import { 
+  Search, Download, History 
+} from "lucide-react";
+import { toast } from "sonner";
 
-import React, { useState, useCallback } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Search,
-  RefreshCw,
-  Edit,
-  Eye,
-  AlertTriangle,
-  Download,
-  Upload,
-  FileText,
-  History
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+  PayoutRecord, CsvRecord, ReconciliationLog,
+} from "./reconTypes";
+import ReconPayoutRecordsTable from "./ReconPayoutRecordsTable";
+import CSVUploadSection from "./CSVUploadSection";
+import CSVPreviewTable from "./CSVPreviewTable";
+import ReconciliationLogsTable from "./ReconciliationLogsTable";
 
 interface PayoutRecord {
   id: string;
@@ -290,7 +278,9 @@ const AdminPaymentRecon = () => {
       <div className="space-y-6 bg-white">
         <div className="bg-white">
           <h1 className="text-2xl font-bold text-black">Payment Reconciliation</h1>
-          <p className="text-gray-600">Monitor and reconcile payment transactions with bank records</p>
+          <p className="text-gray-600">
+            Monitor and reconcile payment transactions with bank records
+          </p>
         </div>
 
         <Tabs defaultValue="reconciliation" className="space-y-4">
@@ -391,230 +381,51 @@ const AdminPaymentRecon = () => {
             {/* Reconciliation Table */}
             <Card className="bg-white border-2 border-black">
               <CardHeader className="bg-white">
-                <CardTitle className="text-black">Reconciliation Records ({filteredRecords.length})</CardTitle>
+                <CardTitle className="text-black">
+                  Reconciliation Records ({filteredRecords.length})
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-black">Payout ID</TableHead>
-                        <TableHead className="text-black">Transaction ID</TableHead>
-                        <TableHead className="text-black">Merchant</TableHead>
-                        <TableHead className="text-black">Amount</TableHead>
-                        <TableHead className="text-black">Payout Status</TableHead>
-                        <TableHead className="text-black">Bank Status</TableHead>
-                        <TableHead className="text-black">Reconciliation</TableHead>
-                        <TableHead className="text-black">UTR Number</TableHead>
-                        <TableHead className="text-black">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredRecords.map((record) => (
-                        <TableRow key={record.id}>
-                          <TableCell className="font-medium text-black">{record.id}</TableCell>
-                          <TableCell className="font-mono text-black">{record.transactionId}</TableCell>
-                          <TableCell className="text-black">{record.merchant}</TableCell>
-                          <TableCell className="text-black">₹{record.amount.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {getPayoutStatusIcon(record.status)}
-                              <span className="capitalize text-black">{record.status}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {record.bankStatus ? (
-                              <span className={`capitalize ${
-                                record.bankStatus === 'success' ? 'text-green-600' : 'text-red-600'
-                              }`}>
-                                {record.bankStatus}
-                              </span>
-                            ) : (
-                              <span className="text-gray-500">Pending</span>
-                            )}
-                          </TableCell>
-                          <TableCell>{getStatusBadge(record.reconciliationStatus)}</TableCell>
-                          <TableCell className="font-mono text-sm text-black">
-                            {record.utrNumber || 'N/A'}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-1">
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon"
-                                    onClick={() => setSelectedRecord(record)}
-                                  >
-                                    <Eye className="h-4 w-4" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl">
-                                  <DialogHeader>
-                                    <DialogTitle>Payment Reconciliation Details</DialogTitle>
-                                  </DialogHeader>
-                                  {selectedRecord && (
-                                    <ReconciliationModal 
-                                      record={selectedRecord}
-                                      onManualOverride={handleManualOverride}
-                                      isProcessing={isProcessing}
-                                    />
-                                  )}
-                                </DialogContent>
-                              </Dialog>
-                              
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => handleStatusCheck(record.id)}
-                                disabled={isProcessing}
-                                title="Check Bank Status"
-                              >
-                                <RefreshCw className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <ReconPayoutRecordsTable
+                  records={filteredRecords}
+                  onView={setSelectedRecord}
+                  selectedRecord={selectedRecord}
+                  onManualOverride={handleManualOverride}
+                  isProcessing={isProcessing}
+                  onStatusCheck={handleStatusCheck}
+                  getStatusBadge={getStatusBadge}
+                  getPayoutStatusIcon={getPayoutStatusIcon}
+                />
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="csv-upload" className="space-y-6">
             {/* CSV Upload Section */}
-            <Card className="bg-white border-2 border-black">
-              <CardHeader className="bg-white">
-                <CardTitle className="text-black">Upload Bank Statement CSV</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div 
-                  className={`border-2 border-dashed p-8 text-center ${
-                    isDragOver ? 'border-blue-500 bg-blue-50' : 'border-black'
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-black mb-2">Drag and drop your CSV file here, or</p>
-                  <Label htmlFor="csv-file" className="cursor-pointer">
-                    <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                      Browse Files
-                    </Button>
-                    <Input
-                      id="csv-file"
-                      type="file"
-                      accept=".csv"
-                      className="hidden"
-                      onChange={handleFileInput}
-                    />
-                  </Label>
-                  {csvFile && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      Selected: {csvFile.name}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* CSV Preview Table */}
+            <CSVUploadSection
+              isDragOver={isDragOver}
+              handleDragOver={handleDragOver}
+              handleDragLeave={handleDragLeave}
+              handleDrop={handleDrop}
+              handleFileInput={handleFileInput}
+              csvFile={csvFile}
+            />
             {csvData.length > 0 && (
               <Card className="bg-white border-2 border-black">
                 <CardHeader className="bg-white">
-                  <CardTitle className="text-black">CSV Preview & Matching Results</CardTitle>
+                  <CardTitle className="text-black">
+                    CSV Preview & Matching Results
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-black">UTR Number</TableHead>
-                          <TableHead className="text-black">Amount</TableHead>
-                          <TableHead className="text-black">Narration</TableHead>
-                          <TableHead className="text-black">Date</TableHead>
-                          <TableHead className="text-black">Matching Status</TableHead>
-                          <TableHead className="text-black">Matched Order ID</TableHead>
-                          <TableHead className="text-black">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {csvData.map((record) => (
-                          <TableRow key={record.id} className={record.matched ? 'bg-green-50' : 'bg-red-50'}>
-                            <TableCell className="font-mono text-black">{record.utrNumber}</TableCell>
-                            <TableCell className="text-black">₹{record.amount.toLocaleString()}</TableCell>
-                            <TableCell className="text-black">{record.narration}</TableCell>
-                            <TableCell className="text-black">{record.date}</TableCell>
-                            <TableCell>
-                              {record.matched ? (
-                                <Badge className="bg-green-100 text-green-800 border-green-200 border">
-                                  <CheckCircle className="h-3 w-3 mr-1" />
-                                  Matched
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-red-100 text-red-800 border-red-200 border">
-                                  <XCircle className="h-3 w-3 mr-1" />
-                                  Unmatched
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="font-mono text-black">
-                              {record.matchedOrderId || 'N/A'}
-                            </TableCell>
-                            <TableCell>
-                              {!record.matched && (
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      onClick={() => setSelectedUnmatchedRecord(record)}
-                                    >
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>Manual Match Record</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4">
-                                      <div>
-                                        <Label className="text-black">UTR Number</Label>
-                                        <div className="font-mono text-sm bg-gray-100 p-2 rounded">{selectedUnmatchedRecord?.utrNumber}</div>
-                                      </div>
-                                      <div>
-                                        <Label className="text-black">Amount</Label>
-                                        <div className="text-lg font-semibold">₹{selectedUnmatchedRecord?.amount.toLocaleString()}</div>
-                                      </div>
-                                      <div>
-                                        <Label className="text-black">Order ID to Match</Label>
-                                        <Input
-                                          value={manualOrderId}
-                                          onChange={(e) => setManualOrderId(e.target.value)}
-                                          placeholder="Enter order ID (e.g., RP123456)"
-                                          className="border-black"
-                                        />
-                                      </div>
-                                      <Button 
-                                        onClick={handleManualMatch}
-                                        disabled={!manualOrderId.trim()}
-                                        className="w-full bg-black hover:bg-gray-800 text-white"
-                                      >
-                                        Match Record
-                                      </Button>
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                  <CSVPreviewTable
+                    csvData={csvData}
+                    selectedUnmatchedRecord={selectedUnmatchedRecord}
+                    setSelectedUnmatchedRecord={setSelectedUnmatchedRecord}
+                    manualOrderId={manualOrderId}
+                    setManualOrderId={setManualOrderId}
+                    handleManualMatch={handleManualMatch}
+                  />
                 </CardContent>
               </Card>
             )}
@@ -630,152 +441,19 @@ const AdminPaymentRecon = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-black">File Name</TableHead>
-                        <TableHead className="text-black">Upload Date</TableHead>
-                        <TableHead className="text-black">Total Records</TableHead>
-                        <TableHead className="text-black">Matched</TableHead>
-                        <TableHead className="text-black">Unmatched</TableHead>
-                        <TableHead className="text-black">Uploaded By</TableHead>
-                        <TableHead className="text-black">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {reconciliationLogs.map((log) => (
-                        <TableRow key={log.id}>
-                          <TableCell className="font-medium text-black flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            {log.fileName}
-                          </TableCell>
-                          <TableCell className="text-black">
-                            {new Date(log.uploadedAt).toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-black">{log.totalRecords}</TableCell>
-                          <TableCell>
-                            <span className="text-green-600 font-medium">{log.matchedRecords}</span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-red-600 font-medium">{log.unmatchedRecords}</span>
-                          </TableCell>
-                          <TableCell className="text-black">{log.uploadedBy}</TableCell>
-                          <TableCell>
-                            <Button variant="ghost" size="icon" title="Download Report">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <ReconciliationLogsTable 
+                  logs={reconciliationLogs}
+                  onDownload={logId => {
+                    // No-op; add real logic for download
+                    toast.success("Download (simulation): " + logId);
+                  }}
+                />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
     </AdminLayout>
-  );
-};
-
-// Reconciliation Modal Component
-const ReconciliationModal: React.FC<{
-  record: PayoutRecord;
-  onManualOverride: (id: string, status: string, notes: string) => void;
-  isProcessing: boolean;
-}> = ({ record, onManualOverride, isProcessing }) => {
-  const [newStatus, setNewStatus] = useState(record.reconciliationStatus);
-  const [notes, setNotes] = useState('');
-
-  const handleOverride = () => {
-    onManualOverride(record.id, newStatus, notes);
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label className="text-black">Payout ID</Label>
-          <div className="font-mono text-sm bg-gray-100 p-2 rounded">{record.id}</div>
-        </div>
-        <div>
-          <Label className="text-black">Transaction ID</Label>
-          <div className="font-mono text-sm bg-gray-100 p-2 rounded">{record.transactionId}</div>
-        </div>
-        <div>
-          <Label className="text-black">Amount</Label>
-          <div className="text-lg font-semibold">₹{record.amount.toLocaleString()}</div>
-        </div>
-        <div>
-          <Label className="text-black">Current Status</Label>
-          <div className="flex items-center gap-2">
-            {record.reconciliationStatus === 'matched' ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            ) : record.reconciliationStatus === 'unmatched' ? (
-              <XCircle className="h-4 w-4 text-red-500" />
-            ) : (
-              <Clock className="h-4 w-4 text-blue-500" />
-            )}
-            <span className="capitalize text-black">{record.reconciliationStatus}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-100 p-3 rounded">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Merchant:</strong> {record.merchant}</div>
-          <div><strong>Beneficiary:</strong> {record.beneficiary}</div>
-          <div><strong>Payout Method:</strong> {record.payoutMethod.replace('_', ' ')}</div>
-          <div><strong>UTR Number:</strong> {record.utrNumber || 'N/A'}</div>
-          <div><strong>Bank Status:</strong> {record.bankStatus || 'Pending'}</div>
-          <div><strong>Created:</strong> {new Date(record.createdAt).toLocaleString()}</div>
-        </div>
-      </div>
-
-      {record.reconciliationStatus === 'unmatched' && (
-        <div className="space-y-4 border-t pt-4">
-          <div className="flex items-center gap-2 text-red-600">
-            <AlertTriangle className="h-4 w-4" />
-            <span className="font-medium">Manual Override Required</span>
-          </div>
-          
-          <div>
-            <Label className="text-black">Override Status</Label>
-            <Select value={newStatus} onValueChange={setNewStatus}>
-              <SelectTrigger className="border-black">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="matched">Mark as Matched</SelectItem>
-                <SelectItem value="unmatched">Keep Unmatched</SelectItem>
-                <SelectItem value="manual">Manual Override</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label className="text-black">Override Notes</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Provide reason for manual override..."
-              rows={3}
-              className="border-black"
-            />
-          </div>
-
-          <Button 
-            onClick={handleOverride} 
-            disabled={isProcessing || !notes.trim()}
-            className="w-full bg-black hover:bg-gray-800 text-white"
-          >
-            {isProcessing ? 'Processing...' : 'Apply Manual Override'}
-          </Button>
-        </div>
-      )}
-    </div>
   );
 };
 
