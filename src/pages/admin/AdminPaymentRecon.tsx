@@ -9,52 +9,27 @@ import {
   Tabs, TabsContent, TabsList, TabsTrigger 
 } from "@/components/ui/tabs";
 import { 
-  Search, Download, History 
+  Search, Download, History,
+  CheckCircle, Clock, XCircle
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { 
   PayoutRecord, CsvRecord, ReconciliationLog,
 } from "./reconTypes";
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
+
 import ReconPayoutRecordsTable from "./ReconPayoutRecordsTable";
 import CSVUploadSection from "./CSVUploadSection";
 import CSVPreviewTable from "./CSVPreviewTable";
 import ReconciliationLogsTable from "./ReconciliationLogsTable";
-
-interface PayoutRecord {
-  id: string;
-  transactionId: string;
-  merchant: string;
-  amount: number;
-  status: string;
-  payoutMethod: string;
-  beneficiary: string;
-  utrNumber?: string;
-  createdAt: string;
-  updatedAt: string;
-  bankStatus?: string;
-  reconciliationStatus: string;
-}
-
-interface CsvRecord {
-  id: string;
-  utrNumber: string;
-  amount: number;
-  narration: string;
-  date: string;
-  matched: boolean;
-  matchedOrderId?: string;
-}
-
-interface ReconciliationLog {
-  id: string;
-  fileName: string;
-  uploadedAt: string;
-  totalRecords: number;
-  matchedRecords: number;
-  unmatchedRecords: number;
-  uploadedBy: string;
-}
 
 const AdminPaymentRecon = () => {
   const [searchTerm, setSearchTerm] = useState('');

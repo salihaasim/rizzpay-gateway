@@ -5,7 +5,7 @@ import { IndianRupee } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
 import { safeSupabaseTable } from '@/utils/supabaseClient';
-import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
+import UpiPaymentForm, { UpiPaymentFormProps } from '@/components/payment/UpiPaymentForm';
 import UpiPaymentSuccess from '@/components/payment/UpiPaymentSuccess';
 import { PaymentMethod } from '@/stores/transactions/types';
 
