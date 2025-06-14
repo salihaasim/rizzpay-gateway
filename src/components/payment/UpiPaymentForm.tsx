@@ -9,7 +9,7 @@ import UpiQrCodeDisplay from './UpiQrCodeDisplay';
 
 
 // Strongly explicit, simple props definition to avoid TypeScript deep type errors.
-interface UpiPaymentFormProps {
+export interface UpiPaymentFormProps { // <-- add export here
   amount: string;
   description: string;
   upiId: string;

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { IndianRupee } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
 import { safeSupabaseTable } from '@/utils/supabaseClient';
-import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
+import UpiPaymentForm, { UpiPaymentFormProps } from '@/components/payment/UpiPaymentForm';
 import UpiPaymentSuccess from '@/components/payment/UpiPaymentSuccess';
 import { PaymentMethod } from '@/stores/transactions/types';
 
@@ -115,17 +114,7 @@ const UpiPaymentPage: React.FC = () => {
   };
 
   // Explicitly typed props for UpiPaymentForm (ONLY shallow/primitive types and functions)
-  const formProps: {
-    amount: string;
-    description: string;
-    upiId: string;
-    qrCodeUrl: string;
-    openUpiApp: () => void;
-    handlePaymentSuccess: () => Promise<void>;
-    loading: boolean;
-    linkCopied: boolean;
-    copyToClipboard: (text: string) => void;
-  } = {
+  const formProps: UpiPaymentFormProps = {
     amount,
     description,
     upiId,
