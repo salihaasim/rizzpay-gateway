@@ -101,11 +101,26 @@
   background-color: transparent !important;
 }
 
+.admin-sidebar-item:hover,
+.admin-nav-item:hover,
+.admin-tabs-trigger:hover {
+  background-color: hsl(210, 25%, 98%) !important;  /* ultra-light gray */
+  color: hsl(var(--admin-primary)) !important;
+  /* Remove any harsh border, box-shadow, or blue background on hover */
+}
+
 .admin-sidebar-item {
   background-color: transparent !important;
   color: hsl(var(--admin-sidebar-text)) !important;
   transition: all 0.2s ease;
   border-radius: 8px;
+}
+
+.admin-sidebar-item.active,
+.admin-nav-item.active,
+.admin-tabs-trigger[data-state="active"] {
+  background-color: hsl(var(--admin-highlight)) !important;   /* Keep blue for active */
+  color: hsl(var(--admin-highlight-text)) !important;
 }
 
 .admin-sidebar-item:hover {
@@ -134,6 +149,17 @@
 }
 
 /* Admin cards */
+/* For the subtle border on tab/inputs, keep neutral */
+.admin-theme .admin-tabs-list,
+.admin-theme .admin-card {
+  border-color: hsl(var(--admin-border)) !important;
+}
+
+.admin-theme .admin-card {
+  background-color: hsl(var(--admin-background)) !important;
+  color: hsl(var(--admin-foreground)) !important;
+}
+
 .admin-card {
   background-color: hsl(var(--admin-card)) !important;
   border: 2px solid hsl(var(--admin-border)) !important;
@@ -147,6 +173,14 @@
   color: hsl(var(--admin-primary-foreground)) !important;
   border-radius: 8px;
   transition: all 0.2s ease;
+}
+
+/* Remove blue hover for outline/ghost buttons in admin */
+.admin-theme .admin-button-primary:hover,
+.admin-theme .admin-button-primary:focus,
+.admin-theme .admin-button-primary:active {
+  background-color: hsl(var(--admin-primary) / 0.97) !important; /* If you want, make it more subtle */
+  /* But keep buttons as close as possible to the screenshot */
 }
 
 .admin-button-primary:hover {
@@ -177,6 +211,7 @@
 .admin-theme h3,
 .admin-theme h4,
 .admin-theme h5,
+.admin-theme h5,
 .admin-theme h6,
 .admin-theme .page-header,
 .admin-theme .section-title,
@@ -196,9 +231,10 @@
   color: hsl(var(--admin-primary)) !important;
 }
 
+/* Remove any other blue hover for admin classes */
 .admin-theme .hover\:bg-blue-50:hover,
 .admin-theme .hover\:bg-muted:hover {
-  background-color: hsl(var(--admin-accent)) !important;
+  background-color: hsl(210, 25%, 98%) !important;
 }
 
 /* Force all active states to blue */
@@ -260,6 +296,13 @@
   transition: all 0.2s ease;
 }
 
+.admin-theme .admin-tabs-trigger {
+  background-color: transparent !important;
+  color: hsl(var(--admin-foreground)) !important;
+  border-radius: 6px;
+  transition: background 0.18s, color 0.18s;
+}
+
 .admin-tabs-trigger:hover {
   background-color: hsl(var(--admin-accent)) !important;
   color: hsl(var(--admin-primary)) !important;
@@ -268,6 +311,11 @@
 .admin-tabs-trigger[data-state="active"] {
   background-color: hsl(var(--admin-highlight)) !important;
   color: hsl(var(--admin-highlight-text)) !important;
+}
+
+.admin-theme .admin-tabs-trigger[data-state="active"] {
+  background-color: hsl(var(--admin-highlight), 0.09) !important; /* very subtle blue */
+  color: hsl(var(--admin-highlight)) !important;
 }
 
 /* Force override any remaining default colors */
