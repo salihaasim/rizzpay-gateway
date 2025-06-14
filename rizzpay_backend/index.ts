@@ -14,6 +14,7 @@ import payoutRoutes from './routes/payoutRoutes';
 import webhookRoutes from './routes/webhookRoutes';
 import adminRoutes from './routes/adminRoutes';
 import reconciliationRoutes from './routes/reconciliationRoutes';
+import webhookManagementRoutes from './routes/webhookManagementRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -66,6 +67,7 @@ app.use('/api/payouts', payoutRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reconcile', reconciliationRoutes);
+app.use('/api/webhook-management', webhookManagementRoutes);
 
 // WebSocket endpoint for real-time updates
 app.get('/api/ws/:merchantId', (req, res) => {
