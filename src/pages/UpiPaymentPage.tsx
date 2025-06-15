@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +25,9 @@ const UpiPaymentPage: React.FC = () => {
   const description: string = searchParams.get('desc') || 'Payment via RizzPay';
   const upiId: string = searchParams.get('upi') || 'merchant@rizzpay';
   const linkId: string = searchParams.get('id') || 'unknown';
+
+  // Helper to protect type inference
+  const safeAmount: string = String(amount);
 
   useEffect(() => {
     // Create UPI payment URL and QR code
@@ -125,10 +127,10 @@ const UpiPaymentPage: React.FC = () => {
 
         <CardContent className="space-y-6">
           {success ? (
-            <UpiPaymentSuccess amount={amount} />
+            <UpiPaymentSuccess amount={safeAmount as string} />
           ) : (
             <UpiPaymentForm
-              amount={amount}
+              amount={safeAmount as string}
               description={description}
               upiId={upiId}
               qrCodeUrl={qrCodeUrl}
