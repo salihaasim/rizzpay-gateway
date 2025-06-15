@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -127,10 +128,10 @@ const UpiPaymentPage: React.FC = () => {
 
         <CardContent className="space-y-6">
           {success ? (
-            <UpiPaymentSuccess amount={safeAmount as string} />
+            <UpiPaymentSuccess amount={safeAmount} />
           ) : (
             <UpiPaymentForm
-              amount={safeAmount as string}
+              amount={safeAmount}
               description={description}
               upiId={upiId}
               qrCodeUrl={qrCodeUrl}
