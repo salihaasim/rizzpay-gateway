@@ -19,7 +19,8 @@ type UpiPaymentFormProps = {
   copyToClipboard: (text: string) => void;
 };
 
-const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
+// Use a standard function instead of React.FC to avoid type expansion issues.
+function UpiPaymentForm({
   amount,
   description,
   upiId,
@@ -29,7 +30,7 @@ const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
   loading,
   linkCopied,
   copyToClipboard
-}) => {
+}: UpiPaymentFormProps) {
   return (
     <>
       <div className="bg-primary/5 p-4 rounded-lg text-center">
@@ -103,7 +104,7 @@ const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
       </Button>
     </>
   );
-};
+}
 
 export default UpiPaymentForm;
 
