@@ -5,7 +5,7 @@ import { CreditCard, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
-// Use alias import for static images (fixes vite path issue)
+// Use the correct path for the image
 import rizzpayAdminLogo from '@/assets/rizzpay-admin-logo.png';
 
 interface AdminSidebarHeaderProps {
@@ -52,3 +52,4 @@ export function AdminSidebarHeader({ collapsed, setMobileMenuOpen }: AdminSideba
     </div>
   );
 }
+
