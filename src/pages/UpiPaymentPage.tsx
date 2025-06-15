@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { useTransactionStore } from '@/stores/transactions';
 import { safeSupabaseTable } from '@/utils/supabaseClient';
 import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
 import UpiPaymentSuccess from '@/components/payment/UpiPaymentSuccess';
-import { PaymentMethod } from '@/stores/transactions/types';
 
 const UpiPaymentPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -70,7 +68,7 @@ const UpiPaymentPage: React.FC = () => {
         date,
         amount: `₹${parseFloat(amount).toFixed(2)}`,
         rawAmount: parseFloat(amount),
-        paymentMethod: 'upi' as PaymentMethod,
+        paymentMethod: 'upi',
         status: 'successful',
         customer: customerName,
         processingState: 'completed',
@@ -128,10 +126,10 @@ const UpiPaymentPage: React.FC = () => {
 
         <CardContent className="space-y-6">
           {success ? (
-            <UpiPaymentSuccess amount={safeAmount} />
+            <UpiPaymentSuccess amount={amount} />
           ) : (
             <UpiPaymentForm
-              amount={safeAmount}
+              amount={amount}
               description={description}
               upiId={upiId}
               qrCodeUrl={qrCodeUrl}
