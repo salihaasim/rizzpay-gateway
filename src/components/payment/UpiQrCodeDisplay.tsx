@@ -4,24 +4,25 @@ import { Loader2, Copy, Check, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-interface UpiQrCodeDisplayProps {
+type UpiQrCodeDisplayProps = {
   qrCodeUrl: string;
   upiId: string;
   isLoading?: boolean;
-}
+};
 
-const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({ 
+// Changed from React.FC to standard function (fixes TS2589 inference issues)
+function UpiQrCodeDisplay({
   qrCodeUrl, 
   upiId,
   isLoading = false
-}) => {
+}: UpiQrCodeDisplayProps) {
   const [linkCopied, setLinkCopied] = useState(false);
-  
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setLinkCopied(true);
     toast.success('UPI ID copied to clipboard!');
-    
+
     setTimeout(() => {
       setLinkCopied(false);
     }, 3000);
@@ -49,7 +50,7 @@ const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({
           </div>
         )}
       </div>
-      
+
       <div className="space-y-2">
         <div className="flex justify-center">
           <div className="inline-flex items-center bg-muted px-3 py-1 rounded-md">
@@ -70,6 +71,5 @@ const UpiQrCodeDisplay: React.FC<UpiQrCodeDisplayProps> = ({
       </div>
     </div>
   );
-};
-
+}
 export default UpiQrCodeDisplay;

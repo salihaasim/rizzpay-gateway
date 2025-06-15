@@ -4,13 +4,14 @@ import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
-interface UpiPaymentSuccessProps {
+type UpiPaymentSuccessProps = {
   amount: string;
-}
+};
 
-const UpiPaymentSuccess: React.FC<UpiPaymentSuccessProps> = ({ amount }) => {
+// Use a standard function instead of React.FC to avoid type inference issues.
+function UpiPaymentSuccess({ amount }: UpiPaymentSuccessProps) {
   const navigate = useNavigate();
-  
+
   return (
     <div className="flex flex-col items-center justify-center py-6">
       <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
@@ -28,6 +29,6 @@ const UpiPaymentSuccess: React.FC<UpiPaymentSuccessProps> = ({ amount }) => {
       </Button>
     </div>
   );
-};
+}
 
 export default UpiPaymentSuccess;
