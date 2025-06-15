@@ -529,6 +529,53 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string | null
+          description: string | null
+          entry_type: string
+          id: string
+          merchant_id: string
+          metadata: Json | null
+          source: string
+          transaction_id: string | null
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string | null
+          description?: string | null
+          entry_type: string
+          id?: string
+          merchant_id: string
+          metadata?: Json | null
+          source: string
+          transaction_id?: string | null
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string | null
+          description?: string | null
+          entry_type?: string
+          id?: string
+          merchant_id?: string
+          metadata?: Json | null
+          source?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_ledger_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       merchant_payout_settings: {
         Row: {
           auto_payout_enabled: boolean | null
@@ -1167,6 +1214,10 @@ export type Database = {
           processing_fee?: number
           gst_rate?: number
         }
+        Returns: number
+      }
+      get_merchant_ledger_balance: {
+        Args: { p_merchant_id: string }
         Returns: number
       }
       get_merchant_wallet_balance: {

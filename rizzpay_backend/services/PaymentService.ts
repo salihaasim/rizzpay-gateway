@@ -1,6 +1,6 @@
-
 import { supabase } from '../config/supabase';
 import { BankIntegrationService } from './BankIntegrationService';
+import { writeMerchantLedgerEntry } from '../utils/merchantLedger';
 
 // Generate unique RizzPay transaction ID
 const generateRizzPayTransactionId = (): string => {
@@ -46,6 +46,19 @@ export class PaymentService {
     
     if (error) {
       throw new Error(`Failed to create transaction: ${error.message}`);
+    }
+    
+    // If transaction status is successful, record in merchant_ledger
+    // (If necessary, update logic to match when/where "successful" status applies)
+    if (transaction.status === 'successful') {
+      await writeMerchantLedgerEntry({
+        merchantId: data.merchantId,
+        entryType: 'credit',
+        amount: data.amount,
+        source: 'payin',
+        transactionId,
+        description: data.description ?? 'Payment received',
+      });
     }
     
     return transaction;

@@ -1,6 +1,6 @@
-
 import { supabase } from '../config/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { writeMerchantLedgerEntry } from '../utils/merchantLedger';
 
 export interface PayoutRequest {
   id?: string;
@@ -163,12 +163,31 @@ export class PayoutService {
         Object.assign(updateData, additionalData);
       }
 
+      // Fetch payout for merchant and amount
+      const { data: payout } = await supabase
+        .from('payout_requests')
+        .select('merchant_id, amount, id, description')
+        .eq('id', payoutId)
+        .maybeSingle();
+
       const { error } = await supabase
         .from('payout_requests')
         .update(updateData)
         .eq('id', payoutId);
 
       if (error) throw error;
+
+      // On completed payout, record as merchant_ledger debit
+      if (status === 'completed' && payout?.merchant_id && payout?.amount) {
+        await writeMerchantLedgerEntry({
+          merchantId: payout.merchant_id,
+          entryType: 'debit',
+          amount: payout.amount,
+          source: 'payout',
+          transactionId: payoutId,
+          description: payout.description ?? 'Payout completed',
+        });
+      }
 
     } catch (error) {
       console.error('Error updating payout status:', error);
