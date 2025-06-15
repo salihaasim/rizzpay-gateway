@@ -1,13 +1,13 @@
+
 import React from 'react';
-// Import all needed UI components and icons
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Loader2, QrCode, Copy, Check, AlertCircle } from 'lucide-react';
 import UpiQrCodeDisplay from './UpiQrCodeDisplay';
 
-// Strongly explicit, simple props definition to avoid TypeScript deep type errors.
-interface UpiPaymentFormProps {
+// Use a plain type (not interface), and do not export it, to avoid any recursive inference.
+type UpiPaymentFormProps = {
   amount: string;
   description: string;
   upiId: string;
@@ -17,7 +17,7 @@ interface UpiPaymentFormProps {
   loading: boolean;
   linkCopied: boolean;
   copyToClipboard: (text: string) => void;
-}
+};
 
 const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
   amount,
@@ -108,3 +108,4 @@ const UpiPaymentForm: React.FC<UpiPaymentFormProps> = ({
 export default UpiPaymentForm;
 
 // NOTE: If you need to extend the props, do so carefully and avoid recursive or extremely generic types.
+
