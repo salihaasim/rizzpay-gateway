@@ -10,6 +10,8 @@ import { Copy, Eye, EyeOff, RefreshCw, Key, Code, Book, ExternalLink, Globe } fr
 import { toast } from 'sonner';
 import { useMerchantAuth } from '@/stores/merchantAuthStore';
 import MerchantUrlBank from '@/components/developer/MerchantUrlBank';
+import WebhookRegistrationBox from "@/components/developer/WebhookRegistrationBox";
+import WebhookLogTable from "@/components/developer/WebhookLogTable";
 
 const DeveloperPage = () => {
   const { currentMerchant } = useMerchantAuth();
@@ -83,6 +85,8 @@ const DeveloperPage = () => {
       description: 'Triggered when a refund is created'
     }
   ];
+
+  const merchantId = currentMerchant?.id;
 
   return (
     <Layout>
@@ -203,41 +207,22 @@ const DeveloperPage = () => {
             <div className="grid gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Webhook Configuration</CardTitle>
-                  <CardDescription>Configure webhooks to receive real-time event notifications</CardDescription>
+                  <CardTitle>Webhook Management</CardTitle>
+                  <CardDescription>
+                    Register your webhook endpoint and view webhook delivery logs
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="webhook-url">Webhook URL</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="webhook-url"
-                        placeholder="https://your-site.com/webhook"
-                        value={webhookUrl}
-                        onChange={(e) => setWebhookUrl(e.target.value)}
-                      />
-                      <Button onClick={testWebhook} variant="outline">
-                        Test
-                      </Button>
+                <CardContent className="space-y-8">
+                  {!merchantId ? (
+                    <div className="text-center text-muted-foreground py-6">
+                      Please log in as a merchant to manage webhooks.
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Webhook Events</Label>
-                    <div className="space-y-2">
-                      {webhookEvents.map((event, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <Badge variant="outline" className="mb-1">{event.event}</Badge>
-                            <p className="text-sm text-muted-foreground">{event.description}</p>
-                          </div>
-                          <input type="checkbox" defaultChecked className="h-4 w-4" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button className="bg-[#0052FF]">Save Webhook Configuration</Button>
+                  ) : (
+                    <>
+                      <WebhookRegistrationBox merchantId={merchantId} />
+                      <WebhookLogTable merchantId={merchantId} />
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
