@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,27 +19,24 @@ const UpiPaymentPage: React.FC = () => {
   const { addTransaction } = useTransactionStore();
 
   // Get payment details from URL parameters
-  const amount: string = searchParams.get('amount') || '0';
-  const customerName: string = searchParams.get('name') || 'Customer';
-  const customerEmail: string = searchParams.get('email') || '';
-  const description: string = searchParams.get('desc') || 'Payment via RizzPay';
-  const upiId: string = searchParams.get('upi') || 'merchant@rizzpay';
-  const linkId: string = searchParams.get('id') || 'unknown';
-
-  // Helper to protect type inference
-  const safeAmount: string = String(amount);
+  const amount = searchParams.get('amount') || '0';
+  const customerName = searchParams.get('name') || 'Customer';
+  const customerEmail = searchParams.get('email') || '';
+  const description = searchParams.get('desc') || 'Payment via RizzPay';
+  const upiId = searchParams.get('upi') || 'merchant@rizzpay';
+  const linkId = searchParams.get('id') || 'unknown';
 
   useEffect(() => {
     // Create UPI payment URL and QR code
     if (upiId && amount) {
-      const upiPaymentUrl: string =
+      const upiPaymentUrl = 
         `upi://pay?pa=${upiId}&pn=${encodeURIComponent('RizzPay')}` +
         `&am=${amount}&cu=INR&tn=${encodeURIComponent(description)}`;
 
       setUpiUrl(upiPaymentUrl);
 
       // Generate QR code URL using a third-party service
-      const qrCodeApiUrl: string = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPaymentUrl)}`;
+      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPaymentUrl)}`;
       setQrCodeUrl(qrCodeApiUrl);
     }
   }, [upiId, amount, description]);
@@ -73,9 +71,8 @@ const UpiPaymentPage: React.FC = () => {
         customer: customerName,
         processingState: 'completed',
         paymentDetails: {
-          upiId,
-          buyerName: customerName,
-          buyerEmail: customerEmail,
+          cardHolderName: customerName,
+          recipientEmail: customerEmail
         },
         description,
       });

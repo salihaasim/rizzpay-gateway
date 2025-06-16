@@ -9,6 +9,65 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_rate_limits: {
+        Row: {
+          created_at: string | null
+          current_day_count: number | null
+          current_hour_count: number | null
+          current_minute_count: number | null
+          endpoint_pattern: string
+          id: string
+          is_active: boolean | null
+          last_reset_day: string | null
+          last_reset_hour: string | null
+          last_reset_minute: string | null
+          merchant_id: string | null
+          requests_per_day: number | null
+          requests_per_hour: number | null
+          requests_per_minute: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_day_count?: number | null
+          current_hour_count?: number | null
+          current_minute_count?: number | null
+          endpoint_pattern: string
+          id?: string
+          is_active?: boolean | null
+          last_reset_day?: string | null
+          last_reset_hour?: string | null
+          last_reset_minute?: string | null
+          merchant_id?: string | null
+          requests_per_day?: number | null
+          requests_per_hour?: number | null
+          requests_per_minute?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          current_day_count?: number | null
+          current_hour_count?: number | null
+          current_minute_count?: number | null
+          endpoint_pattern?: string
+          id?: string
+          is_active?: boolean | null
+          last_reset_day?: string | null
+          last_reset_hour?: string | null
+          last_reset_minute?: string | null
+          merchant_id?: string | null
+          requests_per_day?: number | null
+          requests_per_hour?: number | null
+          requests_per_minute?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_rate_limits_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_request_logs: {
         Row: {
           bank_api_endpoint: string | null
@@ -158,6 +217,71 @@ export type Database = {
           webhook_received_at?: string | null
         }
         Relationships: []
+      }
+      bulk_operations: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          created_by: string
+          error_log: Json | null
+          failed_records: number | null
+          file_name: string | null
+          file_path: string | null
+          id: string
+          merchant_id: string
+          operation_type: string
+          processed_records: number | null
+          result_summary: Json | null
+          started_at: string | null
+          status: string | null
+          successful_records: number | null
+          total_records: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by: string
+          error_log?: Json | null
+          failed_records?: number | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          merchant_id: string
+          operation_type: string
+          processed_records?: number | null
+          result_summary?: Json | null
+          started_at?: string | null
+          status?: string | null
+          successful_records?: number | null
+          total_records: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string
+          error_log?: Json | null
+          failed_records?: number | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          merchant_id?: string
+          operation_type?: string
+          processed_records?: number | null
+          result_summary?: Json | null
+          started_at?: string | null
+          status?: string | null
+          successful_records?: number | null
+          total_records?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulk_operations_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bulk_upload_files: {
         Row: {
@@ -490,6 +614,50 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_api_restrictions: {
+        Row: {
+          applied_at: string | null
+          applied_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          merchant_id: string
+          metadata: Json | null
+          reason: string | null
+          restriction_type: string
+        }
+        Insert: {
+          applied_at?: string | null
+          applied_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          merchant_id: string
+          metadata?: Json | null
+          reason?: string | null
+          restriction_type: string
+        }
+        Update: {
+          applied_at?: string | null
+          applied_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          merchant_id?: string
+          metadata?: Json | null
+          reason?: string | null
+          restriction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_api_restrictions_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       merchant_documents: {
         Row: {
           document_type: string
@@ -720,6 +888,138 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_queue: {
+        Row: {
+          created_at: string | null
+          delivery_attempts: number | null
+          destination: string | null
+          error_message: string | null
+          id: string
+          max_attempts: number | null
+          message: string
+          metadata: Json | null
+          notification_type: string
+          priority: number | null
+          recipient_id: string | null
+          recipient_type: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_attempts?: number | null
+          destination?: string | null
+          error_message?: string | null
+          id?: string
+          max_attempts?: number | null
+          message: string
+          metadata?: Json | null
+          notification_type: string
+          priority?: number | null
+          recipient_id?: string | null
+          recipient_type: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_attempts?: number | null
+          destination?: string | null
+          error_message?: string | null
+          id?: string
+          max_attempts?: number | null
+          message?: string
+          metadata?: Json | null
+          notification_type?: string
+          priority?: number | null
+          recipient_id?: string | null
+          recipient_type?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      payment_links: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          merchant_id: string
+          metadata: Json | null
+          paid_at: string | null
+          payment_methods: Json | null
+          redirect_url: string | null
+          status: string | null
+          transaction_id: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id: string
+          merchant_id: string
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_methods?: Json | null
+          redirect_url?: string | null
+          status?: string | null
+          transaction_id?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          merchant_id?: string
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_methods?: Json | null
+          redirect_url?: string | null
+          status?: string | null
+          transaction_id?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_links_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_links_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payout_ledger: {
         Row: {
           amount: number
@@ -904,6 +1204,62 @@ export type Database = {
           },
         ]
       }
+      reconciliation_discrepancies: {
+        Row: {
+          actual_amount: number | null
+          bank_reference: string | null
+          created_at: string | null
+          description: string | null
+          discrepancy_type: string
+          expected_amount: number | null
+          id: string
+          reconciliation_log_id: string
+          resolution_notes: string | null
+          resolution_status: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          utr_number: string | null
+        }
+        Insert: {
+          actual_amount?: number | null
+          bank_reference?: string | null
+          created_at?: string | null
+          description?: string | null
+          discrepancy_type: string
+          expected_amount?: number | null
+          id?: string
+          reconciliation_log_id: string
+          resolution_notes?: string | null
+          resolution_status?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          utr_number?: string | null
+        }
+        Update: {
+          actual_amount?: number | null
+          bank_reference?: string | null
+          created_at?: string | null
+          description?: string | null
+          discrepancy_type?: string
+          expected_amount?: number | null
+          id?: string
+          reconciliation_log_id?: string
+          resolution_notes?: string | null
+          resolution_status?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          utr_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reconciliation_discrepancies_reconciliation_log_id_fkey"
+            columns: ["reconciliation_log_id"]
+            isOneToOne: false
+            referencedRelation: "reconciliation_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reconciliation_logs: {
         Row: {
           admin_id: string
@@ -942,6 +1298,107 @@ export type Database = {
           upload_time?: string | null
         }
         Relationships: []
+      }
+      reconciliation_matches: {
+        Row: {
+          amount: number
+          bank_reference: string | null
+          id: string
+          match_confidence: number | null
+          match_type: string
+          matched_at: string | null
+          matched_by: string | null
+          metadata: Json | null
+          reconciliation_log_id: string
+          transaction_id: string | null
+          utr_number: string | null
+        }
+        Insert: {
+          amount: number
+          bank_reference?: string | null
+          id?: string
+          match_confidence?: number | null
+          match_type: string
+          matched_at?: string | null
+          matched_by?: string | null
+          metadata?: Json | null
+          reconciliation_log_id: string
+          transaction_id?: string | null
+          utr_number?: string | null
+        }
+        Update: {
+          amount?: number
+          bank_reference?: string | null
+          id?: string
+          match_confidence?: number | null
+          match_type?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          metadata?: Json | null
+          reconciliation_log_id?: string
+          transaction_id?: string | null
+          utr_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reconciliation_matches_reconciliation_log_id_fkey"
+            columns: ["reconciliation_log_id"]
+            isOneToOne: false
+            referencedRelation: "reconciliation_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reconciliation_matches_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transaction_retries: {
+        Row: {
+          attempt_number: number
+          created_at: string | null
+          id: string
+          max_attempts: number | null
+          metadata: Json | null
+          next_retry_at: string | null
+          retry_reason: string | null
+          retry_type: string
+          transaction_id: string
+        }
+        Insert: {
+          attempt_number: number
+          created_at?: string | null
+          id?: string
+          max_attempts?: number | null
+          metadata?: Json | null
+          next_retry_at?: string | null
+          retry_reason?: string | null
+          retry_type: string
+          transaction_id: string
+        }
+        Update: {
+          attempt_number?: number
+          created_at?: string | null
+          id?: string
+          max_attempts?: number | null
+          metadata?: Json | null
+          next_retry_at?: string | null
+          retry_reason?: string | null
+          retry_type?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_retries_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -1164,6 +1621,172 @@ export type Database = {
           webhook_payload?: Json | null
         }
         Relationships: []
+      }
+      wallet_adjustments: {
+        Row: {
+          adjustment_type: string
+          admin_id: string
+          admin_notes: string | null
+          amount: number
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          id: string
+          merchant_id: string
+          reason: string
+          wallet_transaction_id: string | null
+        }
+        Insert: {
+          adjustment_type: string
+          admin_id: string
+          admin_notes?: string | null
+          amount: number
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          merchant_id: string
+          reason: string
+          wallet_transaction_id?: string | null
+        }
+        Update: {
+          adjustment_type?: string
+          admin_id?: string
+          admin_notes?: string | null
+          amount?: number
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          merchant_id?: string
+          reason?: string
+          wallet_transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_adjustments_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_adjustments_wallet_transaction_id_fkey"
+            columns: ["wallet_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "wallet_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          merchant_id: string
+          metadata: Json | null
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          merchant_id: string
+          metadata?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          merchant_id?: string
+          metadata?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string | null
+          delivery_attempts: number | null
+          endpoint_url: string
+          error_message: string | null
+          id: string
+          last_attempt_at: string | null
+          merchant_id: string | null
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          successful: boolean | null
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_attempts?: number | null
+          endpoint_url: string
+          error_message?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          merchant_id?: string | null
+          payload: Json
+          response_body?: string | null
+          response_status?: number | null
+          successful?: boolean | null
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string | null
+          delivery_attempts?: number | null
+          endpoint_url?: string
+          error_message?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          merchant_id?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          successful?: boolean | null
+          webhook_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_whitelist: {
         Row: {
