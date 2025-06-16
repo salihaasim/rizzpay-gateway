@@ -53,7 +53,7 @@ export class NotificationService {
   static async updateNotificationStatus(notificationId: string, status: 'sent' | 'failed' | 'cancelled', errorMessage?: string) {
     const updateData: any = {
       status,
-      delivery_attempts: supabase.raw('delivery_attempts + 1')
+      delivery_attempts: 1 // Fixed: using static increment instead of raw
     };
 
     if (status === 'sent') {

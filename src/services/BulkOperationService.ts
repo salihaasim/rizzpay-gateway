@@ -17,8 +17,8 @@ export class BulkOperationService {
       .from('bulk_operations')
       .insert({
         ...operationData,
-        result_summary: JSON.stringify({}),
-        error_log: JSON.stringify([])
+        result_summary: {},
+        error_log: []
       })
       .select()
       .single();
@@ -94,7 +94,7 @@ export class BulkOperationService {
 
     if (!operation) return;
 
-    const currentErrors = JSON.parse(operation.error_log || '[]');
+    const currentErrors = Array.isArray(operation.error_log) ? operation.error_log : [];
     currentErrors.push({
       ...errorData,
       timestamp: new Date().toISOString()
@@ -103,7 +103,7 @@ export class BulkOperationService {
     const { error } = await supabase
       .from('bulk_operations')
       .update({
-        error_log: JSON.stringify(currentErrors)
+        error_log: currentErrors
       })
       .eq('id', operationId);
 

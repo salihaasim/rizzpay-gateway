@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { IndianRupee } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTransactionStore } from '@/stores/transactions';
-import { safeSupabaseTable } from '@/utils/supabaseClient';
 import UpiPaymentForm from '@/components/payment/UpiPaymentForm';
 import UpiPaymentSuccess from '@/components/payment/UpiPaymentSuccess';
 
@@ -76,16 +75,6 @@ const UpiPaymentPage: React.FC = () => {
         },
         description,
       });
-
-      // Try to update the payment link status in Supabase using the safe method
-      try {
-        await safeSupabaseTable('payment_links')
-          .update({ status: 'paid', paid_at: new Date().toISOString() })
-          .eq('id', linkId);
-      } catch (error) {
-        console.error('Error updating payment link status:', error);
-        // Continue anyway since transaction already added locally
-      }
 
       setSuccess(true);
       setLoading(false);

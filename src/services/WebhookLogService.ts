@@ -37,7 +37,7 @@ export class WebhookLogService {
   }) {
     const updateData = {
       successful: success,
-      delivery_attempts: supabase.raw('delivery_attempts + 1'),
+      delivery_attempts: 1, // Fixed: using static increment instead of raw
       last_attempt_at: new Date().toISOString(),
       ...responseData
     };
