@@ -1,0 +1,275 @@
+# RizzPay AWS EC2 Deployment Guide
+
+## Prerequisites
+- AWS EC2 instance with Amazon Linux
+- Security group with ports 22, 80, 443 open
+- Domain name (optional)
+- SSH key pair for EC2 access
+
+## Step 1: Connect to EC2 Instance
+ssh -i your-key.pem ec2-user@your-ec2-public-ip
+
+## Step 2: System Setup
+# Update system
+sudo yum update -y
+
+# Install Node.js 18
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+# Verify installation
+node --version
+npm --version
+
+# Install Git
+sudo yum install -y git
+
+# Install Docker (optional for containerized deployment)
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -a -G docker ec2-user
+
+## Step 3: Deploy RizzPay Application
+
+# Clone repository (replace with your actual repo URL)
+git clone https://github.com/your-username/rizzpay.git
+cd rizzpay
+
+# Install dependencies
+npm install
+
+# Create production environment file
+cp .env.example .env.production
+
+# Edit environment variables
+nano .env.production
+
+# Required environment variables:
+# VITE_SUPABASE_URL=https://mogqmymxnienxqactuym.supabase.co
+# VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZ3FteW14bmllbnhxYWN0dXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MzEwNTgsImV4cCI6MjA1ODEwNzA1OH0.Z2bzbA8aQQha2NhgA0M1F2R56Ewv8npqRgCj2S_70h4
+
+# Build the application
+npm run build
+
+## Step 4: Process Management with PM2
+
+# Install PM2 globally
+sudo npm install -g pm2
+
+# Start application with PM2
+pm2 start npm --name "rizzpay" -- run preview
+
+# Alternatively, for development mode:
+# pm2 start npm --name "rizzpay-dev" -- run dev
+
+# Save PM2 configuration
+pm2 save
+
+# Setup PM2 to start on boot
+pm2 startup
+# Follow the command output instructions
+
+# Check application status
+pm2 status
+pm2 logs rizzpay
+
+## Step 5: Web Server Setup (Nginx)
+
+# Install Nginx
+sudo yum install -y nginx
+
+# Start and enable Nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# Backup original config
+sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
+
+# Edit Nginx configuration
+sudo nano /etc/nginx/nginx.conf
+
+# Replace the server block with:
+server {
+    listen 80;
+    server_name your-domain.com your-ec2-public-ip;
+    
+    # Security headers
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    
+    location / {
+        proxy_pass http://localhost:4173;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+    
+    # Handle static files
+    location /assets {
+        proxy_pass http://localhost:4173/assets;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+
+# Test Nginx configuration
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx
+
+## Step 6: SSL Certificate (Optional)
+
+# Install Certbot
+sudo yum install -y python3 python3-pip
+sudo pip3 install certbot certbot-nginx
+
+# Get SSL certificate
+sudo certbot --nginx -d your-domain.com
+
+# Auto-renewal setup
+sudo crontab -e
+# Add: 0 12 * * * /usr/bin/certbot renew --quiet
+
+## Step 7: Firewall Configuration
+
+# Configure security group in AWS Console:
+# - HTTP (80) from 0.0.0.0/0
+# - HTTPS (443) from 0.0.0.0/0
+# - SSH (22) from your IP only
+
+## Step 8: Backend Deployment (if using separate backend)
+
+# Navigate to backend directory
+cd rizzpay_backend
+
+# Install backend dependencies
+npm install
+
+# Create backend environment file
+cp .env.example .env.production
+
+# Edit backend environment variables
+nano .env.production
+
+# Build backend
+npm run build
+
+# Start backend with PM2
+pm2 start dist/index.js --name "rizzpay-backend"
+
+# Update Nginx for backend proxy
+sudo nano /etc/nginx/nginx.conf
+
+# Add backend location block:
+location /api {
+    proxy_pass http://localhost:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+## Step 9: Database Configuration
+
+# Update Supabase project settings:
+# 1. Go to Supabase Dashboard
+# 2. Navigate to Settings > API
+# 3. Add your EC2 public IP to allowed origins
+# 4. Update CORS settings if needed
+
+## Step 10: Monitoring and Logs
+
+# View application logs
+pm2 logs rizzpay
+
+# View Nginx logs
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log
+
+# Monitor system resources
+htop
+df -h
+free -m
+
+## Step 11: Backup and Updates
+
+# Create deployment script
+nano deploy.sh
+
+#!/bin/bash
+cd /home/ec2-user/rizzpay
+git pull origin main
+npm install
+npm run build
+pm2 restart rizzpay
+sudo systemctl restart nginx
+
+# Make script executable
+chmod +x deploy.sh
+
+# Run deployment
+./deploy.sh
+
+## Troubleshooting
+
+# Check if application is running
+curl http://localhost:4173
+
+# Check PM2 processes
+pm2 list
+
+# Check Nginx status
+sudo systemctl status nginx
+
+# Check port usage
+sudo netstat -tulpn | grep :80
+sudo netstat -tulpn | grep :4173
+
+# Application not accessible:
+# 1. Check security group settings
+# 2. Verify Nginx configuration
+# 3. Check PM2 process status
+# 4. Review application logs
+
+## Important Notes
+
+1. Replace placeholders with actual values:
+   - your-key.pem
+   - your-ec2-public-ip
+   - your-domain.com
+   - your-username/rizzpay.git
+
+2. Ensure Supabase CORS settings include your domain/IP
+
+3. For production, consider using:
+   - Application Load Balancer
+   - Auto Scaling Groups
+   - RDS for database
+   - CloudFront for CDN
+
+4. Regular backups and monitoring are essential
+
+5. Keep your system updated:
+   sudo yum update -y
+
+## Support
+
+For issues:
+1. Check logs first: pm2 logs rizzpay
+2. Verify all services are running
+3. Test connectivity step by step
+4. Review AWS security group settings
