@@ -2,6 +2,17 @@
 
 RizzPay is a secure, fast, and reliable payment gateway solution for businesses and consumers.
 
+## Getting Started
+
+To run the application locally:
+
+```bash
+npm install
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`
+
 ## Page Layout Structure
 
 - **Home/Landing Page**: The only page that includes the global footer
