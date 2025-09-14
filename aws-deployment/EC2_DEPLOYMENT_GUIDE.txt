@@ -1,0 +1,458 @@
+# RizzPay EC2 Instance Deployment Guide
+
+## Prerequisites
+- AWS EC2 instance (Ubuntu 20.04 LTS or later)
+- Security group with ports 22 (SSH), 80 (HTTP), 443 (HTTPS), 3000 (Frontend), 3001 (Backend) open
+- Elastic IP assigned to the instance
+- Domain name (optional but recommended)
+
+## Step 1: Connect to EC2 Instance
+
+### SSH Connection
+```bash
+# Replace with your key file and instance IP
+ssh -i "your-key-file.pem" ubuntu@your-ec2-public-ip
+
+# Example:
+ssh -i "rizzpay-key.pem" ubuntu@13.234.56.78
+```
+
+### Update System
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+## Step 2: Install Required Software
+
+### Install Node.js 18.x
+```bash
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node --version  # Should show v18.x.x
+npm --version
+```
+
+### Install Git
+```bash
+sudo apt install git -y
+git --version
+```
+
+### Install PM2 (Process Manager)
+```bash
+sudo npm install -g pm2
+pm2 --version
+```
+
+### Install Nginx (Web Server)
+```bash
+sudo apt install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+## Step 3: Clone and Setup Application
+
+### Clone Repository
+```bash
+cd /home/ubuntu
+git clone https://github.com/your-username/rizzpay.git
+cd rizzpay
+```
+
+### Setup Frontend
+```bash
+# Install dependencies
+npm install
+
+# Create production environment file
+cp .env.example .env.production
+nano .env.production
+```
+
+### Environment Variables for Frontend (.env.production)
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_API_URL=https://your-domain.com/api
+VITE_ENVIRONMENT=production
+```
+
+### Build Frontend
+```bash
+npm run build
+```
+
+### Setup Backend
+```bash
+cd rizzpay_backend
+npm install
+
+# Create production environment file
+cp .env.example .env
+nano .env
+```
+
+### Environment Variables for Backend (.env)
+```
+PORT=3001
+NODE_ENV=production
+
+# Database
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Security
+JWT_SECRET=your_super_secure_jwt_secret_here
+API_KEY_PREFIX=rizz_
+
+# AES Encryption
+AES_ENCRYPTION_KEY=your_32_character_encryption_key_here
+
+# Bank-Specific Keys
+CANARA_BANK_AES_KEY=your_canara_bank_32_char_key_here
+HDFC_BANK_AES_KEY=your_hdfc_bank_32_char_key_here
+SBM_BANK_AES_KEY=your_sbm_bank_32_char_key_here
+ICICI_BANK_AES_KEY=your_icici_bank_32_char_key_here
+
+# Bank APIs
+HDFC_API_URL=https://api.hdfcbank.com
+HDFC_API_KEY=your_hdfc_api_key
+SBM_API_URL=https://api.sbmbank.com
+SBM_API_KEY=your_sbm_api_key
+CANARA_API_URL=https://api.canarabank.com
+CANARA_API_KEY=your_canara_api_key
+
+# CORS
+ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com
+
+# Webhooks
+WEBHOOK_BASE_URL=https://your-domain.com/api/webhooks
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Logging
+LOG_LEVEL=info
+```
+
+### Build Backend
+```bash
+npm run build
+```
+
+## Step 4: Database Connection Setup
+
+### Test Supabase Connection
+```bash
+# From backend directory
+node -e "
+const { createClient } = require('@supabase/supabase-js');
+const client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+console.log('Supabase client created successfully');
+client.from('merchants').select('count').then(r => console.log('DB Test:', r));
+"
+```
+
+### Setup Database Tables (if needed)
+```bash
+# Run migration scripts
+npm run migrate
+```
+
+## Step 5: Configure PM2 Process Manager
+
+### Create PM2 Configuration
+```bash
+cd /home/ubuntu/rizzpay
+nano ecosystem.config.js
+```
+
+### PM2 Configuration (ecosystem.config.js)
+```javascript
+module.exports = {
+  apps: [
+    {
+      name: 'rizzpay-backend',
+      script: './rizzpay_backend/dist/index.js',
+      cwd: '/home/ubuntu/rizzpay',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001
+      },
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      error_file: './logs/backend-error.log',
+      out_file: './logs/backend-out.log',
+      log_file: './logs/backend-combined.log',
+      time: true
+    }
+  ]
+};
+```
+
+### Start Application with PM2
+```bash
+# Create logs directory
+mkdir -p logs
+
+# Start backend
+pm2 start ecosystem.config.js
+
+# Save PM2 configuration
+pm2 save
+
+# Setup PM2 to start on boot
+pm2 startup
+# Follow the command output instructions
+```
+
+## Step 6: Configure Nginx
+
+### Create Nginx Configuration
+```bash
+sudo nano /etc/nginx/sites-available/rizzpay
+```
+
+### Nginx Configuration
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
+
+    # Frontend static files
+    location / {
+        root /home/ubuntu/rizzpay/dist;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+    }
+
+    # Backend API proxy
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Static assets caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        root /home/ubuntu/rizzpay/dist;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+### Enable Site
+```bash
+# Enable the site
+sudo ln -s /etc/nginx/sites-available/rizzpay /etc/nginx/sites-enabled/
+
+# Remove default site
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test nginx configuration
+sudo nginx -t
+
+# Restart nginx
+sudo systemctl restart nginx
+```
+
+## Step 7: SSL Certificate Setup
+
+### Install Certbot
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+```
+
+### Obtain SSL Certificate
+```bash
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+```
+
+## Step 8: Firewall Configuration
+
+### Configure UFW
+```bash
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+sudo ufw status
+```
+
+## Step 9: Application Commands
+
+### Start Application
+```bash
+# Start backend
+cd /home/ubuntu/rizzpay
+pm2 start ecosystem.config.js
+
+# Restart nginx
+sudo systemctl restart nginx
+```
+
+### Stop Application
+```bash
+# Stop backend
+pm2 stop rizzpay-backend
+
+# Stop nginx
+sudo systemctl stop nginx
+```
+
+### View Logs
+```bash
+# PM2 logs
+pm2 logs rizzpay-backend
+
+# Nginx logs
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log
+
+# Application logs
+tail -f /home/ubuntu/rizzpay/logs/backend-combined.log
+```
+
+### Application Status
+```bash
+# PM2 status
+pm2 status
+
+# Nginx status
+sudo systemctl status nginx
+
+# Check if app is running
+curl http://localhost:3001/health
+```
+
+## Step 10: Database Commands
+
+### Test Database Connection
+```bash
+cd /home/ubuntu/rizzpay/rizzpay_backend
+node -e "
+require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+const client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+client.from('merchants').select('count').then(console.log).catch(console.error);
+"
+```
+
+### Run Database Migrations
+```bash
+cd /home/ubuntu/rizzpay/rizzpay_backend
+npm run migrate
+```
+
+### Backup Database
+```bash
+# This will depend on your Supabase setup
+# Use Supabase dashboard for backups or CLI tools
+```
+
+## Step 11: Monitoring Setup
+
+### Install htop for system monitoring
+```bash
+sudo apt install htop -y
+```
+
+### Setup log rotation
+```bash
+sudo nano /etc/logrotate.d/rizzpay
+```
+
+### Log rotation configuration
+```
+/home/ubuntu/rizzpay/logs/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 644 ubuntu ubuntu
+    postrotate
+        pm2 reloadLogs
+    endscript
+}
+```
+
+## Step 12: Application URLs
+
+After deployment:
+- Frontend: https://your-domain.com
+- Backend API: https://your-domain.com/api
+- Health Check: https://your-domain.com/api/health
+
+## Troubleshooting Commands
+
+### Check if ports are open
+```bash
+sudo netstat -tlnp | grep :3001
+sudo netstat -tlnp | grep :80
+```
+
+### Check application process
+```bash
+ps aux | grep node
+pm2 status
+```
+
+### Restart everything
+```bash
+pm2 restart rizzpay-backend
+sudo systemctl restart nginx
+```
+
+### View system resources
+```bash
+htop
+df -h
+free -m
+```
+
+## Important Notes
+
+1. Replace all placeholder values (your-domain.com, API keys, etc.) with actual values
+2. Keep your .env files secure and never commit them to version control
+3. Regularly update your system and dependencies
+4. Monitor logs for any issues
+5. Setup regular backups for your database
+6. Use strong passwords and API keys
+7. Consider setting up monitoring alerts
+
+## Support Commands
+
+If you need help:
+```bash
+# Check service status
+sudo systemctl status nginx
+pm2 status
+
+# View recent logs
+pm2 logs --lines 50
+sudo tail -50 /var/log/nginx/error.log
+
+# Test connectivity
+curl -I http://localhost:3001/health
+curl -I https://your-domain.com
+```
